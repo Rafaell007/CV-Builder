@@ -2,7 +2,7 @@
 
 Full plan, stack, decisions and progress: [PLAN.md](PLAN.md). Read §0–§5 first, then only the step you work on.
 
-Next.js (App Router) + MUI + TanStack Store; Apollo Client for GraphQL (not installed yet). TypeScript only.
+Full-stack Next.js (App Router): MUI + TanStack Store + Apollo Client on the front, Apollo Server + Prisma (PostgreSQL) at `/api/graphql`. TypeScript only.
 
 ## Commands
 
@@ -27,7 +27,7 @@ Run `lint` and `typecheck` after changes; run `build` only when touching config 
 - One responsibility per file; one exported component per file, named like the file.
 - Fractal layout: children live inside the parent; shared code moves to the nearest common ancestor; import only via a folder's `index.ts`.
 - No `.js` files, no `any`, no `process.env` outside `src/env.ts`.
-- New env var: add to `.env.example`, `src/env.ts`, and Vercel settings.
+- New env var: add to `.env.example`, `src/env.ts` (public) or `src/server/env.ts` (secrets), and Vercel settings.
 
 ## Working here
 
@@ -35,4 +35,4 @@ Run `lint` and `typecheck` after changes; run `build` only when touching config 
 - Do not read or edit `package-lock.json`, `.next/`, `node_modules/`, `*.tsbuildinfo`.
 - Next.js 16, MUI 9 and TanStack Store differ from older versions; check the official docs rather than relying on memory.
 - Prefer targeted edits over rewriting whole files. Keep new code consistent with the neighbouring files.
-- Not yet set up: Apollo Client, Vitest + RTL, Playwright, Vercel, Render. Ask before adding them.
+- Not yet set up: Apollo Client / Server, Prisma + PostgreSQL, Vitest + RTL, Playwright, Vercel + Neon. Add them only in their PLAN.md §9 step.
