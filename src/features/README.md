@@ -5,6 +5,7 @@ One folder per feature. Each feature folder has the same shape, and so does ever
 ```
 <feature>/
   index.ts                # public entry, the only file imported from outside
+  README.md               # 5–10 lines: purpose, exports, used by, docs link
   Feature.tsx             # representational component
   Feature.test.tsx
   useFeature.ts           # composed hook

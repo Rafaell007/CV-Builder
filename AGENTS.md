@@ -26,6 +26,7 @@ Run `lint` and `typecheck` after changes; run `build` only when touching config 
 - Components are representational: props in, JSX out. Logic goes into composed hooks, pure typed utils.
 - One responsibility per file; one exported component per file, named like the file.
 - Fractal layout: children live inside the parent; shared code moves to the nearest common ancestor; import only via a folder's `index.ts`.
+- Each feature folder and non-obvious shared component has a short `README.md`: purpose, exports, where used, `docs/` link. Simple components get none.
 - No `.js` files, no `any`, no `process.env` outside `src/env.ts`.
 - New env var: add to `.env.example`, `src/env.ts` (public) or `src/server/env.ts` (secrets), and Vercel settings.
 

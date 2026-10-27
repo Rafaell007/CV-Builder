@@ -182,6 +182,7 @@ CV-Builder/
     features/                          frontend, one folder per feature
       <feature>/
         index.ts                       public entry
+        README.md                      purpose, exports, used by, docs link (5–10 lines)
         Feature.tsx · Feature.test.tsx representational component
         useFeature.ts                  composed hook (data + state + handlers)
         feature.graphql                operations used by this feature (codegen input)
@@ -294,6 +295,7 @@ Files and folders follow a **fractal** layout: every unit is a self-contained fo
 - When two siblings need the same code, move it up to their **nearest common ancestor**, not straight to a global shared folder. Only code used across unrelated features goes to `src/shared/` (frontend) or `src/server/lib/` (backend).
 - Each folder exposes a single public entry (`index.ts`). Other code imports from the folder, never from files deep inside it.
 - Dependencies point downward or sideways through public entries, never into another unit's internals.
+- Every feature folder and every non-obvious shared component has a short `README.md` (about 5–10 lines): what it does, what `index.ts` exports, where it is used, link to its `docs/` page. No code walkthroughs. Simple components (e.g. a button) get none. Update it in the same PR when the public API changes.
 
 ### 5.10 Server code
 
