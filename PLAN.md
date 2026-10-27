@@ -4,6 +4,7 @@ Single source of truth for **what we build, how, in what order, and what is done
 Requirements per page live in [docs/](docs/README.md); coding rules in [§5](#5-development-rules); agent instructions in [AGENTS.md](AGENTS.md).
 
 Team: Rafał Kazberuk, Maciej Ukalski. Deadline and demo: **2026-12-07**.
+Repository: [github.com/Rafaell007/CV-Builder](https://github.com/Rafaell007/CV-Builder) — `main` = production (Vercel), `developement` = integration (default branch).
 
 ---
 
@@ -13,7 +14,7 @@ Team: Rafał Kazberuk, Maciej Ukalski. Deadline and demo: **2026-12-07**.
 - **Status markers:** `[ ]` todo · `[~]` in progress · `[x]` merged into `developement`.
 - **When a step is merged:** tick it, add the PR number, and add a line to [§12 Progress log](#12-progress-log). Do it in the same PR.
 - **When a decision changes:** update [§2.3 Decision log](#23-decision-log) in the same PR as the code change.
-- **Jira:** each step in §9 is one ticket (title = step title, description = its bullets). The `Jira` field holds the key; `NEW` means the ticket does not exist yet.
+- **Jira:** each step in §9 is one ticket (title = step title, description = its bullets). Jira is maintained by Rafał and is being reorganised for the new repo; ticket keys are added to the steps once the tickets exist.
 - **Agents:** read §0–§5 for context, then only the step you work on and its docs page.
 
 ---
@@ -36,7 +37,7 @@ Cross-cutting requirements on every page: Light/Dark theme, responsive (desktop 
 
 ### 1.1 Task
 
-- **Mentor ticket:** JST-3581 (parent JST-3573), reporter Oleksandr Onyshko, label React. Team work is tracked in Jira project **KAN** (frontendpractise.atlassian.net).
+- **Mentor ticket:** JST-3581 (parent JST-3573), reporter Oleksandr Onyshko, label React. Team work is tracked in Jira (frontendpractise.atlassian.net), board reorganised for the new repo.
 - **Due date:** 2026-12-07.
 - Implement all functionality from the Notion wiki "CV Builder Wiki Frontend" (summarised per page in `docs/`), in tandem with another intern. Without a partner the task is done alone, same deadline.
 - Libraries are to be agreed with the mentor before completing the task (O1).
@@ -109,7 +110,7 @@ Plus a demo of the application with answers to the mentor's questions (max 30 mi
 | | File upload | Vercel Blob (avatars) |
 | Tests | Unit / component / hook / service | Vitest, RTL, user-event, Apollo `MockedProvider` |
 | | E2E | Playwright against a seeded database |
-| Tooling | Quality | ESLint, Prettier, Husky + lint-staged, commitlint (done in KAN-12) |
+| Tooling | Quality | ESLint, Prettier, Husky + lint-staged, commitlint (done in S0.0) |
 | | Local infra | Docker Compose: PostgreSQL + Mailpit |
 | Deploy | App (front + API) | Vercel |
 | | Production DB | Neon (PostgreSQL via Vercel Marketplace) |
@@ -119,7 +120,7 @@ Plus a demo of the application with answers to the mentor's questions (max 30 mi
 | # | Date | Decision | Why |
 |---|---|---|---|
 | D1 | 2026-10-26 | Fractal structure, representational components, hooks for logic, TS only, no `any` | Rules in §5 (merged from the former `developement-rules.md` on 2026-10-27) |
-| D2 | 2026-10-26 | GitFlow: `main` + `developement`, `feature/KAN-<n>-name`, merge commits (no squash) | Structured commits are graded |
+| D2 | 2026-10-26 | GitFlow: `main` + `developement`, `feature/<ticket>-<name>`, merge commits (no squash) | Structured commits are graded |
 | D3 | 2026-10-27 | **Fullstack: we write the backend ourselves** | Provided CV Builder API link in Notion is dead |
 | D4 | 2026-10-27 | Backend inside the Next.js app (`/api/graphql`), not a separate service | One repo, one deploy, no CORS, shared types |
 | D5 | 2026-10-27 | Deploy everything on Vercel + Neon; Render dropped | Simpler, no cold starts; replaces "backend on Render" |
@@ -127,6 +128,7 @@ Plus a demo of the application with answers to the mentor's questions (max 30 mi
 | D7 | 2026-10-27 | Own JWT auth with `jose` (Better Auth = fallback) | Keeps auth in GraphQL, demonstrable code |
 | D8 | 2026-10-27 | Vertical steps: one step = API + UI + tests of a feature | No waiting on each other, one PR per feature |
 | D9 | 2026-10-27 | Server secrets in `src/server/env.ts` (`server-only`); `src/env.ts` keeps public vars | Secrets never reach the browser (amends rule 5) |
+| D10 | 2026-10-27 | Restart in a new repository `Rafaell007/CV-Builder`; the old `task-8` repo is reference only | Clean history and setup for the new team workflow; Jira reorganised to match |
 
 ### 2.4 Open decisions
 
@@ -164,7 +166,7 @@ Browser ── Apollo Client (HTTP) ──► Next.js on Vercel
 ## 4. Project structure (fractal)
 
 ```
-task-8/
+CV-Builder/
   prisma/              schema.prisma · migrations/ · seed.ts
   e2e/                 Playwright specs, one folder per area (mirrors features/)
   docker-compose.yml   PostgreSQL + Mailpit
@@ -302,8 +304,8 @@ Files and folders follow a **fractal** layout: every unit is a self-contained fo
 
 ### 5.11 Workflow
 
-- Each step = branch `feature/KAN-<n>-<name>` from `developement`, PR into `developement`, merge commit (no squash).
-- Commit types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`; scope = feature or module; ticket key at the end, e.g. `feat(cvs): add CV table (KAN-44)`.
+- Each step = branch `feature/<ticket>-<name>` from `developement`, PR into `developement`, merge commit (no squash).
+- Commit types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`; scope = feature or module; ticket key at the end when the ticket exists, e.g. `feat(cvs): add CV table (<ticket>)`.
 - A step is done when `lint`, `typecheck`, `format:check` pass, its **unit tests and component tests** (§11) are written and pass, `build` passes if routes or config changed, the step's acceptance criteria (docs AC IDs) are met, and this file is updated.
 - New user-facing text goes to the feature's `messages/en.json`; other languages may start as copies.
 
@@ -375,22 +377,22 @@ Seed: 1 admin, 2 employees, departments, positions, skill categories + ~40 skill
 
 ## 9. Roadmap
 
-Owner split (keeps the KAN-4 ownership): **R** = Rafał, **M** = Maciej.
+Owner split: **R** = Rafał, **M** = Maciej.
 
 **Every step ships with its tests** — unit tests for its utils, hooks and services, and component tests for every component it adds (§11). A step without tests is not done.
 
 ### Phase 0 — Foundation (2026-10-27 → 11-02)
 
-- [x] **S0.0 Repo baseline** · KAN-12 · R · PR #1
-  TS-only configs, strict lint, Prettier, Husky + lint-staged + commitlint, `.gitattributes`, fractal skeleton, `(auth)`/`(app)` groups, README structure.
+- [x] **S0.0 Repo baseline** · R · initial commit 2d22ec2
+  Next.js 16 + React 19, MUI 9 + Emotion, TanStack Store installed; TS-only configs, strict lint, Prettier, Husky + lint-staged + commitlint, `.gitattributes`, fractal skeleton, `(auth)`/`(app)` groups, README structure.
 
-- [ ] **S0.1 Database and local infra** · KAN-13 (rewrite) · M
+- [ ] **S0.1 Database and local infra** · M
   - Docker Compose: PostgreSQL + Mailpit; `.env.example` with `DATABASE_URL`.
   - Prisma: full schema from §7, first migration, `seed.ts` (§7 seed), scripts `db:migrate`, `db:seed`, `db:reset`.
   - README: local setup.
   - Done when: both developers run `docker compose up` + migrate + seed from README.
 
-- [ ] **S0.2 GraphQL server** · NEW · M
+- [ ] **S0.2 GraphQL server** · M
   - `src/server/` skeleton (§4), `server/env.ts`, `db.ts`, `context.ts` (user from cookie, unauthenticated allowed).
   - Apollo Server in `app/api/graphql/route.ts`; error codes and field errors (§3); pagination / sort / search helpers in `server/lib`.
   - GraphQL Code Generator (`codegen.ts`, `npm run codegen`): resolver types + typed documents.
@@ -398,99 +400,99 @@ Owner split (keeps the KAN-4 ownership): **R** = Rafał, **M** = Maciej.
   - Done when: `departments` query works at `/api/graphql`; generated types compile.
   - Depends on: S0.1.
 
-- [ ] **S0.3 Apollo Client** · KAN-14 · M
+- [ ] **S0.3 Apollo Client** · M
   - `shared/apollo/`: server client with `SchemaLink`, browser client with `HttpLink`, provider in root layout.
   - Error link: network errors → No Internet state; `UNAUTHENTICATED` → redirect to `/sign-in`.
   - Done when: a Server Component and a Client Component both render `departments`.
   - Depends on: S0.2.
 
-- [ ] **S0.4 Theme + client store** · KAN-15 · R
+- [ ] **S0.4 Theme + client store** · R
   - Theme tokens from Figma, light/dark palettes; mode Light / Dark / Device in TanStack Store, persisted in a cookie read on the server (no flash).
   - Store accessed only via hooks (`useThemeMode`); store logic as tested pure utils.
   - Done when: switching persists after refresh without flash; tests pass.
 
-- [ ] **S0.5 i18n** · KAN-16 · R
+- [ ] **S0.5 i18n** · R
   - next-intl, 9 locales (en complete, others copies), locale in cookie + store, per-feature `messages/` merged at load.
   - Done when: language switch changes texts and persists.
   - Depends on: S0.4.
 
-- [ ] **S0.6 Test setup** · KAN-17 · M
+- [ ] **S0.6 Test setup** · M
   - Vitest for **unit tests** and React Testing Library + user-event for **component tests** (jsdom), coverage-v8 (threshold 80 %, excludes generated/config); test utils (render with theme + Apollo `MockedProvider` + intl).
   - Separate test database for service tests; Playwright config + seeded run; scripts `test`, `test:coverage`, `test:e2e`.
   - Done when: one sample test per level runs in CI-like local command.
 
-- [ ] **S0.7 Shared table, menu, states** · KAN-18 · R
+- [ ] **S0.7 Shared table, menu, states** · R
   - `DataTable` (columns, sort indicator, pagination, search slot, row actions slot), `RowActionsMenu` (one open, Escape/outside close), `PageState` (loading skeleton, empty, no results, error + retry), `SearchField` (debounced).
   - Done when: story-like test page + unit tests.
 
-- [ ] **S0.8 Shared forms and modals** · KAN-19 · M
+- [ ] **S0.8 Shared forms and modals** · M
   - `FormModal` (focus trap, Escape, primary disabled until valid/dirty), `ConfirmModal`, fields: Text, Password (toggle), Select, MultiSelect/Tags, Date, Textarea, OTP; `SelectionToolbar` ("REMOVE (n)"). RHF + Zod integration helpers; mapping of server field errors.
   - Done when: unit tests for each.
 
-- [ ] **S0.9 App layout** · KAN-20 · R
+- [ ] **S0.9 App layout** · R
   - `(app)` layout: sidebar by role (§6), active item, profile section + menu (Profile / Settings / Logout), breadcrumbs, tabs component, Device Error gate (< 768 px, live on resize).
   - Done when: navigation works with seeded admin/employee (after S1.1) or mocked user.
   - Depends on: S0.4.
 
-- [ ] **S0.10 Auth core and route protection** · KAN-21 · M
+- [ ] **S0.10 Auth core and route protection** · M
   - `server/lib`: argon2, JWT (`jose`), cookies, `requireUser`, `requireAdmin`, `requireOwnerOrAdmin`; `me` query; refresh + sign-out.
   - `proxy.ts`: no session → `/sign-in`; signed-in on auth pages → `/cvs`; admin-only routes.
   - Done when: guards unit-tested; protected route redirects.
   - Depends on: S0.2.
 
-- [ ] **S0.11 Mail** · NEW · M
+- [ ] **S0.11 Mail** · M
   - `server/lib/mail`: Nodemailer transport (Mailpit / Resend), templates: verification code, password reset link.
   - Done when: mails visible in Mailpit.
 
-- [ ] **S0.12 Deploy** · KAN-55 (+ replaces KAN-54) · R
+- [ ] **S0.12 Deploy** · R
   - Vercel project from GitHub, Neon database, env vars (§10), `prisma migrate deploy` on build, seed demo data, preview deployments.
   - Done when: production URL serves the app with data; URL in README.
   - Depends on: S0.2.
 
 ### Phase 1 — Authorisation (11-03 → 11-09) · M
 
-- [ ] **S1.1 Sign In** · KAN-22 — API `signIn`; UI tabs, validation, password toggle, errors ("Invalid email or password"). AC: sign-in AC-1…13.
-- [ ] **S1.2 Sign Up** · KAN-23 — API `signUp` (unique email, hash, send code); UI with confirm password; redirect `/verify-email`. AC: sign-up AC-1…13. Depends on S0.11.
-- [ ] **S1.3 Email Verification** · KAN-24 — API `verifyEmail`, `resendVerification` (6 digits, 2 h); UI `OtpField`, CONFIRM, LATER → `/cvs`. AC: verification AC-1…13.
-- [ ] **S1.4 Forgot Password** · KAN-25 — API `forgotPassword` (token + mail); UI. AC: forgot-password AC-1…10.
-- [ ] **S1.5 Reset Password** · KAN-26 — API `resetPassword` (token check, expiry, auto sign-in); UI. AC: reset-password AC-1…15.
+- [ ] **S1.1 Sign In** — API `signIn`; UI tabs, validation, password toggle, errors ("Invalid email or password"). AC: sign-in AC-1…13.
+- [ ] **S1.2 Sign Up** — API `signUp` (unique email, hash, send code); UI with confirm password; redirect `/verify-email`. AC: sign-up AC-1…13. Depends on S0.11.
+- [ ] **S1.3 Email Verification** — API `verifyEmail`, `resendVerification` (6 digits, 2 h); UI `OtpField`, CONFIRM, LATER → `/cvs`. AC: verification AC-1…13.
+- [ ] **S1.4 Forgot Password** — API `forgotPassword` (token + mail); UI. AC: forgot-password AC-1…10.
+- [ ] **S1.5 Reset Password** — API `resetPassword` (token check, expiry, auto sign-in); UI. AC: reset-password AC-1…15.
 
 ### Phase 2 — System pages, settings, catalogs (11-03 → 11-16)
 
-- [ ] **S2.1 Not Found** · KAN-27 · R — `not-found.tsx`, GO BACK. AC 1–7.
-- [ ] **S2.2 No Internet** · KAN-28 · R — screen from Apollo error link / offline, RETRY refetches. AC 1–7.
-- [ ] **S2.3 Device Error** · KAN-29 · R — gate from S0.9 finalized with illustration/message. AC 1–5.
-- [ ] **S2.4 Settings** · KAN-30 · R — theme + language selects (S0.4/S0.5), API `changePassword` (current password check). AC 1–14.
-- [ ] **S2.5 Departments** · KAN-41 · R — module `departments` CRUD (unique, delete blocked when used); page `/admin/departments`. AC 1–17.
-- [ ] **S2.6 Positions** · KAN-42 · R — same pattern as S2.5. AC per positions page.
-- [ ] **S2.7 Skills catalog** · KAN-38 · R — module `skills` CRUD + `skillCategories`; type from category; unique name; page `/admin/skills`. AC 1–20.
-- [ ] **S2.8 Languages catalog** · KAN-40 · R — module `languages` CRUD; ISO uppercase, unique name/ISO; page `/admin/languages`. AC 1–21.
-- [ ] **S2.9 Projects catalog** · KAN-43 · M — module `projects` CRUD + `projectRoles`; date rule; environment as skill tags; search name/domain; sort name/start/end; page `/admin/projects`. AC 1–24.
+- [ ] **S2.1 Not Found** · R — `not-found.tsx`, GO BACK. AC 1–7.
+- [ ] **S2.2 No Internet** · R — screen from Apollo error link / offline, RETRY refetches. AC 1–7.
+- [ ] **S2.3 Device Error** · R — gate from S0.9 finalized with illustration/message. AC 1–5.
+- [ ] **S2.4 Settings** · R — theme + language selects (S0.4/S0.5), API `changePassword` (current password check). AC 1–14.
+- [ ] **S2.5 Departments** · R — module `departments` CRUD (unique, delete blocked when used); page `/admin/departments`. AC 1–17.
+- [ ] **S2.6 Positions** · R — same pattern as S2.5. AC per positions page.
+- [ ] **S2.7 Skills catalog** · R — module `skills` CRUD + `skillCategories`; type from category; unique name; page `/admin/skills`. AC 1–20.
+- [ ] **S2.8 Languages catalog** · R — module `languages` CRUD; ISO uppercase, unique name/ISO; page `/admin/languages`. AC 1–21.
+- [ ] **S2.9 Projects catalog** · M — module `projects` CRUD + `projectRoles`; date rule; environment as skill tags; search name/domain; sort name/start/end; page `/admin/projects`. AC 1–24.
 
 ### Phase 3 — Users (11-10 → 11-23) · R (S3.6 M)
 
-- [ ] **S3.1 Users list** · KAN-31 — module `users` (list search name/email, sort, page; create/update/delete admin); page `/users` with admin modals. AC 1–24. Depends on S2.5, S2.6.
-- [ ] **S3.2 User Details shell** · KAN-32 — `/users/[userId]` layout, tabs (CVs admin only), breadcrumbs, permission context (`canEdit`). Depends on S3.1.
-- [ ] **S3.3 Profile + avatar + verify** · KAN-33 — API `updateProfile`, `uploadAvatar` (PNG/JPG/JPEG/GIF, ≤ 5 MB, Vercel Blob), `resendVerification` reuse; UI read-only vs editable. AC 1–22.
-- [ ] **S3.4 Skills (own page + user tab)** · KAN-37 + KAN-34 — module `users/skills`; `features/skills` list grouped by category, add/update/remove with selection mode; used by `/skills` and the tab. AC skills 1–17, user-skills 1–21. Depends on S2.7.
-- [ ] **S3.5 Languages (own page + user tab)** · KAN-39 + KAN-35 — module `users/languages`; same pattern. AC languages, user-languages 1–21. Depends on S2.8.
-- [ ] **S3.6 User CVs tab** · KAN-36 · M — reuses CVs list from S4.1 filtered by user; create assigns to that user. AC 1–22. Depends on S4.1.
+- [ ] **S3.1 Users list** — module `users` (list search name/email, sort, page; create/update/delete admin); page `/users` with admin modals. AC 1–24. Depends on S2.5, S2.6.
+- [ ] **S3.2 User Details shell** — `/users/[userId]` layout, tabs (CVs admin only), breadcrumbs, permission context (`canEdit`). Depends on S3.1.
+- [ ] **S3.3 Profile + avatar + verify** — API `updateProfile`, `uploadAvatar` (PNG/JPG/JPEG/GIF, ≤ 5 MB, Vercel Blob), `resendVerification` reuse; UI read-only vs editable. AC 1–22.
+- [ ] **S3.4 Skills (own page + user tab)** — module `users/skills`; `features/skills` list grouped by category, add/update/remove with selection mode; used by `/skills` and the tab. AC skills 1–17, user-skills 1–21. Depends on S2.7.
+- [ ] **S3.5 Languages (own page + user tab)** — module `users/languages`; same pattern. AC languages, user-languages 1–21. Depends on S2.8.
+- [ ] **S3.6 User CVs tab** · M — reuses CVs list from S4.1 filtered by user; create assigns to that user. AC 1–22. Depends on S4.1.
 
 ### Phase 4 — CVs (11-17 → 11-30) · M
 
-- [ ] **S4.1 CVs list** · KAN-44 — module `cvs` (own vs all, search name / +email for admin, sort, page, CRUD); page `/cvs`. AC 1–22.
-- [ ] **S4.2 CV Details shell + form** · KAN-45 — `/cvs/[cvId]` layout, tabs, breadcrumbs; Details form (dirty-check UPDATE). AC 1–15.
-- [ ] **S4.3 CV Skills** · KAN-46 — module `cvs/skills` (only owner's skills, no duplicates); reuses `features/skills` list. AC per cv-skills.
-- [ ] **S4.4 CV Projects** · KAN-47 — module `cvs/projects` (dates within project, ≥ 1 role); add/update modal with auto-filled read-only project fields. AC 1–27. Depends on S2.9.
-- [ ] **S4.5 CV Preview** · KAN-48 — `cvPreview` data; pure utils: experience years (earliest project start → now, floor), last used (latest end or current year), unique domains, `MM.YYYY - Present`; preview layout. AC 1–19, 23–29.
-- [ ] **S4.6 Export PDF** · KAN-49 — `@react-pdf/renderer` document matching preview, file name from CV name, disabled when no data. AC 20–22, 26.
+- [ ] **S4.1 CVs list** — module `cvs` (own vs all, search name / +email for admin, sort, page, CRUD); page `/cvs`. AC 1–22.
+- [ ] **S4.2 CV Details shell + form** — `/cvs/[cvId]` layout, tabs, breadcrumbs; Details form (dirty-check UPDATE). AC 1–15.
+- [ ] **S4.3 CV Skills** — module `cvs/skills` (only owner's skills, no duplicates); reuses `features/skills` list. AC per cv-skills.
+- [ ] **S4.4 CV Projects** — module `cvs/projects` (dates within project, ≥ 1 role); add/update modal with auto-filled read-only project fields. AC 1–27. Depends on S2.9.
+- [ ] **S4.5 CV Preview** — `cvPreview` data; pure utils: experience years (earliest project start → now, floor), last used (latest end or current year), unique domains, `MM.YYYY - Present`; preview layout. AC 1–19, 23–29.
+- [ ] **S4.6 Export PDF** — `@react-pdf/renderer` document matching preview, file name from CV name, disabled when no data. AC 20–22, 26.
 
 ### Phase 5 — Quality and delivery (12-01 → 12-07)
 
-- [ ] **S5.1 E2E — Rafał's areas** · KAN-50 · R — layout, system pages, settings, users, skills, languages, departments, positions.
-- [ ] **S5.2 E2E — Maciej's areas** · KAN-51 · M — auth flows, CVs, CV tabs, preview/PDF, projects.
-- [ ] **S5.3 Coverage ≥ 80 % + README** · KAN-52 · R+M — fill gaps; README: functionality, dependencies, startup, tests, E2E structure by test case, deployment + live URL.
-- [ ] **S5.4 Demo** · KAN-53 · R+M — demo data seeded in production, script (≤ 30 min), likely mentor questions.
+- [ ] **S5.1 E2E — Rafał's areas** · R — layout, system pages, settings, users, skills, languages, departments, positions.
+- [ ] **S5.2 E2E — Maciej's areas** · M — auth flows, CVs, CV tabs, preview/PDF, projects.
+- [ ] **S5.3 Coverage ≥ 80 % + README** · R+M — fill gaps; README: functionality, dependencies, startup, tests, E2E structure by test case, deployment + live URL.
+- [ ] **S5.4 Demo** · R+M — demo data seeded in production, script (≤ 30 min), likely mentor questions.
 
 ---
 
@@ -551,4 +553,4 @@ Over 80 % over `src/`, excluding generated code, configs and `app/` route files.
 
 | Date | Step | PR | Note |
 |---|---|---|---|
-| 2026-10-26 | S0.0 Repo baseline | #1 | Merged into `developement` |
+| 2026-10-27 | S0.0 Repo baseline | — | Initial commit 2d22ec2 on `main` and `developement` in the new repo |
