@@ -32,7 +32,7 @@ Run `lint` and `typecheck` after changes; run `build` only when touching config 
 
 ## Working here
 
-- Read only the `docs/` page for the screen you are building; open its `preview.png` only when layout details matter.
+- Read only the `docs/pages/` file for the screen you are building; open its image in `docs/images/` only when layout details matter.
 - Do not read or edit `package-lock.json`, `.next/`, `node_modules/`, `*.tsbuildinfo`.
 - Next.js 16, MUI 9 and TanStack Store differ from older versions; check the official docs rather than relying on memory.
 - Prefer targeted edits over rewriting whole files. Keep new code consistent with the neighbouring files.
