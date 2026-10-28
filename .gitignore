@@ -21,6 +21,9 @@ out/
 build
 dist
 
+# prisma generated client
+backend/src/generated
+
 # misc
 .DS_Store
 *.pem

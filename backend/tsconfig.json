@@ -13,6 +13,6 @@
     "baseUrl": "./",
     "types": ["node", "jest"]
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"],
+  "include": ["src/**/*.ts", "test/**/*.ts", "prisma.config.ts"],
   "exclude": ["node_modules", "dist"]
 }
