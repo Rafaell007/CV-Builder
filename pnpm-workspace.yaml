@@ -5,3 +5,5 @@ packages:
 allowBuilds:
   unrs-resolver: false
   "@parcel/watcher": false
+  "@prisma/engines": false
+  prisma: false
