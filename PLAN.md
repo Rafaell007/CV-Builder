@@ -3,8 +3,8 @@
 Single source of truth for **what we build, how, in what order, and what is done**.
 Requirements per page live in [docs/](docs/README.md); coding rules in [§5](#5-development-rules); agent instructions in [AGENTS.md](AGENTS.md).
 
-Deadline and demo: **2026-12-07**.
-Repository: [github.com/Rafaell007/CV-Builder](https://github.com/Rafaell007/CV-Builder) — `main` = production (Vercel), `developement` = integration (default branch).
+Deadline and demo: **2026-12-07** (task: 4 weeks).
+Repository: [github.com/Rafaell007/CV-Builder](https://github.com/Rafaell007/CV-Builder) — `main` = releases, `developement` = integration (default branch).
 
 ---
 
@@ -14,64 +14,67 @@ Repository: [github.com/Rafaell007/CV-Builder](https://github.com/Rafaell007/CV-
 - **Status markers:** `[ ]` todo · `[~]` in progress · `[x]` merged into `developement`.
 - **When a step is merged:** tick it, add the PR number, and add a line to [§12 Progress log](#12-progress-log). Do it in the same PR.
 - **When a decision changes:** update [§2.3 Decision log](#23-decision-log) in the same PR as the code change.
-- **Jira:** each step in §9 is one ticket (title = step title, description = its bullets). Jira is being reorganised for the new repo; ticket keys are added to the steps once the tickets exist.
+- **Jira:** each step in §9 is one ticket (title = step title, description = its bullets). Who does which step is tracked in Jira, not here.
 - **Agents:** read §0–§5 for context, then only the step you work on and its docs page.
 
 ---
 
 ## 1. Product
 
-CV Builder: employees maintain their profile, skills and languages and build CVs from projects; admins manage users and global catalogs. Two roles: **Admin** and **Employee**.
+CV Builder: users maintain their profile, skills and languages and build CVs from projects; admins manage users and global catalogs. Two roles: **Admin** and **User**.
 
-| Area | Pages (docs) |
-|---|---|
-| Authorisation | [sign-in](docs/pages/02-sign-in-page.md), [sign-up](docs/pages/03-sign-up-page.md), [verification](docs/pages/06-verification-page.md), [forgot-password](docs/pages/04-forgot-password-page.md), [reset-password](docs/pages/05-reset-password-page.md) |
-| System and settings | [not-found](docs/pages/08-not-found-page.md), [no-internet](docs/pages/07-no-internet-page.md), [device-error](docs/pages/09-device-error-page.md), [settings](docs/pages/15-settings-page.md) |
-| Users | [users](docs/pages/10-users-page.md), [user-profile](docs/pages/11-user-profile-page.md), [user-skills](docs/pages/12-user-skills-page.md), [user-languages](docs/pages/13-user-languages-page.md), [user-cvs](docs/pages/14-user-cvs-page.md) |
-| Skills | [skills](docs/pages/16-skills-page.md) (own), [skills-admin](docs/pages/17-skills-page-admin.md) (catalog) |
-| Languages | [languages](docs/pages/18-languages-page.md) (own), [languages-admin](docs/pages/19-languages-page-admin.md) (catalog) |
-| CVs | [cvs](docs/pages/20-cvs-page.md), [cv-details](docs/pages/21-cv-details-page.md), [cv-skills](docs/pages/22-cv-skills-page.md), [cv-projects](docs/pages/23-cv-projects-page.md), [cv-preview](docs/pages/24-cv-preview-page.md) |
-| Admin catalogs | [departments](docs/pages/25-departments-page.md), [positions](docs/pages/26-positions-page.md), [projects](docs/pages/27-projects-page.md) |
+| Area | Pages (docs) | Access |
+|---|---|---|
+| Authentication | [sign-in](docs/pages/02-sign-in-page.md), [sign-up](docs/pages/03-sign-up-page.md), [forgot-password](docs/pages/04-forgot-password-page.md), [reset-password](docs/pages/05-reset-password-page.md), [verification](docs/pages/06-verification-page.md) | public |
+| System | [no-internet](docs/pages/07-no-internet-page.md), [not-found](docs/pages/08-not-found-page.md), [device-error](docs/pages/09-device-error-page.md) | public |
+| Users | [users](docs/pages/10-users-page.md) (main page), [user-profile](docs/pages/11-user-profile-page.md), [user-skills](docs/pages/12-user-skills-page.md), [user-languages](docs/pages/13-user-languages-page.md) | User, Admin |
+| Users | [user-cvs](docs/pages/14-user-cvs-page.md) | Admin |
+| Settings | [settings](docs/pages/15-settings-page.md) | User, Admin |
+| Skills | [skills](docs/pages/16-skills-page.md) (own) · [skills-admin](docs/pages/17-skills-page-admin.md) (catalog) | User · Admin |
+| Languages | [languages](docs/pages/18-languages-page.md) (own) · [languages-admin](docs/pages/19-languages-page-admin.md) (catalog) | User · Admin |
+| CVs | [cvs](docs/pages/20-cvs-page.md), [cv-details](docs/pages/21-cv-details-page.md), [cv-skills](docs/pages/22-cv-skills-page.md), [cv-projects](docs/pages/23-cv-projects-page.md), [cv-preview](docs/pages/24-cv-preview-page.md) | User, Admin |
+| Catalogs | [departments](docs/pages/25-departments-page.md), [positions](docs/pages/26-positions-page.md), [projects](docs/pages/27-projects-page.md) | Admin |
 
-Cross-cutting requirements on every page: Light/Dark theme, responsive (desktop + tablet; < 768 px shows Device Error), keyboard accessible, inline validation, failed requests keep entered values, loading / empty / error (+ retry) states.
+Overview and general requirements: [01-overview](docs/pages/01-overview.md). Design: Figma (link in the overview).
+
+Cross-cutting requirements on every page: Light/Dark theme, responsive (desktop + tablet; < 768 px shows Device Error), close to the Figma design, keyboard accessible, client **and** server validation, failed requests keep entered values, loading / empty / error (+ retry) / success states.
 
 ### 1.1 Task
 
-- **Mentor ticket:** JST-3581 (parent JST-3573), label React. Team work is tracked in Jira (frontendpractise.atlassian.net), board reorganised for the new repo.
-- **Due date:** 2026-12-07.
-- Implement all functionality from the Notion wiki "CV Builder Wiki Frontend" (summarised per page in `docs/`), in tandem with another intern. Without a partner the task is done alone, same deadline.
-- Libraries are to be agreed with the mentor before completing the task (O1).
+- Fullstack application built in a pair: **Next.js frontend + NestJS backend**, communicating through **GraphQL**, with a database, authentication and authorization, server-side validation and error handling, responsive UI, unit and integration tests, team development in Git.
+- Teamwork is graded: split tasks, agree frontend/backend boundaries and the GraphQL contract, separate branches, pull requests, **code reviews**, resolved merge conflicts, meaningful contribution from each member.
+- Without a partner the task is done alone with the maximum possible functionality.
 
-### 1.2 Completion format
+### 1.2 Submission
 
-A GitHub repository containing:
-- source code;
-- `README.md` with brief functionality, list of dependencies, startup instructions, deployment notes and live URL, instructions for running unit tests;
-- structured commits;
-- extra: when E2E tests are added, their structure by test case listed in the README.
+GitHub repository with frontend and backend source code, structured commits, PR and review history, test results, and a `README.md` containing:
+application description · implemented functionality · technologies and dependencies · how to run the frontend, the backend, the database and migrations · how to run unit and integration tests · coverage information · project structure · team task distribution · main architectural decisions · required environment variables · API documentation · extra: E2E tests and their test cases.
 
-Plus a demo of the application with answers to the mentor's questions (max 30 minutes).
+Plus a demo (max 30 minutes) with answers to the mentor's questions. A deployed link is optional.
 
 ### 1.3 Evaluation criteria
 
 | Criterion | Covered by |
 |---|---|
-| The application works without errors | All steps, S5.3 |
-| Next.js routing is configured correctly | §6 routes, S0.9, S0.10 |
-| State is processed through the selected state management | Apollo Client cache + TanStack Store (S0.3, S0.4) |
-| The UI is adaptive and implemented with the UI library | MUI, responsive + Device Error (S0.9, S2.3) |
-| API requests are executed dynamically | Apollo Client over HTTP in the browser (D6) |
-| Repository formatted: project structure, README with launch instructions | §4, S0.0, S5.3 |
-| Unit test coverage over 80 % | §11, S0.6, S5.3 |
-| Extra: E2E tests are working | S5.1, S5.2 |
+| Functionality per Notion docs | Phases 3–7 |
+| Frontend in Next.js; routing with Next.js; SSR/SSG where required | §6, S0.4, D6 |
+| Backend in NestJS; GraphQL API works; contract agreed and consistent | §3, S0.2, S2.2, D3, D4 |
+| Auth and authorization (checked on the backend) | §8, Phase 3 |
+| Database integration, migrations | §7, S2.1 |
+| Server-side validation and error handling | S2.2, D7 |
+| Application state handled correctly | Apollo cache + React Context (D5) |
+| UI with the selected library, responsive | Radix UI, S0.4, Phase 1 |
+| Unit tests (FE + BE), integration tests (BE), required tools, coverage > 80 % | §11, S0.5 |
+| Clear modular structure, FE/BE responsibilities separated | §4, §5 |
+| Env variables for config and secrets | §10 |
+| README, Git history, branches, PRs, code reviews, task distribution | §5.11, S8.3 |
+| Extra: E2E | S8.1 |
 
 ### 1.4 Resources
 
-- Requirements: [CV Builder Wiki Frontend (Notion)](https://innowise-frontend.notion.site/32e1d8d45e0d8010a41ed21fb0e8f3fc)
-- [Next.js](https://nextjs.org/docs) · [Material UI](https://mui.com/material-ui/) · [TanStack Store](https://tanstack.com/store) · [GraphQL](https://graphql.org/)
-- [Apollo Client integration for Next.js](https://github.com/apollographql/apollo-client-integrations/tree/main/packages/nextjs) · [Apollo Server](https://www.apollographql.com/docs/apollo-server) · [Prisma](https://www.prisma.io/docs)
-- [Testing Library](https://testing-library.com/) · [Vitest](https://vitest.dev/) · [Playwright](https://playwright.dev/)
-- [Vercel](https://vercel.com/docs) · [Neon](https://neon.tech/docs)
+- Requirements: [docs/](docs/README.md) (export of the Notion "CV Builder Wiki")
+- [Next.js](https://nextjs.org/docs) · [NestJS](https://docs.nestjs.com/) · [GraphQL](https://graphql.org/) · [Apollo Client](https://www.apollographql.com/docs/react) · [Prisma](https://www.prisma.io/docs) · [Radix UI](https://www.radix-ui.com/primitives)
+- [Vitest](https://vitest.dev/) · [Testing Library](https://testing-library.com/) · [Jest](https://jestjs.io/) · [Playwright](https://playwright.dev/) · [Storybook](https://storybook.js.org/)
 
 ---
 
@@ -79,296 +82,288 @@ Plus a demo of the application with answers to the mentor's questions (max 30 mi
 
 ### 2.1 Task requirements → choice
 
-| Requirement (task description) | Choice |
+| Requirement | Choice |
 |---|---|
-| Next.js, pages with SSR/SSG | Next.js 16, App Router |
-| Data via a locally configured backend with GraphQL + Apollo | Own GraphQL backend in the same app: **Apollo Server** + **Apollo Client** |
-| UI library, adaptive UI | Material UI |
-| State through state management | Apollo Client cache (server data) + TanStack Store (client state) |
-| Unit tests and component tests (RTL + Vitest), > 80 % coverage | Vitest (unit) + React Testing Library (components) + `@vitest/coverage-v8` |
+| Frontend in Next.js, SSR/SSG where required | Next.js 16, App Router |
+| Backend in NestJS | NestJS 11 |
+| GraphQL between frontend and backend | Code-first GraphQL (Apollo Server 5) ↔ Apollo Client 4 |
+| Database + migrations | PostgreSQL 17 + Prisma 7 |
+| UI library, responsive | Radix UI + CSS Modules + design tokens |
+| Frontend unit tests | Vitest + React Testing Library |
+| Backend unit / integration tests | Jest + `@nestjs/testing` / + Supertest |
 | Extra: E2E | Playwright |
 | Structured commits | Conventional Commits, enforced by commitlint |
 
 ### 2.2 Full stack
 
+Same stack and setup order as the other intern team (D2).
+
 | Layer | Purpose | Technology |
 |---|---|---|
-| Frontend | Framework, routing, SSR/SSG | Next.js 16 (App Router), React 19, TypeScript strict |
-| | UI, theming | Material UI 9 + Emotion, `@mui/material-nextjs`, `@mui/x-date-pickers` + date-fns |
-| | Server data | Apollo Client + `@apollo/client-integration-nextjs` |
-| | Client state | TanStack Store (`@tanstack/react-store`) |
-| | Forms | React Hook Form + Zod (`@hookform/resolvers`) |
+| Repo | Monorepo, two apps | pnpm workspaces, Node 24: `frontend/`, `backend/` |
+| Frontend | Framework, routing, SSR | Next.js 16 (App Router), React 19, TypeScript strict |
+| | Server data | Apollo Client 4 + `@apollo/client-integration-nextjs`; GraphQL Code Generator (typed documents from `schema.gql`) |
+| | Client state | React Context (theme, language), persisted in cookies |
+| | UI kit | Radix UI primitives, CSS Modules, design tokens (light/dark) |
+| | Dates | date-fns, react-datepicker |
+| | Forms | React Hook Form + Zod |
 | | i18n (9 languages) | next-intl |
-| | CV PDF export | `@react-pdf/renderer` (client side) |
-| Backend | GraphQL server | Apollo Server + `@as-integrations/next` (Route Handler `/api/graphql`) |
-| | Schema | SDL `.graphql` files per module |
-| | Types | GraphQL Code Generator (resolver types + typed documents) |
-| | Database / ORM | PostgreSQL / Prisma (schema, migrations, seed) |
-| | Validation | Zod (schemas shared with frontend) |
-| | Auth | argon2 (passwords), `jose` (JWT) in httpOnly cookies |
-| | Mail | Nodemailer; Mailpit locally, Resend (SMTP) in production |
-| | File upload | Vercel Blob (avatars) |
-| Tests | Unit / component / hook / service | Vitest, RTL, user-event, Apollo `MockedProvider` |
+| | UI development | Storybook 10 (stories + component tests with Vitest/Playwright) |
+| Backend | Framework | NestJS 11 (modules, DI, pipes, guards, filters) |
+| | API | GraphQL code-first, Apollo Server 5; generated `schema.gql` = contract |
+| | Database / ORM | PostgreSQL 17 (Docker) / Prisma 7 (schema, migrations, seed) |
+| | Validation | `class-validator` + `class-transformer` (global `ValidationPipe`) |
+| | Auth | `@nestjs/jwt`, `@node-rs/argon2`, access + refresh tokens in httpOnly cookies |
+| | Mail | Nodemailer; Mailpit locally |
+| | Files | Avatar upload via REST (multer), stored in PostgreSQL |
+| | CV PDF | pdfmake (Roboto, Cyrillic) |
+| | Config | `@nestjs/config` with validated env |
+| Tests | Frontend | Vitest, RTL, user-event, Apollo `MockedProvider` |
+| | Backend | Jest + `@nestjs/testing` (unit), + Supertest against a test database (integration) |
 | | E2E | Playwright against a seeded database |
-| Tooling | Quality | ESLint, Prettier, Husky + lint-staged, commitlint (done in S0.0) |
-| | Local infra | Docker Compose: PostgreSQL + Mailpit |
-| Deploy | App (front + API) | Vercel |
-| | Production DB | Neon (PostgreSQL via Vercel Marketplace) |
+| Tooling | Quality | One shared ESLint + Prettier config, Husky + lint-staged, commitlint |
+| | Local infra | Docker Compose: PostgreSQL 17 + Mailpit |
+| | CI | GitHub Actions: format, lint, typecheck, tests, builds (not a required check: no branch protection on the free plan) |
+| Deploy (optional) | Frontend / backend / DB | Vercel / Render (Docker) / Neon |
 
 ### 2.3 Decision log
 
 | # | Date | Decision | Why |
 |---|---|---|---|
-| D1 | 2026-10-26 | Fractal structure, representational components, hooks for logic, TS only, no `any` | Rules in §5 (merged from the former `developement-rules.md` on 2026-10-27) |
-| D2 | 2026-10-26 | GitFlow: `main` + `developement`, `feature/<ticket>-<name>`, merge commits (no squash) | Structured commits are graded |
-| D3 | 2026-10-27 | **Fullstack: we write the backend ourselves** | Provided CV Builder API link in Notion is dead |
-| D4 | 2026-10-27 | Backend inside the Next.js app (`/api/graphql`), not a separate service | One repo, one deploy, no CORS, shared types |
-| D5 | 2026-10-27 | Deploy everything on Vercel + Neon; Render dropped | Simpler, no cold starts; replaces "backend on Render" |
-| D6 | 2026-10-27 | Server-side Apollo uses `SchemaLink`, browser uses HTTP | SSG works during `next build`; requests stay dynamic in the browser |
-| D7 | 2026-10-27 | Own JWT auth with `jose` (Better Auth = fallback) | Keeps auth in GraphQL, demonstrable code |
-| D8 | 2026-10-27 | Vertical steps: one step = API + UI + tests of a feature | No waiting on each other, one PR per feature |
-| D9 | 2026-10-27 | Server secrets in `src/server/env.ts` (`server-only`); `src/env.ts` keeps public vars | Secrets never reach the browser (amends rule 5) |
-| D10 | 2026-10-27 | Restart in a new repository `Rafaell007/CV-Builder`; the old `task-8` repo is reference only | Clean history and setup for the new team workflow; Jira reorganised to match |
+| D1 | 2026-10-26 | GitFlow: `main` + `developement`, `feature/<ticket>-<name>`, merge commits (no squash) | Structured commits and PR history are graded |
+| D2 | 2026-10-28 | Copy the other intern team's stack and setup order: pnpm monorepo, Next.js + NestJS, Radix UI, Prisma, Storybook. MUI and TanStack Store dropped | New task requires NestJS; the teams can help each other |
+| D3 | 2026-10-28 | GraphQL **code-first**; the generated `backend/schema.gql` is committed and is the contract. Frontend types are generated from it | One source of truth; contract changes are visible in PR diffs |
+| D4 | 2026-10-28 | Contract first: a module's GraphQL types and operations are merged (resolvers may be stubbed) before its frontend step starts | Frontend and backend work in parallel without waiting |
+| D5 | 2026-10-28 | State: server data in the Apollo cache; theme and language in React Context, persisted in cookies (read on the server, no flash) | No extra state library needed |
+| D6 | 2026-10-28 | Rendering: protected pages are SSR per request (Server Components query the backend, forwarding the user's cookies); auth, not-found and device-error pages are static | Protected pages are per-user, so they cannot be SSG |
+| D7 | 2026-10-28 | Errors: one global exception filter maps errors to GraphQL `extensions.code` (`UNAUTHENTICATED`, `FORBIDDEN`, `BAD_USER_INPUT` with field errors, `NOT_FOUND`, `CONFLICT`); the UI shows field errors inline, others as a system error | Consistent error contract |
+| D8 | 2026-10-28 | The browser calls the backend through a Next.js rewrite (`/graphql`, `/api/*` → backend), so auth cookies stay first-party | No CORS or third-party cookie issues, also when deployed on two hosts |
+| D9 | 2026-10-28 | Session: access JWT 15 min + refresh token 7 days (stored hashed, rotated), both httpOnly cookies. Frontend `proxy.ts` refreshes before render; Apollo error link refreshes once, then redirects to sign-in | Users stay signed in; tokens are not readable by JS |
+| D10 | 2026-10-28 | Authorization on the backend: global `JwtAuthGuard` (opt-out with `@Public()`), `RolesGuard` with `@Roles()`, ownership checks in services, `@Verified()` for verified-only actions | Docs require backend enforcement, not UI hiding |
+| D11 | 2026-10-28 | Avatars: `POST /api/users/:id/avatar` (multipart, ≤ 5 MB, PNG/JPG/JPEG/GIF checked by file content), stored in PostgreSQL, served by `GET /api/users/:id/avatar` | Works locally and deployed without an extra storage service |
+| D12 | 2026-10-28 | CV PDF generated on the backend (`exportCvPdf`, pdfmake with Roboto) from the same data as the preview | Docs: PDF from persisted data, permission-checked |
+| D13 | 2026-10-28 | Delete rules: deleting a user cascades to everything they own; removing a user skill also removes it from their CVs; catalog items in use cannot be deleted | Defined behaviour, no dangling references |
+| D14 | 2026-10-28 | E2E specs are written with each step; Phase 8 only fills gaps and stabilises | No E2E crunch in the last week |
+| D15 | 2026-10-28 | Every PR gets a review and approval from the other developer before merge | Code reviews are graded |
 
 ### 2.4 Open decisions
 
 | # | Question | Default until decided |
 |---|---|---|
-| O1 | Mentor approval of the library list and of writing our own backend (task requires discussing libraries) | Proceed with this plan |
-| O2 | Team agreement to D3–D9 and the step split | — |
-| O3 | Main page after sign-in / LATER on verification | `/cvs` |
-| O4 | Sidebar: employee "Skills"/"Languages" = own pages; admin catalogs in an Admin group | See §6 routes |
-| O5 | Block deleting a Position / Skill / Language / Project that is in use (docs say it only for Departments) | Block, same message pattern |
-| O6 | Skill **Type** values (derived from category) | Seeded with categories |
-| O7 | Project roles catalog: no admin page in docs | Seeded list |
-| O8 | Page size for tables | 10 |
+| O1 | Which actions require a verified email (verification page AC-16) | Creating and changing CVs, and changing own skills and languages |
+| O2 | Main page after sign-in and after LATER | `/users` (overview: "Users (Main Page)") |
+| O3 | Skill and language catalog delete when in use (docs say "block" only for departments) | Block, same message pattern (D13) |
+| O4 | Page size for tables | 10 |
+| O5 | Verification resend limit (docs leave it to the backend) | 60 s cooldown, max 5 wrong attempts per code |
+| O6 | Reset token lifetime (not in docs) | 1 h, single use |
 
 ---
 
 ## 3. Architecture
 
 ```
-Browser ── Apollo Client (HTTP) ──► Next.js on Vercel
-                                     ├─ pages: Server Components (SSR/SSG)
-                                     │    └─ Apollo Client + SchemaLink ─► schema executed in-process
-                                     ├─ /api/graphql (Route Handler) ─► Apollo Server
-                                     │                                   └─ resolvers ─► services ─► Prisma ─► PostgreSQL
-                                     └─ proxy.ts ─► route protection (no session → /sign-in)
+Browser ──► Next.js (frontend/)                                   NestJS (backend/)
+            ├─ proxy.ts: route protection + session refresh       ├─ GraphQL /graphql (Apollo Server 5, code-first)
+            ├─ Server Components (SSR) ── fetch with cookies ───► │    └─ resolvers ─► services ─► Prisma ─► PostgreSQL
+            ├─ Client Components ── Apollo Client ──┐             ├─ REST /api/users/:id/avatar (upload, read)
+            └─ rewrites /graphql, /api/* ───────────┴───────────► └─ guards · ValidationPipe · exception filter · mail
 ```
 
-- **Session:** short-lived access JWT + refresh token, both `httpOnly`, `Secure`, `SameSite=Lax` cookies. `context.ts` resolves the current user per request.
-- **Authorization lives in services** (backend). The UI only hides what the user may not do.
-- **Errors:** GraphQL errors carry `extensions.code` (`UNAUTHENTICATED`, `FORBIDDEN`, `BAD_USER_INPUT` with field errors, `NOT_FOUND`, `CONFLICT`). The UI maps field errors inline and others to a system error.
-- **List pattern:** every list query takes `search`, `sort { field, direction }`, `page { number, size }` and returns `{ items, total }`.
+- **Contract:** `backend/schema.gql` is generated from the code-first types and committed. The frontend runs codegen against it (D3, D4).
+- **Session:** see D9. The backend reads the access token from the cookie; `me` returns the current user or `null`.
+- **Authorization:** see D10. The UI only hides what the user may not do.
+- **Errors:** see D7. Unknown errors are logged and returned as `INTERNAL_SERVER_ERROR` without details.
+- **List pattern:** every list query takes `search`, `sort { field, direction }`, `page { number, size }` and returns `{ items, total }` (shared GraphQL building blocks, S2.2).
+- **Verification:** unverified users can sign in and use the app after LATER; verified-only actions (O1) fail with `FORBIDDEN` and code `EMAIL_NOT_VERIFIED`.
 
 ---
 
-## 4. Project structure (fractal)
+## 4. Project structure
 
 ```
 CV-Builder/
-  prisma/              schema.prisma · migrations/ · seed.ts
-  e2e/                 Playwright specs, one folder per area (mirrors features/)
-  docker-compose.yml   PostgreSQL + Mailpit
-  codegen.ts · vitest.config.ts · playwright.config.ts
-  src/
-    app/                               routes only, thin
-      api/graphql/route.ts             mounts Apollo Server from src/server
-      (auth)/                          public: sign-in, sign-up, verify-email, forgot-password, reset-password
-      (app)/                           protected: cvs, users, skills, languages, settings, admin/*
-      not-found.tsx
-    proxy.ts                           redirect without session
-    env.ts                             public env (NEXT_PUBLIC_*)
-    features/                          frontend, one folder per feature
-      <feature>/
-        index.ts                       public entry
-        README.md                      purpose, exports, used by, docs link (5–10 lines)
-        Feature.tsx · Feature.test.tsx representational component
-        useFeature.ts                  composed hook (data + state + handlers)
-        feature.graphql                operations used by this feature (codegen input)
-        feature.utils.ts · feature.types.ts
-        messages/                      i18n: en.json … uk.json
-        components/<Child>/            same shape, one level down
-    shared/                            only code used by unrelated features
-      components/                      DataTable, RowActionsMenu, PageState, FormModal, ConfirmModal,
-                                       PasswordField, SelectField, DateField, TagsField, OtpField, SelectionToolbar
-      hooks/ utils/ theme/ store/ i18n/ apollo/
-      validation/<module>.ts           Zod schemas used by both a feature and a server module
-      graphql/                         generated types (codegen output, not edited)
-    server/                            backend; every file starts with `import "server-only"`
-      index.ts                         schema + context factory
-      context.ts · db.ts · env.ts
-      lib/                             cross-module helpers: password, jwt, cookies, guards, errors, pagination, mail, upload
-      modules/<module>/                same fractal shape as features
-        index.ts
-        <module>.graphql               SDL
-        <module>.resolvers.ts          thin: parse input, call service
-        <module>.service.ts            business rules + permissions + Prisma
-        <module>.test.ts
-        <child>/                       same shape (e.g. cvs/skills, cvs/projects, cvs/preview, users/skills, users/languages)
+  package.json · pnpm-workspace.yaml     root scripts run both apps
+  tsconfig.base.json · eslint.config.ts · prettier.config.ts · commitlint.config.ts
+  docker-compose.yml                     PostgreSQL 17 + Mailpit
+  .github/workflows/ci.yml
+  docs/                                  requirements (pages/ + images/)
+  e2e/                                   Playwright specs, one folder per area
+  frontend/
+    src/
+      app/                               routes only, thin
+        (auth)/                          sign-in, sign-up, verify-email, forgot-password, reset-password
+        (app)/                           users, cvs, skills, languages, settings, admin/*
+        not-found.tsx
+      proxy.ts                           route protection + session refresh
+      env.ts                             the only place reading process.env
+      features/<feature>/                one folder per feature (shape below)
+      shared/
+        ui/                              UI kit on Radix: Button, TextField, PasswordField, Select, MultiSelect,
+                                         DatePicker, OtpField, DataTable, Pagination, Menu, Modal, ConfirmModal,
+                                         Toast, Tabs, Breadcrumbs, PageState, SearchField
+        styles/                          design tokens, light/dark themes, global CSS
+        apollo/ hooks/ utils/ i18n/ preferences/
+        graphql/                         generated typed documents (codegen output, not edited)
+  backend/
+    schema.gql                           generated contract (committed)
+    prisma/                              schema.prisma · migrations/ · seed.ts
+    src/
+      main.ts · app.module.ts
+      config/                            env validation
+      common/                            guards, decorators, filters, pagination, GraphQL building blocks
+      prisma/                            PrismaService
+      modules/<module>/                  one folder per module (shape below)
+    test/                                integration tests (Supertest), test DB setup
 ```
 
-Placement rules (§5.9 applied):
-- Code used by one feature stays in it. Shared by sibling children → their parent. Shared by unrelated features → `shared/`.
-- **Skills list UI** is used by `/skills`, the User Details Skills tab and CV Skills → lives in `features/skills/` and is imported via its `index.ts`. Same for languages.
-- **Frontend never imports `src/server/`.** The only shared code is `shared/validation` and generated types.
+Feature (frontend):
+```
+features/<feature>/
+  index.ts                 public entry
+  README.md                purpose, exports, used by, docs link (5–10 lines)
+  Feature.tsx · Feature.module.css · Feature.test.tsx · Feature.stories.tsx
+  useFeature.ts            composed hook (data + state + handlers)
+  feature.graphql          operations (codegen input)
+  feature.utils.ts · feature.types.ts
+  messages/                i18n: en.json … uk.json
+  components/<Child>/      same shape, one level down
+```
+
+Module (backend):
+```
+modules/<module>/
+  <module>.module.ts
+  <module>.resolver.ts     thin: map input, call service
+  <module>.service.ts      business rules, ownership checks, Prisma
+  dto/                     @InputType classes with class-validator
+  models/                  @ObjectType classes
+  <module>.service.spec.ts · <module>.resolver.spec.ts
+  <child>/                 same shape (e.g. cvs/skills, cvs/projects, users/skills)
+```
+
+Placement rules (§5.9): code used by one unit stays in it; shared by siblings → their parent; shared by unrelated features → `frontend/src/shared/` or `backend/src/common/`. The **skills list UI** is used by `/skills`, the user Skills tab and CV Skills → lives in `features/skills/`. Same for languages. The frontend never imports backend code; they share only `schema.gql`.
 
 ---
 
 ## 5. Development rules
 
-Rules for all code in this repository. They apply to frontend and backend alike.
+Rules for all code in this repository.
 
-### 5.1 Representational components (UI only)
+### 5.1 Representational components (frontend)
 
-- Components are **representational**: they receive data and callbacks through props and render markup. Nothing else.
-- No data fetching, no business logic, no side effects, no direct access to stores, contexts or `process.env` inside a component body.
-- Allowed in a component: props, JSX, purely visual local state (e.g. open/closed), and calling hooks that exist only for UI concerns.
-- Anything non-visual lives in a hook or a util (5.2, 5.4).
+- Components receive data and callbacks through props and render markup. No data fetching, business logic, side effects, context access or `process.env` in a component body.
+- Allowed: props, JSX, purely visual local state (e.g. open/closed), UI-only hooks.
 
-### 5.2 Hook composition
+### 5.2 Hook composition (frontend)
 
-- Logic is extracted into custom hooks (`useXxx`), and bigger hooks are **composed from smaller hooks**.
-- A hook returns a small, typed, stable API (values and handlers). Components never see how it is built.
-- Do not call the same data source from several unrelated components; compose one hook and pass the result down.
-- Container-level hooks (data, state, handlers) are called by the page/container, whose only job is to wire hooks to components.
+- Logic lives in custom hooks (`useXxx`); bigger hooks are composed from smaller ones and return a small typed API.
+- Pages/containers call container hooks and wire the result to components.
 
-### 5.3 Component composition
+### 5.3 Component composition (frontend)
 
-- Build UI by **composing** small components (children, slots, props), not by growing one large component or using flags and branches for every variant.
-- Prefer `children` and explicit slot props over boolean-prop explosions.
-- Pages/containers assemble components; components do not know which page they live in.
+- Compose small components (children, slots) instead of boolean-prop explosions. Components do not know which page they live in.
+- Styling only through CSS Modules and design tokens; no hard-coded colours or sizes.
 
 ### 5.4 Single responsibility
 
-- One component, hook, util, resolver or service does one thing. If its description needs "and", split it.
-- One exported component per file; file name matches the export.
-- Keep files short enough to read in one screen where possible; split by responsibility, not by line count.
+- One component, hook, util, resolver or service does one thing. One exported component per file, named like the file.
 
 ### 5.5 Environment variables
 
-- Public values (`NEXT_PUBLIC_*`) are read **only** in `src/env.ts`; server secrets **only** in `src/server/env.ts` (starts with `import "server-only"`). Both validate, type and export a single object. Never use `process.env` anywhere else.
-- `NEXT_PUBLIC_*` variables must be accessed as literal properties (`process.env.NEXT_PUBLIC_X`), otherwise Next.js does not inline them for the browser.
-- Every new variable is added to `.env.example` (no real values) and to the Vercel project settings (Production and Preview). `.env` is git-ignored.
+- Frontend reads `process.env` only in `frontend/src/env.ts`; backend only through `@nestjs/config` with a validation schema in `backend/src/config/`. Both fail fast on missing values.
+- Every new variable goes to the app's `.env.example` (no real values) and §10. `.env` files are git-ignored.
 
-```ts
-// src/server/env.ts
-import "server-only";
+### 5.6 TypeScript only
 
-const required = (key: string, value: string | undefined): string => {
-  if (!value) throw new Error(`Missing env variable: ${key}`);
-  return value;
-};
-
-export const serverEnv = {
-  databaseUrl: required("DATABASE_URL", process.env.DATABASE_URL),
-  jwtSecret: required("JWT_SECRET", process.env.JWT_SECRET),
-} as const;
-```
-
-### 5.6 TypeScript only, no `.js`
-
-- No `.js`, `.jsx`, `.mjs` or `.cjs` files in the repo. Config and scripts are TypeScript too (`next.config.ts`, `eslint.config.ts`, `prettier.config.ts`, `commitlint.config.ts`, `vitest.config.ts`, `playwright.config.ts`, `codegen.ts`, `prisma/seed.ts`).
-- `allowJs` stays `true` in `tsconfig.json`: Next.js rewrites it on every build, so it cannot be turned off. The rule is enforced by convention and code review.
-- `strict` stays on, together with `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes`.
+- No `.js`/`.jsx`/`.mjs`/`.cjs` source or config files. `strict`, `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes` stay on in both apps.
 
 ### 5.7 No `any`
 
-- `any` is forbidden (`@typescript-eslint/no-explicit-any` is an error), including `as any` and implicit any.
-- Use `unknown` plus narrowing, generics, or proper types instead.
-- Avoid `@ts-ignore`; if unavoidable, use `@ts-expect-error` with a reason.
-- Data entering from outside is checked where it arrives: environment variables in the env files, route and search params in the route that reads them, GraphQL input in the resolver (Zod), GraphQL responses and form input in the hook that receives them. Inside the app, code works with typed values only.
+- `any` is an ESLint error, including `as any`. Use `unknown` + narrowing, generics or proper types. `@ts-expect-error` only with a reason.
+- External data is checked where it arrives: env in the config files, GraphQL input by `ValidationPipe`, route/search params in the route, form input by Zod.
 
 ### 5.8 Typed utils
 
-- Utils are pure functions with explicit parameter and return types.
-- Generic utils use generics rather than loose types.
-- Utils contain no React and no side effects; each is unit tested.
+- Utils are pure functions with explicit types, no React, no side effects; each is unit tested.
 
 ### 5.9 Fractal structure
 
-Files and folders follow a **fractal** layout: every unit is a self-contained folder, and the same shape repeats at every level. The full tree is in [§4](#4-project-structure-fractal).
+- Every unit is a folder that owns its files, tests and children; the same shape repeats at every level.
+- Shared code moves to the **nearest common ancestor**; only code used by unrelated features goes to `shared/` (frontend) or `common/` (backend).
+- Frontend folders expose one public `index.ts`; other code imports only from it. Backend modules are imported through their Nest module.
+- Every feature folder and every non-obvious shared component has a short `README.md` (about 5–10 lines): what it does, what it exports, where it is used, link to its `docs/` page. Simple components (e.g. a button) get none. Update it in the same PR when the public API changes.
 
-- A component, feature, page or server module is a folder that owns everything it needs: its main file, hooks, utils, types, tests and child units.
-- A folder's internal layout mirrors the layout of the project: a child big enough to need its own hooks or utils becomes a folder with the same shape.
-- Children live **inside** their parent. Code used by only one parent stays in that parent's folder.
-- When two siblings need the same code, move it up to their **nearest common ancestor**, not straight to a global shared folder. Only code used across unrelated features goes to `src/shared/` (frontend) or `src/server/lib/` (backend).
-- Each folder exposes a single public entry (`index.ts`). Other code imports from the folder, never from files deep inside it.
-- Dependencies point downward or sideways through public entries, never into another unit's internals.
-- Every feature folder and every non-obvious shared component has a short `README.md` (about 5–10 lines): what it does, what `index.ts` exports, where it is used, link to its `docs/` page. No code walkthroughs. Simple components (e.g. a button) get none. Update it in the same PR when the public API changes.
+### 5.10 Backend code
 
-### 5.10 Server code
-
-- Every file in `src/server/` starts with `import "server-only"`. The frontend never imports `src/server/`; it talks to it only through GraphQL.
-- Resolvers are thin: validate input, call a service, return. Services hold business rules, permission checks and Prisma calls.
-- Authorization is enforced in services (§8); the UI only hides what the user may not do.
+- Resolvers are thin: input → service → output. Services hold business rules, ownership checks and Prisma calls.
+- Inputs are `@InputType` classes validated with class-validator; outputs are `@ObjectType` classes. No Prisma types in the GraphQL schema.
+- Authorization through guards and decorators (D10); ownership checks in services.
 - GraphQL naming: queries are nouns (`users`, `cv`), mutations are verbs (`createCv`, `removeUserSkills`), inputs `<Mutation>Input`.
+- A change to `schema.gql` is called out in the PR description; breaking changes are agreed with the frontend developer first.
 
 ### 5.11 Workflow
 
-- Each step = branch `feature/<ticket>-<name>` from `developement`, PR into `developement`, merge commit (no squash).
-- Commit types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`; scope = feature or module; ticket key at the end when the ticket exists, e.g. `feat(cvs): add CV table (<ticket>)`.
-- A step is done when `lint`, `typecheck`, `format:check` pass, its **unit tests and component tests** (§11) are written and pass, `build` passes if routes or config changed, the step's acceptance criteria (docs AC IDs) are met, and this file is updated.
+- Each step = branch `feature/<ticket>-<name>` from `developement`, PR into `developement`, **review and approval by the other developer** (D15), merge commit (no squash).
+- Commit types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`; scope = app or module (`frontend`, `backend`, `cvs`, …); ticket key at the end when the ticket exists.
+- A step is done when format, lint, typecheck and tests pass (CI green), its unit / component / integration tests (§11) are written, the step's acceptance criteria (docs AC IDs) are met, and this file is updated.
 - New user-facing text goes to the feature's `messages/en.json`; other languages may start as copies.
 
 ---
 
 ## 6. Routes
 
-| Route | Page (docs) | Access |
-|---|---|---|
-| `/sign-in` | sign-in | public (signed-in → `/cvs`) |
-| `/sign-up` | sign-up | public |
-| `/verify-email` | verification | signed-in, unverified |
-| `/forgot-password` | forgot-password | public |
-| `/reset-password?token=` | reset-password | public with valid token |
-| `/` | redirect → `/cvs` (O3) | — |
-| `/cvs` | cvs | all |
-| `/cvs/[cvId]` → `/details` · `/skills` · `/projects` · `/preview` | cv-details, cv-skills, cv-projects, cv-preview | owner or admin |
-| `/users` | users ("Employees") | all |
-| `/users/[userId]` → `/profile` · `/skills` · `/languages` · `/cvs` | user-profile, user-skills, user-languages, user-cvs | all (edit: owner or admin; CVs tab: admin) |
-| `/skills` | skills (own) | all |
-| `/languages` | languages (own) | all |
-| `/settings` | settings | all |
-| `/admin/skills` · `/admin/languages` · `/admin/departments` · `/admin/positions` · `/admin/projects` | catalogs | admin |
-| any other | not-found | all |
+| Route | Page (docs) | Access | Rendering |
+|---|---|---|---|
+| `/sign-in` · `/sign-up` | sign-in, sign-up | public (signed-in → `/users`) | static |
+| `/verify-email` | verification | signed-in, unverified | static |
+| `/forgot-password` · `/reset-password?token=` | forgot-password, reset-password | public | static |
+| `/` | redirect → `/users` (O2) | — | — |
+| `/users` | users (main page) | User, Admin | SSR |
+| `/users/[userId]` → `/profile` · `/skills` · `/languages` · `/cvs` | user-profile, user-skills, user-languages, user-cvs | User, Admin (edit: owner or admin; CVs tab: admin) | SSR |
+| `/skills` · `/languages` | skills, languages (own) | User | SSR |
+| `/cvs` · `/cvs/[cvId]` → `/details` · `/skills` · `/projects` · `/preview` | cvs, cv-* | User (own), Admin (any) | SSR |
+| `/settings` | settings | User, Admin | SSR |
+| `/admin/skills` · `/admin/languages` · `/admin/departments` · `/admin/positions` · `/admin/projects` | catalogs | Admin | SSR |
+| any other | not-found | public | static |
 
-Sidebar: Employees, CVs, Skills, Languages; Admin group (admin only): Skills, Languages, Departments, Positions, Projects. Profile menu: Profile, Settings, Logout.
+No-internet and device-error are states shown over any page, not routes. Sidebar by role: User — Employees, CVs, Skills, Languages; Admin — Employees, CVs, Skills, Languages, Departments, Positions, Projects (catalog pages). Profile menu: Profile, Settings, Logout.
 
 ---
 
 ## 7. Data model (Prisma)
 
-| Model | Fields | Rules (docs) |
-|---|---|---|
-| User | id, email unique, passwordHash, role `ADMIN`/`EMPLOYEE`, isVerified, firstName, lastName (≤100), avatarUrl?, departmentId?, positionId?, createdAt | createdAt = "Member since" |
-| Department | id, name unique | delete blocked when referenced |
-| Position | id, name unique | delete blocked when referenced (O5) |
-| SkillCategory | id, name, type | seeded (O6) |
-| Skill | id, name unique, categoryId | type comes from category |
-| UserSkill | userId + skillId (unique), mastery `BEGINNER` `ELEMENTARY` `INTERMEDIATE` `ADVANCED` `EXPERT` | |
-| Language | id, name unique, iso unique (2, upper), nativeName | |
-| UserLanguage | userId + languageId (unique), proficiency `A1` `A2` `B1` `B2` `C1` `C2` `NATIVE` | |
-| Project | id, name (≤100), domain (≤100), startDate, endDate, description (≤2000), environment → Skill[] | endDate ≥ startDate |
-| ProjectRole | id, name | seeded (O7) |
-| Cv | id, name (≤255), education (≤255), description, userId | |
-| CvSkill | cvId + skillId (unique) | skill must be in owner's skills |
-| CvProject | id, cvId, projectId, startDate, endDate?, responsibilities?, roles → ProjectRole[] (≥1) | dates within project dates |
-| VerificationCode | userId, codeHash, expiresAt | 6 digits, 2 h |
-| PasswordResetToken | userId, tokenHash, expiresAt | |
-| RefreshToken | userId, tokenHash, expiresAt | deleted on sign-out |
+Field lists are a starting point; S2.1 checks every docs page and completes them.
 
-Seed: 1 admin, 2 employees, departments, positions, skill categories + ~40 skills, 9+ languages, project roles, ~6 projects, sample CVs.
+| Model | Fields | Rules |
+|---|---|---|
+| User | id, email unique, passwordHash, role `ADMIN`/`USER`, isVerified, firstName?, lastName?, departmentId?, positionId?, createdAt | delete cascades (D13) |
+| Avatar | userId (PK), data (bytes), mimeType, updatedAt | ≤ 5 MB, PNG/JPG/JPEG/GIF (D11) |
+| Department · Position | id, name unique | delete blocked when used |
+| SkillCategory | id, name, type | seeded |
+| Skill | id, name unique, categoryId | delete blocked when used (O3) |
+| UserSkill | userId + skillId unique, mastery `BEGINNER` `ELEMENTARY` `INTERMEDIATE` `ADVANCED` `EXPERT` | removing it removes it from the user's CVs (D13) |
+| Language | id, name unique, iso unique, nativeName | delete blocked when used (O3) |
+| UserLanguage | userId + languageId unique, proficiency `A1` `A2` `B1` `B2` `C1` `C2` `NATIVE` | |
+| Project | id, name, domain, startDate, endDate?, description, environment → Skill[] | delete blocked when used in a CV |
+| ProjectRole | id, name | seeded |
+| Cv | id, name, education?, description, userId | |
+| CvSkill | cvId + skillId unique, mastery | skill must be one of the owner's skills |
+| CvProject | id, cvId, projectId, startDate, endDate?, responsibilities?, roles → ProjectRole[] (≥ 1) | dates within the project's dates |
+| VerificationCode | userId, codeHash, expiresAt, usedAt?, attempts | 6 digits, 10 min, single use (O5) |
+| PasswordResetToken | userId, tokenHash, expiresAt, usedAt? | single use (O6) |
+| RefreshToken | userId, tokenHash, expiresAt | rotated on refresh, deleted on sign-out |
+
+Seed: 1 admin, 2+ users, departments, positions, skill categories + ~40 skills, 10+ languages, project roles, ~6 projects, sample CVs.
 
 ---
 
 ## 8. Permissions
 
-| Action | Employee | Admin |
+| Action | User | Admin |
 |---|---|---|
+| Use the app while unverified (except O1 actions) | ✓ | ✓ |
 | View users list and any profile / skills / languages | ✓ | ✓ |
-| Edit profile, avatar, own skills / languages | own only | any user |
-| Verify email | own only | own only |
+| Edit profile, avatar, skills, languages | own only | any user |
 | Create / update / delete users | — | ✓ |
 | User Details → CVs tab | — | ✓ |
 | CVs: view, create, update, delete, skills, projects, preview, PDF | own only | any |
@@ -379,173 +374,157 @@ Seed: 1 admin, 2 employees, departments, positions, skill categories + ~40 skill
 
 ## 9. Roadmap
 
-**Every step ships with its tests** — unit tests for its utils, hooks and services, and component tests for every component it adds (§11). A step without tests is not done.
+**Every step ships with its tests** (§11). Feature steps are split into a backend step (**BE**) and a frontend step (**FE**) so the two developers can work in parallel; the BE step merges the contract first (D4). Steps with a user flow add their E2E spec once the flow works (D14).
 
-### Phase 0 — Foundation (2026-10-27 → 11-02)
+### Phase 0 — Monorepo and infrastructure
 
-- [x] **S0.0 Repo baseline** · initial commit 2d22ec2
-  Next.js 16 + React 19, MUI 9 + Emotion, TanStack Store installed; TS-only configs, strict lint, Prettier, Husky + lint-staged + commitlint, `.gitattributes`, fractal skeleton, `(auth)`/`(app)` groups, README structure.
+- [ ] **S0.1 Monorepo structure**
+  - pnpm workspaces (Node 24): move the Next.js app to `frontend/`, scaffold NestJS 11 in `backend/`; remove MUI and TanStack Store, npm lockfile.
+  - Shared `tsconfig.base.json`, one ESLint + Prettier config, Husky + lint-staged + commitlint at the root; root scripts (`dev`, `lint`, `typecheck`, `test`, `build`, `format:check`).
+  - README skeleton with the required sections (§1.2).
+  - Done when: `pnpm install` + `pnpm dev` start both apps; lint and typecheck pass in both.
 
-- [ ] **S0.1 Database and local infra**
-  - Docker Compose: PostgreSQL + Mailpit; `.env.example` with `DATABASE_URL`.
-  - Prisma: full schema from §7, first migration, `seed.ts` (§7 seed), scripts `db:migrate`, `db:seed`, `db:reset`.
-  - README: local setup.
-  - Done when: both developers run `docker compose up` + migrate + seed from README.
-
-- [ ] **S0.2 GraphQL server**
-  - `src/server/` skeleton (§4), `server/env.ts`, `db.ts`, `context.ts` (user from cookie, unauthenticated allowed).
-  - Apollo Server in `app/api/graphql/route.ts`; error codes and field errors (§3); pagination / sort / search helpers in `server/lib`.
-  - GraphQL Code Generator (`codegen.ts`, `npm run codegen`): resolver types + typed documents.
-  - First module: `departments` query only (proves the chain).
-  - Done when: `departments` query works at `/api/graphql`; generated types compile.
+- [ ] **S0.2 Backend infrastructure**
+  - Docker Compose: PostgreSQL 17 + Mailpit. Prisma 7 with `PrismaService`; scripts `db:migrate`, `db:seed`, `db:reset`.
+  - GraphQL code-first with Apollo Server 5, `schema.gql` generated and committed; `@nestjs/config` with env validation; a `health` query.
+  - Done when: a fresh clone runs Docker + migrate + backend from the README and `health` answers.
   - Depends on: S0.1.
 
-- [ ] **S0.3 Apollo Client**
-  - `shared/apollo/`: server client with `SchemaLink`, browser client with `HttpLink`, provider in root layout.
-  - Error link: network errors → No Internet state; `UNAUTHENTICATED` → redirect to `/sign-in`.
-  - Done when: a Server Component and a Client Component both render `departments`.
-  - Depends on: S0.2.
+- [ ] **S0.3 CI**
+  - GitHub Actions on PRs to `developement`: format, lint, typecheck, tests (with a Postgres service), builds of both apps.
+  - Done when: the workflow is green on a PR.
+  - Depends on: S0.1.
 
-- [ ] **S0.4 Theme + client store**
-  - Theme tokens from Figma, light/dark palettes; mode Light / Dark / Device in TanStack Store, persisted in a cookie read on the server (no flash).
-  - Store accessed only via hooks (`useThemeMode`); store logic as tested pure utils.
-  - Done when: switching persists after refresh without flash; tests pass.
+- [ ] **S0.4 Frontend foundation**
+  - Apollo Client 4 (SSR integration, cookie forwarding, error link), codegen from `backend/schema.gql`, Next.js rewrites (D8).
+  - Route groups `(auth)` / `(app)` with placeholder pages (§6).
+  - Design tokens from Figma, light/dark themes with CSS Modules; theme and language preferences in React Context + cookies (D5); Radix UI installed.
+  - Storybook 10 with the theme switcher.
+  - Done when: a page renders `health` through Apollo; theme switch persists without flash; Storybook runs.
+  - Depends on: S0.1, S0.2.
 
-- [ ] **S0.5 i18n**
-  - next-intl, 9 locales (en complete, others copies), locale in cookie + store, per-feature `messages/` merged at load.
-  - Done when: language switch changes texts and persists.
+- [ ] **S0.5 Test setup**
+  - Frontend: Vitest + RTL + user-event (jsdom), test render helper (theme, intl, `MockedProvider`), coverage threshold 80 %.
+  - Backend: Jest unit config; integration config with Supertest and a separate test database; coverage threshold 80 %.
+  - Playwright config at the root with a seeded run.
+  - Done when: one sample test per level runs locally and in CI.
+  - Depends on: S0.2, S0.3.
+
+- [ ] **S0.6 i18n**
+  - next-intl, 9 languages from the settings page (en complete, others start as copies), locale from the preference cookie, per-feature `messages/`.
+  - Done when: switching language changes texts and persists.
   - Depends on: S0.4.
 
-- [ ] **S0.6 Test setup**
-  - Vitest for **unit tests** and React Testing Library + user-event for **component tests** (jsdom), coverage-v8 (threshold 80 %, excludes generated/config); test utils (render with theme + Apollo `MockedProvider` + intl).
-  - Separate test database for service tests; Playwright config + seeded run; scripts `test`, `test:coverage`, `test:e2e`.
-  - Done when: one sample test per level runs in CI-like local command.
+### Phase 1 — Shared UI kit (from Figma)
 
-- [ ] **S0.7 Shared table, menu, states**
-  - `DataTable` (columns, sort indicator, pagination, search slot, row actions slot), `RowActionsMenu` (one open, Escape/outside close), `PageState` (loading skeleton, empty, no results, error + retry), `SearchField` (debounced).
-  - Done when: story-like test page + unit tests.
+- [ ] **S1.1 Form controls** — Button, IconButton, TextField, PasswordField (toggle), Textarea, Select, MultiSelect, DatePicker, OtpField, SearchField (debounced); RHF + Zod helpers and server field-error mapping. Stories + tests.
+- [ ] **S1.2 Data display** — DataTable (columns, sort indicator, row actions slot), Pagination, Menu (one open, Escape/outside close), Tabs, Breadcrumbs, Avatar, PageState (loading skeleton, empty, no results, error + retry). Stories + tests.
+- [ ] **S1.3 Overlays and feedback** — Modal / FormModal (focus trap, Escape, primary disabled until valid and dirty), ConfirmModal, Toast notifications, SelectionToolbar ("REMOVE (n)"). Stories + tests.
+- [ ] **S1.4 App layout** — `(app)` layout: sidebar by role (§6), active item, profile section + menu, header with breadcrumbs, Device Error gate (< 768 px, live on resize), No Internet state. Depends on S1.2, S3.1 (`me`).
 
-- [ ] **S0.8 Shared forms and modals**
-  - `FormModal` (focus trap, Escape, primary disabled until valid/dirty), `ConfirmModal`, fields: Text, Password (toggle), Select, MultiSelect/Tags, Date, Textarea, OTP; `SelectionToolbar` ("REMOVE (n)"). RHF + Zod integration helpers; mapping of server field errors.
-  - Done when: unit tests for each.
+### Phase 2 — Data model and API conventions
 
-- [ ] **S0.9 App layout**
-  - `(app)` layout: sidebar by role (§6), active item, profile section + menu (Profile / Settings / Logout), breadcrumbs, tabs component, Device Error gate (< 768 px, live on resize).
-  - Done when: navigation works with seeded admin/employee (after S1.1) or mocked user.
-  - Depends on: S0.4.
+- [ ] **S2.1 Data model** — Prisma schema from §7 checked against every docs page, initial migration, seed (§7). Done when: `db:reset` builds a seeded database.
+- [ ] **S2.2 API conventions** — shared GraphQL building blocks in `common/`: pagination / sort / search inputs and paginated output, `ValidationPipe` with field errors, exception filter (D7), guards and decorators skeleton (D10). Unit tests for each. Depends on S0.2.
 
-- [ ] **S0.10 Auth core and route protection**
-  - `server/lib`: argon2, JWT (`jose`), cookies, `requireUser`, `requireAdmin`, `requireOwnerOrAdmin`; `me` query; refresh + sign-out.
-  - `proxy.ts`: no session → `/sign-in`; signed-in on auth pages → `/cvs`; admin-only routes.
-  - Done when: guards unit-tested; protected route redirects.
-  - Depends on: S0.2.
+### Phase 3 — Authentication
 
-- [ ] **S0.11 Mail**
-  - `server/lib/mail`: Nodemailer transport (Mailpit / Resend), templates: verification code, password reset link.
-  - Done when: mails visible in Mailpit.
+- [ ] **S3.1 BE Auth core** — `signIn`, `signOut`, `refresh`, `me`; argon2, JWT cookies, refresh rotation (D9); guards active globally. Integration tests for each guard.
+- [ ] **S3.2 FE Session** — `proxy.ts` (no session → `/sign-in`, refresh before render, signed-in on auth pages → `/users`, admin-only routes), error link refresh-then-redirect, `useCurrentUser`. Depends on S3.1, S0.4.
+- [ ] **S3.3 BE Mail** — Nodemailer module (Mailpit locally), templates: verification code, password reset link (links use `FRONTEND_URL`).
+- [ ] **S3.4 Sign In** — BE errors ("Invalid email or password"); FE page. AC per sign-in.
+- [ ] **S3.5 Sign Up** — BE `signUp` (unique email, hash, send code, sign in); FE page → `/verify-email`. AC per sign-up. Depends on S3.3.
+- [ ] **S3.6 Email Verification** — BE `verifyEmail`, `resendVerificationCode` (10 min, single use, O5), `@Verified()`; FE OTP page, CONFIRM, LATER → `/users`. AC per verification.
+- [ ] **S3.7 Forgot Password** — BE `forgotPassword` (token + mail, same response for unknown emails); FE page. AC per forgot-password.
+- [ ] **S3.8 Reset Password** — BE `resetPassword` (token check, expiry, single use); FE page. AC per reset-password.
 
-- [ ] **S0.12 Deploy**
-  - Vercel project from GitHub, Neon database, env vars (§10), `prisma migrate deploy` on build, seed demo data, preview deployments.
-  - Done when: production URL serves the app with data; URL in README.
-  - Depends on: S0.2.
+### Phase 4 — System pages and settings
 
-### Phase 1 — Authorisation (11-03 → 11-09)
+- [ ] **S4.1 Not Found** — `not-found.tsx`, GO BACK. AC per not-found.
+- [ ] **S4.2 No Internet** — state from the Apollo error link / offline event, RETRY refetches. AC per no-internet.
+- [ ] **S4.3 Device Error** — gate from S1.4 finalised with illustration and message. AC per device-error.
+- [ ] **S4.4 Settings** — theme and language selects (S0.4, S0.6); BE `changePassword` (current password check); FE form. AC per settings.
 
-- [ ] **S1.1 Sign In** — API `signIn`; UI tabs, validation, password toggle, errors ("Invalid email or password"). AC: sign-in AC-1…13.
-- [ ] **S1.2 Sign Up** — API `signUp` (unique email, hash, send code); UI with confirm password; redirect `/verify-email`. AC: sign-up AC-1…13. Depends on S0.11.
-- [ ] **S1.3 Email Verification** — API `verifyEmail`, `resendVerification` (6 digits, 2 h); UI `OtpField`, CONFIRM, LATER → `/cvs`. AC: verification AC-1…13.
-- [ ] **S1.4 Forgot Password** — API `forgotPassword` (token + mail); UI. AC: forgot-password AC-1…10.
-- [ ] **S1.5 Reset Password** — API `resetPassword` (token check, expiry, auto sign-in); UI. AC: reset-password AC-1…15.
+### Phase 5 — Catalogs (admin)
 
-### Phase 2 — System pages, settings, catalogs (11-03 → 11-16)
+Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE page under `/admin/*`.
 
-- [ ] **S2.1 Not Found** — `not-found.tsx`, GO BACK. AC 1–7.
-- [ ] **S2.2 No Internet** — screen from Apollo error link / offline, RETRY refetches. AC 1–7.
-- [ ] **S2.3 Device Error** — gate from S0.9 finalized with illustration/message. AC 1–5.
-- [ ] **S2.4 Settings** — theme + language selects (S0.4/S0.5), API `changePassword` (current password check). AC 1–14.
-- [ ] **S2.5 Departments** — module `departments` CRUD (unique, delete blocked when used); page `/admin/departments`. AC 1–17.
-- [ ] **S2.6 Positions** — same pattern as S2.5. AC per positions page.
-- [ ] **S2.7 Skills catalog** — module `skills` CRUD + `skillCategories`; type from category; unique name; page `/admin/skills`. AC 1–20.
-- [ ] **S2.8 Languages catalog** — module `languages` CRUD; ISO uppercase, unique name/ISO; page `/admin/languages`. AC 1–21.
-- [ ] **S2.9 Projects catalog** — module `projects` CRUD + `projectRoles`; date rule; environment as skill tags; search name/domain; sort name/start/end; page `/admin/projects`. AC 1–24.
+- [ ] **S5.1 Departments** — AC per departments.
+- [ ] **S5.2 Positions** — AC per positions.
+- [ ] **S5.3 Skills catalog** — with `skillCategories`; type from category. AC per skills-admin.
+- [ ] **S5.4 Languages catalog** — ISO unique. AC per languages-admin.
+- [ ] **S5.5 Projects** — with `projectRoles`; date rules; environment as skill tags; search name/domain; blocked when used in a CV. AC per projects.
 
-### Phase 3 — Users (11-10 → 11-23)
+### Phase 6 — Users
 
-- [ ] **S3.1 Users list** — module `users` (list search name/email, sort, page; create/update/delete admin); page `/users` with admin modals. AC 1–24. Depends on S2.5, S2.6.
-- [ ] **S3.2 User Details shell** — `/users/[userId]` layout, tabs (CVs admin only), breadcrumbs, permission context (`canEdit`). Depends on S3.1.
-- [ ] **S3.3 Profile + avatar + verify** — API `updateProfile`, `uploadAvatar` (PNG/JPG/JPEG/GIF, ≤ 5 MB, Vercel Blob), `resendVerification` reuse; UI read-only vs editable. AC 1–22.
-- [ ] **S3.4 Skills (own page + user tab)** — module `users/skills`; `features/skills` list grouped by category, add/update/remove with selection mode; used by `/skills` and the tab. AC skills 1–17, user-skills 1–21. Depends on S2.7.
-- [ ] **S3.5 Languages (own page + user tab)** — module `users/languages`; same pattern. AC languages, user-languages 1–21. Depends on S2.8.
-- [ ] **S3.6 User CVs tab** — reuses CVs list from S4.1 filtered by user; create assigns to that user. AC 1–22. Depends on S4.1.
+- [ ] **S6.1 Users list** — BE `users` (search name/email, sort, page; admin create / update / delete with cascade); FE `/users` with admin modals. AC per users. Depends on S5.1, S5.2.
+- [ ] **S6.2 User Details shell** — FE `/users/[userId]` layout, tabs (CVs admin only), breadcrumbs, `canEdit`. Depends on S6.1.
+- [ ] **S6.3 Profile + avatar** — BE `updateProfile`, avatar REST endpoints (D11); FE read-only vs editable profile, upload with validation, verify banner. AC per user-profile.
+- [ ] **S6.4 Skills (own page + user tab)** — BE `users/skills` (remove also removes from CVs); FE `features/skills` grouped by category, add / update / remove with selection mode. AC per skills, user-skills. Depends on S5.3.
+- [ ] **S6.5 Languages (own page + user tab)** — BE `users/languages`; FE same pattern. AC per languages, user-languages. Depends on S5.4.
 
-### Phase 4 — CVs (11-17 → 11-30)
+### Phase 7 — CVs
 
-- [ ] **S4.1 CVs list** — module `cvs` (own vs all, search name / +email for admin, sort, page, CRUD); page `/cvs`. AC 1–22.
-- [ ] **S4.2 CV Details shell + form** — `/cvs/[cvId]` layout, tabs, breadcrumbs; Details form (dirty-check UPDATE). AC 1–15.
-- [ ] **S4.3 CV Skills** — module `cvs/skills` (only owner's skills, no duplicates); reuses `features/skills` list. AC per cv-skills.
-- [ ] **S4.4 CV Projects** — module `cvs/projects` (dates within project, ≥ 1 role); add/update modal with auto-filled read-only project fields. AC 1–27. Depends on S2.9.
-- [ ] **S4.5 CV Preview** — `cvPreview` data; pure utils: experience years (earliest project start → now, floor), last used (latest end or current year), unique domains, `MM.YYYY - Present`; preview layout. AC 1–19, 23–29.
-- [ ] **S4.6 Export PDF** — `@react-pdf/renderer` document matching preview, file name from CV name, disabled when no data. AC 20–22, 26.
+- [ ] **S7.1 CVs list** — BE `cvs` (own vs all, search, sort, page, CRUD); FE `/cvs`. AC per cvs.
+- [ ] **S7.2 CV Details** — FE `/cvs/[cvId]` layout, tabs, breadcrumbs; details form (dirty-check UPDATE); BE `updateCv`. AC per cv-details.
+- [ ] **S7.3 CV Skills** — BE `cvs/skills` (only the owner's skills, no duplicates, mastery per CV); FE reuses `features/skills`. AC per cv-skills.
+- [ ] **S7.4 CV Projects** — BE `cvs/projects` (dates within project, ≥ 1 role); FE add / update modal with read-only project fields. AC per cv-projects. Depends on S5.5.
+- [ ] **S7.5 CV Preview** — BE `cvPreview` aggregate (experience years, last used, unique domains); FE preview layout. AC per cv-preview.
+- [ ] **S7.6 Export PDF** — BE `exportCvPdf` (D12); FE EXPORT PDF action, file name from CV name, disabled when no data. AC per cv-preview.
+- [ ] **S7.7 User CVs tab** — FE reuses the CVs list filtered by user; create assigns to that user. AC per user-cvs. Depends on S7.1, S6.2.
 
-### Phase 5 — Quality and delivery (12-01 → 12-07)
+### Phase 8 — Quality and delivery
 
-- [ ] **S5.1 E2E — part 1** — layout, system pages, settings, users, skills, languages, departments, positions.
-- [ ] **S5.2 E2E — part 2** — auth flows, CVs, CV tabs, preview/PDF, projects.
-- [ ] **S5.3 Coverage ≥ 80 % + README** — fill gaps; README: functionality, dependencies, startup, tests, E2E structure by test case, deployment + live URL.
-- [ ] **S5.4 Demo** — demo data seeded in production, script (≤ 30 min), likely mentor questions.
+- [ ] **S8.1 E2E** — fill gaps and stabilise (D14); test cases listed in the README.
+- [ ] **S8.2 Coverage > 80 %** — both apps; results in the README.
+- [ ] **S8.3 README** — all sections from §1.2, including team task distribution, architecture decisions and API documentation (link to `schema.gql` + main operations).
+- [ ] **S8.4 Deploy (optional)** — frontend on Vercel, backend on Render (Docker), database on Neon; live URL in the README.
+- [ ] **S8.5 Demo** — seeded demo data, script ≤ 30 minutes, likely mentor questions.
 
 ---
 
 ## 10. Environment variables
 
-| Variable | File | Purpose |
+| Variable | App | Purpose |
 |---|---|---|
-| `NEXT_PUBLIC_APP_URL` | `src/env.ts` | Absolute links in emails |
-| `DATABASE_URL` | `src/server/env.ts` | PostgreSQL |
-| `JWT_SECRET` | `src/server/env.ts` | Token signing |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | `src/server/env.ts` | Mail |
-| `BLOB_READ_WRITE_TOKEN` | `src/server/env.ts` | Avatar upload |
-
-`NEXT_PUBLIC_API_URL` is removed (API is same-origin `/api/graphql`).
+| `BACKEND_URL` | frontend | Backend origin for rewrites and server-side requests |
+| `DATABASE_URL` | backend | PostgreSQL |
+| `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | backend | Token signing |
+| `FRONTEND_URL` | backend | Absolute links in emails |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | backend | Mail |
+| `PORT` | backend | HTTP port (default 4000) |
 
 ---
 
 ## 11. Testing plan
 
-Required by the task (Notion): **unit tests and component tests** with React Testing Library + Vitest, coverage over 80 %. Extra: E2E with Playwright.
+Required: frontend unit tests (Vitest + RTL), backend unit tests (Jest + `@nestjs/testing`), backend integration tests (Jest + `@nestjs/testing` + Supertest), coverage over 80 %, main business scenarios covered. Extra: E2E (Playwright).
 
-### 11.1 Unit tests (Vitest)
-
-Test logic in isolation, without rendering UI.
+### 11.1 Frontend (Vitest + React Testing Library)
 
 | What | Examples | Where |
 |---|---|---|
-| Utils | Zod schemas, CV preview calculations (experience years, last used, unique domains, `MM.YYYY - Present`), date and sort helpers, store logic | `x.utils.test.ts` next to the util |
-| Hooks | feature hooks with Apollo `MockedProvider`: loading / data / error, handlers call the right mutation | `useX.test.ts` next to the hook |
-| Server services | permissions (own vs admin), uniqueness, date rules, delete restrictions, token expiry | `<module>.test.ts` in `server/modules/**`, against the test DB |
+| Utils | Zod schemas, date and sort helpers, preference logic | `x.utils.test.ts` next to the util |
+| Hooks | feature hooks with `MockedProvider`: loading / data / error, handlers call the right mutation | `useX.test.ts` |
+| Components | rendering from props, states (loading, empty, error + retry), interactions via user-event, form validation messages, values kept after a failed request, permission-based hiding, labels and focus | `Component.test.tsx` |
 
-### 11.2 Component tests (React Testing Library + Vitest)
+Query by role/label, not by class names.
 
-Render a component the way a user sees it and interact through `user-event`; query by role/label, not by class names.
+### 11.2 Backend unit (Jest + `@nestjs/testing`)
 
-| What | Examples |
-|---|---|
-| Rendering from props | table shows the docs columns, profile shows read-only email |
-| States | loading skeleton, empty message, error with RETRY, no search results |
-| Interactions | sort header toggles direction, menu closes on Escape, OTP moves focus and accepts paste, selection mode shows "REMOVE (n)" |
-| Forms | inline validation messages from docs, primary button disabled until valid / changed, values kept after a failed request |
-| Permissions in UI | buttons hidden for employees viewing another user |
-| Accessibility basics | labels on fields, focus trapped in modals |
+Services with a mocked `PrismaService`: business rules, ownership checks, uniqueness, date rules, delete restrictions, token expiry and single use. Guards, pipes and the exception filter. Files `*.spec.ts` next to the code.
 
-Every component in `features/` and `shared/components/` has a `Component.test.tsx` next to it. Test helper renders with theme, intl and `MockedProvider` (S0.6).
+### 11.3 Backend integration (Jest + `@nestjs/testing` + Supertest)
 
-### 11.3 E2E tests (Playwright, extra)
+GraphQL operations over HTTP against a test database: auth flow (cookies, refresh, sign-out), authorization (`UNAUTHENTICATED`, `FORBIDDEN`, own vs admin), validation errors with field details, main CRUD per module. Files in `backend/test/`.
 
-Full flows per docs page against a seeded database, in `e2e/<area>/`; the structure by test case is listed in the README.
+### 11.4 E2E (Playwright, extra)
 
-### 11.4 Coverage
+Main user flows per area against a seeded database, in `e2e/<area>/`; written with each step (D14).
 
-Over 80 % over `src/`, excluding generated code, configs and `app/` route files. Checked with `npm run test:coverage` before every PR.
+### 11.5 Coverage
+
+Over 80 % per app, excluding generated code, configs, `main.ts` and route files. Checked in CI.
 
 ---
 
@@ -553,4 +532,6 @@ Over 80 % over `src/`, excluding generated code, configs and `app/` route files.
 
 | Date | Step | PR | Note |
 |---|---|---|---|
-| 2026-10-27 | S0.0 Repo baseline | — | Initial commit 2d22ec2 on `main` and `developement` in the new repo |
+| 2026-10-27 | Initial setup | — | Single Next.js app with MUI and TanStack Store (2d22ec2); replaced by S0.1 |
+| 2026-10-28 | Docs | — | `docs/` replaced with the final wiki export |
+| 2026-10-28 | Plan | — | Plan rewritten for the NestJS monorepo (D2) |
