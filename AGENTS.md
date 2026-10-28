@@ -4,15 +4,16 @@ Full plan, stack, decisions and progress: [PLAN.md](PLAN.md). Read §0–§5 fir
 
 pnpm monorepo (Node 24): `frontend/` = Next.js 16 + Apollo Client 4 + Radix UI + CSS Modules; `backend/` = NestJS 11 + GraphQL code-first + Prisma 7 + PostgreSQL 17. TypeScript only.
 
-> The repo is still a single Next.js app with MUI until PLAN.md step S0.1 restructures it.
+## Commands
 
-## Commands (after S0.1)
+Use Node 24 and pnpm 12 (`.nvmrc`, `packageManager`); run from the repo root. Each command runs in every workspace that defines the script.
 
-- `pnpm dev` — both apps (frontend http://localhost:3000, backend http://localhost:4000/graphql)
+- `pnpm dev` — both apps (frontend http://localhost:3000, backend http://localhost:4000; `/graphql` arrives with S0.2)
 - `pnpm lint` · `pnpm typecheck` · `pnpm test` · `pnpm format:check` · `pnpm build`
-- `docker compose up -d` — PostgreSQL + Mailpit
+- One app: `pnpm --filter @cv-builder/frontend <script>` or `pnpm --filter @cv-builder/backend <script>`
+- `docker compose up -d` — PostgreSQL + Mailpit (not available until S0.2)
 
-Run `lint`, `typecheck` and the tests of the app you changed.
+Run `lint`, `typecheck` and the tests of the app you changed. The frontend has no test script until S0.5.
 
 ## Where things are
 
