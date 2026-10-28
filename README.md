@@ -10,7 +10,6 @@ Plan, stack, decisions, coding rules and progress: [PLAN.md](PLAN.md). Per-page 
 |---|---|---|
 | Framework | Next.js 16 (App Router), React 19, TypeScript strict | installed |
 | UI | Radix UI + CSS Modules | planned |
-| Client state | TanStack Store | installed |
 | Server data | Apollo Client + Apollo Server (`/api/graphql`) | planned |
 | Database | PostgreSQL + Prisma | planned |
 | Tests | Vitest + React Testing Library, Playwright (E2E) | planned |
