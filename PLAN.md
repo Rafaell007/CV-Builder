@@ -25,13 +25,13 @@ CV Builder: employees maintain their profile, skills and languages and build CVs
 
 | Area | Pages (docs) |
 |---|---|
-| Authorisation | [sign-in](docs/01-authorisation/sign-in/README.md), [sign-up](docs/01-authorisation/sign-up/README.md), [verification](docs/01-authorisation/verification/README.md), [forgot-password](docs/01-authorisation/forgot-password/README.md), [reset-password](docs/01-authorisation/reset-password/README.md) |
-| System and settings | [not-found](docs/02-errors-and-settings/not-found/README.md), [no-internet](docs/02-errors-and-settings/no-internet/README.md), [device-error](docs/02-errors-and-settings/device-error/README.md), [settings](docs/02-errors-and-settings/settings/README.md) |
-| Users | [users](docs/03-users/users/README.md), [user-profile](docs/03-users/user-profile/README.md), [user-skills](docs/03-users/user-skills/README.md), [user-languages](docs/03-users/user-languages/README.md), [user-cvs](docs/03-users/user-cvs/README.md) |
-| Skills | [skills](docs/04-skills/skills/README.md) (own), [skills-admin](docs/04-skills/skills-admin/README.md) (catalog) |
-| Languages | [languages](docs/05-languages/languages/README.md) (own), [languages-admin](docs/05-languages/languages-admin/README.md) (catalog) |
-| CVs | [cvs](docs/06-cvs/cvs/README.md), [cv-details](docs/06-cvs/cv-details/README.md), [cv-skills](docs/06-cvs/cv-skills/README.md), [cv-projects](docs/06-cvs/cv-projects/README.md), [cv-preview](docs/06-cvs/cv-preview/README.md) |
-| Admin catalogs | [departments](docs/07-others/departments/README.md), [positions](docs/07-others/positions/README.md), [projects](docs/07-others/projects/README.md) |
+| Authorisation | [sign-in](docs/pages/02-sign-in-page.md), [sign-up](docs/pages/03-sign-up-page.md), [verification](docs/pages/06-verification-page.md), [forgot-password](docs/pages/04-forgot-password-page.md), [reset-password](docs/pages/05-reset-password-page.md) |
+| System and settings | [not-found](docs/pages/08-not-found-page.md), [no-internet](docs/pages/07-no-internet-page.md), [device-error](docs/pages/09-device-error-page.md), [settings](docs/pages/15-settings-page.md) |
+| Users | [users](docs/pages/10-users-page.md), [user-profile](docs/pages/11-user-profile-page.md), [user-skills](docs/pages/12-user-skills-page.md), [user-languages](docs/pages/13-user-languages-page.md), [user-cvs](docs/pages/14-user-cvs-page.md) |
+| Skills | [skills](docs/pages/16-skills-page.md) (own), [skills-admin](docs/pages/17-skills-page-admin.md) (catalog) |
+| Languages | [languages](docs/pages/18-languages-page.md) (own), [languages-admin](docs/pages/19-languages-page-admin.md) (catalog) |
+| CVs | [cvs](docs/pages/20-cvs-page.md), [cv-details](docs/pages/21-cv-details-page.md), [cv-skills](docs/pages/22-cv-skills-page.md), [cv-projects](docs/pages/23-cv-projects-page.md), [cv-preview](docs/pages/24-cv-preview-page.md) |
+| Admin catalogs | [departments](docs/pages/25-departments-page.md), [positions](docs/pages/26-positions-page.md), [projects](docs/pages/27-projects-page.md) |
 
 Cross-cutting requirements on every page: Light/Dark theme, responsive (desktop + tablet; < 768 px shows Device Error), keyboard accessible, inline validation, failed requests keep entered values, loading / empty / error (+ retry) states.
 
