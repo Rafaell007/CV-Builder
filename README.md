@@ -65,7 +65,7 @@ Details: [src/features/README.md](src/features/README.md) and [PLAN.md §4](PLAN
 
 ## Workflow
 
-- Branches: `main` (releases), `developement` (integration), feature branches from `developement`; pull requests go into `developement`.
+- Branches: `main` (releases), `development` (integration), feature branches from `development`; pull requests go into `development`.
 - Commits follow [Conventional Commits](https://www.conventionalcommits.org/), e.g. `feat(cvs): add CV table`.
 - Git hooks (Husky, installed by `npm ci`): ESLint and Prettier run on staged files; commitlint checks the message.
 
