@@ -4,14 +4,14 @@ Single source of truth for **what we build, how, in what order, and what is done
 Requirements per page live in [docs/](docs/README.md); coding rules in [§5](#5-development-rules); agent instructions in [AGENTS.md](AGENTS.md).
 
 Deadline and demo: **2026-12-07** (task: 4 weeks).
-Repository: [github.com/Rafaell007/CV-Builder](https://github.com/Rafaell007/CV-Builder) — `main` = releases, `developement` = integration (default branch).
+Repository: [github.com/Rafaell007/CV-Builder](https://github.com/Rafaell007/CV-Builder) — `main` = releases, `development` = integration (default branch).
 
 ---
 
 ## 0. How to use this file
 
 - **Before starting work:** find your step in [§9 Roadmap](#9-roadmap), read its docs page(s), check "Depends on".
-- **Status markers:** `[ ]` todo · `[~]` in progress · `[x]` merged into `developement`.
+- **Status markers:** `[ ]` todo · `[~]` in progress · `[x]` merged into `development`.
 - **When a step is merged:** tick it, add the PR number, and add a line to [§12 Progress log](#12-progress-log). Do it in the same PR.
 - **When a decision changes:** update [§2.3 Decision log](#23-decision-log) in the same PR as the code change.
 - **Jira:** each step in §9 is one ticket (title = step title, description = its bullets). Who does which step is tracked in Jira, not here.
@@ -130,7 +130,7 @@ Same stack and setup order as the other intern team (D2).
 
 | # | Date | Decision | Why |
 |---|---|---|---|
-| D1 | 2026-10-26 | GitFlow: `main` + `developement`, `feature/<ticket>-<name>`, merge commits (no squash) | Structured commits and PR history are graded |
+| D1 | 2026-10-26 | GitFlow: `main` + `development`, `feature/<ticket>-<name>`, merge commits (no squash) | Structured commits and PR history are graded |
 | D2 | 2026-10-28 | Copy the other intern team's stack and setup order: pnpm monorepo, Next.js + NestJS, Radix UI, Prisma, Storybook. MUI and TanStack Store dropped | New task requires NestJS; the teams can help each other |
 | D3 | 2026-10-28 | GraphQL **code-first**; the generated `backend/schema.gql` is committed and is the contract. Frontend types are generated from it | One source of truth; contract changes are visible in PR diffs |
 | D4 | 2026-10-28 | Contract first: a module's GraphQL types and operations are merged (resolvers may be stubbed) before its frontend step starts | Frontend and backend work in parallel without waiting |
@@ -145,17 +145,26 @@ Same stack and setup order as the other intern team (D2).
 | D13 | 2026-10-28 | Delete rules: deleting a user cascades to everything they own; removing a user skill also removes it from their CVs; catalog items in use cannot be deleted | Defined behaviour, no dangling references |
 | D14 | 2026-10-28 | E2E specs are written with each step; Phase 8 only fills gaps and stabilises | No E2E crunch in the last week |
 | D15 | 2026-10-28 | Every PR gets a review and approval from the other developer before merge | Code reviews are graded |
+| D16 | 2026-10-28 | Verified-only actions (verification AC-16): creating and changing CVs, changing own skills and languages. Admin-created and seed users start verified | Docs leave the list to the team; admin-created users have no way to receive a code first |
+| D17 | 2026-10-28 | Main page after sign-in and after LATER: `/users` | Overview: "Users (Main Page)" |
+| D18 | 2026-10-28 | Catalog items in use cannot be deleted (`CONFLICT`). "In use": a skill is referenced by UserSkill, CvSkill or Project.environment; a language by UserLanguage; a department/position by a User; a project by a CvProject | Docs say "block" only for departments; same rule everywhere (D13) |
+| D19 | 2026-10-28 | Table page size: 10 | Not in docs |
+| D20 | 2026-10-28 | Verification: resend 60 s cooldown, max 5 wrong attempts per code. Reset token: 1 h, single use | Not in docs |
+| D21 | 2026-10-28 | Refresh rotation with a 30 s reuse grace window (old token valid once after rotation); reuse after the window revokes the whole token family. Frontend refresh is single-flight | Parallel requests (tabs, `proxy.ts` + Apollo) would otherwise log the user out; reuse detection catches stolen tokens |
+| D22 | 2026-10-28 | `changePassword` and `resetPassword` revoke all the user's refresh tokens; `changePassword` issues a new one for the current session | Old sessions must not survive a password change |
+| D23 | 2026-10-28 | Rate limiting with `@nestjs/throttler` (GraphQL-aware guard) on `signIn`, `signUp`, `forgotPassword`, `verifyEmail`, `resendVerificationCode` | Verification AC-18 and security requirements |
+| D24 | 2026-10-28 | An admin cannot delete themselves, remove their own Admin role, or remove the last admin (`CONFLICT`) | The app must never lose its last admin |
+| D25 | 2026-10-28 | Updating a project's dates is blocked (`CONFLICT`, with the count) when CV projects would fall outside them | CvProject dates must stay within the project's dates |
+| D26 | 2026-10-28 | Theme and language are stored only in cookies (client-side), not on the backend | Settings docs allow it; no extra API or migration |
+| D27 | 2026-10-28 | i18n: `en` complete, `pl` fully translated; the other 7 languages fall back to `en` | 9 full translations per feature cost too much for the deadline |
+| D28 | 2026-10-28 | Device Error gate (< 768 px) is CSS-only (media query), no JS width check | No flash of the real page on SSR |
+| D29 | 2026-10-28 | Steps are tagged **Must / Should / Could** (§9); Could steps are dropped first when time runs out | Fixed deadline |
+| D30 | 2026-10-28 | Demo runs locally (Docker + seed). Deploy stays optional | Free-tier cold starts (~50 s) and upload limits are demo risks |
+| D31 | 2026-10-28 | Integration branch renamed `developement` → `development` | Typo would spread into CI, README and deploy settings |
 
 ### 2.4 Open decisions
 
-| # | Question | Default until decided |
-|---|---|---|
-| O1 | Which actions require a verified email (verification page AC-16) | Creating and changing CVs, and changing own skills and languages |
-| O2 | Main page after sign-in and after LATER | `/users` (overview: "Users (Main Page)") |
-| O3 | Skill and language catalog delete when in use (docs say "block" only for departments) | Block, same message pattern (D13) |
-| O4 | Page size for tables | 10 |
-| O5 | Verification resend limit (docs leave it to the backend) | 60 s cooldown, max 5 wrong attempts per code |
-| O6 | Reset token lifetime (not in docs) | 1 h, single use |
+None. Add new ones here as `O<n>` with a default until decided.
 
 ---
 
@@ -174,7 +183,7 @@ Browser ──► Next.js (frontend/)                                   NestJS (
 - **Authorization:** see D10. The UI only hides what the user may not do.
 - **Errors:** see D7. Unknown errors are logged and returned as `INTERNAL_SERVER_ERROR` without details.
 - **List pattern:** every list query takes `search`, `sort { field, direction }`, `page { number, size }` and returns `{ items, total }` (shared GraphQL building blocks, S2.2).
-- **Verification:** unverified users can sign in and use the app after LATER; verified-only actions (O1) fail with `FORBIDDEN` and code `EMAIL_NOT_VERIFIED`.
+- **Verification:** unverified users can sign in and use the app after LATER; verified-only actions (D16) fail with `FORBIDDEN` and code `EMAIL_NOT_VERIFIED`.
 
 ---
 
@@ -303,7 +312,7 @@ Rules for all code in this repository.
 
 ### 5.11 Workflow
 
-- Each step = branch `feature/<ticket>-<name>` from `developement`, PR into `developement`, **review and approval by the other developer** (D15), merge commit (no squash).
+- Each step = branch `feature/<ticket>-<name>` from `development`, PR into `development`, **review and approval by the other developer** (D15), merge commit (no squash).
 - Commit types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`; scope = app or module (`frontend`, `backend`, `cvs`, …); ticket key at the end when the ticket exists.
 - A step is done when format, lint, typecheck and tests pass (CI green), its unit / component / integration tests (§11) are written, the step's acceptance criteria (docs AC IDs) are met, and this file is updated.
 - New user-facing text goes to the feature's `messages/en.json`; other languages may start as copies.
@@ -317,7 +326,7 @@ Rules for all code in this repository.
 | `/sign-in` · `/sign-up` | sign-in, sign-up | public (signed-in → `/users`) | static |
 | `/verify-email` | verification | signed-in, unverified | static |
 | `/forgot-password` · `/reset-password?token=` | forgot-password, reset-password | public | static |
-| `/` | redirect → `/users` (O2) | — | — |
+| `/` | redirect → `/users` (D17) | — | — |
 | `/users` | users (main page) | User, Admin | SSR |
 | `/users/[userId]` → `/profile` · `/skills` · `/languages` · `/cvs` | user-profile, user-skills, user-languages, user-cvs | User, Admin (edit: owner or admin; CVs tab: admin) | SSR |
 | `/skills` · `/languages` | skills, languages (own) | User | SSR |
@@ -340,20 +349,20 @@ Field lists are a starting point; S2.1 checks every docs page and completes them
 | Avatar | userId (PK), data (bytes), mimeType, updatedAt | ≤ 5 MB, PNG/JPG/JPEG/GIF (D11) |
 | Department · Position | id, name unique | delete blocked when used |
 | SkillCategory | id, name, type | seeded |
-| Skill | id, name unique, categoryId | delete blocked when used (O3) |
+| Skill | id, name unique, categoryId | delete blocked when used (D18) |
 | UserSkill | userId + skillId unique, mastery `BEGINNER` `ELEMENTARY` `INTERMEDIATE` `ADVANCED` `EXPERT` | removing it removes it from the user's CVs (D13) |
-| Language | id, name unique, iso unique, nativeName | delete blocked when used (O3) |
+| Language | id, name unique, iso unique, nativeName | delete blocked when used (D18) |
 | UserLanguage | userId + languageId unique, proficiency `A1` `A2` `B1` `B2` `C1` `C2` `NATIVE` | |
-| Project | id, name, domain, startDate, endDate?, description, environment → Skill[] | delete blocked when used in a CV |
+| Project | id, name, domain, startDate, endDate?, description, environment → Skill[] | delete blocked when used in a CV; date change blocked when CV projects would fall outside (D25) |
 | ProjectRole | id, name | seeded |
 | Cv | id, name, education?, description, userId | |
 | CvSkill | cvId + skillId unique, mastery | skill must be one of the owner's skills |
 | CvProject | id, cvId, projectId, startDate, endDate?, responsibilities?, roles → ProjectRole[] (≥ 1) | dates within the project's dates |
-| VerificationCode | userId, codeHash, expiresAt, usedAt?, attempts | 6 digits, 10 min, single use (O5) |
-| PasswordResetToken | userId, tokenHash, expiresAt, usedAt? | single use (O6) |
-| RefreshToken | userId, tokenHash, expiresAt | rotated on refresh, deleted on sign-out |
+| VerificationCode | userId, codeHash, expiresAt, usedAt?, attempts | 6 digits, 10 min, single use (D20) |
+| PasswordResetToken | userId, tokenHash, expiresAt, usedAt? | single use (D20) |
+| RefreshToken | userId, tokenHash, familyId, expiresAt, replacedAt? | rotated on refresh with a 30 s grace window; reuse after it revokes the family (D21); deleted on sign-out; all revoked on password change/reset (D22) |
 
-Seed: 1 admin, 2+ users, departments, positions, skill categories + ~40 skills, 10+ languages, project roles, ~6 projects, sample CVs.
+Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill categories + ~40 skills, 10+ languages, project roles, ~6 projects, sample CVs.
 
 ---
 
@@ -361,7 +370,7 @@ Seed: 1 admin, 2+ users, departments, positions, skill categories + ~40 skills, 
 
 | Action | User | Admin |
 |---|---|---|
-| Use the app while unverified (except O1 actions) | ✓ | ✓ |
+| Use the app while unverified (except D16 actions) | ✓ | ✓ |
 | View users list and any profile / skills / languages | ✓ | ✓ |
 | Edit profile, avatar, skills, languages | own only | any user |
 | Create / update / delete users | — | ✓ |
@@ -376,6 +385,8 @@ Seed: 1 admin, 2+ users, departments, positions, skill categories + ~40 skills, 
 
 **Every step ships with its tests** (§11). Feature steps are split into a backend step (**BE**) and a frontend step (**FE**) so the two developers can work in parallel; the BE step merges the contract first (D4). Steps with a user flow add their E2E spec once the flow works (D14).
 
+**Priority (D29):** steps without a tag are **Must**. **(Should)** — do after all Must steps of the same phase. **(Could)** — dropped first when time runs out.
+
 ### Phase 0 — Monorepo and infrastructure
 
 - [ ] **S0.1 Monorepo structure**
@@ -387,11 +398,13 @@ Seed: 1 admin, 2+ users, departments, positions, skill categories + ~40 skills, 
 - [ ] **S0.2 Backend infrastructure**
   - Docker Compose: PostgreSQL 17 + Mailpit. Prisma 7 with `PrismaService`; scripts `db:migrate`, `db:seed`, `db:reset`.
   - GraphQL code-first with Apollo Server 5, `schema.gql` generated and committed; `@nestjs/config` with env validation; a `health` query.
+  - Prisma 7 spike first: driver adapter (`@prisma/adapter-pg`) + `prisma.config.ts`; the generated client must work in Nest dev, build and Jest. If the new `prisma-client` generator clashes with Nest's CommonJS build, use `prisma-client-js`.
   - Done when: a fresh clone runs Docker + migrate + backend from the README and `health` answers.
   - Depends on: S0.1.
 
 - [ ] **S0.3 CI**
-  - GitHub Actions on PRs to `developement`: format, lint, typecheck, tests (with a Postgres service), builds of both apps.
+  - GitHub Actions on PRs to `development`: format, lint, typecheck, tests (with a Postgres service), builds of both apps.
+  - Contract check: regenerate `schema.gql` and fail on `git diff`; run frontend codegen + typecheck against it.
   - Done when: the workflow is green on a PR.
   - Depends on: S0.1.
 
@@ -399,19 +412,20 @@ Seed: 1 admin, 2+ users, departments, positions, skill categories + ~40 skills, 
   - Apollo Client 4 (SSR integration, cookie forwarding, error link), codegen from `backend/schema.gql`, Next.js rewrites (D8).
   - Route groups `(auth)` / `(app)` with placeholder pages (§6).
   - Design tokens from Figma, light/dark themes with CSS Modules; theme and language preferences in React Context + cookies (D5); Radix UI installed.
-  - Storybook 10 with the theme switcher.
-  - Done when: a page renders `health` through Apollo; theme switch persists without flash; Storybook runs.
+  - **(Should)** Storybook 10 with the theme switcher.
+  - Done when: a page renders `health` through Apollo; theme switch persists without flash; Storybook runs (if done).
   - Depends on: S0.1, S0.2.
 
 - [ ] **S0.5 Test setup**
-  - Frontend: Vitest + RTL + user-event (jsdom), test render helper (theme, intl, `MockedProvider`), coverage threshold 80 %.
-  - Backend: Jest unit config; integration config with Supertest and a separate test database; coverage threshold 80 %.
+  - Frontend: Vitest + RTL + user-event (jsdom), test render helper (theme, intl, `MockedProvider`).
+  - Backend: Jest unit config; integration config with Supertest and a separate test database, run serially (`--runInBand`), tables truncated per test file; injectable `Clock` provider for date-based rules.
+  - Coverage threshold 80 % in both apps, enforced in CI from Phase 3 on (reported only before that).
   - Playwright config at the root with a seeded run.
   - Done when: one sample test per level runs locally and in CI.
   - Depends on: S0.2, S0.3.
 
 - [ ] **S0.6 i18n**
-  - next-intl, 9 languages from the settings page (en complete, others start as copies), locale from the preference cookie, per-feature `messages/`.
+  - next-intl, 9 languages from the settings page (D27: `en` complete, `pl` fully translated, the other 7 fall back to `en`), locale from the preference cookie, per-feature `messages/`.
   - Done when: switching language changes texts and persists.
   - Depends on: S0.4.
 
@@ -420,7 +434,7 @@ Seed: 1 admin, 2+ users, departments, positions, skill categories + ~40 skills, 
 - [ ] **S1.1 Form controls** — Button, IconButton, TextField, PasswordField (toggle), Textarea, Select, MultiSelect, DatePicker, OtpField, SearchField (debounced); RHF + Zod helpers and server field-error mapping. Stories + tests.
 - [ ] **S1.2 Data display** — DataTable (columns, sort indicator, row actions slot), Pagination, Menu (one open, Escape/outside close), Tabs, Breadcrumbs, Avatar, PageState (loading skeleton, empty, no results, error + retry). Stories + tests.
 - [ ] **S1.3 Overlays and feedback** — Modal / FormModal (focus trap, Escape, primary disabled until valid and dirty), ConfirmModal, Toast notifications, SelectionToolbar ("REMOVE (n)"). Stories + tests.
-- [ ] **S1.4 App layout** — `(app)` layout: sidebar by role (§6), active item, profile section + menu, header with breadcrumbs, Device Error gate (< 768 px, live on resize), No Internet state. Depends on S1.2, S3.1 (`me`).
+- [ ] **S1.4 App layout** — `(app)` layout: sidebar by role (§6), active item, profile section + menu, header with breadcrumbs, Device Error gate (< 768 px, CSS media query only, D28), No Internet state. Depends on S1.2, S3.1 (`me`).
 
 ### Phase 2 — Data model and API conventions
 
@@ -429,21 +443,21 @@ Seed: 1 admin, 2+ users, departments, positions, skill categories + ~40 skills, 
 
 ### Phase 3 — Authentication
 
-- [ ] **S3.1 BE Auth core** — `signIn`, `signOut`, `refresh`, `me`; argon2, JWT cookies, refresh rotation (D9); guards active globally. Integration tests for each guard.
+- [ ] **S3.1 BE Auth core** — `signIn`, `signOut`, `refresh`, `me`; argon2, JWT cookies, refresh rotation with grace window and family revoke (D9, D21), throttling (D23); guards active globally. Integration tests for each guard.
 - [ ] **S3.2 FE Session** — `proxy.ts` (no session → `/sign-in`, refresh before render, signed-in on auth pages → `/users`, admin-only routes), error link refresh-then-redirect, `useCurrentUser`. Depends on S3.1, S0.4.
 - [ ] **S3.3 BE Mail** — Nodemailer module (Mailpit locally), templates: verification code, password reset link (links use `FRONTEND_URL`).
 - [ ] **S3.4 Sign In** — BE errors ("Invalid email or password"); FE page. AC per sign-in.
 - [ ] **S3.5 Sign Up** — BE `signUp` (unique email, hash, send code, sign in); FE page → `/verify-email`. AC per sign-up. Depends on S3.3.
-- [ ] **S3.6 Email Verification** — BE `verifyEmail`, `resendVerificationCode` (10 min, single use, O5), `@Verified()`; FE OTP page, CONFIRM, LATER → `/users`. AC per verification.
-- [ ] **S3.7 Forgot Password** — BE `forgotPassword` (token + mail, same response for unknown emails); FE page. AC per forgot-password.
-- [ ] **S3.8 Reset Password** — BE `resetPassword` (token check, expiry, single use); FE page. AC per reset-password.
+- [ ] **S3.6 Email Verification** — BE `verifyEmail`, `resendVerificationCode` (10 min, single use, D20), `@Verified()`; FE OTP page, CONFIRM, LATER → `/users`. AC per verification.
+- [ ] **S3.7 Forgot Password** (Should) — BE `forgotPassword` (token + mail, same response for unknown emails); FE page. AC per forgot-password.
+- [ ] **S3.8 Reset Password** (Should) — BE `resetPassword` (token check, expiry, single use, revokes sessions D22); FE page. AC per reset-password.
 
 ### Phase 4 — System pages and settings
 
 - [ ] **S4.1 Not Found** — `not-found.tsx`, GO BACK. AC per not-found.
 - [ ] **S4.2 No Internet** — state from the Apollo error link / offline event, RETRY refetches. AC per no-internet.
 - [ ] **S4.3 Device Error** — gate from S1.4 finalised with illustration and message. AC per device-error.
-- [ ] **S4.4 Settings** — theme and language selects (S0.4, S0.6); BE `changePassword` (current password check); FE form. AC per settings.
+- [ ] **S4.4 Settings** — theme and language selects (S0.4, S0.6); BE `changePassword` (current password check, revokes other sessions D22); FE form. AC per settings.
 
 ### Phase 5 — Catalogs (admin)
 
@@ -453,13 +467,13 @@ Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE 
 - [ ] **S5.2 Positions** — AC per positions.
 - [ ] **S5.3 Skills catalog** — with `skillCategories`; type from category. AC per skills-admin.
 - [ ] **S5.4 Languages catalog** — ISO unique. AC per languages-admin.
-- [ ] **S5.5 Projects** — with `projectRoles`; date rules; environment as skill tags; search name/domain; blocked when used in a CV. AC per projects.
+- [ ] **S5.5 Projects** — with `projectRoles`; date rules; environment as skill tags; search name/domain; delete blocked when used in a CV; date change blocked when CV projects would fall outside (D25). AC per projects.
 
 ### Phase 6 — Users
 
-- [ ] **S6.1 Users list** — BE `users` (search name/email, sort, page; admin create / update / delete with cascade); FE `/users` with admin modals. AC per users. Depends on S5.1, S5.2.
+- [ ] **S6.1 Users list** — BE `users` (search name/email, sort, page; admin create / update / delete with cascade; created users are verified (D16); last-admin and self rules (D24)); FE `/users` with admin modals. AC per users. Depends on S5.1, S5.2.
 - [ ] **S6.2 User Details shell** — FE `/users/[userId]` layout, tabs (CVs admin only), breadcrumbs, `canEdit`. Depends on S6.1.
-- [ ] **S6.3 Profile + avatar** — BE `updateProfile`, avatar REST endpoints (D11); FE read-only vs editable profile, upload with validation, verify banner. AC per user-profile.
+- [ ] **S6.3 Profile + avatar** — BE `updateProfile`; FE read-only vs editable profile, verify banner. **(Should)** avatar REST endpoints (D11) and upload with validation. AC per user-profile.
 - [ ] **S6.4 Skills (own page + user tab)** — BE `users/skills` (remove also removes from CVs); FE `features/skills` grouped by category, add / update / remove with selection mode. AC per skills, user-skills. Depends on S5.3.
 - [ ] **S6.5 Languages (own page + user tab)** — BE `users/languages`; FE same pattern. AC per languages, user-languages. Depends on S5.4.
 
@@ -470,16 +484,16 @@ Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE 
 - [ ] **S7.3 CV Skills** — BE `cvs/skills` (only the owner's skills, no duplicates, mastery per CV); FE reuses `features/skills`. AC per cv-skills.
 - [ ] **S7.4 CV Projects** — BE `cvs/projects` (dates within project, ≥ 1 role); FE add / update modal with read-only project fields. AC per cv-projects. Depends on S5.5.
 - [ ] **S7.5 CV Preview** — BE `cvPreview` aggregate (experience years, last used, unique domains); FE preview layout. AC per cv-preview.
-- [ ] **S7.6 Export PDF** — BE `exportCvPdf` (D12); FE EXPORT PDF action, file name from CV name, disabled when no data. AC per cv-preview.
+- [ ] **S7.6 Export PDF** (Should) — BE `exportCvPdf` (D12); FE EXPORT PDF action, file name from CV name, disabled when no data. AC per cv-preview.
 - [ ] **S7.7 User CVs tab** — FE reuses the CVs list filtered by user; create assigns to that user. AC per user-cvs. Depends on S7.1, S6.2.
 
 ### Phase 8 — Quality and delivery
 
-- [ ] **S8.1 E2E** — fill gaps and stabilise (D14); test cases listed in the README.
+- [ ] **S8.1 E2E** — smoke flows (sign-in, create CV, preview) stable; test cases listed in the README. **(Could)** fill remaining gaps (D14).
 - [ ] **S8.2 Coverage > 80 %** — both apps; results in the README.
 - [ ] **S8.3 README** — all sections from §1.2, including team task distribution, architecture decisions and API documentation (link to `schema.gql` + main operations).
-- [ ] **S8.4 Deploy (optional)** — frontend on Vercel, backend on Render (Docker), database on Neon; live URL in the README.
-- [ ] **S8.5 Demo** — seeded demo data, script ≤ 30 minutes, likely mentor questions.
+- [ ] **S8.4 Deploy** (Could) — frontend on Vercel, backend on Render (Docker), database on Neon; test avatar upload (5 MB) through the rewrite early; live URL in the README.
+- [ ] **S8.5 Demo** — runs locally (D30); seeded demo data, script ≤ 30 minutes, likely mentor questions.
 
 ---
 
@@ -524,7 +538,7 @@ Main user flows per area against a seeded database, in `e2e/<area>/`; written wi
 
 ### 11.5 Coverage
 
-Over 80 % per app, excluding generated code, configs, `main.ts` and route files. Checked in CI.
+Over 80 % per app, excluding generated code, configs, `main.ts` and route files. Enforced in CI from Phase 3 on.
 
 ---
 
@@ -535,3 +549,4 @@ Over 80 % per app, excluding generated code, configs, `main.ts` and route files.
 | 2026-10-27 | Initial setup | — | Single Next.js app with MUI and TanStack Store (2d22ec2); replaced by S0.1 |
 | 2026-10-28 | Docs | — | `docs/` replaced with the final wiki export |
 | 2026-10-28 | Plan | — | Plan rewritten for the NestJS monorepo (D2) |
+| 2026-10-28 | Plan review | — | Gaps closed: D16–D31, priorities, branch renamed to `development` |
