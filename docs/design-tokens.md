@@ -66,6 +66,36 @@ Font: **Roboto** everywhere. LH = line height, LS = letter spacing (px). DS = pa
 | Notification text | 400 · 12 · 20 · 0.15 | DS › Notifications |
 | Error text | 400 · 12 · 16 · 0.15 | DS › Input › Invalid |
 
+## Spacing
+
+Figma uses no auto-layout, so there are no padding or gap fields; distances were measured from layer positions. Most values sit on a 4px grid, which becomes the scale. Off-grid values are not rounded: they stay exact in the component's CSS.
+
+| Token | Value | Examples |
+|---|---|---|
+| `--space-1` | 4px | menu item top/bottom inset; input eye button top |
+| `--space-2` | 8px | notification title top; title → description |
+| `--space-3` | 12px | input text inset; notification close icon right |
+| `--space-4` | 16px | button top/bottom; table cell left; nav icon inset |
+| `--space-6` | 24px | page content left; notification stack gap |
+| `--space-8` | 32px | menu item height |
+| `--space-10` | 40px | search height |
+| `--space-12` | 48px | button and input height |
+| `--space-14` | 56px | header and nav link height |
+
+Off-grid values (exact, per component):
+
+| Element | Value | Source |
+|---|---|---|
+| Primary button side inset | 30px | DS › Buttons › Button |
+| Menu item side inset | 15px | DS › Table › Nav › Link |
+| Sidebar nav link gap | 14px | USER PROFILE › Aside › Nav |
+| Table row height; cell text top | 73px; 27.5px | DS › Table › Row |
+| Table header row height; text top | 57.8px; 16.8px | USERS › Table |
+| Sign-in: heading → subtitle → email → password → button | 22 / 42 / 36 / 44px | SIGN IN › Form |
+| Sign-in: heading from page top | 274px | SIGN IN › Form |
+| USERS: content right edge | 26px | USERS › Main |
+| Input eye button right | 6px | DS › Input › Button |
+
 ## Radius
 
 | Element | Value |
@@ -86,10 +116,13 @@ Font: **Roboto** everywhere. LH = line height, LS = letter spacing (px). DS = pa
 
 Component-level details (secondary, ghost and select states) are left for the component tickets.
 
-## Gaps to confirm with the designer
+## Decisions where Figma is unclear
+
+There is no designer to ask; we follow Figma as closely as possible and decide the gaps ourselves.
 
 - Dark 1440 frames have a second fill #121212 under #2E2E2E; read as a covered underlay and ignored (fill opacity is not visible in view mode).
 - DS primary button has no shadow, but the screens do; we follow the screens.
 - No dark notifications; we use the light colours.
-- The input state "Active" is assumed to mean focus.
-- Dark input hover border: not found.
+- The input state "Active" means focus.
+- Dark input hover border: not found; we keep the default border (#AEAEAE) on hover.
+- Off-grid spacing (30, 15, 14, 22, 42, 36, 44, 26, 73px) is kept exact, not rounded.
