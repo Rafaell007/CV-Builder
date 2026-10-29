@@ -43,7 +43,7 @@ A feature is added to this table as "done" when its PLAN.md step is merged.
 | Backend | NestJS 11, TypeScript strict | installed |
 | UI | Radix UI + CSS Modules | planned |
 | API | GraphQL, code-first (Apollo Server 5), Apollo Client 4 | planned |
-| Database | PostgreSQL 17 + Prisma 7 | planned |
+| Database | PostgreSQL 17 + Prisma 7 | installed (no models yet) |
 | Auth | JWT access and refresh tokens in httpOnly cookies | planned |
 | Tests | Vitest + React Testing Library, Jest + Supertest, Playwright (E2E) | backend Jest installed, rest planned |
 | Quality | ESLint, Prettier, Husky, lint-staged, commitlint | installed |
@@ -56,13 +56,20 @@ Full list with reasons: [PLAN.md §3](PLAN.md).
 Requirements: Node.js 24 (see [.nvmrc](.nvmrc)) and pnpm 12 (pinned in `package.json`; `corepack enable` provides it).
 
 ```bash
+docker compose up -d                                # PostgreSQL 17 + Mailpit
 pnpm install
-cp frontend/.env.example frontend/.env.local   # then adjust the values
+cp frontend/.env.example frontend/.env.local        # then adjust the values
+cp backend/.env.example backend/.env
+pnpm --filter @cv-builder/backend db:generate       # Prisma client; needs backend/.env
+pnpm --filter @cv-builder/backend db:migrate
 pnpm dev
 ```
 
+The backend needs the database running and `backend/.env` in place, or it will not start. Run `db:generate` once after cloning and again after every change to `backend/prisma/schema.prisma`; typecheck, build and tests need the generated client.
+
 - Frontend: http://localhost:3000
 - Backend: http://localhost:4000 (the GraphQL endpoint `/graphql` arrives in step S0.2)
+- Mailpit inbox (catches all outgoing mail): http://localhost:8025
 
 ### Running one app
 
@@ -73,7 +80,24 @@ pnpm --filter @cv-builder/backend dev
 
 ### Database and migrations
 
-Planned for step S0.2: `docker compose up -d` (PostgreSQL 17 and Mailpit), then `pnpm --filter @cv-builder/backend db:migrate` and `db:seed`. _Not available yet._
+PostgreSQL 17 and Mailpit run in Docker (`docker-compose.yml`). The database is `cv_builder` on `localhost:5432` (user and password `cv_builder`, local use only); the data lives in a Docker volume and survives restarts.
+
+```bash
+docker compose up -d      # start
+docker compose down       # stop, keep the data
+docker compose down -v    # stop and delete the data
+```
+
+Prisma scripts, run from the repository root with `pnpm --filter @cv-builder/backend <script>`:
+
+| Script | What it does |
+|---|---|
+| `db:generate` | Generate the Prisma client into `backend/src/generated` (git-ignored) |
+| `db:migrate` | Create and apply migrations from `prisma/schema.prisma` |
+| `db:seed` | Run `prisma/seed.ts` (a placeholder until the data model lands in S2.1) |
+| `db:reset` | Drop the database, re-apply all migrations. **Deletes all data**; run `db:seed` afterwards |
+
+The schema has no models yet, so `db:migrate` reports "Already in sync".
 
 ### Scripts
 
@@ -141,7 +165,7 @@ The full log is in [PLAN.md §2.3](PLAN.md). The ones that shape the code most:
 |---|---|---|---|
 | `NEXT_PUBLIC_APP_URL` | frontend | Public URL of the app | in use |
 | `BACKEND_URL` | frontend | Backend origin for rewrites and server-side requests | planned |
-| `DATABASE_URL` | backend | PostgreSQL connection string | planned |
+| `DATABASE_URL` | backend | PostgreSQL connection string | in use |
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | backend | Token signing | planned |
 | `FRONTEND_URL` | backend | Absolute links in emails | planned |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | backend | Mail | planned |
