@@ -395,10 +395,11 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
   - README skeleton with the required sections (§1.2).
   - Done when: `pnpm install` + `pnpm dev` start both apps; lint and typecheck pass in both.
 
-- [ ] **S0.2 Backend infrastructure**
+- [~] **S0.2 Backend infrastructure**
   - Docker Compose: PostgreSQL 17 + Mailpit. Prisma 7 with `PrismaService`; scripts `db:migrate`, `db:seed`, `db:reset`.
   - GraphQL code-first with Apollo Server 5, `schema.gql` generated and committed; `@nestjs/config` with env validation; a `health` query.
   - Prisma 7 spike first: driver adapter (`@prisma/adapter-pg`) + `prisma.config.ts`; the generated client must work in Nest dev, build and Jest. If the new `prisma-client` generator clashes with Nest's CommonJS build, use `prisma-client-js`.
+  - **Spike result:** the new `prisma-client` generator works with Nest's CommonJS build when `moduleFormat = "cjs"` is set (output `backend/src/generated/prisma`, git-ignored, rebuilt by `db:generate`); `prisma-client-js` is not needed. The `pg` adapter connects lazily, so `PrismaService` runs `SELECT 1` on startup to fail fast without a database. `prisma.config.ts` reads `DATABASE_URL` with `process.env` instead of `env()`, so `db:generate` works without a `.env` (CI); `migrate` and `seed` still need it.
   - Done when: a fresh clone runs Docker + migrate + backend from the README and `health` answers.
   - Depends on: S0.1.
 
@@ -551,3 +552,4 @@ Over 80 % per app, excluding generated code, configs, `main.ts` and route files.
 | 2026-10-28 | Plan | — | Plan rewritten for the NestJS monorepo (D2) |
 | 2026-10-28 | Plan review | — | Gaps closed: D16–D31, priorities, branch renamed to `development` |
 | 2026-10-28 | S0.1 Monorepo structure | #7 | pnpm workspaces, `frontend/` + `backend/` (NestJS 11), shared tooling, README skeleton; MUI and TanStack Store removed |
+| 2026-10-29 | S0.2a Docker Compose and Prisma 7 | #8 | PostgreSQL + Mailpit, Prisma 7 with `prisma-client` (CJS) and the `pg` adapter, `PrismaService`, db scripts; spike result in S0.2 |
