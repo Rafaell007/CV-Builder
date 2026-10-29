@@ -8,8 +8,8 @@ One folder per feature. Each feature folder has the same shape, and so does ever
   README.md               # 5–10 lines: purpose, exports, used by, docs link
   Feature.tsx             # representational component
   Feature.test.tsx
-  useFeature.ts           # composed hook
-  feature.utils.ts
+  useFeature/             # composed hook: useFeature.ts, useFeature.test.ts, index.ts
+  utils/                  # feature.utils.ts, feature.utils.test.ts, index.ts
   feature.types.ts
   components/
     Child/                # same shape, one level down
