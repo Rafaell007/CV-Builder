@@ -389,7 +389,7 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
 
 ### Phase 0 — Monorepo and infrastructure
 
-- [~] **S0.1 Monorepo structure**
+- [x] **S0.1 Monorepo structure**
   - pnpm workspaces (Node 24): move the Next.js app to `frontend/`, scaffold NestJS 11 in `backend/`; remove MUI and TanStack Store, npm lockfile.
   - Shared `tsconfig.base.json`, one ESLint + Prettier config, Husky + lint-staged + commitlint at the root; root scripts (`dev`, `lint`, `typecheck`, `test`, `build`, `format:check`).
   - README skeleton with the required sections (§1.2).
@@ -550,5 +550,5 @@ Over 80 % per app, excluding generated code, configs, `main.ts` and route files.
 | 2026-10-28 | Docs | — | `docs/` replaced with the final wiki export |
 | 2026-10-28 | Plan | — | Plan rewritten for the NestJS monorepo (D2) |
 | 2026-10-28 | Plan review | — | Gaps closed: D16–D31, priorities, branch renamed to `development` |
-| 2026-10-28 | S0.1 Monorepo structure | — | Done on `feature/KAN-64-pre-configuration`, PR and review pending; set to `[x]` on merge |
+| 2026-10-28 | S0.1 Monorepo structure | #7 | pnpm monorepo with `frontend/` and `backend/`, shared tooling; merged into `development` |
 | 2026-10-29 | S0.4a Design tokens, themes, preferences | — | Tokens from Figma (`docs/design-tokens.md`), light/dark themes, preference cookies with a pre-paint script, Radix UI installed; Apollo part (S0.4b) pending |
