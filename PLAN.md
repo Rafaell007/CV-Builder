@@ -134,7 +134,7 @@ Same stack and setup order as the other intern team (D2).
 | D2 | 2026-10-28 | Copy the other intern team's stack and setup order: pnpm monorepo, Next.js + NestJS, Radix UI, Prisma, Storybook. MUI and TanStack Store dropped | New task requires NestJS; the teams can help each other |
 | D3 | 2026-10-28 | GraphQL **code-first**; the generated `backend/schema.gql` is committed and is the contract. Frontend types are generated from it | One source of truth; contract changes are visible in PR diffs |
 | D4 | 2026-10-28 | Contract first: a module's GraphQL types and operations are merged (resolvers may be stubbed) before its frontend step starts | Frontend and backend work in parallel without waiting |
-| D5 | 2026-10-28 | State: server data in the Apollo cache; theme and language in React Context, persisted in cookies (read on the server, no flash) | No extra state library needed |
+| D5 | 2026-10-28 | State: server data in the Apollo cache; theme and language in React Context, persisted in cookies; an inline `<head>` script applies them before the first paint (no flash). The server does not read them, so pages stay static under Cache Components | No extra state library needed; reading cookies in the root layout would make every route dynamic ([Next.js guide](https://nextjs.org/docs/app/guides/preventing-flash-before-hydration)) |
 | D6 | 2026-10-28 | Rendering: protected pages are SSR per request (Server Components query the backend, forwarding the user's cookies); auth, not-found and device-error pages are static | Protected pages are per-user, so they cannot be SSG |
 | D7 | 2026-10-28 | Errors: one global exception filter maps errors to GraphQL `extensions.code` (`UNAUTHENTICATED`, `FORBIDDEN`, `BAD_USER_INPUT` with field errors, `NOT_FOUND`, `CONFLICT`); the UI shows field errors inline, others as a system error | Consistent error contract |
 | D8 | 2026-10-28 | The browser calls the backend through a Next.js rewrite (`/graphql`, `/api/*` → backend), so auth cookies stay first-party | No CORS or third-party cookie issues, also when deployed on two hosts |
@@ -156,7 +156,7 @@ Same stack and setup order as the other intern team (D2).
 | D24 | 2026-10-28 | An admin cannot delete themselves, remove their own Admin role, or remove the last admin (`CONFLICT`) | The app must never lose its last admin |
 | D25 | 2026-10-28 | Updating a project's dates is blocked (`CONFLICT`, with the count) when CV projects would fall outside them | CvProject dates must stay within the project's dates |
 | D26 | 2026-10-28 | Theme and language are stored only in cookies (client-side), not on the backend | Settings docs allow it; no extra API or migration |
-| D27 | 2026-10-28 | i18n: `en` complete, `pl` fully translated; the other 7 languages fall back to `en` | 9 full translations per feature cost too much for the deadline |
+| D27 | 2026-10-29 | i18n: `en` and `pl`, both fully translated. The language selector lists only supported languages (settings AC-8); a language is added with its code and messages | 9 full translations per feature cost too much for the deadline; listing untranslated languages would show English anyway |
 | D28 | 2026-10-28 | Device Error gate (< 768 px) is CSS-only (media query), no JS width check | No flash of the real page on SSR |
 | D29 | 2026-10-28 | Steps are tagged **Must / Should / Could** (§9); Could steps are dropped first when time runs out | Fixed deadline |
 | D30 | 2026-10-28 | Demo runs locally (Docker + seed). Deploy stays optional | Free-tier cold starts (~50 s) and upload limits are demo risks |
@@ -231,10 +231,11 @@ features/<feature>/
   index.ts                 public entry
   README.md                purpose, exports, used by, docs link (5–10 lines)
   Feature.tsx · Feature.module.css · Feature.test.tsx · Feature.stories.tsx
-  useFeature.ts            composed hook (data + state + handlers)
+  useFeature/              composed hook (data + state + handlers): useFeature.ts · useFeature.test.ts · index.ts
+  utils/                   feature.utils.ts · feature.utils.test.ts · index.ts
   feature.graphql          operations (codegen input)
-  feature.utils.ts · feature.types.ts
-  messages/                i18n: en.json … uk.json
+  feature.types.ts
+  messages/                i18n: en.json, pl.json
   components/<Child>/      same shape, one level down
 ```
 
@@ -298,6 +299,7 @@ Rules for all code in this repository.
 ### 5.9 Fractal structure
 
 - Every unit is a folder that owns its files, tests and children; the same shape repeats at every level.
+- A file and its test are one unit: `X.ts(x)` and `X.test.ts(x)` live in folder `X/` with an `index.ts`. A file without a test stays a plain file. Role files are named by their role: `x.utils.ts` → `utils/`, `x.store.ts` → `store/`. A feature's main component stays at the feature root, since the feature folder is already its folder.
 - Shared code moves to the **nearest common ancestor**; only code used by unrelated features goes to `shared/` (frontend) or `common/` (backend).
 - Frontend folders expose one public `index.ts`; other code imports only from it. Backend modules are imported through their Nest module.
 - Every feature folder and every non-obvious shared component has a short `README.md` (about 5–10 lines): what it does, what it exports, where it is used, link to its `docs/` page. Simple components (e.g. a button) get none. Update it in the same PR when the public API changes.
@@ -389,7 +391,7 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
 
 ### Phase 0 — Monorepo and infrastructure
 
-- [~] **S0.1 Monorepo structure**
+- [x] **S0.1 Monorepo structure**
   - pnpm workspaces (Node 24): move the Next.js app to `frontend/`, scaffold NestJS 11 in `backend/`; remove MUI and TanStack Store, npm lockfile.
   - Shared `tsconfig.base.json`, one ESLint + Prettier config, Husky + lint-staged + commitlint at the root; root scripts (`dev`, `lint`, `typecheck`, `test`, `build`, `format:check`).
   - README skeleton with the required sections (§1.2).
@@ -408,7 +410,7 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
   - Done when: the workflow is green on a PR.
   - Depends on: S0.1.
 
-- [ ] **S0.4 Frontend foundation**
+- [~] **S0.4 Frontend foundation**
   - Apollo Client 4 (SSR integration, cookie forwarding, error link), codegen from `backend/schema.gql`, Next.js rewrites (D8).
   - Route groups `(auth)` / `(app)` with placeholder pages (§6).
   - Design tokens from Figma, light/dark themes with CSS Modules; theme and language preferences in React Context + cookies (D5); Radix UI installed.
@@ -417,7 +419,7 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
   - Depends on: S0.1, S0.2.
 
 - [ ] **S0.5 Test setup**
-  - Frontend: Vitest + RTL + user-event (jsdom), test render helper (theme, intl, `MockedProvider`).
+  - Frontend: Vitest + RTL + user-event (jsdom), test render helper (theme, intl, `MockedProvider`). Base already in place from S0.4a: `vitest.config.mts` (jsdom, React plugin, tsconfig paths), `test` script, Vitest + RTL + jsdom installed.
   - Backend: Jest unit config; integration config with Supertest and a separate test database, run serially (`--runInBand`), tables truncated per test file; injectable `Clock` provider for date-based rules.
   - Coverage threshold 80 % in both apps, enforced in CI from Phase 3 on (reported only before that).
   - Playwright config at the root with a seeded run.
@@ -425,7 +427,7 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
   - Depends on: S0.2, S0.3.
 
 - [ ] **S0.6 i18n**
-  - next-intl, 9 languages from the settings page (D27: `en` complete, `pl` fully translated, the other 7 fall back to `en`), locale from the preference cookie, per-feature `messages/`.
+  - next-intl, `en` and `pl` (D27), locale from the preference cookie, per-feature `messages/`.
   - Done when: switching language changes texts and persists.
   - Depends on: S0.4.
 
@@ -550,4 +552,5 @@ Over 80 % per app, excluding generated code, configs, `main.ts` and route files.
 | 2026-10-28 | Docs | — | `docs/` replaced with the final wiki export |
 | 2026-10-28 | Plan | — | Plan rewritten for the NestJS monorepo (D2) |
 | 2026-10-28 | Plan review | — | Gaps closed: D16–D31, priorities, branch renamed to `development` |
-| 2026-10-28 | S0.1 Monorepo structure | — | Done on `feature/KAN-64-pre-configuration`, PR and review pending; set to `[x]` on merge |
+| 2026-10-28 | S0.1 Monorepo structure | #7 | pnpm monorepo with `frontend/` and `backend/`, shared tooling; merged into `development` |
+| 2026-10-29 | S0.4a Design tokens, themes, preferences | — | Tokens from Figma (`docs/design-tokens.md`), light/dark themes, preference cookies with a pre-paint script, Radix UI installed; Apollo part (S0.4b) pending |
