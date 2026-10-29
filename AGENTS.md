@@ -8,10 +8,10 @@ pnpm monorepo (Node 24): `frontend/` = Next.js 16 + Apollo Client 4 + Radix UI +
 
 Use Node 24 and pnpm 12 (`.nvmrc`, `packageManager`); run from the repo root. Each command runs in every workspace that defines the script.
 
-- `pnpm dev` — both apps (frontend http://localhost:3000, backend http://localhost:4000; `/graphql` arrives with S0.2)
+- `pnpm dev` — both apps (frontend http://localhost:3000, backend http://localhost:4000, GraphQL at http://localhost:4000/graphql)
 - `pnpm lint` · `pnpm typecheck` · `pnpm test` · `pnpm format:check` · `pnpm build`
 - One app: `pnpm --filter @cv-builder/frontend <script>` or `pnpm --filter @cv-builder/backend <script>`
-- `docker compose up -d` — PostgreSQL + Mailpit (not available until S0.2)
+- `docker compose up -d` — PostgreSQL + Mailpit
 
 Run `lint`, `typecheck` and the tests of the app you changed. The frontend has no test script until S0.5.
 
