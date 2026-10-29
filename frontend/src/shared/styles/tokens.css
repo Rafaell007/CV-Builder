@@ -1,0 +1,72 @@
+/* Theme-independent design tokens. Values: docs/design-tokens.md (Figma). */
+
+:root {
+  /* Palette: raw colours, used only by themes.css */
+  --palette-grey-100: #f5f5f7;
+  --palette-grey-200: #e2e2e4;
+  --palette-grey-300: #c4c4c6;
+  --palette-grey-400: #aeaeae;
+  --palette-grey-500: #626262;
+  --palette-grey-600: #454545;
+  --palette-grey-700: #2e2e2e;
+  --palette-red: #c63031;
+  --palette-red-light: #e9b0b0;
+  --palette-red-dark: #631818;
+  --palette-green: #66bb6a;
+  --palette-green-dark: #335d35;
+  --palette-yellow: #ffb800;
+  --palette-yellow-dark: #7f5c00;
+  --palette-blue: #29b6f6;
+  --palette-blue-dark: #145b7b;
+
+  /* Typography: font shorthand (weight size/line-height family) + letter spacing */
+  --font-family: var(--font-roboto, "Roboto"), sans-serif;
+
+  --text-title: 400 34px/42px var(--font-family);
+  --text-title-ls: 0.25px;
+  --text-heading: 400 24px/32px var(--font-family);
+  --text-heading-ls: 0;
+  --text-body: 400 16px/24px var(--font-family);
+  --text-body-ls: 0.15px;
+  --text-input: 400 16px/23px var(--font-family);
+  --text-input-ls: 0.15px;
+  --text-notification-title: 500 16px/16px var(--font-family);
+  --text-notification-title-ls: 0.15px;
+  --text-table-header: 500 14px/24px var(--font-family);
+  --text-table-header-ls: 0.15px;
+  --text-table-cell: 400 14px/20px var(--font-family);
+  --text-table-cell-ls: 0.15px;
+  --text-button: 500 14px/24.5px var(--font-family);
+  --text-button-ls: 0.4px;
+  --text-tab: 500 14px/17.5px var(--font-family);
+  --text-tab-active: 600 14px/17.5px var(--font-family);
+  --text-tab-ls: 0.4px;
+  --text-label: 400 12px/23px var(--font-family);
+  --text-label-ls: 0.15px;
+  --text-caption: 400 12px/20px var(--font-family);
+  --text-caption-ls: 0.15px;
+  --text-error: 400 12px/16px var(--font-family);
+  --text-error-ls: 0.15px;
+
+  /* Spacing: 4px grid. Off-grid Figma values stay exact in component CSS. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-14: 56px;
+
+  /* Radius */
+  --radius-pill: 40px;
+  --radius-menu: 8px;
+  --radius-notification: 12px;
+  --radius-round: 50%;
+
+  /* Shadows */
+  --shadow-button:
+    0 1px 5px 0 rgb(0 0 0 / 12%), 0 2px 2px 0 rgb(0 0 0 / 14%), 0 3px 1px -2px rgb(0 0 0 / 20%);
+  --shadow-button-active: 0 4px 4px 0 rgb(0 0 0 / 25%);
+}
