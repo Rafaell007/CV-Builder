@@ -1,12 +1,29 @@
-import { act, renderHook } from "@testing-library/react";
+import { act, render, renderHook, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { afterEach, describe, expect, it } from "vitest";
+import { renderToString } from "react-dom/server";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { usePreferences } from "../../usePreferences";
 import { PreferencesProvider } from "./PreferencesProvider";
 
 const wrapper = ({ children }: { children: ReactNode }) => (
   <PreferencesProvider>{children}</PreferencesProvider>
 );
+
+const ThemeLabel = () => <p>{usePreferences().theme}</p>;
+
+const app = (
+  <PreferencesProvider>
+    <ThemeLabel />
+  </PreferencesProvider>
+);
+
+// A real server has no cookies: render the HTML before any cookie is set.
+const renderServerHtml = () => {
+  const container = document.createElement("div");
+  container.innerHTML = renderToString(app);
+  document.body.append(container);
+  return container;
+};
 
 const clearCookie = (name: string) => {
   document.cookie = `${name}=; path=/; max-age=0`;
@@ -64,5 +81,34 @@ describe("PreferencesProvider", () => {
     expect(result.current.language).toBe("pl");
     expect(document.cookie).toContain("locale=pl");
     expect(document.documentElement.lang).toBe("pl");
+  });
+
+  it("renders the defaults on the server, which cannot read cookies", () => {
+    document.cookie = "theme=dark; path=/";
+
+    expect(renderToString(app)).toContain("system");
+  });
+
+  it("hydrates server HTML without a mismatch, then shows the saved theme", () => {
+    const container = renderServerHtml();
+    document.cookie = "theme=dark; path=/";
+    const onRecoverableError = vi.fn();
+
+    render(app, { container, hydrate: true, onRecoverableError });
+
+    expect(screen.getByText("dark")).toBeDefined();
+    expect(onRecoverableError).not.toHaveBeenCalled();
+    container.remove();
+  });
+
+  it("keeps the theme set by PreferencesScript during hydration", () => {
+    const container = renderServerHtml();
+    document.cookie = "theme=dark; path=/";
+    document.documentElement.setAttribute("data-theme", "dark");
+
+    render(app, { container, hydrate: true });
+
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+    container.remove();
   });
 });

@@ -1,11 +1,9 @@
 "use client";
 
 import { createContext } from "react";
-import type { Language, Theme } from "./preferences.types";
+import type { Language, Preferences, Theme } from "./preferences.types";
 
-export type PreferencesContextValue = {
-  theme: Theme;
-  language: Language;
+export type PreferencesContextValue = Preferences & {
   setTheme: (theme: Theme) => void;
   setLanguage: (language: Language) => void;
 };

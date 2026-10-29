@@ -1,41 +1,24 @@
 "use client";
 
-import { useCallback, useLayoutEffect, useMemo, useState, type ReactNode } from "react";
+import { useLayoutEffect, useMemo, useSyncExternalStore, type ReactNode } from "react";
 import { PreferencesContext } from "../../PreferencesContext";
-import { applyLanguage, applyTheme, writeCookie } from "../../preferences.browser";
-import { LANGUAGE_COOKIE, THEME_COOKIE } from "../../preferences.constants";
-import type { Language, Theme } from "../../preferences.types";
-import { parseLanguage, parseTheme, readCookie } from "../../utils";
-
-// Lazy initial state: same cookies as PreferencesScript, so state matches the page. Defaults on the server.
-const readCookieValue = (name: string): string | undefined =>
-  typeof document === "undefined" ? undefined : readCookie(document.cookie, name);
+import { applyLanguage, applyTheme } from "../../preferences.browser";
+import { getServerSnapshot, getSnapshot, saveLanguage, saveTheme, subscribe } from "../../store";
 
 export function PreferencesProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState(() => parseTheme(readCookieValue(THEME_COOKIE)));
-  const [language, setLanguageState] = useState(() =>
-    parseLanguage(readCookieValue(LANGUAGE_COOKIE)),
-  );
+  const { theme, language } = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  // Applies changes before paint; also re-applies after the dev Strict Mode remount clears <html> attributes.
+  // Dev Strict Mode remount clears <html> attributes; re-apply the saved values (no-op in production).
+  // Reads the cookies, not the rendered value, which is still the server default during hydration.
   useLayoutEffect(() => {
-    applyTheme(theme);
-    applyLanguage(language);
-  }, [theme, language]);
-
-  const setTheme = useCallback((next: Theme) => {
-    writeCookie(THEME_COOKIE, next);
-    setThemeState(next);
-  }, []);
-
-  const setLanguage = useCallback((next: Language) => {
-    writeCookie(LANGUAGE_COOKIE, next);
-    setLanguageState(next);
+    const saved = getSnapshot();
+    applyTheme(saved.theme);
+    applyLanguage(saved.language);
   }, []);
 
   const value = useMemo(
-    () => ({ theme, language, setTheme, setLanguage }),
-    [theme, language, setTheme, setLanguage],
+    () => ({ theme, language, setTheme: saveTheme, setLanguage: saveLanguage }),
+    [theme, language],
   );
 
   return <PreferencesContext value={value}>{children}</PreferencesContext>;
