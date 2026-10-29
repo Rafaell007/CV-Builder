@@ -11,7 +11,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   }
 
   async onModuleInit(): Promise<void> {
-    await this.$connect();
+    // The pg adapter connects lazily, so $connect() would succeed without a database.
+    // A real query makes a missing or wrong DATABASE_URL fail at startup.
+    await this.$queryRaw`SELECT 1`;
   }
 
   async onModuleDestroy(): Promise<void> {
