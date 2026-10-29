@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
-import { DEFAULT_LANGUAGE, PreferencesScript } from "@/shared/preferences";
+import { DEFAULT_LANGUAGE, PreferencesProvider, PreferencesScript } from "@/shared/preferences";
 import "@/shared/styles/global.css";
 
 const roboto = Roboto({
@@ -21,7 +21,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <PreferencesScript />
       </head>
-      <body>{children}</body>
+      <body>
+        <PreferencesProvider>{children}</PreferencesProvider>
+      </body>
     </html>
   );
 }
