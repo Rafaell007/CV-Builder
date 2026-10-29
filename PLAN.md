@@ -299,7 +299,7 @@ Rules for all code in this repository.
 ### 5.9 Fractal structure
 
 - Every unit is a folder that owns its files, tests and children; the same shape repeats at every level.
-- A file and its test are one unit: `X.ts(x)` and `X.test.ts(x)` live in folder `X/` with an `index.ts`. A file without a test stays a plain file. For `x.utils.ts` the folder is `utils/`. A feature's main component stays at the feature root, since the feature folder is already its folder.
+- A file and its test are one unit: `X.ts(x)` and `X.test.ts(x)` live in folder `X/` with an `index.ts`. A file without a test stays a plain file. Role files are named by their role: `x.utils.ts` → `utils/`, `x.store.ts` → `store/`. A feature's main component stays at the feature root, since the feature folder is already its folder.
 - Shared code moves to the **nearest common ancestor**; only code used by unrelated features goes to `shared/` (frontend) or `common/` (backend).
 - Frontend folders expose one public `index.ts`; other code imports only from it. Backend modules are imported through their Nest module.
 - Every feature folder and every non-obvious shared component has a short `README.md` (about 5–10 lines): what it does, what it exports, where it is used, link to its `docs/` page. Simple components (e.g. a button) get none. Update it in the same PR when the public API changes.
