@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
+import { DEFAULT_LANGUAGE, PreferencesScript } from "@/shared/preferences";
 import "@/shared/styles/global.css";
 
 const roboto = Roboto({
@@ -15,7 +16,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={roboto.variable}>
+    // suppressHydrationWarning: PreferencesScript changes data-theme and lang before React hydrates
+    <html lang={DEFAULT_LANGUAGE} className={roboto.variable} suppressHydrationWarning>
+      <head>
+        <PreferencesScript />
+      </head>
       <body>{children}</body>
     </html>
   );
