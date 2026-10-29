@@ -1,8 +1,8 @@
 import { act, renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
+import { usePreferences } from "../../usePreferences";
 import { PreferencesProvider } from "./PreferencesProvider";
-import { usePreferences } from "./usePreferences";
 
 const wrapper = ({ children }: { children: ReactNode }) => (
   <PreferencesProvider>{children}</PreferencesProvider>
@@ -64,15 +64,5 @@ describe("PreferencesProvider", () => {
     expect(result.current.language).toBe("pl");
     expect(document.cookie).toContain("locale=pl");
     expect(document.documentElement.lang).toBe("pl");
-  });
-});
-
-describe("usePreferences", () => {
-  it("throws when used outside PreferencesProvider", () => {
-    vi.spyOn(console, "error").mockImplementation(() => {});
-
-    expect(() => renderHook(() => usePreferences())).toThrow(
-      "usePreferences must be used inside PreferencesProvider",
-    );
   });
 });

@@ -1,4 +1,4 @@
-import { LANGUAGE_COOKIE, LANGUAGES, THEME_COOKIE, THEMES } from "./preferences.constants";
+import { LANGUAGE_COOKIE, LANGUAGES, THEME_COOKIE, THEMES } from "../../preferences.constants";
 
 const forcedThemes = THEMES.filter((theme) => theme !== "system");
 

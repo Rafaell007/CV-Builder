@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext } from "react";
-import { PreferencesContext, type PreferencesContextValue } from "./PreferencesContext";
+import { PreferencesContext, type PreferencesContextValue } from "../PreferencesContext";
 
 // Current theme and language, and setters that save them in cookies.
 export const usePreferences = (): PreferencesContextValue => {

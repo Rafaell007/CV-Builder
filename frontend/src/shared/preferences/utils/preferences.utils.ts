@@ -1,5 +1,5 @@
-import { DEFAULT_LANGUAGE, DEFAULT_THEME, LANGUAGES, THEMES } from "./preferences.constants";
-import type { Language, Theme } from "./preferences.types";
+import { DEFAULT_LANGUAGE, DEFAULT_THEME, LANGUAGES, THEMES } from "../preferences.constants";
+import type { Language, Theme } from "../preferences.types";
 
 export const parseTheme = (value: string | undefined): Theme =>
   THEMES.find((theme) => theme === value) ?? DEFAULT_THEME;

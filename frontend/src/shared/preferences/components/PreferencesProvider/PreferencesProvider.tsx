@@ -1,11 +1,11 @@
 "use client";
 
 import { useCallback, useLayoutEffect, useMemo, useState, type ReactNode } from "react";
-import { PreferencesContext } from "./PreferencesContext";
-import { applyLanguage, applyTheme, writeCookie } from "./preferences.browser";
-import { LANGUAGE_COOKIE, THEME_COOKIE } from "./preferences.constants";
-import type { Language, Theme } from "./preferences.types";
-import { parseLanguage, parseTheme, readCookie } from "./preferences.utils";
+import { PreferencesContext } from "../../PreferencesContext";
+import { applyLanguage, applyTheme, writeCookie } from "../../preferences.browser";
+import { LANGUAGE_COOKIE, THEME_COOKIE } from "../../preferences.constants";
+import type { Language, Theme } from "../../preferences.types";
+import { parseLanguage, parseTheme, readCookie } from "../../utils";
 
 // Lazy initial state: same cookies as PreferencesScript, so state matches the page. Defaults on the server.
 const readCookieValue = (name: string): string | undefined =>
