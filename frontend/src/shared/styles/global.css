@@ -1,0 +1,22 @@
+/* Global base styles. Imported once in app/layout.tsx. */
+@import "./tokens.css";
+@import "./themes.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: var(--text-body);
+  letter-spacing: var(--text-body-ls);
+}

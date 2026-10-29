@@ -4,10 +4,12 @@ import { GraphQLModule } from "@nestjs/graphql";
 import { join } from "node:path";
 import { AppConfigModule } from "./config";
 import { HealthModule } from "./modules/health/health.module";
+import { PrismaModule } from "./prisma/prisma.module";
 
 @Module({
   imports: [
     AppConfigModule,
+    PrismaModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       // The generated, committed contract (D3). Sorted so that diffs only show real changes.
