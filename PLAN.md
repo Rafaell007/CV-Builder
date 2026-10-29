@@ -280,7 +280,7 @@ Rules for all code in this repository.
 
 ### 5.5 Environment variables
 
-- Frontend reads `process.env` only in `frontend/src/env.ts`; backend only through `@nestjs/config` with a validation schema in `backend/src/config/`. Both fail fast on missing values.
+- Frontend reads `process.env` only in `frontend/src/env.ts`; backend only through `@nestjs/config` with a validation schema in `backend/src/config/`, except `backend/prisma.config.ts`: it is Prisma CLI config that runs outside Nest and reads `DATABASE_URL` itself (so `db:generate` works without a `.env`). Both apps fail fast on missing values.
 - Every new variable goes to the app's `.env.example` (no real values) and §10. `.env` files are git-ignored.
 
 ### 5.6 TypeScript only

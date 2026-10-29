@@ -68,7 +68,7 @@ pnpm dev
 The backend needs the database running and `backend/.env` in place, or it will not start. Run `db:generate` once after cloning and again after every change to `backend/prisma/schema.prisma`; typecheck, build and tests need the generated client.
 
 - Frontend: http://localhost:3000
-- Backend: http://localhost:4000 (the GraphQL endpoint `/graphql` arrives in step S0.2)
+- Backend: http://localhost:4000 (GraphQL endpoint: http://localhost:4000/graphql)
 - Mailpit inbox (catches all outgoing mail): http://localhost:8025
 
 ### Running one app
@@ -131,14 +131,14 @@ frontend/                 Next.js app
   src/shared/             code used by unrelated features (UI kit, styles, utils)
   src/env.ts              the only place that reads frontend environment variables
 backend/                  NestJS app
-  src/                    main.ts, app.module.ts; modules/, common/, config/ arrive with S0.2
+  src/                    main.ts, app.module.ts; config/ (env validation), modules/, prisma/
 docs/                     per-page requirements and designs
 tsconfig.base.json        shared compiler options
 eslint.config.ts          one ESLint config for both apps
 prettier.config.ts        one Prettier config
 ```
 
-The backend will grow `modules/<name>/`, `common/`, `config/`, `prisma/` and `test/`. Details: [PLAN.md §4](PLAN.md) and [frontend/src/features/README.md](frontend/src/features/README.md).
+The backend will also grow `common/` and `test/`. Details: [PLAN.md §4](PLAN.md) and [frontend/src/features/README.md](frontend/src/features/README.md).
 
 ## Team and task distribution
 
@@ -169,13 +169,13 @@ The full log is in [PLAN.md §2.3](PLAN.md). The ones that shape the code most:
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | backend | Token signing | planned |
 | `FRONTEND_URL` | backend | Absolute links in emails | planned |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | backend | Mail | planned |
-| `PORT` | backend | HTTP port (default 4000) | planned |
+| `PORT` | backend | HTTP port (default 4000) | in use |
 
 Examples live in each app's `.env.example`; the table is mirrored in [PLAN.md §10](PLAN.md). Both apps fail fast on a missing value.
 
 ## API documentation
 
-Planned: the GraphQL contract in [backend/schema.gql](backend/schema.gql) (generated in S0.2), plus a short guide to authentication, errors and pagination. _Not available yet._
+The GraphQL contract is [backend/schema.gql](backend/schema.gql), generated from the code-first types (for now only the `health` query). Planned: a short guide to authentication, errors and pagination. _Not available yet._
 
 ## E2E tests
 
