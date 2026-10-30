@@ -106,6 +106,7 @@ model Skill {
 
   userSkills    UserSkill[]
   projectSkills ProjectSkill[]
+  cvSkills      CvSkill[]
 }
 
 model Language {
@@ -191,5 +192,21 @@ model Cv {
   updatedAt   DateTime @updatedAt
 
   // Cascade: a user's CVs go with the user (D13).
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skills CvSkill[]
+}
+
+model CvSkill {
+  id        String   @id @default(uuid()) @db.Uuid
+  cvId      String   @db.Uuid
+  skillId   String   @db.Uuid
+  mastery   Mastery
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Cascade: the skills go with the CV. Restrict: a skill used in a CV cannot be deleted (D18).
+  cv    Cv    @relation(fields: [cvId], references: [id], onDelete: Cascade)
+  skill Skill @relation(fields: [skillId], references: [id], onDelete: Restrict)
+
+  @@unique([cvId, skillId])
 }
