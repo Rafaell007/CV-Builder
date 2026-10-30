@@ -77,6 +77,8 @@ model User {
 
   @@index([departmentId])
   @@index([positionId])
+  @@index([firstName])
+  @@index([lastName])
 }
 
 model Avatar {
@@ -173,6 +175,10 @@ model Project {
   // The project's environment (technologies used).
   skills     ProjectSkill[]
   cvProjects CvProject[]
+
+  @@index([name])
+  @@index([startDate])
+  @@index([endDate])
 }
 
 model ProjectSkill {
@@ -209,6 +215,8 @@ model Cv {
   user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   skills   CvSkill[]
   projects CvProject[]
+
+  @@index([userId, name])
 }
 
 model CvSkill {
