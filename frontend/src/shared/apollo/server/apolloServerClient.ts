@@ -11,7 +11,7 @@ import { createCookieLink } from "../cookieLink";
 import { errorLink } from "../errorLink";
 
 // One client per request. It calls the backend directly (no rewrite needed on the server) and
-// forwards the user's cookies. Reading cookies makes the caller dynamic: wrap it in <Suspense>.
+// forwards the user's cookies. Callers run per request: `await connection()` first, inside <Suspense>.
 export const { getClient, query, PreloadQuery } = registerApolloClient(
   () =>
     new ApolloClient({

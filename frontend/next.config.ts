@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
   agentRules: false,
   cacheComponents: true,
   partialPrefetching: true,
+  // The main page after sign-in is the employees list (PLAN D17). Not permanent: browsers would cache it.
+  redirects: async () => [{ source: "/", destination: "/users", permanent: false }],
   // The browser calls the backend through the frontend's own origin, so auth cookies stay first-party (PLAN D8).
   rewrites: async () => [
     { source: "/graphql", destination: `${backendUrl}/graphql` },

@@ -12,6 +12,7 @@ Use Node 24 and pnpm 12 (`.nvmrc`, `packageManager`); run from the repo root. Ea
 - `pnpm lint` · `pnpm typecheck` · `pnpm test` · `pnpm format:check` · `pnpm build`
 - One app: `pnpm --filter @cv-builder/frontend <script>` or `pnpm --filter @cv-builder/backend <script>`
 - `docker compose up -d` — PostgreSQL + Mailpit
+- `pnpm --filter @cv-builder/frontend codegen` — regenerate the frontend's GraphQL types after `schema.gql` or a `.graphql` file changes (`dev`, `build`, `typecheck`, `test` run it first)
 - `pnpm --filter @cv-builder/backend schema:generate` — regenerate `backend/schema.gql` (needs the database and `DATABASE_URL`); CI fails when the committed file differs
 
 Run `lint`, `typecheck` and the tests of the app you changed. The frontend has no test script until S0.5.

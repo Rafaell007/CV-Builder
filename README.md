@@ -111,6 +111,7 @@ Run from the repository root; each runs in every workspace that defines it.
 | `pnpm typecheck` | TypeScript, no emit (the frontend also generates Next.js route types) |
 | `pnpm test` | Unit and integration tests |
 | `pnpm format` · `pnpm format:check` | Format with Prettier, or only check |
+| `pnpm --filter @cv-builder/frontend codegen` | Generate typed GraphQL documents from `backend/schema.gql` into `frontend/src/shared/graphql/generated/` (git-ignored; `dev`, `build`, `typecheck` and `test` run it first) |
 
 ## Tests and coverage
 
