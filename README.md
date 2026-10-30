@@ -186,3 +186,4 @@ Planned: Playwright against a seeded database, one spec per user flow, written w
 - Branches: `main` (releases), `development` (integration), feature branches `feature/<ticket>-<name>` from `development`; pull requests go into `development` and need the other developer's approval.
 - Commits follow [Conventional Commits](https://www.conventionalcommits.org/), e.g. `feat(cvs): add CV table`, with the ticket key at the end.
 - Git hooks (Husky, installed by `pnpm install`): ESLint and Prettier run on staged files; commitlint checks the message.
+- CI (GitHub Actions, [.github/workflows/ci.yml](.github/workflows/ci.yml)) runs on pull requests to `development`: format, lint, typecheck, tests, builds of both apps, and a check that `backend/schema.gql` is up to date. It is not a required check (no branch protection on the free plan), so read its result before asking for a review.

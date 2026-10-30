@@ -414,9 +414,10 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
   - Done when: a fresh clone runs Docker + migrate + backend from the README and `health` answers.
   - Depends on: S0.1.
 
-- [ ] **S0.3 CI**
+- [~] **S0.3 CI**
   - GitHub Actions on PRs to `development`: format, lint, typecheck, tests (with a Postgres service), builds of both apps.
   - Contract check: regenerate `schema.gql` and fail on `git diff`; run frontend codegen + typecheck against it.
+  - Implementation: `.github/workflows/ci.yml`; `schema:generate` (backend) boots the app without listening so the contract is regenerated exactly as the running app writes it. The frontend codegen step is `--if-present` and starts working when S0.4b adds a `codegen` script; the typecheck runs after it. Not a required check (free plan).
   - Done when: the workflow is green on a PR.
   - Depends on: S0.1.
 
@@ -566,4 +567,5 @@ Over 80 % per app, excluding generated code, configs, `main.ts` and route files.
 | 2026-10-28 | S0.1 Monorepo structure | #7 | pnpm workspaces, `frontend/` + `backend/` (NestJS 11), shared tooling, README skeleton; MUI and TanStack Store removed |
 | 2026-10-29 | S0.2a Docker Compose and Prisma 7 | #8 | PostgreSQL + Mailpit, Prisma 7 with `prisma-client` (CJS) and the `pg` adapter, `PrismaService`, db scripts; spike result in S0.2 |
 | 2026-10-29 | S0.4a Design tokens, themes, preferences | — | Tokens from Figma (`docs/design-tokens.md`), light/dark themes, preference cookies with a pre-paint script, Radix UI installed; Apollo part (S0.4b) pending |
+| 2026-10-29 | S0.3 CI workflow with contract check | — | GitHub Actions on PRs to `development` (format, lint, typecheck, tests, builds, `schema.gql` up-to-date check); `schema:generate` script; green on a PR still to be confirmed |
 | 2026-10-30 | S2.1a Prisma schema and initial migration | — | 19 models from §7 checked against docs pages 10–27, indexes, `init` + `add_date_checks` migrations; project `endDate` is required (page 27) |
