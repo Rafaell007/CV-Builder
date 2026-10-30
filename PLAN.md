@@ -429,10 +429,11 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
   - Done when: a page renders `health` through Apollo; theme switch persists without flash; Storybook runs (if done).
   - Depends on: S0.1, S0.2.
 
-- [ ] **S0.5 Test setup**
+- [~] **S0.5 Test setup**
   - Frontend: Vitest + RTL + user-event (jsdom), test render helper (theme, intl, `MockedProvider`). Base already in place from S0.4a: `vitest.config.mts` (jsdom, React plugin, tsconfig paths), `test` script, Vitest + RTL + jsdom installed.
   - Backend: Jest unit config; integration config with Supertest and a separate test database, run serially (`--runInBand`), tables truncated per test file; injectable `Clock` provider for date-based rules.
   - Coverage threshold 80 % in both apps, enforced in CI from Phase 3 on (reported only before that).
+  - **Backend done (S0.5b):** `test` (unit), `test:int` (integration, `backend/test/`), `test:cov` (report, fails under 80 %: the threshold is in the Jest config so it works on Windows and macOS; switch CI to it in Phase 3). Integration config `backend/test/jest-integration.json`; the `_test` database is created and migrated by a global setup and truncated before each test file. `Clock` lives in `backend/src/common/clock/`. CI runs `test:int` against its Postgres service.
   - Playwright config at the root with a seeded run.
   - Done when: one sample test per level runs locally and in CI.
   - Depends on: S0.2, S0.3.
@@ -521,6 +522,7 @@ Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE 
 | `FRONTEND_URL` | backend | Absolute links in emails |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | backend | Mail |
 | `PORT` | backend | HTTP port (default 4000) |
+| `TEST_DATABASE_URL` | backend | Integration test database, name must end in `_test` (optional, defaults to `cv_builder_test` on localhost) |
 
 ---
 
@@ -569,3 +571,4 @@ Over 80 % per app, excluding generated code, configs, `main.ts` and route files.
 | 2026-10-29 | S0.4a Design tokens, themes, preferences | — | Tokens from Figma (`docs/design-tokens.md`), light/dark themes, preference cookies with a pre-paint script, Radix UI installed; Apollo part (S0.4b) pending |
 | 2026-10-29 | S0.3 CI workflow with contract check | — | GitHub Actions on PRs to `development` (format, lint, typecheck, tests, builds, `schema.gql` up-to-date check); `schema:generate` script; green on a PR still to be confirmed |
 | 2026-10-30 | S2.1a Prisma schema and initial migration | — | 19 models from §7 checked against docs pages 10–27, indexes, `init` + `add_date_checks` migrations; project `endDate` is required (page 27) |
+| 2026-10-30 | S0.5b Backend test setup | — | Jest unit + coverage scripts, Supertest integration tests on a separate `_test` database (serial, truncated per file), injectable `Clock`; sample health tests |
