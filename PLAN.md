@@ -424,7 +424,7 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
   - Frontend: Vitest + RTL + user-event (jsdom), test render helper (theme, intl, `MockedProvider`). Base already in place from S0.4a: `vitest.config.mts` (jsdom, React plugin, tsconfig paths), `test` script, Vitest + RTL + jsdom installed.
   - Backend: Jest unit config; integration config with Supertest and a separate test database, run serially (`--runInBand`), tables truncated per test file; injectable `Clock` provider for date-based rules.
   - Coverage threshold 80 % in both apps, enforced in CI from Phase 3 on (reported only before that).
-  - **Backend done (S0.5b):** `test` (unit), `test:int` (integration, `backend/test/`), `test:cov` (report) and `test:cov:check` (fails under 80 %, switch CI to it in Phase 3). Integration config `backend/test/jest-integration.json`; the `_test` database is created and migrated by a global setup and truncated before each test file. `Clock` lives in `backend/src/common/clock/`. CI still has to run `test:int` with a Postgres service (S0.3).
+  - **Backend done (S0.5b):** `test` (unit), `test:int` (integration, `backend/test/`), `test:cov` (report, fails under 80 %: the threshold is in the Jest config so it works on Windows and macOS; switch CI to it in Phase 3). Integration config `backend/test/jest-integration.json`; the `_test` database is created and migrated by a global setup and truncated before each test file. `Clock` lives in `backend/src/common/clock/`. CI still has to run `test:int` with a Postgres service (S0.3).
   - Playwright config at the root with a seeded run.
   - Done when: one sample test per level runs locally and in CI.
   - Depends on: S0.2, S0.3.

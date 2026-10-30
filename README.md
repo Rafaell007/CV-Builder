@@ -120,7 +120,7 @@ Run from the repository root; each runs in every workspace that defines it.
 | Backend integration | Jest + Supertest, test database | `pnpm --filter @cv-builder/backend test:int` | set up (health query) |
 | Frontend unit and component | Vitest + React Testing Library | _planned in S0.5_ | planned |
 
-Coverage target: over 80 %. `pnpm --filter @cv-builder/backend test:cov` prints the backend report; `test:cov:check` fails below 80 % and is switched on in CI from Phase 3. Frontend coverage: _to be added with its test setup._
+Coverage target: over 80 %. `pnpm --filter @cv-builder/backend test:cov` prints the backend report and fails below 80 % (the threshold lives in the Jest config in `backend/package.json`); it is switched on in CI from Phase 3. Frontend coverage: _to be added with its test setup._
 
 Integration tests need the database running (`docker compose up -d`). They use a separate database, `cv_builder_test`, which is created and migrated automatically on the first run. Files run one at a time and every table is truncated before each test file. The database name must end in `_test`, otherwise the run aborts, so development data is never touched. Set `TEST_DATABASE_URL` to use another server.
 
