@@ -70,6 +70,7 @@ model User {
   avatar        Avatar?
   userSkills    UserSkill[]
   userLanguages UserLanguage[]
+  cvs           Cv[]
 }
 
 model Avatar {
@@ -178,4 +179,17 @@ model ProjectRole {
   name      String   @unique @db.VarChar(100)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Cv {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @db.VarChar(255)
+  education   String?  @db.VarChar(255)
+  description String
+  userId      String   @db.Uuid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Cascade: a user's CVs go with the user (D13).
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
