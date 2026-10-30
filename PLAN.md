@@ -355,7 +355,7 @@ Checked against `docs/pages/10` to `27` in S2.1a. Conventions:
 | User | id, email unique (≤ 255), passwordHash, role `ADMIN`/`USER`, isVerified, firstName? (≤ 100), lastName? (≤ 100), departmentId?, positionId?, createdAt, updatedAt | delete cascades (D13). Sign-up and admin create take only email + password (≥ 6 characters); names, department and position are required by the profile update, not by the database |
 | Avatar | userId (PK), data (bytes), mimeType, updatedAt | ≤ 5 MB, PNG/JPG/JPEG/GIF (D11) |
 | Department · Position | id, name unique (≤ 100), createdAt, updatedAt | delete blocked when used |
-| SkillCategory | id, name unique (≤ 100), type (short text), createdAt, updatedAt | seeded; a skill's type comes from its category and is not stored on `Skill` (page 17) |
+| SkillCategory | id, name unique (≤ 100), type (short text), createdAt, updatedAt | seeded; a skill's type comes from its category and is not stored on `Skill` (page 17); delete blocked while it has skills |
 | Skill | id, name unique (≤ 100), categoryId, createdAt, updatedAt | delete blocked when used (D18) |
 | UserSkill | id, userId + skillId unique, mastery `BEGINNER` `ELEMENTARY` `INTERMEDIATE` `ADVANCED` `EXPERT`, createdAt, updatedAt | removing it removes it from the user's CVs (D13) |
 | Language | id, name unique (≤ 100), iso unique (≤ 5), nativeName (≤ 100), createdAt, updatedAt | delete blocked when used (D18) |
@@ -371,7 +371,7 @@ Checked against `docs/pages/10` to `27` in S2.1a. Conventions:
 | PasswordResetToken | id, userId, tokenHash unique, expiresAt, usedAt?, createdAt | single use (D20) |
 | RefreshToken | id, userId, tokenHash unique, familyId, expiresAt, replacedAt?, createdAt | rotated on refresh with a 30 s grace window; reuse after it revokes the family (D21); deleted on sign-out; all revoked on password change/reset (D22) |
 
-Delete rules (D13): everything a user owns (`Avatar`, `UserSkill`, `UserLanguage`, `Cv`, tokens) is removed with the user; a `Cv` takes its `CvSkill` and `CvProject` rows with it, and a `CvProject` its `CvProjectRole` rows. Catalog items in use (`Department`, `Position`, `Skill`, `Language`, `Project`, `ProjectRole`) are `Restrict`, so the database refuses the delete and the service turns that into `CONFLICT` (D18).
+Delete rules (D13): everything a user owns (`Avatar`, `UserSkill`, `UserLanguage`, `Cv`, tokens) is removed with the user; a `Cv` takes its `CvSkill` and `CvProject` rows with it, and a `CvProject` its `CvProjectRole` rows. Catalog items in use (`SkillCategory`, `Department`, `Position`, `Skill`, `Language`, `Project`, `ProjectRole`) are `Restrict`, so the database refuses the delete and the service turns that into `CONFLICT` (D18).
 
 Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill categories + ~40 skills, 10+ languages, project roles, ~6 projects, sample CVs.
 
@@ -450,7 +450,8 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
 
 ### Phase 2 — Data model and API conventions
 
-- [ ] **S2.1 Data model** — Prisma schema from §7 checked against every docs page, initial migration, seed (§7). Done when: `db:reset` builds a seeded database.
+- [~] **S2.1 Data model** — Prisma schema from §7 checked against every docs page, initial migration, seed (§7). Done when: `db:reset` builds a seeded database.
+  - **S2.1a done:** schema for all 19 models and two migrations, `init` (generated) and `add_date_checks` (hand-written CHECK constraints for project dates). Foreign keys and sortable columns are indexed; text search inside names is not (it would need a `pg_trgm` index). The seed is still to do.
 - [ ] **S2.2 API conventions** — shared GraphQL building blocks in `common/`: pagination / sort / search inputs and paginated output, `ValidationPipe` with field errors, exception filter (D7), guards and decorators skeleton (D10). Unit tests for each. Depends on S0.2.
 
 ### Phase 3 — Authentication
@@ -565,3 +566,4 @@ Over 80 % per app, excluding generated code, configs, `main.ts` and route files.
 | 2026-10-28 | S0.1 Monorepo structure | #7 | pnpm workspaces, `frontend/` + `backend/` (NestJS 11), shared tooling, README skeleton; MUI and TanStack Store removed |
 | 2026-10-29 | S0.2a Docker Compose and Prisma 7 | #8 | PostgreSQL + Mailpit, Prisma 7 with `prisma-client` (CJS) and the `pg` adapter, `PrismaService`, db scripts; spike result in S0.2 |
 | 2026-10-29 | S0.4a Design tokens, themes, preferences | — | Tokens from Figma (`docs/design-tokens.md`), light/dark themes, preference cookies with a pre-paint script, Radix UI installed; Apollo part (S0.4b) pending |
+| 2026-10-30 | S2.1a Prisma schema and initial migration | — | 19 models from §7 checked against docs pages 10–27, indexes, `init` + `add_date_checks` migrations; project `endDate` is required (page 27) |
