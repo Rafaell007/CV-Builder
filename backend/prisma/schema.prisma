@@ -67,10 +67,11 @@ model User {
   department Department? @relation(fields: [departmentId], references: [id], onDelete: Restrict)
   position   Position?   @relation(fields: [positionId], references: [id], onDelete: Restrict)
 
-  avatar        Avatar?
-  userSkills    UserSkill[]
-  userLanguages UserLanguage[]
-  cvs           Cv[]
+  avatar            Avatar?
+  userSkills        UserSkill[]
+  userLanguages     UserLanguage[]
+  cvs               Cv[]
+  verificationCodes VerificationCode[]
 }
 
 model Avatar {
@@ -242,4 +243,18 @@ model CvProjectRole {
   role      ProjectRole @relation(fields: [roleId], references: [id], onDelete: Restrict)
 
   @@id([cvProjectId, roleId])
+}
+
+model VerificationCode {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  codeHash  String
+  expiresAt DateTime
+  usedAt    DateTime?
+  attempts  Int       @default(0)
+  // Also the start of the 60 s resend cooldown (D20).
+  createdAt DateTime  @default(now())
+
+  // Cascade: a user's codes go with the user (D13).
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
