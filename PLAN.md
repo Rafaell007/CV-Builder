@@ -363,9 +363,9 @@ Checked against `docs/pages/10` to `27` in S2.1a. Conventions:
 | Project | id, name (≤ 100), domain (≤ 100), startDate, endDate, description (≤ 2000), createdAt, updatedAt | `startDate` ≤ `endDate`. **`endDate` is required** (page 27; the plan had it optional). Delete blocked when used in a CV; date change blocked when CV projects would fall outside (D25) |
 | ProjectSkill | projectId + skillId unique | the project's environment; skill delete blocked while used (D18) |
 | ProjectRole | id, name unique (≤ 100) | seeded |
-| Cv | id, name (≤ 255), education? (≤ 255), description (required), userId, createdAt, updatedAt | delete cascades from the user |
+| Cv | id, name (≤ 255), education (≤ 255, required), description (required), userId, createdAt, updatedAt | delete cascades from the user |
 | CvSkill | id, cvId + skillId unique, mastery, createdAt, updatedAt | skill must be one of the owner's skills |
-| CvProject | id, cvId, projectId, startDate, endDate? (empty = "Present"), responsibilities?, createdAt, updatedAt | dates within the project's dates |
+| CvProject | id, cvId + projectId unique (a project is in a CV once), startDate, endDate? (empty = "Present"), responsibilities?, createdAt, updatedAt | dates within the project's dates |
 | CvProjectRole | cvProjectId + roleId unique | roles of a CV project, at least one |
 | VerificationCode | id, userId, codeHash, expiresAt, usedAt?, attempts, createdAt | 6 digits, 10 min, single use, resend cooldown 60 s from `createdAt` (D20) |
 | PasswordResetToken | id, userId, tokenHash unique, expiresAt, usedAt?, createdAt | single use (D20) |
