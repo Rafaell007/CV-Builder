@@ -1,4 +1,4 @@
-import { execFileSync } from "node:child_process";
+import { execSync } from "node:child_process";
 import { join } from "node:path";
 import { Client } from "pg";
 import { getTestDatabaseUrl } from "./test-database-url";
@@ -25,7 +25,8 @@ export default async function globalSetup(): Promise<void> {
     await admin.end();
   }
 
-  execFileSync("pnpm", ["exec", "prisma", "migrate", "deploy"], {
+  // A command string runs through the shell, which is what lets Windows start pnpm.cmd.
+  execSync("pnpm exec prisma migrate deploy", {
     cwd: join(__dirname, "..", ".."),
     env: { ...process.env, DATABASE_URL: url.toString() },
     stdio: "inherit",
