@@ -343,26 +343,35 @@ No-internet and device-error are states shown over any page, not routes. Sidebar
 
 ## 7. Data model (Prisma)
 
-Field lists are a starting point; S2.1 checks every docs page and completes them.
+Checked against `docs/pages/10` to `27` in S2.1a. Conventions:
+
+- Ids are UUIDs (`@db.Uuid`). `createdAt` and `updatedAt` exist on every model except `Avatar` (`updatedAt` only) and the three token models (`createdAt` only). "Member since" in the UI is `User.createdAt`.
+- Dates are stored as date or timestamp columns, never as formatted strings.
+- Limits are `VarChar(n)`; the docs state them only where listed below, the rest default to 100 (names) and `Text` (long text).
+- Unique names are normalised (trimmed) in the service; the unique constraint is the backstop.
 
 | Model | Fields | Rules |
 |---|---|---|
-| User | id, email unique, passwordHash, role `ADMIN`/`USER`, isVerified, firstName?, lastName?, departmentId?, positionId?, createdAt | delete cascades (D13) |
+| User | id, email unique (≤ 255), passwordHash, role `ADMIN`/`USER`, isVerified, firstName? (≤ 100), lastName? (≤ 100), departmentId?, positionId?, createdAt, updatedAt | delete cascades (D13). Sign-up and admin create take only email + password (≥ 6 characters); names, department and position are required by the profile update, not by the database |
 | Avatar | userId (PK), data (bytes), mimeType, updatedAt | ≤ 5 MB, PNG/JPG/JPEG/GIF (D11) |
-| Department · Position | id, name unique | delete blocked when used |
-| SkillCategory | id, name, type | seeded |
-| Skill | id, name unique, categoryId | delete blocked when used (D18) |
-| UserSkill | userId + skillId unique, mastery `BEGINNER` `ELEMENTARY` `INTERMEDIATE` `ADVANCED` `EXPERT` | removing it removes it from the user's CVs (D13) |
-| Language | id, name unique, iso unique, nativeName | delete blocked when used (D18) |
-| UserLanguage | userId + languageId unique, proficiency `A1` `A2` `B1` `B2` `C1` `C2` `NATIVE` | |
-| Project | id, name, domain, startDate, endDate?, description, environment → Skill[] | delete blocked when used in a CV; date change blocked when CV projects would fall outside (D25) |
-| ProjectRole | id, name | seeded |
-| Cv | id, name, education?, description, userId | |
-| CvSkill | cvId + skillId unique, mastery | skill must be one of the owner's skills |
-| CvProject | id, cvId, projectId, startDate, endDate?, responsibilities?, roles → ProjectRole[] (≥ 1) | dates within the project's dates |
-| VerificationCode | userId, codeHash, expiresAt, usedAt?, attempts | 6 digits, 10 min, single use (D20) |
-| PasswordResetToken | userId, tokenHash, expiresAt, usedAt? | single use (D20) |
-| RefreshToken | userId, tokenHash, familyId, expiresAt, replacedAt? | rotated on refresh with a 30 s grace window; reuse after it revokes the family (D21); deleted on sign-out; all revoked on password change/reset (D22) |
+| Department · Position | id, name unique (≤ 100), createdAt, updatedAt | delete blocked when used |
+| SkillCategory | id, name unique (≤ 100), type (short text), createdAt, updatedAt | seeded; a skill's type comes from its category and is not stored on `Skill` (page 17) |
+| Skill | id, name unique (≤ 100), categoryId, createdAt, updatedAt | delete blocked when used (D18) |
+| UserSkill | id, userId + skillId unique, mastery `BEGINNER` `ELEMENTARY` `INTERMEDIATE` `ADVANCED` `EXPERT`, createdAt, updatedAt | removing it removes it from the user's CVs (D13) |
+| Language | id, name unique (≤ 100), iso unique (≤ 5), nativeName (≤ 100), createdAt, updatedAt | delete blocked when used (D18) |
+| UserLanguage | id, userId + languageId unique, proficiency `A1` `A2` `B1` `B2` `C1` `C2` `NATIVE`, createdAt, updatedAt | |
+| Project | id, name (≤ 100), domain (≤ 100), startDate, endDate, description (≤ 2000), createdAt, updatedAt | `startDate` ≤ `endDate`. **`endDate` is required** (page 27; the plan had it optional). Delete blocked when used in a CV; date change blocked when CV projects would fall outside (D25) |
+| ProjectSkill | projectId + skillId unique | the project's environment; skill delete blocked while used (D18) |
+| ProjectRole | id, name unique (≤ 100) | seeded |
+| Cv | id, name (≤ 255), education? (≤ 255), description (required), userId, createdAt, updatedAt | delete cascades from the user |
+| CvSkill | id, cvId + skillId unique, mastery, createdAt, updatedAt | skill must be one of the owner's skills |
+| CvProject | id, cvId, projectId, startDate, endDate? (empty = "Present"), responsibilities?, createdAt, updatedAt | dates within the project's dates |
+| CvProjectRole | cvProjectId + roleId unique | roles of a CV project, at least one |
+| VerificationCode | id, userId, codeHash, expiresAt, usedAt?, attempts, createdAt | 6 digits, 10 min, single use, resend cooldown 60 s from `createdAt` (D20) |
+| PasswordResetToken | id, userId, tokenHash unique, expiresAt, usedAt?, createdAt | single use (D20) |
+| RefreshToken | id, userId, tokenHash unique, familyId, expiresAt, replacedAt?, createdAt | rotated on refresh with a 30 s grace window; reuse after it revokes the family (D21); deleted on sign-out; all revoked on password change/reset (D22) |
+
+Delete rules (D13): everything a user owns (`Avatar`, `UserSkill`, `UserLanguage`, `Cv`, tokens) is removed with the user; a `Cv` takes its `CvSkill` and `CvProject` rows with it, and a `CvProject` its `CvProjectRole` rows. Catalog items in use (`Department`, `Position`, `Skill`, `Language`, `Project`, `ProjectRole`) are `Restrict`, so the database refuses the delete and the service turns that into `CONFLICT` (D18).
 
 Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill categories + ~40 skills, 10+ languages, project roles, ~6 projects, sample CVs.
 
