@@ -343,26 +343,35 @@ No-internet and device-error are states shown over any page, not routes. Sidebar
 
 ## 7. Data model (Prisma)
 
-Field lists are a starting point; S2.1 checks every docs page and completes them.
+Checked against `docs/pages/10` to `27` in S2.1a. Conventions:
+
+- Ids are UUIDs (`@db.Uuid`). `createdAt` and `updatedAt` exist on every model except `Avatar` (`updatedAt` only) and the three token models (`createdAt` only). "Member since" in the UI is `User.createdAt`.
+- Dates are stored as date or timestamp columns, never as formatted strings.
+- Limits are `VarChar(n)`; the docs state them only where listed below, the rest default to 100 (names) and `Text` (long text).
+- Unique names are normalised (trimmed) in the service; the unique constraint is the backstop.
 
 | Model | Fields | Rules |
 |---|---|---|
-| User | id, email unique, passwordHash, role `ADMIN`/`USER`, isVerified, firstName?, lastName?, departmentId?, positionId?, createdAt | delete cascades (D13) |
+| User | id, email unique (≤ 255), passwordHash, role `ADMIN`/`USER`, isVerified, firstName? (≤ 100), lastName? (≤ 100), departmentId?, positionId?, createdAt, updatedAt | delete cascades (D13). Sign-up and admin create take only email + password (≥ 6 characters); names, department and position are required by the profile update, not by the database |
 | Avatar | userId (PK), data (bytes), mimeType, updatedAt | ≤ 5 MB, PNG/JPG/JPEG/GIF (D11) |
-| Department · Position | id, name unique | delete blocked when used |
-| SkillCategory | id, name, type | seeded |
-| Skill | id, name unique, categoryId | delete blocked when used (D18) |
-| UserSkill | userId + skillId unique, mastery `BEGINNER` `ELEMENTARY` `INTERMEDIATE` `ADVANCED` `EXPERT` | removing it removes it from the user's CVs (D13) |
-| Language | id, name unique, iso unique, nativeName | delete blocked when used (D18) |
-| UserLanguage | userId + languageId unique, proficiency `A1` `A2` `B1` `B2` `C1` `C2` `NATIVE` | |
-| Project | id, name, domain, startDate, endDate?, description, environment → Skill[] | delete blocked when used in a CV; date change blocked when CV projects would fall outside (D25) |
-| ProjectRole | id, name | seeded |
-| Cv | id, name, education?, description, userId | |
-| CvSkill | cvId + skillId unique, mastery | skill must be one of the owner's skills |
-| CvProject | id, cvId, projectId, startDate, endDate?, responsibilities?, roles → ProjectRole[] (≥ 1) | dates within the project's dates |
-| VerificationCode | userId, codeHash, expiresAt, usedAt?, attempts | 6 digits, 10 min, single use (D20) |
-| PasswordResetToken | userId, tokenHash, expiresAt, usedAt? | single use (D20) |
-| RefreshToken | userId, tokenHash, familyId, expiresAt, replacedAt? | rotated on refresh with a 30 s grace window; reuse after it revokes the family (D21); deleted on sign-out; all revoked on password change/reset (D22) |
+| Department · Position | id, name unique (≤ 100), createdAt, updatedAt | delete blocked when used |
+| SkillCategory | id, name unique (≤ 100), type (short text), createdAt, updatedAt | seeded; a skill's type comes from its category and is not stored on `Skill` (page 17); delete blocked while it has skills |
+| Skill | id, name unique (≤ 100), categoryId, createdAt, updatedAt | delete blocked when used (D18) |
+| UserSkill | id, userId + skillId unique, mastery `BEGINNER` `ELEMENTARY` `INTERMEDIATE` `ADVANCED` `EXPERT`, createdAt, updatedAt | removing it removes it from the user's CVs (D13) |
+| Language | id, name unique (≤ 100), iso unique (≤ 5), nativeName (≤ 100), createdAt, updatedAt | delete blocked when used (D18) |
+| UserLanguage | id, userId + languageId unique, proficiency `A1` `A2` `B1` `B2` `C1` `C2` `NATIVE`, createdAt, updatedAt | |
+| Project | id, name (≤ 100), domain (≤ 100), startDate, endDate, description (≤ 2000), createdAt, updatedAt | `startDate` ≤ `endDate`. **`endDate` is required** (page 27; the plan had it optional). Delete blocked when used in a CV; date change blocked when CV projects would fall outside (D25) |
+| ProjectSkill | projectId + skillId unique | the project's environment; skill delete blocked while used (D18) |
+| ProjectRole | id, name unique (≤ 100) | seeded |
+| Cv | id, name (≤ 255), education (≤ 255, required), description (required), userId, createdAt, updatedAt | delete cascades from the user |
+| CvSkill | id, cvId + skillId unique, mastery, createdAt, updatedAt | skill must be one of the owner's skills |
+| CvProject | id, cvId + projectId unique (a project is in a CV once), startDate, endDate? (empty = "Present"), responsibilities?, createdAt, updatedAt | dates within the project's dates |
+| CvProjectRole | cvProjectId + roleId unique | roles of a CV project, at least one |
+| VerificationCode | id, userId, codeHash, expiresAt, usedAt?, attempts, createdAt | 6 digits, 10 min, single use, resend cooldown 60 s from `createdAt` (D20) |
+| PasswordResetToken | id, userId, tokenHash unique, expiresAt, usedAt?, createdAt | single use (D20) |
+| RefreshToken | id, userId, tokenHash unique, familyId, expiresAt, replacedAt?, createdAt | rotated on refresh with a 30 s grace window; reuse after it revokes the family (D21); deleted on sign-out; all revoked on password change/reset (D22) |
+
+Delete rules (D13): everything a user owns (`Avatar`, `UserSkill`, `UserLanguage`, `Cv`, tokens) is removed with the user; a `Cv` takes its `CvSkill` and `CvProject` rows with it, and a `CvProject` its `CvProjectRole` rows. Catalog items in use (`SkillCategory`, `Department`, `Position`, `Skill`, `Language`, `Project`, `ProjectRole`) are `Restrict`, so the database refuses the delete and the service turns that into `CONFLICT` (D18).
 
 Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill categories + ~40 skills, 10+ languages, project roles, ~6 projects, sample CVs.
 
@@ -420,10 +429,11 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
   - Done when: a page renders `health` through Apollo; theme switch persists without flash; Storybook runs (if done).
   - Depends on: S0.1, S0.2.
 
-- [ ] **S0.5 Test setup**
+- [~] **S0.5 Test setup**
   - Frontend: Vitest + RTL + user-event (jsdom), test render helper (theme, intl, `MockedProvider`). Base already in place from S0.4a: `vitest.config.mts` (jsdom, React plugin, tsconfig paths), `test` script, Vitest + RTL + jsdom installed.
   - Backend: Jest unit config; integration config with Supertest and a separate test database, run serially (`--runInBand`), tables truncated per test file; injectable `Clock` provider for date-based rules.
   - Coverage threshold 80 % in both apps, enforced in CI from Phase 3 on (reported only before that).
+  - **Backend done (S0.5b):** `test` (unit), `test:int` (integration, `backend/test/`), `test:cov` (report, fails under 80 %: the threshold is in the Jest config so it works on Windows and macOS; switch CI to it in Phase 3). Integration config `backend/test/jest-integration.json`; the `_test` database is created and migrated by a global setup and truncated before each test file. `Clock` lives in `backend/src/common/clock/`. CI runs `test:int` against its Postgres service.
   - Playwright config at the root with a seeded run.
   - Done when: one sample test per level runs locally and in CI.
   - Depends on: S0.2, S0.3.
@@ -442,7 +452,8 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
 
 ### Phase 2 — Data model and API conventions
 
-- [ ] **S2.1 Data model** — Prisma schema from §7 checked against every docs page, initial migration, seed (§7). Done when: `db:reset` builds a seeded database.
+- [~] **S2.1 Data model** — Prisma schema from §7 checked against every docs page, initial migration, seed (§7). Done when: `db:reset` builds a seeded database.
+  - **S2.1a done:** schema for all 19 models and two migrations, `init` (generated) and `add_date_checks` (hand-written CHECK constraints for project dates). Foreign keys and sortable columns are indexed; text search inside names is not (it would need a `pg_trgm` index). The seed is still to do.
 - [ ] **S2.2 API conventions** — shared GraphQL building blocks in `common/`: pagination / sort / search inputs and paginated output, `ValidationPipe` with field errors, exception filter (D7), guards and decorators skeleton (D10). Unit tests for each. Depends on S0.2.
 
 ### Phase 3 — Authentication
@@ -511,6 +522,7 @@ Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE 
 | `FRONTEND_URL` | backend | Absolute links in emails |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | backend | Mail |
 | `PORT` | backend | HTTP port (default 4000) |
+| `TEST_DATABASE_URL` | backend | Integration test database, name must end in `_test` (optional, defaults to `cv_builder_test` on localhost) |
 
 ---
 
@@ -558,3 +570,5 @@ Over 80 % per app, excluding generated code, configs, `main.ts` and route files.
 | 2026-10-29 | S0.2a Docker Compose and Prisma 7 | #8 | PostgreSQL + Mailpit, Prisma 7 with `prisma-client` (CJS) and the `pg` adapter, `PrismaService`, db scripts; spike result in S0.2 |
 | 2026-10-29 | S0.4a Design tokens, themes, preferences | — | Tokens from Figma (`docs/design-tokens.md`), light/dark themes, preference cookies with a pre-paint script, Radix UI installed; Apollo part (S0.4b) pending |
 | 2026-10-29 | S0.3 CI workflow with contract check | — | GitHub Actions on PRs to `development` (format, lint, typecheck, tests, builds, `schema.gql` up-to-date check); `schema:generate` script; green on a PR still to be confirmed |
+| 2026-10-30 | S2.1a Prisma schema and initial migration | — | 19 models from §7 checked against docs pages 10–27, indexes, `init` + `add_date_checks` migrations; project `endDate` is required (page 27) |
+| 2026-10-30 | S0.5b Backend test setup | — | Jest unit + coverage scripts, Supertest integration tests on a separate `_test` database (serial, truncated per file), injectable `Clock`; sample health tests |
