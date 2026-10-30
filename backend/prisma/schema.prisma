@@ -73,6 +73,7 @@ model User {
   cvs                 Cv[]
   verificationCodes   VerificationCode[]
   passwordResetTokens PasswordResetToken[]
+  refreshTokens       RefreshToken[]
 }
 
 model Avatar {
@@ -268,6 +269,21 @@ model PasswordResetToken {
   expiresAt DateTime
   usedAt    DateTime?
   createdAt DateTime  @default(now())
+
+  // Cascade: a user's tokens go with the user (D13).
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RefreshToken {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @db.Uuid
+  tokenHash  String    @unique
+  // Tokens from one sign-in share a family; reuse of a replaced token revokes the whole family (D21).
+  familyId   String    @db.Uuid
+  expiresAt  DateTime
+  // Set when the token is swapped for a new one; the 30 s grace window is measured from it (D21).
+  replacedAt DateTime?
+  createdAt  DateTime  @default(now())
 
   // Cascade: a user's tokens go with the user (D13).
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
