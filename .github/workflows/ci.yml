@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [development]
+
+# A new push to the same PR cancels the run that is still going.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # Same image and credentials as docker-compose.yml. Used by schema:generate now and by integration tests later.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: cv_builder
+          POSTGRES_PASSWORD: cv_builder
+          POSTGRES_DB: cv_builder
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U cv_builder -d cv_builder"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://cv_builder:cv_builder@localhost:5432/cv_builder
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # Reads the pnpm version from "packageManager" in package.json.
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The typecheck, tests and build need the generated Prisma client (git-ignored).
+      - name: Generate Prisma client
+        run: pnpm --filter @cv-builder/backend db:generate
+
+      # Contract check: schema.gql is committed (D3), so it must match what the code generates.
+      - name: Regenerate schema.gql
+        run: pnpm --filter @cv-builder/backend schema:generate
+
+      - name: Check that schema.gql is up to date
+        run: |
+          if ! git diff --exit-code -- backend/schema.gql; then
+            echo "::error file=backend/schema.gql::schema.gql is out of date. Run 'pnpm --filter @cv-builder/backend schema:generate' and commit the result."
+            exit 1
+          fi
+
+      # Does nothing until the frontend gets a codegen script (S0.4b), then runs against the schema above.
+      - name: Frontend codegen
+        run: pnpm --filter @cv-builder/frontend --if-present codegen
+
+      - name: Format
+        run: pnpm format:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build

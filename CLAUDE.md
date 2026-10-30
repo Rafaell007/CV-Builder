@@ -1,2 +1,2 @@
 @AGENTS.md
-@MACIEK.md
+@maciek/MACIEK.md

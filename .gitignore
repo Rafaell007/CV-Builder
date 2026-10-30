@@ -48,5 +48,5 @@ next-env.d.ts
 # local agent settings
 .claude/settings.local.json
 
-# devs skills
-MACIEK.md
+# side notes - personal
+maciek/
