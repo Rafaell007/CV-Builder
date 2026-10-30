@@ -7,3 +7,17 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model Department {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique @db.VarChar(100)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Position {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique @db.VarChar(100)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
