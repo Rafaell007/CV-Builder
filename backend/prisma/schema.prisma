@@ -161,7 +161,8 @@ model Project {
   updatedAt   DateTime @updatedAt
 
   // The project's environment (technologies used).
-  skills ProjectSkill[]
+  skills     ProjectSkill[]
+  cvProjects CvProject[]
 }
 
 model ProjectSkill {
@@ -192,8 +193,9 @@ model Cv {
   updatedAt   DateTime @updatedAt
 
   // Cascade: a user's CVs go with the user (D13).
-  user   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  skills CvSkill[]
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skills   CvSkill[]
+  projects CvProject[]
 }
 
 model CvSkill {
@@ -209,4 +211,20 @@ model CvSkill {
   skill Skill @relation(fields: [skillId], references: [id], onDelete: Restrict)
 
   @@unique([cvId, skillId])
+}
+
+model CvProject {
+  id               String    @id @default(uuid()) @db.Uuid
+  cvId             String    @db.Uuid
+  projectId        String    @db.Uuid
+  // The person's own dates; they must stay within the project's dates (D25). No end date means "Present".
+  startDate        DateTime  @db.Date
+  endDate          DateTime? @db.Date
+  responsibilities String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  // Cascade: the projects go with the CV. Restrict: a project used in a CV cannot be deleted (D18).
+  cv      Cv      @relation(fields: [cvId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Restrict)
 }
