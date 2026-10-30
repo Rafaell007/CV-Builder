@@ -204,7 +204,7 @@ CV-Builder/
         (app)/                           users, cvs, skills, languages, settings, admin/*
         not-found.tsx
       proxy.ts                           route protection + session refresh
-      env.ts                             the only place reading process.env
+      env.ts · server/env.ts             the only places reading process.env (public · server only)
       features/<feature>/                one folder per feature (shape below)
       shared/
         ui/                              UI kit on Radix: Button, TextField, PasswordField, Select, MultiSelect,
@@ -280,7 +280,7 @@ Rules for all code in this repository.
 
 ### 5.5 Environment variables
 
-- Frontend reads `process.env` only in `frontend/src/env.ts`; backend only through `@nestjs/config` with a validation schema in `backend/src/config/`, except `backend/prisma.config.ts`: it is Prisma CLI config that runs outside Nest and reads `DATABASE_URL` itself (so `db:generate` works without a `.env`). Both apps fail fast on missing values.
+- Frontend reads `process.env` only in `frontend/src/env.ts` (public `NEXT_PUBLIC_*`) and `frontend/src/server/env.ts` (server only, guarded by `server-only`), except `frontend/next.config.ts`: it runs outside the app and reads `BACKEND_URL` for the rewrites; backend only through `@nestjs/config` with a validation schema in `backend/src/config/`, except `backend/prisma.config.ts`: it is Prisma CLI config that runs outside Nest and reads `DATABASE_URL` itself (so `db:generate` works without a `.env`). Both apps fail fast on missing values.
 - Every new variable goes to the app's `.env.example` (no real values) and §10. `.env` files are git-ignored.
 
 ### 5.6 TypeScript only

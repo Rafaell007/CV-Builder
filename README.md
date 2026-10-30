@@ -164,7 +164,7 @@ The full log is in [PLAN.md §2.3](PLAN.md). The ones that shape the code most:
 | Variable | App | Description | Status |
 |---|---|---|---|
 | `NEXT_PUBLIC_APP_URL` | frontend | Public URL of the app | in use |
-| `BACKEND_URL` | frontend | Backend origin for rewrites and server-side requests | planned |
+| `BACKEND_URL` | frontend | Backend origin for rewrites and server-side requests | in use |
 | `DATABASE_URL` | backend | PostgreSQL connection string | in use |
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | backend | Token signing | planned |
 | `FRONTEND_URL` | backend | Absolute links in emails | planned |

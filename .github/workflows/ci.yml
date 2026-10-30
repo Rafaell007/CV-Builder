@@ -36,6 +36,7 @@ jobs:
     env:
       DATABASE_URL: postgresql://cv_builder:cv_builder@localhost:5432/cv_builder
       NEXT_PUBLIC_APP_URL: http://localhost:3000
+      BACKEND_URL: http://localhost:4000
 
     steps:
       - uses: actions/checkout@v7
