@@ -181,6 +181,8 @@ model ProjectRole {
   name      String   @unique @db.VarChar(100)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  cvProjectRoles CvProjectRole[]
 }
 
 model Cv {
@@ -227,4 +229,17 @@ model CvProject {
   // Cascade: the projects go with the CV. Restrict: a project used in a CV cannot be deleted (D18).
   cv      Cv      @relation(fields: [cvId], references: [id], onDelete: Cascade)
   project Project @relation(fields: [projectId], references: [id], onDelete: Restrict)
+
+  roles CvProjectRole[]
+}
+
+model CvProjectRole {
+  cvProjectId String @db.Uuid
+  roleId      String @db.Uuid
+
+  // Cascade: the roles go with the CV project. Restrict: a role in use cannot be deleted (D18).
+  cvProject CvProject   @relation(fields: [cvProjectId], references: [id], onDelete: Cascade)
+  role      ProjectRole @relation(fields: [roleId], references: [id], onDelete: Restrict)
+
+  @@id([cvProjectId, roleId])
 }
