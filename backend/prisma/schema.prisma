@@ -74,6 +74,9 @@ model User {
   verificationCodes   VerificationCode[]
   passwordResetTokens PasswordResetToken[]
   refreshTokens       RefreshToken[]
+
+  @@index([departmentId])
+  @@index([positionId])
 }
 
 model Avatar {
@@ -110,6 +113,8 @@ model Skill {
   userSkills    UserSkill[]
   projectSkills ProjectSkill[]
   cvSkills      CvSkill[]
+
+  @@index([categoryId])
 }
 
 model Language {
@@ -136,6 +141,7 @@ model UserSkill {
   skill Skill @relation(fields: [skillId], references: [id], onDelete: Restrict)
 
   @@unique([userId, skillId])
+  @@index([skillId])
 }
 
 model UserLanguage {
@@ -151,6 +157,7 @@ model UserLanguage {
   language Language @relation(fields: [languageId], references: [id], onDelete: Restrict)
 
   @@unique([userId, languageId])
+  @@index([languageId])
 }
 
 model Project {
@@ -177,6 +184,7 @@ model ProjectSkill {
   skill   Skill   @relation(fields: [skillId], references: [id], onDelete: Restrict)
 
   @@id([projectId, skillId])
+  @@index([skillId])
 }
 
 model ProjectRole {
@@ -216,6 +224,7 @@ model CvSkill {
   skill Skill @relation(fields: [skillId], references: [id], onDelete: Restrict)
 
   @@unique([cvId, skillId])
+  @@index([skillId])
 }
 
 model CvProject {
@@ -234,6 +243,9 @@ model CvProject {
   project Project @relation(fields: [projectId], references: [id], onDelete: Restrict)
 
   roles CvProjectRole[]
+
+  @@index([cvId])
+  @@index([projectId])
 }
 
 model CvProjectRole {
@@ -245,6 +257,7 @@ model CvProjectRole {
   role      ProjectRole @relation(fields: [roleId], references: [id], onDelete: Restrict)
 
   @@id([cvProjectId, roleId])
+  @@index([roleId])
 }
 
 model VerificationCode {
@@ -259,6 +272,8 @@ model VerificationCode {
 
   // Cascade: a user's codes go with the user (D13).
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model PasswordResetToken {
@@ -272,6 +287,8 @@ model PasswordResetToken {
 
   // Cascade: a user's tokens go with the user (D13).
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model RefreshToken {
@@ -287,4 +304,7 @@ model RefreshToken {
 
   // Cascade: a user's tokens go with the user (D13).
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
 }
