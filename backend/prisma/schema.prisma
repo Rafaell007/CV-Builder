@@ -47,4 +47,16 @@ model User {
   // Restrict: a department or position that is still assigned cannot be deleted (D18).
   department Department? @relation(fields: [departmentId], references: [id], onDelete: Restrict)
   position   Position?   @relation(fields: [positionId], references: [id], onDelete: Restrict)
+
+  avatar Avatar?
+}
+
+model Avatar {
+  userId    String   @id @db.Uuid
+  data      Bytes
+  mimeType  String   @db.VarChar(50)
+  updatedAt DateTime @updatedAt
+
+  // Cascade: the avatar is removed together with its user (D13).
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
