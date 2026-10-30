@@ -450,8 +450,9 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
 
 ### Phase 2 — Data model and API conventions
 
-- [~] **S2.1 Data model** — Prisma schema from §7 checked against every docs page, initial migration, seed (§7). Done when: `db:reset` builds a seeded database.
-  - **S2.1a done:** schema for all 19 models and two migrations, `init` (generated) and `add_date_checks` (hand-written CHECK constraints for project dates). Foreign keys and sortable columns are indexed; text search inside names is not (it would need a `pg_trgm` index). The seed is still to do.
+- [x] **S2.1 Data model** — Prisma schema from §7 checked against every docs page, initial migration, seed (§7). Done when: `db:reset` builds a seeded database.
+  - **S2.1a done:** schema for all 19 models and two migrations, `init` (generated) and `add_date_checks` (hand-written CHECK constraints for project dates). Foreign keys and sortable columns are indexed; text search inside names is not (it would need a `pg_trgm` index).
+  - **S2.1b done:** `prisma/seed.ts` calls the steps in `prisma/seed/` (catalogs, users, projects, CVs); it uses `upsert` or a lookup by name, so running it twice adds nothing. 1 admin + 3 users (all verified, password hashed with `@node-rs/argon2`, accounts in the README), 41 skills in 7 categories, 12 languages, 6 projects, 5 CVs. `db:reset` is `prisma migrate reset && prisma db seed`; it still asks for confirmation, so scripts and E2E need to run the two Prisma commands with `--force`.
 - [ ] **S2.2 API conventions** — shared GraphQL building blocks in `common/`: pagination / sort / search inputs and paginated output, `ValidationPipe` with field errors, exception filter (D7), guards and decorators skeleton (D10). Unit tests for each. Depends on S0.2.
 
 ### Phase 3 — Authentication
@@ -567,3 +568,4 @@ Over 80 % per app, excluding generated code, configs, `main.ts` and route files.
 | 2026-10-29 | S0.2a Docker Compose and Prisma 7 | #8 | PostgreSQL + Mailpit, Prisma 7 with `prisma-client` (CJS) and the `pg` adapter, `PrismaService`, db scripts; spike result in S0.2 |
 | 2026-10-29 | S0.4a Design tokens, themes, preferences | — | Tokens from Figma (`docs/design-tokens.md`), light/dark themes, preference cookies with a pre-paint script, Radix UI installed; Apollo part (S0.4b) pending |
 | 2026-10-30 | S2.1a Prisma schema and initial migration | — | 19 models from §7 checked against docs pages 10–27, indexes, `init` + `add_date_checks` migrations; project `endDate` is required (page 27) |
+| 2026-10-30 | S2.1b Seed data | — | Seed for all catalogs, 4 verified users, 6 projects, 5 CVs; `db:reset` seeds; README lists the test accounts; `@node-rs/argon2` added early so seed hashes match auth (S3.1) |
