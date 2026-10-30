@@ -148,7 +148,7 @@ CREATE TABLE "ProjectRole" (
 CREATE TABLE "Cv" (
     "id" UUID NOT NULL,
     "name" VARCHAR(255) NOT NULL,
-    "education" VARCHAR(255),
+    "education" VARCHAR(255) NOT NULL,
     "description" TEXT NOT NULL,
     "userId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -302,10 +302,10 @@ CREATE INDEX "CvSkill_skillId_idx" ON "CvSkill"("skillId");
 CREATE UNIQUE INDEX "CvSkill_cvId_skillId_key" ON "CvSkill"("cvId", "skillId");
 
 -- CreateIndex
-CREATE INDEX "CvProject_cvId_idx" ON "CvProject"("cvId");
+CREATE INDEX "CvProject_projectId_idx" ON "CvProject"("projectId");
 
 -- CreateIndex
-CREATE INDEX "CvProject_projectId_idx" ON "CvProject"("projectId");
+CREATE UNIQUE INDEX "CvProject_cvId_projectId_key" ON "CvProject"("cvId", "projectId");
 
 -- CreateIndex
 CREATE INDEX "CvProjectRole_roleId_idx" ON "CvProjectRole"("roleId");
