@@ -7,3 +7,313 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum Role {
+  ADMIN
+  USER
+}
+
+// Shared by UserSkill and CvSkill.
+enum Mastery {
+  BEGINNER
+  ELEMENTARY
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum Proficiency {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+  NATIVE
+}
+
+model Department {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique @db.VarChar(100)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users User[]
+}
+
+model Position {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique @db.VarChar(100)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users User[]
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique @db.VarChar(255)
+  passwordHash String
+  role         Role     @default(USER)
+  isVerified   Boolean  @default(false)
+  firstName    String?  @db.VarChar(100)
+  lastName     String?  @db.VarChar(100)
+  departmentId String?  @db.Uuid
+  positionId   String?  @db.Uuid
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Restrict: a department or position that is still assigned cannot be deleted (D18).
+  department Department? @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  position   Position?   @relation(fields: [positionId], references: [id], onDelete: Restrict)
+
+  avatar              Avatar?
+  userSkills          UserSkill[]
+  userLanguages       UserLanguage[]
+  cvs                 Cv[]
+  verificationCodes   VerificationCode[]
+  passwordResetTokens PasswordResetToken[]
+  refreshTokens       RefreshToken[]
+
+  @@index([departmentId])
+  @@index([positionId])
+  @@index([firstName])
+  @@index([lastName])
+}
+
+model Avatar {
+  userId    String   @id @db.Uuid
+  data      Bytes
+  mimeType  String   @db.VarChar(50)
+  updatedAt DateTime @updatedAt
+
+  // Cascade: the avatar is removed together with its user (D13).
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SkillCategory {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique @db.VarChar(100)
+  // A skill's type is derived from its category, so it is stored here and not on Skill.
+  type      String   @db.VarChar(50)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  skills Skill[]
+}
+
+model Skill {
+  id         String   @id @default(uuid()) @db.Uuid
+  name       String   @unique @db.VarChar(100)
+  categoryId String   @db.Uuid
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Restrict: a category that still has skills cannot be deleted.
+  category SkillCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  userSkills    UserSkill[]
+  projectSkills ProjectSkill[]
+  cvSkills      CvSkill[]
+
+  @@index([categoryId])
+}
+
+model Language {
+  id         String   @id @default(uuid()) @db.Uuid
+  name       String   @unique @db.VarChar(100)
+  iso        String   @unique @db.VarChar(5)
+  nativeName String   @db.VarChar(100)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  userLanguages UserLanguage[]
+}
+
+model UserSkill {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  skillId   String   @db.Uuid
+  mastery   Mastery
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Cascade: a user's skills go with the user (D13). Restrict: a skill that is still assigned cannot be deleted (D18).
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill Skill @relation(fields: [skillId], references: [id], onDelete: Restrict)
+
+  @@unique([userId, skillId])
+  @@index([skillId])
+}
+
+model UserLanguage {
+  id          String      @id @default(uuid()) @db.Uuid
+  userId      String      @db.Uuid
+  languageId  String      @db.Uuid
+  proficiency Proficiency
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Cascade: a user's languages go with the user (D13). Restrict: a language that is still assigned cannot be deleted (D18).
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  language Language @relation(fields: [languageId], references: [id], onDelete: Restrict)
+
+  @@unique([userId, languageId])
+  @@index([languageId])
+}
+
+model Project {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @db.VarChar(100)
+  domain      String   @db.VarChar(100)
+  startDate   DateTime @db.Date
+  endDate     DateTime @db.Date
+  description String   @db.VarChar(2000)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // The project's environment (technologies used).
+  skills     ProjectSkill[]
+  cvProjects CvProject[]
+
+  @@index([name])
+  @@index([startDate])
+  @@index([endDate])
+}
+
+model ProjectSkill {
+  projectId String @db.Uuid
+  skillId   String @db.Uuid
+
+  // Cascade: the links go with the project. Restrict: a skill used by a project cannot be deleted (D18).
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  skill   Skill   @relation(fields: [skillId], references: [id], onDelete: Restrict)
+
+  @@id([projectId, skillId])
+  @@index([skillId])
+}
+
+model ProjectRole {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique @db.VarChar(100)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cvProjectRoles CvProjectRole[]
+}
+
+model Cv {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @db.VarChar(255)
+  education   String   @db.VarChar(255)
+  description String
+  userId      String   @db.Uuid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Cascade: a user's CVs go with the user (D13).
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skills   CvSkill[]
+  projects CvProject[]
+
+  @@index([userId, name])
+}
+
+model CvSkill {
+  id        String   @id @default(uuid()) @db.Uuid
+  cvId      String   @db.Uuid
+  skillId   String   @db.Uuid
+  mastery   Mastery
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Cascade: the skills go with the CV. Restrict: a skill used in a CV cannot be deleted (D18).
+  cv    Cv    @relation(fields: [cvId], references: [id], onDelete: Cascade)
+  skill Skill @relation(fields: [skillId], references: [id], onDelete: Restrict)
+
+  @@unique([cvId, skillId])
+  @@index([skillId])
+}
+
+model CvProject {
+  id               String    @id @default(uuid()) @db.Uuid
+  cvId             String    @db.Uuid
+  projectId        String    @db.Uuid
+  // The person's own dates; they must stay within the project's dates (D25). No end date means "Present".
+  startDate        DateTime  @db.Date
+  endDate          DateTime? @db.Date
+  responsibilities String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  // Cascade: the projects go with the CV. Restrict: a project used in a CV cannot be deleted (D18).
+  cv      Cv      @relation(fields: [cvId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Restrict)
+
+  roles CvProjectRole[]
+
+  // A project can be in a CV only once (AC-31); the unique index also serves lookups by cvId.
+  @@unique([cvId, projectId])
+  @@index([projectId])
+}
+
+model CvProjectRole {
+  cvProjectId String @db.Uuid
+  roleId      String @db.Uuid
+
+  // Cascade: the roles go with the CV project. Restrict: a role in use cannot be deleted (D18).
+  cvProject CvProject   @relation(fields: [cvProjectId], references: [id], onDelete: Cascade)
+  role      ProjectRole @relation(fields: [roleId], references: [id], onDelete: Restrict)
+
+  @@id([cvProjectId, roleId])
+  @@index([roleId])
+}
+
+model VerificationCode {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  codeHash  String
+  expiresAt DateTime
+  usedAt    DateTime?
+  attempts  Int       @default(0)
+  // Also the start of the 60 s resend cooldown (D20).
+  createdAt DateTime  @default(now())
+
+  // Cascade: a user's codes go with the user (D13).
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  // Unique, because the token from the email link is looked up by its hash.
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  // Cascade: a user's tokens go with the user (D13).
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model RefreshToken {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @db.Uuid
+  tokenHash  String    @unique
+  // Tokens from one sign-in share a family; reuse of a replaced token revokes the whole family (D21).
+  familyId   String    @db.Uuid
+  expiresAt  DateTime
+  // Set when the token is swapped for a new one; the 30 s grace window is measured from it (D21).
+  replacedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  // Cascade: a user's tokens go with the user (D13).
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+}
