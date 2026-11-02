@@ -5,6 +5,7 @@ export const ErrorCode = {
   BadUserInput: "BAD_USER_INPUT",
   NotFound: "NOT_FOUND",
   Conflict: "CONFLICT",
+  TooManyRequests: "TOO_MANY_REQUESTS",
   InternalServerError: "INTERNAL_SERVER_ERROR",
 } as const;
 

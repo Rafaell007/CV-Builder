@@ -369,7 +369,7 @@ Checked against `docs/pages/10` to `27` in S2.1a. Conventions:
 | CvProjectRole | cvProjectId + roleId unique | roles of a CV project, at least one |
 | VerificationCode | id, userId, codeHash, expiresAt, usedAt?, attempts, createdAt | 6 digits, 10 min, single use, resend cooldown 60 s from `createdAt` (D20) |
 | PasswordResetToken | id, userId, tokenHash unique, expiresAt, usedAt?, createdAt | single use (D20) |
-| RefreshToken | id, userId, tokenHash unique, familyId, expiresAt, replacedAt?, createdAt | rotated on refresh with a 30 s grace window; reuse after it revokes the family (D21); deleted on sign-out; all revoked on password change/reset (D22) |
+| RefreshToken | id, userId, tokenHash unique, familyId, expiresAt, replacedAt?, graceUsedAt?, createdAt | rotated on refresh with a 30 s grace window; reuse after it revokes the family (D21); deleted on sign-out; all revoked on password change/reset (D22) |
 
 Delete rules (D13): everything a user owns (`Avatar`, `UserSkill`, `UserLanguage`, `Cv`, tokens) is removed with the user; a `Cv` takes its `CvSkill` and `CvProject` rows with it, and a `CvProject` its `CvProjectRole` rows. Catalog items in use (`SkillCategory`, `Department`, `Position`, `Skill`, `Language`, `Project`, `ProjectRole`) are `Restrict`, so the database refuses the delete and the service turns that into `CONFLICT` (D18).
 
@@ -522,6 +522,8 @@ Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE 
 | `BACKEND_URL` | frontend | Backend origin for rewrites and server-side requests |
 | `DATABASE_URL` | backend | PostgreSQL |
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | backend | Token signing (access JWT) and keyed hashing (refresh tokens); 32 characters or more |
+| `THROTTLE_LIMIT`, `THROTTLE_TTL_SECONDS` | backend | Rate limit per client IP and operation (D23): at most `THROTTLE_LIMIT` calls in `THROTTLE_TTL_SECONDS` seconds (defaults 10 and 60) |
+| `TRUST_PROXY_HOPS` | backend | Number of proxies in front of the backend (default 0: none, `X-Forwarded-For` is ignored). Set it behind a proxy (production), so `req.ip` and the rate limit (D23) see the client IP |
 | `NODE_ENV` | backend | `development` (default), `test` or `production`; in production the auth cookies are `Secure` |
 | `FRONTEND_URL` | backend | Absolute links in emails |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | backend | Mail |
