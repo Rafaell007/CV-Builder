@@ -1,6 +1,8 @@
+import { UseGuards } from "@nestjs/common";
 import { Args, Context, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { CurrentUser, Public } from "../../common/auth";
 import type { AuthUser } from "../../common/auth";
+import { GqlThrottlerGuard } from "../../common/throttling";
 import type { AuthContext } from "./auth-context";
 import { AuthService } from "./auth.service";
 import { SignInInput } from "./dto/sign-in.input";
@@ -15,6 +17,7 @@ export class AuthResolver {
   ) {}
 
   @Public()
+  @UseGuards(GqlThrottlerGuard)
   @Mutation(() => SessionUser)
   async signIn(
     @Args("input") input: SignInInput,

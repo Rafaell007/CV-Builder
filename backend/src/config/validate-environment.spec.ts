@@ -10,6 +10,19 @@ describe("validateEnvironment", () => {
     expect(validateEnvironment(VALID).PORT).toBe(4000);
   });
 
+  it("defaults the rate limit to 10 calls per 60 seconds", () => {
+    const environment = validateEnvironment(VALID);
+
+    expect(environment.THROTTLE_LIMIT).toBe(10);
+    expect(environment.THROTTLE_TTL_SECONDS).toBe(60);
+  });
+
+  it.each(["THROTTLE_LIMIT", "THROTTLE_TTL_SECONDS"])("throws for %s below 1", (name) => {
+    expect(() => validateEnvironment({ ...VALID, [name]: "0" })).toThrow(
+      new RegExp(`Invalid environment variables:\\n${name}`),
+    );
+  });
+
   it("converts PORT from a string to a number", () => {
     expect(validateEnvironment({ ...VALID, PORT: "5000" }).PORT).toBe(5000);
   });

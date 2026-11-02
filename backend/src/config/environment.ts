@@ -30,4 +30,15 @@ export class Environment {
   @IsString()
   @MinLength(32)
   JWT_REFRESH_SECRET!: string;
+
+  // Rate limit per client IP and per operation (D23): at most THROTTLE_LIMIT calls in THROTTLE_TTL_SECONDS.
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  THROTTLE_LIMIT = 10;
+
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  THROTTLE_TTL_SECONDS = 60;
 }

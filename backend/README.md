@@ -85,6 +85,7 @@ Throw Nest exceptions in the service. The global exception filter maps them (D7)
 | `ForbiddenException` | `FORBIDDEN` |
 | `NotFoundException`, Prisma `P2025` (record not found) | `NOT_FOUND` |
 | `ConflictException`, Prisma `P2002` (unique constraint) | `CONFLICT` |
+| `HttpException` with status 429 (thrown by `GqlThrottlerGuard`) | `TOO_MANY_REQUESTS` |
 | any other error | `INTERNAL_SERVER_ERROR` (logged, no details sent to the client) |
 
 ### 4. Protect a resolver

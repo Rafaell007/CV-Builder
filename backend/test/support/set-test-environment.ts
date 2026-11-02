@@ -4,3 +4,5 @@ import { getTestDatabaseUrl } from "./test-database-url";
 process.env["DATABASE_URL"] = getTestDatabaseUrl();
 process.env["JWT_ACCESS_SECRET"] = "integration-test-access-secret-0123456789";
 process.env["JWT_REFRESH_SECRET"] = "integration-test-refresh-secret-0123456789";
+// High, so that tests that sign in many times are not throttled. The throttling test lowers it.
+process.env["THROTTLE_LIMIT"] = "1000";
