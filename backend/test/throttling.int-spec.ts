@@ -24,8 +24,9 @@ describe("throttling", () => {
     else process.env["THROTTLE_LIMIT"] = previousLimit;
   });
 
-  function signIn(password: string) {
+  function signIn(password: string, headers: Record<string, string> = {}) {
     return graphqlRequest(app, SIGN_IN, {
+      headers,
       variables: { input: { email: "user1@example.com", password } },
     });
   }
@@ -41,6 +42,10 @@ describe("throttling", () => {
     expect(blocked.body.data).toBeNull();
     expect(blocked.body.errors?.[0]?.extensions.code).toBe("TOO_MANY_REQUESTS");
     expect(blocked.setCookies).toEqual([]);
+
+    // TRUST_PROXY_HOPS is 0 here, so a faked X-Forwarded-For does not give the client a new IP.
+    const faked = await signIn(TEST_PASSWORD, { "X-Forwarded-For": "203.0.113.99" });
+    expect(faked.body.errors?.[0]?.extensions.code).toBe("TOO_MANY_REQUESTS");
   });
 
   it("does not throttle the operations that D23 does not list", async () => {

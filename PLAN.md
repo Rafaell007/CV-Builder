@@ -461,8 +461,8 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
 
 ### Phase 3 — Authentication
 
-- [x] **S3.1 BE Auth core** — `signIn`, `signOut`, `refresh`, `me`; argon2, JWT cookies, refresh rotation with grace window and family revoke (D9, D21), throttling (D23); guards active globally. Integration tests for each guard.
-- [x] **S3.2 FE Session** — `proxy.ts` (no session → `/sign-in`, refresh before render, signed-in on auth pages → `/users`, admin-only routes), error link refresh-then-redirect, `useCurrentUser`. Depends on S3.1, S0.4.
+- [ ] **S3.1 BE Auth core** — `signIn`, `signOut`, `refresh`, `me`; argon2, JWT cookies, refresh rotation with grace window and family revoke (D9, D21), throttling (D23); guards active globally. Integration tests for each guard.
+- [ ] **S3.2 FE Session** — `proxy.ts` (no session → `/sign-in`, refresh before render, signed-in on auth pages → `/users`, admin-only routes), error link refresh-then-redirect, `useCurrentUser`. Depends on S3.1, S0.4.
 - [ ] **S3.3 BE Mail** — Nodemailer module (Mailpit locally), templates: verification code, password reset link (links use `FRONTEND_URL`).
 - [ ] **S3.4 Sign In** — BE errors ("Invalid email or password"); FE page. AC per sign-in.
 - [ ] **S3.5 Sign Up** — BE `signUp` (unique email, hash, send code, sign in); FE page → `/verify-email`. AC per sign-up. Depends on S3.3.
@@ -523,6 +523,7 @@ Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE 
 | `DATABASE_URL` | backend | PostgreSQL |
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | backend | Token signing (access JWT) and keyed hashing (refresh tokens); 32 characters or more |
 | `THROTTLE_LIMIT`, `THROTTLE_TTL_SECONDS` | backend | Rate limit per client IP and operation (D23): at most `THROTTLE_LIMIT` calls in `THROTTLE_TTL_SECONDS` seconds (defaults 10 and 60) |
+| `TRUST_PROXY_HOPS` | backend | Number of proxies in front of the backend (default 0: none, `X-Forwarded-For` is ignored). Set it behind a proxy (production), so `req.ip` and the rate limit (D23) see the client IP |
 | `NODE_ENV` | backend | `development` (default), `test` or `production`; in production the auth cookies are `Secure` |
 | `FRONTEND_URL` | backend | Absolute links in emails |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | backend | Mail |
@@ -576,6 +577,4 @@ Over 80 % per app, excluding generated code, configs, `main.ts` and route files.
 | 2026-10-29 | S0.4a Design tokens, themes, preferences | — | Tokens from Figma (`docs/design-tokens.md`), light/dark themes, preference cookies with a pre-paint script, Radix UI installed; Apollo part (S0.4b) pending |
 | 2026-10-29 | S0.3 CI workflow with contract check | — | GitHub Actions on PRs to `development` (format, lint, typecheck, tests, builds, `schema.gql` up-to-date check); `schema:generate` script; green on a PR still to be confirmed |
 | 2026-10-30 | S2.1a Prisma schema and initial migration | — | 19 models from §7 checked against docs pages 10–27, indexes, `init` + `add_date_checks` migrations; project `endDate` is required (page 27) |
-| 2026-11-02 | S3.1b BE Refresh and throttling (KAN-84) | — | `refresh` rotates the refresh token (`replacedAt`, same `familyId`); a replaced token works once more inside 30 s (`graceUsedAt`); a second use, or any use after 30 s, deletes the whole family and clears the cookies; `GqlThrottlerGuard` on `signIn` (in-memory counters, per IP and operation); error code `TOO_MANY_REQUESTS`. Contract change: `Mutation.refresh: Boolean!`. Migration: `add_refresh_token_grace_used_at`. New env: `THROTTLE_LIMIT`, `THROTTLE_TTL_SECONDS`. New package: `@nestjs/throttler` |
-| 2026-11-02 | S3.2 FE Session (KAN-85) | — | `src/proxy.ts` (logic in `server/session`): no session → `/sign-in`, expired access token refreshed before render, signed-in on `/sign-in` and `/sign-up` → `/users`, admin-only routes (`/admin/*`, `/users/:id/cvs`) blocked for users; `createSessionLink` (refresh, retry once, then `/sign-in`); `useCurrentUser`; E2E `session/` + `signIn` helper (smoke now signs in). Operations `Me` and `Refresh` in `shared/graphql/session.graphql`. The `(app)` layout had no mock to replace; the hook is used from S1.4 |
 | 2026-10-30 | S0.5b Backend test setup | — | Jest unit + coverage scripts, Supertest integration tests on a separate `_test` database (serial, truncated per file), injectable `Clock`; sample health tests |
