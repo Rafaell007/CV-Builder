@@ -7,8 +7,14 @@ const config: StorybookConfig = {
   // Globs are relative to this folder. Component stories live next to the component in src/;
   // Storybook-only samples live here.
   stories: ["../src/**/*.stories.tsx", "./**/*.stories.tsx"],
-  // a11y: axe checks in the Accessibility panel and in every story test.
-  addons: ["@storybook/addon-a11y"],
+  addons: [
+    // Axe checks in the Accessibility panel and in every story test.
+    "@storybook/addon-a11y",
+    // Generated docs pages (props table, all stories) for components tagged `autodocs` (all, via preview.tsx).
+    "@storybook/addon-docs",
+    // "Run tests" panel in the Storybook UI; the tests themselves come from the plugin in vitest.config.mts.
+    "@storybook/addon-vitest",
+  ],
 };
 
 export default config;

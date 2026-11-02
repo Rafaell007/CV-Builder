@@ -9,6 +9,8 @@ import "@/shared/styles/global.css";
 document.documentElement.classList.add(roboto.variable);
 
 const preview: Preview = {
+  // A docs page for every component; opt out with `tags: ["!autodocs"]`. https://storybook.js.org/docs/writing-docs/autodocs
+  tags: ["autodocs"],
   parameters: {
     // Components use the App Router (next/navigation), not the Pages Router.
     nextjs: { appDirectory: true },
