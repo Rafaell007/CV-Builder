@@ -1,9 +1,11 @@
+import { ConfigService } from "@nestjs/config";
 import { Test } from "@nestjs/testing";
 import { randomUUID } from "node:crypto";
-import { AppConfigModule } from "../src/config";
+import { AppConfigModule, type Environment } from "../src/config";
 import { MailModule, MailService } from "../src/modules/mail";
+import { buildPasswordResetLink } from "../src/modules/mail/templates/password-reset.template";
 
-// Mailpit from docker-compose.yml: SMTP on 1025 (the config default), web inbox and API on 8025.
+// Mailpit web port from docker-compose.yml, where the API runs. It is not an app setting, so no env var holds it.
 const MAILPIT_API = "http://localhost:8025/api/v1";
 
 interface MailpitMessage {
@@ -28,12 +30,18 @@ async function findMails(recipient: string): Promise<MailpitMessage[]> {
 
 describe("mail (needs Mailpit: docker compose up -d)", () => {
   let mail: MailService;
+  let frontendUrl: string;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppConfigModule, MailModule],
     }).compile();
     mail = moduleRef.get(MailService);
+    frontendUrl = moduleRef
+      .get<ConfigService<Environment, true>>(ConfigService)
+      .get("FRONTEND_URL", {
+        infer: true,
+      });
   });
 
   it("delivers the verification code to Mailpit", async () => {
@@ -54,6 +62,6 @@ describe("mail (needs Mailpit: docker compose up -d)", () => {
 
     const [message] = await findMails(recipient);
     expect(message?.Subject).toBe("Reset your CV Builder password");
-    expect(message?.Text).toContain("http://localhost:3000/reset-password?token=reset-token-1");
+    expect(message?.Text).toContain(buildPasswordResetLink(frontendUrl, "reset-token-1"));
   });
 });
