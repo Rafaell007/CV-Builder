@@ -1,3 +1,5 @@
+import { ACCESS_COOKIE, REFRESH_COOKIE } from "@/shared/session";
+
 export type CookieUpdate = { name: string; value: string };
 
 /** Reads the name and value of a `Set-Cookie` header; the attributes (Path, Max-Age, ...) are not needed here. */
@@ -20,4 +22,11 @@ export function applySetCookies(jar: Map<string, string>, headers: readonly stri
 
 export function toCookieHeader(jar: ReadonlyMap<string, string>): string {
   return [...jar].map(([name, value]) => `${name}=${value}`).join("; ");
+}
+
+/** `Set-Cookie` headers that delete both session cookies. The attributes match the ones the backend sets (D9). */
+export function clearSessionCookies(secure: boolean): string[] {
+  return [ACCESS_COOKIE, REFRESH_COOKIE].map(
+    (name) => `${name}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax${secure ? "; Secure" : ""}`,
+  );
 }

@@ -15,15 +15,8 @@ export async function handleRequest(request: NextRequest, backendUrl: string) {
     refreshToken: request.cookies.get(REFRESH_COOKIE)?.value,
     needRole: kind === "admin-only",
     nowMs: Date.now(),
+    secureCookies: request.nextUrl.protocol === "https:",
   });
-  // The backend did not answer, so the visitor is not signed out for it. The page shows its own error.
-  if (session.status === "unavailable") return NextResponse.next();
-
-  const redirectTo = resolveRedirect(
-    kind,
-    session.status === "active",
-    session.status === "active" ? session.role : null,
-  );
 
   // Cookies the backend issued or cleared while checking: the page being rendered must see them too.
   for (const header of session.setCookies) {
@@ -32,6 +25,17 @@ export async function handleRequest(request: NextRequest, backendUrl: string) {
     if (cookie.value === "") request.cookies.delete(cookie.name);
     else request.cookies.set(cookie.name, cookie.value);
   }
+
+  // The backend did not answer, so the visitor is not signed out for it. The page shows its own error.
+  // Cookies a refresh already issued still go out, or the browser would keep a refresh token that is used up.
+  const redirectTo =
+    session.status === "unavailable"
+      ? null
+      : resolveRedirect(
+          kind,
+          session.status === "active",
+          session.status === "active" ? session.role : null,
+        );
 
   const response = redirectTo
     ? NextResponse.redirect(new URL(redirectTo, request.url))

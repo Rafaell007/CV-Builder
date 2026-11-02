@@ -1,8 +1,12 @@
 import { NextRequest } from "next/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { handleRequest } from "./handleRequest";
 
-const proxy = (request: NextRequest) => handleRequest(request, "http://backend");
+// resolveSession keeps finished refreshes for a few seconds, so each call loads a fresh copy of the module.
+async function proxy(request: NextRequest) {
+  vi.resetModules();
+  const { handleRequest } = await import("./handleRequest");
+  return handleRequest(request, "http://backend");
+}
 
 const FRESH = `h.${btoa(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 600 }))}.s`;
 const EXPIRED = `h.${btoa(JSON.stringify({ exp: Math.floor(Date.now() / 1000) - 60 }))}.s`;
@@ -127,6 +131,30 @@ describe("handleRequest", () => {
 
     expect(isRedirect(response)).toBe(false);
     expect(response.headers.getSetCookie()).toEqual([]);
+  });
+
+  it("still passes on the cookies a refresh issued when the role request then fails", async () => {
+    const newCookies = ["access_token=new; Path=/", "refresh_token=r2; Path=/"];
+    mockBackend(
+      { body: { data: { refresh: true } }, setCookies: newCookies },
+      new TypeError("fetch failed"),
+    );
+
+    const response = await proxy(requestFor("/admin/skills", { access: EXPIRED, refresh: "r1" }));
+
+    expect(isRedirect(response)).toBe(false);
+    expect(response.headers.getSetCookie()).toEqual(newCookies);
+  });
+
+  it("redirects to sign-in and clears the cookies when the backend refuses a fresh-looking token", async () => {
+    mockBackend({ body: { data: null, errors: [{ extensions: { code: "UNAUTHENTICATED" } }] } });
+    const request = requestFor("/admin/skills", { access: FRESH, refresh: "r" });
+
+    const response = await proxy(request);
+
+    expect(location(response)).toBe("http://localhost:3000/sign-in");
+    expect(response.headers.getSetCookie()).toHaveLength(2);
+    expect(request.cookies.get("access_token")).toBeUndefined();
   });
 
   it("blocks a user from an admin-only route", async () => {

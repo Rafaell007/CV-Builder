@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { resolveSession } from "./resolveSession";
 
 const NOW_MS = Date.UTC(2026, 10, 2, 12, 0, 0);
 
@@ -34,14 +33,29 @@ function calls(fetchMock: ReturnType<typeof vi.fn>) {
   });
 }
 
-function resolve(input: { accessToken?: string; refreshToken?: string; needRole?: boolean }) {
+// The module keeps finished refreshes for a few seconds, so each call loads a fresh copy unless a test
+// passes `resolveSession` itself to share that state.
+async function resolve(input: {
+  accessToken?: string;
+  refreshToken?: string;
+  needRole?: boolean;
+  secureCookies?: boolean;
+  loaded?: typeof import("./resolveSession");
+}) {
+  const { resolveSession } = input.loaded ?? (await loadModule());
   return resolveSession({
     backendUrl: "http://backend",
     accessToken: input.accessToken,
     refreshToken: input.refreshToken,
     needRole: input.needRole ?? false,
     nowMs: NOW_MS,
+    secureCookies: input.secureCookies ?? false,
   });
+}
+
+async function loadModule() {
+  vi.resetModules();
+  return import("./resolveSession");
 }
 
 const ADMIN = { data: { me: { role: "ADMIN" } } };
@@ -85,14 +99,46 @@ describe("resolveSession", () => {
     const newCookies = ["access_token=new; Path=/"];
     const fetchMock = mockBackend({ body: { data: { refresh: true } }, setCookies: newCookies });
 
+    const loaded = await loadModule();
     const [first, second] = await Promise.all([
-      resolve({ accessToken: EXPIRED, refreshToken: "r1" }),
-      resolve({ accessToken: EXPIRED, refreshToken: "r1" }),
+      resolve({ accessToken: EXPIRED, refreshToken: "r1", loaded }),
+      resolve({ accessToken: EXPIRED, refreshToken: "r1", loaded }),
     ]);
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(first).toEqual({ status: "active", role: null, setCookies: newCookies });
     expect(second).toEqual(first);
+  });
+
+  it("reuses a finished refresh for a request that arrives late with the same refresh token", async () => {
+    const newCookies = ["access_token=new; Path=/"];
+    const fetchMock = mockBackend({ body: { data: { refresh: true } }, setCookies: newCookies });
+    const loaded = await loadModule();
+
+    await resolve({ accessToken: EXPIRED, refreshToken: "r1", loaded });
+    const late = await resolve({ accessToken: EXPIRED, refreshToken: "r1", loaded });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(late).toEqual({ status: "active", role: null, setCookies: newCookies });
+  });
+
+  it("refreshes again once the reuse time has passed", async () => {
+    vi.useFakeTimers();
+    try {
+      const fetchMock = mockBackend(
+        { body: { data: { refresh: true } } },
+        { body: { data: { refresh: true } } },
+      );
+      const loaded = await loadModule();
+
+      await resolve({ accessToken: EXPIRED, refreshToken: "r1", loaded });
+      vi.advanceTimersByTime(6_000);
+      await resolve({ accessToken: EXPIRED, refreshToken: "r1", loaded });
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("refreshes when only the refresh cookie is left", async () => {
@@ -121,6 +167,7 @@ describe("resolveSession", () => {
 
     expect(await resolve({ accessToken: EXPIRED, refreshToken: "r1" })).toEqual({
       status: "unavailable",
+      setCookies: [],
     });
   });
 
@@ -131,7 +178,39 @@ describe("resolveSession", () => {
 
     expect(await resolve({ accessToken: EXPIRED, refreshToken: "r1" })).toEqual({
       status: "unavailable",
+      setCookies: [],
     });
+  });
+
+  it("ends the session and clears the cookies when the backend refuses a fresh-looking token", async () => {
+    mockBackend({ body: { data: null, errors: [{ extensions: { code: "UNAUTHENTICATED" } }] } });
+
+    const result = await resolve({
+      accessToken: FRESH,
+      refreshToken: "r",
+      needRole: true,
+      secureCookies: true,
+    });
+
+    expect(result).toEqual({
+      status: "none",
+      setCookies: [
+        "access_token=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax; Secure",
+        "refresh_token=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax; Secure",
+      ],
+    });
+  });
+
+  it("keeps the cookies a refresh issued when the role request then fails", async () => {
+    const newCookies = ["access_token=new; Path=/", "refresh_token=r2; Path=/"];
+    mockBackend(
+      { body: { data: { refresh: true } }, setCookies: newCookies },
+      new TypeError("fetch failed"),
+    );
+
+    const result = await resolve({ accessToken: EXPIRED, refreshToken: "r1", needRole: true });
+
+    expect(result).toEqual({ status: "unavailable", setCookies: newCookies });
   });
 
   it("reads the role of a fresh session when asked", async () => {
@@ -173,6 +252,7 @@ describe("resolveSession", () => {
 
     expect(await resolve({ accessToken: FRESH, refreshToken: "r", needRole: true })).toEqual({
       status: "unavailable",
+      setCookies: [],
     });
   });
 });

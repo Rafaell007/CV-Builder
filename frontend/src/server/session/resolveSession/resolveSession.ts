@@ -1,24 +1,45 @@
 import { MeDocument, RefreshDocument, type RefreshMutation, type Role } from "@/shared/graphql";
 import { ACCESS_COOKIE, isAccessTokenFresh, REFRESH_COOKIE } from "@/shared/session";
 import { postGraphql, type GraphqlResult } from "../postGraphql";
-import { applySetCookies, toCookieHeader } from "../utils";
+import { applySetCookies, clearSessionCookies, toCookieHeader } from "../utils";
 
-// Refreshes that are running now, by refresh token. Next.js prefetches several pages at once; each would
-// send the same refresh token, and the backend treats a third use as theft and ends the session (D21).
-const refreshesInFlight = new Map<string, Promise<GraphqlResult<RefreshMutation>>>();
+// How long the answer of a finished refresh is reused. Next.js prefetches several pages at once and some of
+// them arrive after the first refresh has finished, still carrying the old refresh token. The backend allows
+// the old token one grace use; a third use looks like theft and ends the session (D21).
+const REFRESH_REUSE_MS = 5_000;
+
+type SharedRefresh = {
+  result: Promise<GraphqlResult<RefreshMutation>>;
+  // Set when the refresh has finished; `null` while it is running.
+  finishedAtMs: number | null;
+};
+
+// Refreshes by the refresh token they were sent with.
+const sharedRefreshes = new Map<string, SharedRefresh>();
 
 function refreshOnce(
   backendUrl: string,
   refreshToken: string,
   cookieHeader: string,
 ): Promise<GraphqlResult<RefreshMutation>> {
-  const running = refreshesInFlight.get(refreshToken);
-  if (running) return running;
-  const started = postGraphql(backendUrl, RefreshDocument, cookieHeader).finally(() => {
-    refreshesInFlight.delete(refreshToken);
-  });
-  refreshesInFlight.set(refreshToken, started);
-  return started;
+  const now = Date.now();
+  for (const [token, { finishedAtMs }] of sharedRefreshes) {
+    if (finishedAtMs !== null && now - finishedAtMs > REFRESH_REUSE_MS)
+      sharedRefreshes.delete(token);
+  }
+  const shared = sharedRefreshes.get(refreshToken);
+  if (shared) return shared.result;
+
+  const entry: SharedRefresh = {
+    result: postGraphql(backendUrl, RefreshDocument, cookieHeader).finally(() => {
+      entry.finishedAtMs = Date.now();
+    }),
+    finishedAtMs: null,
+  };
+  // A failed call is not kept: the next request may try again.
+  entry.result.catch(() => sharedRefreshes.delete(refreshToken));
+  sharedRefreshes.set(refreshToken, entry);
+  return entry.result;
 }
 
 export type SessionResult =
@@ -27,7 +48,8 @@ export type SessionResult =
   // No usable session. `setCookies` may hold the headers that clear the dead cookies.
   | { status: "none"; setCookies: string[] }
   // The backend did not answer properly, so nothing is known. The caller must not log the user out.
-  | { status: "unavailable" };
+  // `setCookies` holds the cookies a refresh already issued; they must still reach the browser.
+  | { status: "unavailable"; setCookies: string[] };
 
 export type ResolveSessionInput = {
   backendUrl: string;
@@ -35,6 +57,8 @@ export type ResolveSessionInput = {
   refreshToken: string | undefined;
   needRole: boolean;
   nowMs: number;
+  // Whether the site is served over HTTPS. Cookies that are cleared must carry the same `Secure` flag.
+  secureCookies: boolean;
 };
 
 /**
@@ -48,6 +72,7 @@ export async function resolveSession({
   refreshToken,
   needRole,
   nowMs,
+  secureCookies,
 }: ResolveSessionInput): Promise<SessionResult> {
   const jar = new Map<string, string>();
   if (accessToken) jar.set(ACCESS_COOKIE, accessToken);
@@ -62,16 +87,20 @@ export async function resolveSession({
       setCookies.push(...refreshed.setCookies);
       applySetCookies(jar, refreshed.setCookies);
       if (refreshed.errorCodes.includes("UNAUTHENTICATED")) return { status: "none", setCookies };
-      if (!refreshed.data?.refresh) return { status: "unavailable" };
+      if (!refreshed.data?.refresh) return { status: "unavailable", setCookies };
     }
 
     if (!needRole) return { status: "active", role: null, setCookies };
 
     const current = await postGraphql(backendUrl, MeDocument, toCookieHeader(jar));
-    if (current.errorCodes.length > 0) return { status: "unavailable" };
+    // The token looked fresh but the backend refuses it (deleted user, rotated secret): the session is over.
+    if (current.errorCodes.includes("UNAUTHENTICATED")) {
+      return { status: "none", setCookies: [...setCookies, ...clearSessionCookies(secureCookies)] };
+    }
+    if (current.errorCodes.length > 0) return { status: "unavailable", setCookies };
     if (!current.data?.me) return { status: "none", setCookies };
     return { status: "active", role: current.data.me.role, setCookies };
   } catch {
-    return { status: "unavailable" };
+    return { status: "unavailable", setCookies };
   }
 }

@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { applySetCookies, parseSetCookie, toCookieHeader } from "./setCookie.utils";
+import {
+  applySetCookies,
+  clearSessionCookies,
+  parseSetCookie,
+  toCookieHeader,
+} from "./setCookie.utils";
 
 describe("parseSetCookie", () => {
   it("reads the name and value and ignores the attributes", () => {
@@ -56,5 +61,18 @@ describe("toCookieHeader", () => {
 
   it("returns an empty string for an empty jar", () => {
     expect(toCookieHeader(new Map())).toBe("");
+  });
+});
+
+describe("clearSessionCookies", () => {
+  it("deletes both session cookies with the attributes the backend uses", () => {
+    expect(clearSessionCookies(false)).toEqual([
+      "access_token=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax",
+      "refresh_token=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax",
+    ]);
+  });
+
+  it("adds Secure over HTTPS", () => {
+    expect(clearSessionCookies(true).every((header) => header.endsWith("; Secure"))).toBe(true);
   });
 });
