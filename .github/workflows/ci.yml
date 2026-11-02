@@ -67,9 +67,9 @@ jobs:
             exit 1
           fi
 
-      # Does nothing until the frontend gets a codegen script (S0.4b), then runs against the schema above.
+      # Generates the frontend's GraphQL types from the schema above; the typecheck below uses them.
       - name: Frontend codegen
-        run: pnpm --filter @cv-builder/frontend --if-present codegen
+        run: pnpm --filter @cv-builder/frontend codegen
 
       - name: Format
         run: pnpm format:check

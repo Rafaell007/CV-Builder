@@ -45,7 +45,7 @@ A feature is added to this table as "done" when its PLAN.md step is merged.
 | API | GraphQL, code-first (Apollo Server 5), Apollo Client 4 | planned |
 | Database | PostgreSQL 17 + Prisma 7 | schema, migrations and seed in place |
 | Auth | JWT access and refresh tokens in httpOnly cookies | planned |
-| Tests | Vitest + React Testing Library, Jest + Supertest, Playwright (E2E) | backend Jest installed, rest planned |
+| Tests | Vitest + React Testing Library, Jest + Supertest, Playwright (E2E) | set up |
 | Quality | ESLint, Prettier, Husky, lint-staged, commitlint | installed |
 | Hosting | Vercel, Render, Neon (optional) | planned |
 
@@ -123,6 +123,7 @@ Run from the repository root; each runs in every workspace that defines it.
 | `pnpm lint` | ESLint |
 | `pnpm typecheck` | TypeScript, no emit (the frontend also generates Next.js route types) |
 | `pnpm test` | Unit tests (backend integration tests: `pnpm --filter @cv-builder/backend test:int`) |
+| `pnpm test:e2e` | Playwright E2E tests against a freshly seeded database (see [E2E tests](#e2e-tests)) |
 | `pnpm format` · `pnpm format:check` | Format with Prettier, or only check |
 | `pnpm --filter @cv-builder/frontend codegen` | Generate typed GraphQL documents from `backend/schema.gql` into `frontend/src/shared/graphql/generated/` (git-ignored; `dev`, `build`, `typecheck` and `test` run it first) |
 
@@ -132,9 +133,12 @@ Run from the repository root; each runs in every workspace that defines it.
 |---|---|---|---|
 | Backend unit | Jest + `@nestjs/testing` | `pnpm --filter @cv-builder/backend test` | set up |
 | Backend integration | Jest + Supertest, test database | `pnpm --filter @cv-builder/backend test:int` | set up (health query) |
-| Frontend unit and component | Vitest + React Testing Library | _planned in S0.5_ | planned |
+| Frontend unit and component | Vitest + React Testing Library + user-event | `pnpm --filter @cv-builder/frontend test` | set up |
+| E2E | Playwright, seeded test database | `pnpm test:e2e` | set up (smoke test) |
 
-Coverage target: over 80 %. `pnpm --filter @cv-builder/backend test:cov` prints the backend report and fails below 80 % (the threshold lives in the Jest config in `backend/package.json`); it is switched on in CI from Phase 3. Frontend coverage: _to be added with its test setup._
+Coverage target: over 80 %. `test:cov` prints the report and fails below 80 % in each app: `pnpm --filter @cv-builder/backend test:cov` (threshold in the Jest config in `backend/package.json`) and `pnpm --filter @cv-builder/frontend test:cov` (threshold in `frontend/vitest.config.mts`; HTML report in `frontend/coverage/`). Both are switched on in CI from Phase 3.
+
+Frontend component tests render through `renderWithProviders` from `@/shared/testing` (app providers, Apollo mocks, a user-event `user`); see [frontend/src/shared/testing/README.md](frontend/src/shared/testing/README.md).
 
 Integration tests need the database running (`docker compose up -d`). They use a separate database, `cv_builder_test`, which is created and migrated automatically on the first run. Files run one at a time and every table is truncated before each test file. The database name must end in `_test`, otherwise the run aborts, so development data is never touched. Set `TEST_DATABASE_URL` to use another server.
 
@@ -196,11 +200,17 @@ The GraphQL contract is [backend/schema.gql](backend/schema.gql), generated from
 
 ## E2E tests
 
-Planned: Playwright against a seeded database, one spec per user flow, written with each step. The list of test cases will be added here. _Not available yet._
+Playwright drives a real browser through the whole app against a freshly seeded database. Run `pnpm test:e2e` with Docker running; install the browser once per machine with `pnpm --filter @cv-builder/e2e exec playwright install chromium`. Details: [e2e/README.md](e2e/README.md).
+
+| Area | Test case | Spec |
+|---|---|---|
+| Smoke | `/` redirects to the employees page, and the backend health query answers on the server and in the browser | `e2e/smoke/home.spec.ts` |
+
+One spec per user flow is added with each step.
 
 ## Workflow
 
 - Branches: `main` (releases), `development` (integration), feature branches `feature/<ticket>-<name>` from `development`; pull requests go into `development` and need the other developer's approval.
 - Commits follow [Conventional Commits](https://www.conventionalcommits.org/), e.g. `feat(cvs): add CV table`, with the ticket key at the end.
 - Git hooks (Husky, installed by `pnpm install`): ESLint and Prettier run on staged files; commitlint checks the message.
-- CI (GitHub Actions, [.github/workflows/ci.yml](.github/workflows/ci.yml)) runs on pull requests to `development`: format, lint, typecheck, tests, builds of both apps, and a check that `backend/schema.gql` is up to date. It is not a required check (no branch protection on the free plan), so read its result before asking for a review.
+- CI (GitHub Actions, [.github/workflows/ci.yml](.github/workflows/ci.yml)) runs on pull requests to `development`: format, lint, typecheck, tests, builds of both apps, and a check that `backend/schema.gql` is up to date; a separate `e2e` job runs the Playwright tests and uploads their HTML report. It is not a required check (no branch protection on the free plan), so read its result before asking for a review.
