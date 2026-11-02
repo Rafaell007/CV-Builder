@@ -46,7 +46,7 @@ A feature is added to this table as "done" when its PLAN.md step is merged.
 | Database | PostgreSQL 17 + Prisma 7 | schema, migrations and seed in place |
 | Auth | JWT access and refresh tokens in httpOnly cookies | planned |
 | Tests | Vitest + React Testing Library, Jest + Supertest, Playwright (E2E) | set up |
-| UI development | Storybook 10 (light/dark switcher, stories run as tests) | set up |
+| UI development | Storybook 10 (light/dark/system switcher, stories run as tests with accessibility checks) | set up |
 | Quality | ESLint, Prettier, Husky, lint-staged, commitlint | installed |
 | Hosting | Vercel, Render, Neon (optional) | planned |
 
