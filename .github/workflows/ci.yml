@@ -80,6 +80,10 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      # The frontend's Storybook tests run in Chromium (Vitest browser mode). Not cached, like the e2e job.
+      - name: Install Chromium
+        run: pnpm --filter @cv-builder/frontend exec playwright install --with-deps chromium
+
       - name: Test
         run: pnpm test
 
