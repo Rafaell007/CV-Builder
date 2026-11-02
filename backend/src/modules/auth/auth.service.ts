@@ -8,11 +8,19 @@ import type { SessionUser } from "./models/session-user";
 import { hashPassword, verifyPassword } from "./password";
 import { REFRESH_TOKEN_TTL_MS, TokenService } from "./token.service";
 
-export interface SignedInSession {
-  user: SessionUser;
+export interface SessionTokens {
   accessToken: string;
   refreshToken: string;
 }
+
+export interface SignedInSession extends SessionTokens {
+  user: SessionUser;
+}
+
+/** How long a replaced refresh token still works, so that parallel requests do not sign the user out (D21). */
+export const REFRESH_GRACE_WINDOW_MS = 30 * 1000;
+
+const SESSION_ENDED = "Session ended, sign in again";
 
 const SESSION_USER_SELECT = {
   id: true,
@@ -58,21 +66,48 @@ export class AuthService {
       firstName: user.firstName,
       lastName: user.lastName,
     };
-    const refreshToken = this.tokens.createRefreshToken();
-    await this.prisma.refreshToken.create({
-      data: {
-        userId: user.id,
-        tokenHash: this.tokens.hashRefreshToken(refreshToken),
-        familyId: randomUUID(), // a new sign-in starts a new family of refresh tokens (D21)
-        expiresAt: new Date(this.clock.now().getTime() + REFRESH_TOKEN_TTL_MS),
-      },
-    });
+    // a new sign-in starts a new family of refresh tokens (D21)
+    const tokens = await this.issueTokens(user.id, randomUUID());
 
-    return {
-      user: sessionUser,
-      accessToken: await this.tokens.signAccessToken(user.id),
-      refreshToken,
-    };
+    return { user: sessionUser, ...tokens };
+  }
+
+  /**
+   * Swaps a refresh token for a new pair of tokens (D21).
+   * - A token that was never used is marked as replaced.
+   * - A replaced token works once more inside `REFRESH_GRACE_WINDOW_MS`, for a parallel request.
+   * - A replaced token used after that window, or a second time inside it, means the token may be
+   *   stolen: the whole family is deleted.
+   */
+  async refresh(refreshToken: string | undefined): Promise<SessionTokens> {
+    if (refreshToken === undefined) throw new UnauthorizedException(SESSION_ENDED);
+
+    const now = this.clock.now();
+    const stored = await this.prisma.refreshToken.findUnique({
+      where: { tokenHash: this.tokens.hashRefreshToken(refreshToken) },
+      select: { id: true, userId: true, familyId: true, expiresAt: true, replacedAt: true },
+    });
+    if (stored === null || stored.expiresAt <= now) throw new UnauthorizedException(SESSION_ENDED);
+
+    if (stored.replacedAt === null) {
+      // Only one of two parallel requests can change the row; the other one gets `count: 0`
+      // and is the grace use below.
+      const { count } = await this.prisma.refreshToken.updateMany({
+        where: { id: stored.id, replacedAt: null },
+        data: { replacedAt: now },
+      });
+      if (count === 1) return this.issueTokens(stored.userId, stored.familyId);
+    } else if (now.getTime() - stored.replacedAt.getTime() > REFRESH_GRACE_WINDOW_MS) {
+      return this.revokeFamily(stored.familyId);
+    }
+
+    // The grace use: allowed once per token, and the same race rule decides which request gets it.
+    const { count } = await this.prisma.refreshToken.updateMany({
+      where: { id: stored.id, graceUsedAt: null },
+      data: { graceUsedAt: now },
+    });
+    if (count === 0) return this.revokeFamily(stored.familyId);
+    return this.issueTokens(stored.userId, stored.familyId);
   }
 
   /** Ends the session of this refresh token on this server. An unknown or missing token is not an error. */
@@ -99,6 +134,24 @@ export class AuthService {
 
   async findSessionUser(userId: string): Promise<SessionUser | null> {
     return this.prisma.user.findUnique({ where: { id: userId }, select: SESSION_USER_SELECT });
+  }
+
+  private async revokeFamily(familyId: string): Promise<never> {
+    await this.prisma.refreshToken.deleteMany({ where: { familyId } });
+    throw new UnauthorizedException(SESSION_ENDED);
+  }
+
+  private async issueTokens(userId: string, familyId: string): Promise<SessionTokens> {
+    const refreshToken = this.tokens.createRefreshToken();
+    await this.prisma.refreshToken.create({
+      data: {
+        userId,
+        tokenHash: this.tokens.hashRefreshToken(refreshToken),
+        familyId,
+        expiresAt: new Date(this.clock.now().getTime() + REFRESH_TOKEN_TTL_MS),
+      },
+    });
+    return { accessToken: await this.tokens.signAccessToken(userId), refreshToken };
   }
 
   private getUnknownUserHash(): Promise<string> {

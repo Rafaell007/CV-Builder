@@ -1,4 +1,4 @@
-import { UseGuards } from "@nestjs/common";
+import { UnauthorizedException, UseGuards } from "@nestjs/common";
 import { Args, Context, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { CurrentUser, Public } from "../../common/auth";
 import type { AuthUser } from "../../common/auth";
@@ -35,6 +35,21 @@ export class AuthResolver {
     await this.authService.signOut(this.cookies.readRefreshToken(req));
     this.cookies.clear(res);
     return true;
+  }
+
+  // Public, because this is called when the access token has already expired.
+  @Public()
+  @Mutation(() => Boolean)
+  async refresh(@Context() { req, res }: AuthContext): Promise<boolean> {
+    try {
+      const tokens = await this.authService.refresh(this.cookies.readRefreshToken(req));
+      this.cookies.set(res, tokens);
+      return true;
+    } catch (error) {
+      // The session is over, so the browser must not keep sending the dead cookies.
+      if (error instanceof UnauthorizedException) this.cookies.clear(res);
+      throw error;
+    }
   }
 
   // Public, because "nobody is signed in" is a normal answer (`null`), not an error.
