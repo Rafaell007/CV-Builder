@@ -15,7 +15,10 @@ export async function handleRequest(request: NextRequest, backendUrl: string) {
     refreshToken: request.cookies.get(REFRESH_COOKIE)?.value,
     needRole: kind === "admin-only",
     nowMs: Date.now(),
-    secureCookies: request.nextUrl.protocol === "https:",
+    // Behind a TLS-terminating proxy the request looks like plain HTTP; the proxy tells the real protocol.
+    secureCookies:
+      request.nextUrl.protocol === "https:" ||
+      request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim() === "https",
   });
 
   // Cookies the backend issued or cleared while checking: the page being rendered must see them too.

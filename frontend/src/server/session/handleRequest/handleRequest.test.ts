@@ -157,6 +157,20 @@ describe("handleRequest", () => {
     expect(request.cookies.get("access_token")).toBeUndefined();
   });
 
+  it("marks the cleared cookies Secure when a proxy forwards an HTTPS request", async () => {
+    mockBackend({ body: { data: null, errors: [{ extensions: { code: "UNAUTHENTICATED" } }] } });
+    const request = new NextRequest("http://localhost:3000/admin/skills", {
+      headers: {
+        cookie: `access_token=${FRESH}; refresh_token=r`,
+        "x-forwarded-proto": "https",
+      },
+    });
+
+    const response = await proxy(request);
+
+    for (const header of response.headers.getSetCookie()) expect(header).toContain("; Secure");
+  });
+
   it("blocks a user from an admin-only route", async () => {
     mockBackend({ body: { data: { me: { role: "USER" } } } });
 
