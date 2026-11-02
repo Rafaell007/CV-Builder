@@ -122,18 +122,20 @@ Run from the repository root; each runs in every workspace that defines it.
 | `pnpm build` | Production build of both apps |
 | `pnpm lint` | ESLint |
 | `pnpm typecheck` | TypeScript, no emit (the frontend also generates Next.js route types) |
-| `pnpm test` | Unit and integration tests |
+| `pnpm test` | Unit tests (backend integration tests: `pnpm --filter @cv-builder/backend test:int`) |
 | `pnpm format` · `pnpm format:check` | Format with Prettier, or only check |
 
 ## Tests and coverage
 
 | Kind | Tools | Run | Status |
 |---|---|---|---|
-| Backend unit | Jest + `@nestjs/testing` | `pnpm --filter @cv-builder/backend test` | set up (smoke test) |
-| Backend integration | Jest + Supertest, test database | _planned in S0.5_ | planned |
+| Backend unit | Jest + `@nestjs/testing` | `pnpm --filter @cv-builder/backend test` | set up |
+| Backend integration | Jest + Supertest, test database | `pnpm --filter @cv-builder/backend test:int` | set up (health query) |
 | Frontend unit and component | Vitest + React Testing Library | _planned in S0.5_ | planned |
 
-Coverage target: over 80 %. Coverage report and numbers: _to be added once the coverage scripts exist._
+Coverage target: over 80 %. `pnpm --filter @cv-builder/backend test:cov` prints the backend report and fails below 80 % (the threshold lives in the Jest config in `backend/package.json`); it is switched on in CI from Phase 3. Frontend coverage: _to be added with its test setup._
+
+Integration tests need the database running (`docker compose up -d`). They use a separate database, `cv_builder_test`, which is created and migrated automatically on the first run. Files run one at a time and every table is truncated before each test file. The database name must end in `_test`, otherwise the run aborts, so development data is never touched. Set `TEST_DATABASE_URL` to use another server.
 
 ## Project structure
 
@@ -151,7 +153,7 @@ eslint.config.ts          one ESLint config for both apps
 prettier.config.ts        one Prettier config
 ```
 
-The backend will also grow `common/` and `test/`. Details: [PLAN.md §4](PLAN.md) and [frontend/src/features/README.md](frontend/src/features/README.md).
+The backend also has `common/` (shared providers such as `Clock`) and `test/` (integration tests). Details: [PLAN.md §4](PLAN.md) and [frontend/src/features/README.md](frontend/src/features/README.md).
 
 ## Team and task distribution
 
@@ -183,6 +185,7 @@ The full log is in [PLAN.md §2.3](PLAN.md). The ones that shape the code most:
 | `FRONTEND_URL` | backend | Absolute links in emails | planned |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | backend | Mail | planned |
 | `PORT` | backend | HTTP port (default 4000) | in use |
+| `TEST_DATABASE_URL` | backend | Integration test database, name must end in `_test` (optional, has a default) | in use |
 
 Examples live in each app's `.env.example`; the table is mirrored in [PLAN.md §10](PLAN.md). Both apps fail fast on a missing value.
 
@@ -199,3 +202,4 @@ Planned: Playwright against a seeded database, one spec per user flow, written w
 - Branches: `main` (releases), `development` (integration), feature branches `feature/<ticket>-<name>` from `development`; pull requests go into `development` and need the other developer's approval.
 - Commits follow [Conventional Commits](https://www.conventionalcommits.org/), e.g. `feat(cvs): add CV table`, with the ticket key at the end.
 - Git hooks (Husky, installed by `pnpm install`): ESLint and Prettier run on staged files; commitlint checks the message.
+- CI (GitHub Actions, [.github/workflows/ci.yml](.github/workflows/ci.yml)) runs on pull requests to `development`: format, lint, typecheck, tests, builds of both apps, and a check that `backend/schema.gql` is up to date. It is not a required check (no branch protection on the free plan), so read its result before asking for a review.
