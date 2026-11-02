@@ -124,6 +124,7 @@ Run from the repository root; each runs in every workspace that defines it.
 | `pnpm typecheck` | TypeScript, no emit (the frontend also generates Next.js route types) |
 | `pnpm test` | Unit tests (backend integration tests: `pnpm --filter @cv-builder/backend test:int`) |
 | `pnpm format` · `pnpm format:check` | Format with Prettier, or only check |
+| `pnpm --filter @cv-builder/frontend codegen` | Generate typed GraphQL documents from `backend/schema.gql` into `frontend/src/shared/graphql/generated/` (git-ignored; `dev`, `build`, `typecheck` and `test` run it first) |
 
 ## Tests and coverage
 
@@ -179,7 +180,7 @@ The full log is in [PLAN.md §2.3](PLAN.md). The ones that shape the code most:
 | Variable | App | Description | Status |
 |---|---|---|---|
 | `NEXT_PUBLIC_APP_URL` | frontend | Public URL of the app | in use |
-| `BACKEND_URL` | frontend | Backend origin for rewrites and server-side requests | planned |
+| `BACKEND_URL` | frontend | Backend origin for rewrites and server-side requests | in use |
 | `DATABASE_URL` | backend | PostgreSQL connection string | in use |
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | backend | Token signing | planned |
 | `FRONTEND_URL` | backend | Absolute links in emails | planned |

@@ -24,6 +24,9 @@ dist
 # prisma generated client
 backend/src/generated
 
+# graphql codegen output (pnpm --filter @cv-builder/frontend codegen)
+frontend/src/shared/graphql/generated
+
 # misc
 .DS_Store
 *.pem
