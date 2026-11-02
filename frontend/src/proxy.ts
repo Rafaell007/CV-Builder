@@ -9,5 +9,5 @@ export function proxy(request: NextRequest) {
 
 // Static: Next.js reads it at build time. Skips the backend rewrites and Next.js internals.
 export const config = {
-  matcher: ["/((?!api|graphql|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api/|graphql/|graphql$|_next/static|_next/image|favicon\\.ico$).*)"],
 };
