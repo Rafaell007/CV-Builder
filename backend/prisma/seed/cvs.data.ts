@@ -12,7 +12,7 @@ interface CvProjectSeed {
 interface CvSeed {
   ownerEmail: string;
   name: string;
-  education: string | null;
+  education: string;
   description: string;
   // Must be skills the owner has (see users.data.ts); the mastery is copied from them.
   skills: string[];
@@ -48,7 +48,7 @@ export const CVS: CvSeed[] = [
   {
     ownerEmail: SEED_EMAILS.user1,
     name: "Fullstack Developer (draft)",
-    education: null,
+    education: "BSc Computer Science, Warsaw University of Technology",
     description: "Work in progress: a fullstack version of the profile, no projects added yet.",
     skills: ["TypeScript", "JavaScript"],
     projects: [],
