@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { APP_GUARD } from "@nestjs/core";
 import { JwtModule } from "@nestjs/jwt";
+import { ThrottlingModule } from "../../common/throttling";
 import { AuthResolver } from "./auth.resolver";
 import { AuthService } from "./auth.service";
 import { JwtAuthGuard } from "./jwt-auth.guard";
@@ -12,7 +13,7 @@ import { TokenService } from "./token.service";
  * must import this module before `ApiConventionsModule`: `RolesGuard` needs `request.user` to exist.
  */
 @Module({
-  imports: [JwtModule.register({})], // secrets are passed per call, from the validated config
+  imports: [JwtModule.register({}), ThrottlingModule], // secrets are passed per call, from the validated config
   providers: [
     AuthResolver,
     AuthService,

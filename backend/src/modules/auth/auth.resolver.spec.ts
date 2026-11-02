@@ -1,3 +1,4 @@
+import { UnauthorizedException } from "@nestjs/common";
 import { Role } from "../../generated/prisma/enums";
 import type { AuthContext } from "./auth-context";
 import { AuthResolver } from "./auth.resolver";
@@ -20,6 +21,7 @@ function setup() {
       .fn()
       .mockResolvedValue({ user: USER, accessToken: "access", refreshToken: "refresh" }),
     signOut: jest.fn().mockResolvedValue(undefined),
+    refresh: jest.fn().mockResolvedValue({ accessToken: "access-2", refreshToken: "refresh-2" }),
     findSessionUser: jest.fn().mockResolvedValue(USER),
   } as unknown as jest.Mocked<AuthService>;
   const cookies = {
@@ -63,6 +65,37 @@ describe("AuthResolver", () => {
 
     expect(authService.signOut).toHaveBeenCalledWith("refresh");
     expect(cookies.clear).toHaveBeenCalledWith(context.res);
+  });
+
+  it("refresh sets the new cookies", async () => {
+    const { resolver, authService, cookies, context } = setup();
+
+    await expect(resolver.refresh(context)).resolves.toBe(true);
+
+    expect(authService.refresh).toHaveBeenCalledWith("refresh");
+    expect(cookies.set).toHaveBeenCalledWith(context.res, {
+      accessToken: "access-2",
+      refreshToken: "refresh-2",
+    });
+  });
+
+  it("refresh clears the cookies when the session has ended", async () => {
+    const { resolver, authService, cookies, context } = setup();
+    authService.refresh.mockRejectedValue(new UnauthorizedException("Session ended"));
+
+    await expect(resolver.refresh(context)).rejects.toThrow(UnauthorizedException);
+
+    expect(cookies.clear).toHaveBeenCalledWith(context.res);
+    expect(cookies.set).not.toHaveBeenCalled();
+  });
+
+  it("refresh does not clear the cookies on an unexpected error", async () => {
+    const { resolver, authService, cookies, context } = setup();
+    authService.refresh.mockRejectedValue(new Error("database down"));
+
+    await expect(resolver.refresh(context)).rejects.toThrow("database down");
+
+    expect(cookies.clear).not.toHaveBeenCalled();
   });
 
   it("me returns the current user", async () => {

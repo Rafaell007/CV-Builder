@@ -7,6 +7,7 @@ type Health {
 }
 
 type Mutation {
+  refresh: Boolean!
   signIn(input: SignInInput!): SessionUser!
   signOut: Boolean!
 }

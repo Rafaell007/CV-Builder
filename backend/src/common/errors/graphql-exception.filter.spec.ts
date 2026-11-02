@@ -1,6 +1,8 @@
 import {
   ConflictException,
   ForbiddenException,
+  HttpException,
+  HttpStatus,
   ImATeapotException,
   InternalServerErrorException,
   Logger,
@@ -35,6 +37,7 @@ describe("GraphQLExceptionFilter", () => {
     [new ForbiddenException("Admins only"), "FORBIDDEN"],
     [new NotFoundException("No such CV"), "NOT_FOUND"],
     [new ConflictException("Email taken"), "CONFLICT"],
+    [new HttpException("Slow down", HttpStatus.TOO_MANY_REQUESTS), "TOO_MANY_REQUESTS"],
   ])("maps %p to %s and keeps the message", (exception, code) => {
     const error = catchGraphQL(exception);
 
