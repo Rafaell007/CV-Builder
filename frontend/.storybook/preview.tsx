@@ -12,6 +12,9 @@ const preview: Preview = {
   parameters: {
     // Components use the App Router (next/navigation), not the Pages Router.
     nextjs: { appDirectory: true },
+    // Accessibility violations fail the story test (pnpm test, CI). A story can opt out with
+    // `parameters: { a11y: { test: "todo" } }` (warning only). https://storybook.js.org/docs/writing-tests/accessibility-testing
+    a11y: { test: "error" },
   },
   // Toolbar theme switcher (core Storybook, no addon). withAppProviders applies it through the preferences store.
   // https://storybook.js.org/docs/essentials/toolbars-and-globals
