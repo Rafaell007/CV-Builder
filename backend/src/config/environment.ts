@@ -1,8 +1,11 @@
 import { Type } from "class-transformer";
-import { IsInt, IsUrl, Max, Min } from "class-validator";
+import { IsIn, IsInt, IsString, IsUrl, Max, MinLength, Min } from "class-validator";
 
 /** Every environment variable the backend reads. New variables go here, in `.env.example` and in PLAN.md §10. */
 export class Environment {
+  @IsIn(["development", "test", "production"])
+  NODE_ENV = "development";
+
   @Type(() => Number) // env values arrive as strings
   @IsInt()
   @Min(1)
@@ -18,4 +21,13 @@ export class Environment {
     },
   )
   DATABASE_URL!: string;
+
+  // 32 characters or more, so the signing keys cannot be guessed (D9).
+  @IsString()
+  @MinLength(32)
+  JWT_ACCESS_SECRET!: string;
+
+  @IsString()
+  @MinLength(32)
+  JWT_REFRESH_SECRET!: string;
 }

@@ -1,18 +1,21 @@
 import { validateEnvironment } from "./validate-environment";
 
 const DATABASE_URL = "postgresql://cv_builder:cv_builder@localhost:5432/cv_builder";
+const JWT_ACCESS_SECRET = "a".repeat(32);
+const JWT_REFRESH_SECRET = "b".repeat(32);
+const VALID = { DATABASE_URL, JWT_ACCESS_SECRET, JWT_REFRESH_SECRET };
 
 describe("validateEnvironment", () => {
   it("defaults PORT to 4000 when it is not set", () => {
-    expect(validateEnvironment({ DATABASE_URL }).PORT).toBe(4000);
+    expect(validateEnvironment(VALID).PORT).toBe(4000);
   });
 
   it("converts PORT from a string to a number", () => {
-    expect(validateEnvironment({ DATABASE_URL, PORT: "5000" }).PORT).toBe(5000);
+    expect(validateEnvironment({ ...VALID, PORT: "5000" }).PORT).toBe(5000);
   });
 
   it.each(["abc", "0", "70000"])("throws for invalid PORT %s", (port) => {
-    expect(() => validateEnvironment({ DATABASE_URL, PORT: port })).toThrow(
+    expect(() => validateEnvironment({ ...VALID, PORT: port })).toThrow(
       /Invalid environment variables:\nPORT/,
     );
   });
@@ -22,21 +25,45 @@ describe("validateEnvironment", () => {
     "postgres://user:pass@db.example.com:5432/app",
     "postgresql://user:p%40ss@postgres:5432/app?sslmode=require",
   ])("accepts DATABASE_URL %s", (url) => {
-    expect(validateEnvironment({ DATABASE_URL: url }).DATABASE_URL).toBe(url);
+    expect(validateEnvironment({ ...VALID, DATABASE_URL: url }).DATABASE_URL).toBe(url);
   });
 
   it("throws and names DATABASE_URL when it is missing", () => {
-    expect(() => validateEnvironment({})).toThrow(/Invalid environment variables:\nDATABASE_URL/);
+    expect(() => validateEnvironment({ JWT_ACCESS_SECRET, JWT_REFRESH_SECRET })).toThrow(
+      /Invalid environment variables:\nDATABASE_URL/,
+    );
   });
 
   it.each(["", "not-a-url", "mysql://user:pass@localhost:3306/db", "localhost:5432/db"])(
     "throws for invalid DATABASE_URL %p",
     (url) => {
-      expect(() => validateEnvironment({ DATABASE_URL: url })).toThrow(
+      expect(() => validateEnvironment({ ...VALID, DATABASE_URL: url })).toThrow(
         /Invalid environment variables:\nDATABASE_URL/,
       );
     },
   );
+
+  it("defaults NODE_ENV to development", () => {
+    expect(validateEnvironment(VALID).NODE_ENV).toBe("development");
+  });
+
+  it("throws for an unknown NODE_ENV", () => {
+    expect(() => validateEnvironment({ ...VALID, NODE_ENV: "staging" })).toThrow(
+      /Invalid environment variables:\nNODE_ENV/,
+    );
+  });
+
+  it.each(["JWT_ACCESS_SECRET", "JWT_REFRESH_SECRET"])("throws when %s is missing", (name) => {
+    expect(() => validateEnvironment({ ...VALID, [name]: undefined })).toThrow(
+      new RegExp(`Invalid environment variables:\\n${name}`),
+    );
+  });
+
+  it.each(["JWT_ACCESS_SECRET", "JWT_REFRESH_SECRET"])("throws when %s is too short", (name) => {
+    expect(() => validateEnvironment({ ...VALID, [name]: "short" })).toThrow(
+      new RegExp(`${name}: .*32`),
+    );
+  });
 
   it("lists every invalid variable in one error", () => {
     expect(() => validateEnvironment({ PORT: "abc" })).toThrow(/PORT: .*\nDATABASE_URL: /s);
