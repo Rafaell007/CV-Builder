@@ -7,3 +7,4 @@ backend/schema.gql
 *.md
 backend/src/generated
 frontend/src/shared/graphql/generated
+storybook-static

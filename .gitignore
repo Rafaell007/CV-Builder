@@ -16,6 +16,9 @@ test-results/
 playwright-report/
 blob-report/
 
+# storybook build output (pnpm --filter @cv-builder/frontend build-storybook)
+storybook-static
+
 # next.js
 .next/
 out/
