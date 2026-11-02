@@ -280,7 +280,7 @@ Rules for all code in this repository.
 
 ### 5.5 Environment variables
 
-- Frontend reads `process.env` only in `frontend/src/env.ts` (public `NEXT_PUBLIC_*`) and `frontend/src/server/env.ts` (server only, guarded by `server-only`), except `frontend/next.config.ts`: it runs outside the app and reads `BACKEND_URL` for the rewrites; backend only through `@nestjs/config` with a validation schema in `backend/src/config/`, except `backend/prisma.config.ts`: it is Prisma CLI config that runs outside Nest and reads `DATABASE_URL` itself (so `db:generate` works without a `.env`). Both apps fail fast on missing values.
+- Frontend reads `process.env` only in `frontend/src/env.ts` (public `NEXT_PUBLIC_*`) and `frontend/src/server/env.ts` (server only, guarded by `server-only`), except `frontend/next.config.ts`: it runs outside the app and reads `BACKEND_URL` for the rewrites; backend only through `@nestjs/config` with a validation schema in `backend/src/config/`, except `backend/prisma.config.ts` and `backend/prisma/seed.ts`: they are Prisma CLI scripts that run outside Nest and read `DATABASE_URL` themselves (so `db:generate` works without a `.env`). Both apps fail fast on missing values.
 - Every new variable goes to the app's `.env.example` (no real values) and §10. `.env` files are git-ignored.
 
 ### 5.6 TypeScript only
@@ -453,7 +453,8 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
 ### Phase 2 — Data model and API conventions
 
 - [~] **S2.1 Data model** — Prisma schema from §7 checked against every docs page, initial migration, seed (§7). Done when: `db:reset` builds a seeded database.
-  - **S2.1a done:** schema for all 19 models and two migrations, `init` (generated) and `add_date_checks` (hand-written CHECK constraints for project dates). Foreign keys and sortable columns are indexed; text search inside names is not (it would need a `pg_trgm` index). The seed is still to do.
+  - **S2.1a done:** schema for all 19 models and two migrations, `init` (generated) and `add_date_checks` (hand-written CHECK constraints for project dates). Foreign keys and sortable columns are indexed; text search inside names is not (it would need a `pg_trgm` index).
+  - **S2.1b done:** `prisma/seed.ts` calls the steps in `prisma/seed/` (catalogs, users, projects, CVs); it uses `upsert` or a lookup by name, so running it twice adds nothing. 1 admin + 3 users (all verified, password hashed with `@node-rs/argon2`, accounts in the README), 41 skills in 7 categories, 12 languages, 6 projects, 5 CVs. `db:reset` is `prisma migrate reset && prisma db seed`; it still asks for confirmation, so scripts and E2E need to run the two Prisma commands with `--force`.
 - [ ] **S2.2 API conventions** — shared GraphQL building blocks in `common/`: pagination / sort / search inputs and paginated output, `ValidationPipe` with field errors, exception filter (D7), guards and decorators skeleton (D10). Unit tests for each. Depends on S0.2.
 
 ### Phase 3 — Authentication
