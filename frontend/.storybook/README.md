@@ -5,7 +5,7 @@ Storybook 10 shows components one at a time, outside the app, in light, dark and
 ## Run
 
 - `pnpm storybook` (from the repo root) opens http://localhost:6006.
-- `pnpm --filter @cv-builder/frontend test` runs the stories as tests in headless Chromium, together with the unit tests. Install the browser once per machine: `pnpm --filter @cv-builder/frontend exec playwright install chromium`. The "Run tests" panel in the Storybook UI runs the same tests.
+- `pnpm --filter @cv-builder/frontend test` runs the stories as tests in headless Chromium, together with the unit tests. Install the browser once per machine: `pnpm --filter @cv-builder/frontend exec playwright install chromium`. The "Run tests" panel in the Storybook UI runs the same tests. The story tests load `next.config.ts`, which needs `BACKEND_URL`; `vitest.config.mts` reads it from `frontend/.env` or `.env.local` (Next.js itself skips `.env.local` in test mode).
 - `pnpm --filter @cv-builder/frontend build-storybook` builds a static copy into `storybook-static/` (git-ignored).
 
 ## Files
