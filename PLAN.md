@@ -369,7 +369,7 @@ Checked against `docs/pages/10` to `27` in S2.1a. Conventions:
 | CvProjectRole | cvProjectId + roleId unique | roles of a CV project, at least one |
 | VerificationCode | id, userId, codeHash, expiresAt, usedAt?, attempts, createdAt | 6 digits, 10 min, single use, resend cooldown 60 s from `createdAt` (D20) |
 | PasswordResetToken | id, userId, tokenHash unique, expiresAt, usedAt?, createdAt | single use (D20) |
-| RefreshToken | id, userId, tokenHash unique, familyId, expiresAt, replacedAt?, createdAt | rotated on refresh with a 30 s grace window; reuse after it revokes the family (D21); deleted on sign-out; all revoked on password change/reset (D22) |
+| RefreshToken | id, userId, tokenHash unique, familyId, expiresAt, replacedAt?, graceUsedAt?, createdAt | rotated on refresh with a 30 s grace window; reuse after it revokes the family (D21); deleted on sign-out; all revoked on password change/reset (D22) |
 
 Delete rules (D13): everything a user owns (`Avatar`, `UserSkill`, `UserLanguage`, `Cv`, tokens) is removed with the user; a `Cv` takes its `CvSkill` and `CvProject` rows with it, and a `CvProject` its `CvProjectRole` rows. Catalog items in use (`SkillCategory`, `Department`, `Position`, `Skill`, `Language`, `Project`, `ProjectRole`) are `Restrict`, so the database refuses the delete and the service turns that into `CONFLICT` (D18).
 
@@ -461,7 +461,7 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
 
 ### Phase 3 — Authentication
 
-- [ ] **S3.1 BE Auth core** — `signIn`, `signOut`, `refresh`, `me`; argon2, JWT cookies, refresh rotation with grace window and family revoke (D9, D21), throttling (D23); guards active globally. Integration tests for each guard.
+- [x] **S3.1 BE Auth core** — `signIn`, `signOut`, `refresh`, `me`; argon2, JWT cookies, refresh rotation with grace window and family revoke (D9, D21), throttling (D23); guards active globally. Integration tests for each guard.
 - [ ] **S3.2 FE Session** — `proxy.ts` (no session → `/sign-in`, refresh before render, signed-in on auth pages → `/users`, admin-only routes), error link refresh-then-redirect, `useCurrentUser`. Depends on S3.1, S0.4.
 - [ ] **S3.3 BE Mail** — Nodemailer module (Mailpit locally), templates: verification code, password reset link (links use `FRONTEND_URL`).
 - [ ] **S3.4 Sign In** — BE errors ("Invalid email or password"); FE page. AC per sign-in.
@@ -522,6 +522,7 @@ Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE 
 | `BACKEND_URL` | frontend | Backend origin for rewrites and server-side requests |
 | `DATABASE_URL` | backend | PostgreSQL |
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | backend | Token signing (access JWT) and keyed hashing (refresh tokens); 32 characters or more |
+| `THROTTLE_LIMIT`, `THROTTLE_TTL_SECONDS` | backend | Rate limit per client IP and operation (D23): at most `THROTTLE_LIMIT` calls in `THROTTLE_TTL_SECONDS` seconds (defaults 10 and 60) |
 | `NODE_ENV` | backend | `development` (default), `test` or `production`; in production the auth cookies are `Secure` |
 | `FRONTEND_URL` | backend | Absolute links in emails |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | backend | Mail |
@@ -575,4 +576,5 @@ Over 80 % per app, excluding generated code, configs, `main.ts` and route files.
 | 2026-10-29 | S0.4a Design tokens, themes, preferences | — | Tokens from Figma (`docs/design-tokens.md`), light/dark themes, preference cookies with a pre-paint script, Radix UI installed; Apollo part (S0.4b) pending |
 | 2026-10-29 | S0.3 CI workflow with contract check | — | GitHub Actions on PRs to `development` (format, lint, typecheck, tests, builds, `schema.gql` up-to-date check); `schema:generate` script; green on a PR still to be confirmed |
 | 2026-10-30 | S2.1a Prisma schema and initial migration | — | 19 models from §7 checked against docs pages 10–27, indexes, `init` + `add_date_checks` migrations; project `endDate` is required (page 27) |
+| 2026-11-02 | S3.1b BE Refresh and throttling (KAN-84) | — | `refresh` rotates the refresh token (`replacedAt`, same `familyId`); a replaced token works once more inside 30 s (`graceUsedAt`); a second use, or any use after 30 s, deletes the whole family and clears the cookies; `GqlThrottlerGuard` on `signIn` (in-memory counters, per IP and operation); error code `TOO_MANY_REQUESTS`. Contract change: `Mutation.refresh: Boolean!`. Migration: `add_refresh_token_grace_used_at`. New env: `THROTTLE_LIMIT`, `THROTTLE_TTL_SECONDS`. New package: `@nestjs/throttler` |
 | 2026-10-30 | S0.5b Backend test setup | — | Jest unit + coverage scripts, Supertest integration tests on a separate `_test` database (serial, truncated per file), injectable `Clock`; sample health tests |
