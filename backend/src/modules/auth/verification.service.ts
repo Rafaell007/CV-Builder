@@ -124,6 +124,14 @@ export class VerificationService {
       data: { attempts: { increment: 1 } },
     });
     if (count === 0) {
+      // The try is also refused when a parallel request has just used the code. Read the row again to name the right cause.
+      const current = await this.prisma.verificationCode.findFirst({
+        where: { id: stored.id },
+        select: { usedAt: true },
+      });
+      if (current?.usedAt != null) {
+        throw codeError("Verification code has already been used", VerificationReason.CodeUsed);
+      }
       throw new HttpException(
         {
           message: "Too many wrong attempts, request a new code",

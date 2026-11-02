@@ -218,6 +218,17 @@ describe("VerificationService", () => {
       expect(prisma.user.update).not.toHaveBeenCalled();
     });
 
+    it("reports a used code, not too many tries, when a parallel request used it first", async () => {
+      prisma.verificationCode.updateMany.mockResolvedValue({ count: 0 });
+      prisma.verificationCode.findFirst
+        .mockResolvedValueOnce(storedCode())
+        .mockResolvedValueOnce({ usedAt: NOW });
+
+      const failure = await rejection(createService().verifyEmail("user-1", CODE));
+
+      expect(failure).toEqual({ reason: VerificationReason.CodeUsed, status: 400 });
+    });
+
     it("rejects the second of two parallel requests with the correct code", async () => {
       prisma.verificationCode.updateMany
         .mockResolvedValueOnce({ count: 1 }) // the try is counted
