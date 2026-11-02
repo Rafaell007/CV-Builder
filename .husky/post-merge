@@ -1,0 +1,7 @@
+# After `git pull`: warn when the pull brought a new database migration. Only prints; it never changes the database.
+if git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD 2>/dev/null | grep -q '^backend/prisma/migrations/'; then
+  echo ""
+  echo "This pull contains a new database migration."
+  echo "Run: pnpm --filter @cv-builder/backend db:migrate"
+  echo ""
+fi

@@ -30,4 +30,22 @@ export class Environment {
   @IsString()
   @MinLength(32)
   JWT_REFRESH_SECRET!: string;
+
+  // Rate limit per client IP and per operation (D23): at most THROTTLE_LIMIT calls in THROTTLE_TTL_SECONDS.
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  THROTTLE_LIMIT = 10;
+
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  THROTTLE_TTL_SECONDS = 60;
+
+  // Number of proxies in front of the app. 0: trust none, so `X-Forwarded-For` is ignored and a client cannot fake its IP.
+  // Behind a proxy (production), set it so `req.ip`, which the throttler counts by, is the client and not the proxy.
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  TRUST_PROXY_HOPS = 0;
 }

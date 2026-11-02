@@ -12,6 +12,7 @@ const CODE_BY_STATUS: ReadonlyMap<number, ErrorCode> = new Map([
   [HttpStatus.FORBIDDEN, ErrorCode.Forbidden],
   [HttpStatus.NOT_FOUND, ErrorCode.NotFound],
   [HttpStatus.CONFLICT, ErrorCode.Conflict],
+  [HttpStatus.TOO_MANY_REQUESTS, ErrorCode.TooManyRequests],
 ]);
 
 const CODE_BY_PRISMA_ERROR: ReadonlyMap<string, ErrorCode> = new Map([
