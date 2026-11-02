@@ -12,6 +12,12 @@ concurrency:
 permissions:
   contents: read
 
+# Test-only values for every job. The backend refuses to start without the JWT secrets (32+ characters).
+env:
+  NODE_ENV: test
+  JWT_ACCESS_SECRET: ci-only-access-secret-not-used-anywhere-else
+  JWT_REFRESH_SECRET: ci-only-refresh-secret-not-used-anywhere-else
+
 jobs:
   checks:
     runs-on: ubuntu-latest
