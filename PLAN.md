@@ -196,7 +196,7 @@ CV-Builder/
   docker-compose.yml                     PostgreSQL 17 + Mailpit
   .github/workflows/ci.yml
   docs/                                  requirements (pages/ + images/)
-  e2e/                                   Playwright specs, one folder per area
+  e2e/                                   Playwright workspace package: config + specs, one folder per area
   frontend/
     src/
       app/                               routes only, thin
@@ -280,7 +280,7 @@ Rules for all code in this repository.
 
 ### 5.5 Environment variables
 
-- Frontend reads `process.env` only in `frontend/src/env.ts` (public `NEXT_PUBLIC_*`) and `frontend/src/server/env.ts` (server only, guarded by `server-only`), except `frontend/next.config.ts`: it runs outside the app and reads `BACKEND_URL` for the rewrites; backend only through `@nestjs/config` with a validation schema in `backend/src/config/`, except `backend/prisma.config.ts` and `backend/prisma/seed.ts`: they are Prisma CLI scripts that run outside Nest and read `DATABASE_URL` themselves (so `db:generate` works without a `.env`). Both apps fail fast on missing values.
+- Frontend reads `process.env` only in `frontend/src/env.ts` (public `NEXT_PUBLIC_*`) and `frontend/src/server/env.ts` (server only, guarded by `server-only`), except `frontend/next.config.ts`: it runs outside the app and reads `BACKEND_URL` for the rewrites; backend only through `@nestjs/config` with a validation schema in `backend/src/config/`, except `backend/prisma.config.ts` and `backend/prisma/seed.ts`: they are Prisma CLI scripts that run outside Nest and read `DATABASE_URL` themselves (so `db:generate` works without a `.env`); and `e2e/playwright.config.ts`, a tool config that passes ports and the test database URL to the servers it starts. Both apps fail fast on missing values.
 - Every new variable goes to the app's `.env.example` (no real values) and §10. `.env` files are git-ignored.
 
 ### 5.6 TypeScript only
@@ -435,6 +435,8 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
   - Coverage threshold 80 % in both apps, enforced in CI from Phase 3 on (reported only before that).
   - **Backend done (S0.5b):** `test` (unit), `test:int` (integration, `backend/test/`), `test:cov` (report, fails under 80 %: the threshold is in the Jest config so it works on Windows and macOS; switch CI to it in Phase 3). Integration config `backend/test/jest-integration.json`; the `_test` database is created and migrated by a global setup and truncated before each test file. `Clock` lives in `backend/src/common/clock/`. CI runs `test:int` against its Postgres service.
   - Playwright config at the root with a seeded run.
+  - **Frontend done (S0.5a):** `frontend/vitest.setup.ts` adds jest-dom matchers and cleans up after each test (Vitest globals stay off). `renderWithProviders` in `frontend/src/shared/testing/` wraps `PreferencesProvider` + `MockedProvider` and returns a user-event `user`; S0.6 adds the next-intl provider there. `test:cov` (v8, all of `src/` except tests, routes, generated code and `index.ts`; fails under 80 %; switch CI to it in Phase 3).
+  - **E2E done (S0.5a):** `e2e/` is a workspace package (so lint and typecheck cover it) with `playwright.config.ts`; `pnpm test:e2e` runs `e2e:db` (backend: creates, migrates, empties and seeds `cv_builder_test`, no `migrate reset`), then production builds of both apps on ports 3100 / 4100, so `pnpm dev` and the development database are never used. CI runs it in a separate `e2e` job and uploads the HTML report.
   - Done when: one sample test per level runs locally and in CI.
   - Depends on: S0.2, S0.3.
 

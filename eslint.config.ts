@@ -19,7 +19,7 @@ function scopeToDir(configs: Linter.Config[], dir: string): Linter.Config[] {
 const eslintConfig = defineConfig([
   ...scopeToDir([...nextVitals, ...nextTs], "frontend"),
   {
-    files: ["backend/**/*.ts"],
+    files: ["backend/**/*.ts", "e2e/**/*.ts"],
     extends: [tseslint.configs.recommended],
   },
   {
@@ -34,6 +34,9 @@ const eslintConfig = defineConfig([
     "**/dist/**",
     "**/next-env.d.ts",
     "**/generated/**",
+    "**/coverage/**",
+    "**/playwright-report/**",
+    "**/test-results/**",
   ]),
 ]);
 

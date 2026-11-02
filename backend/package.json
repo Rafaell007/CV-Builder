@@ -11,6 +11,7 @@
     "test": "jest",
     "test:int": "jest --config test/jest-integration.json --runInBand",
     "test:cov": "jest --coverage",
+    "e2e:db": "tsx test/support/prepare-e2e-database.ts",
     "schema:generate": "nest build && node dist/generate-schema",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
