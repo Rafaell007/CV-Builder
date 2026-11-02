@@ -39,6 +39,18 @@ jobs:
           --health-timeout 3s
           --health-retries 10
 
+      # Catches the mail sent by the integration tests, like the mailpit service in docker-compose.yml.
+      mailpit:
+        image: axllent/mailpit:v1.32
+        ports:
+          - 1025:1025
+          - 8025:8025
+        options: >-
+          --health-cmd "/mailpit readyz"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
     env:
       DATABASE_URL: postgresql://cv_builder:cv_builder@localhost:5432/cv_builder
       NEXT_PUBLIC_APP_URL: http://localhost:3000
