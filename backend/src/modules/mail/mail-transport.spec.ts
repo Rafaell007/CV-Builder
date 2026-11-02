@@ -24,6 +24,14 @@ describe("mailTransportProvider", () => {
     });
   });
 
+  it("uses a secure connection from the start on port 465 only", () => {
+    build({ SMTP_HOST: "smtp.example.com", SMTP_PORT: 465 });
+    build({ SMTP_HOST: "smtp.example.com", SMTP_PORT: 587 });
+
+    expect(createTransport).toHaveBeenNthCalledWith(1, expect.objectContaining({ secure: true }));
+    expect(createTransport).toHaveBeenNthCalledWith(2, expect.objectContaining({ secure: false }));
+  });
+
   it("adds the login when both user and password are set", () => {
     build({ SMTP_HOST: "smtp.example.com", SMTP_PORT: 587, SMTP_USER: "u", SMTP_PASS: "p" });
 

@@ -14,10 +14,12 @@ export const mailTransportProvider: Provider<Transporter> = {
     const user = config.get("SMTP_USER", { infer: true });
     const pass = config.get("SMTP_PASS", { infer: true });
 
+    const port = config.get("SMTP_PORT", { infer: true });
+
     return createTransport({
       host: config.get("SMTP_HOST", { infer: true }),
-      port: config.get("SMTP_PORT", { infer: true }),
-      secure: false, // port 465 would need `true`; other ports upgrade with STARTTLS when the server offers it
+      port,
+      secure: port === 465, // port 465 is TLS from the start; other ports upgrade with STARTTLS when the server offers it
       ...(user && pass ? { auth: { user, pass } } : {}),
     });
   },
