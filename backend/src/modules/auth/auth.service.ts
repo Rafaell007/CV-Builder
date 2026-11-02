@@ -22,7 +22,7 @@ export const REFRESH_GRACE_WINDOW_MS = 30 * 1000;
 
 const SESSION_ENDED = "Session ended, sign in again";
 
-const SESSION_USER_SELECT = {
+export const SESSION_USER_SELECT = {
   id: true,
   email: true,
   role: true,
