@@ -54,6 +54,10 @@
   },
   "jest": {
     "rootDir": "src",
+    "roots": [
+      "<rootDir>",
+      "<rootDir>/../prisma"
+    ],
     "moduleFileExtensions": [
       "js",
       "json",
