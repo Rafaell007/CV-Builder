@@ -8,8 +8,12 @@ async function loadRedirect() {
   return (await import("./redirectToSignIn")).redirectToSignIn;
 }
 
+function stubLocation(pathname: string) {
+  vi.stubGlobal("location", { assign, pathname });
+}
+
 beforeEach(() => {
-  vi.stubGlobal("location", { assign });
+  stubLocation("/users");
 });
 
 afterEach(() => {
@@ -24,6 +28,15 @@ describe("redirectToSignIn", () => {
     redirectToSignIn();
 
     expect(assign).toHaveBeenCalledWith("/sign-in");
+  });
+
+  it("does nothing on the sign-in page, so it cannot reload in a loop", async () => {
+    stubLocation("/sign-in");
+    const redirectToSignIn = await loadRedirect();
+
+    redirectToSignIn();
+
+    expect(assign).not.toHaveBeenCalled();
   });
 
   it("redirects only once when several requests end the session", async () => {
