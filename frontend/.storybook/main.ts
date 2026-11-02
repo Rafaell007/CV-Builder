@@ -7,7 +7,7 @@ const config: StorybookConfig = {
   // Globs are relative to this folder. Component stories live next to the component in src/;
   // Storybook-only samples live here.
   stories: ["../src/**/*.stories.tsx", "./**/*.stories.tsx"],
-  addons: ["@storybook/addon-themes"],
+  addons: [],
 };
 
 export default config;

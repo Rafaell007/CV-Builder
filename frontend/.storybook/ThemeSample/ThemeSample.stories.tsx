@@ -11,7 +11,7 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-// `globals.theme` picks the toolbar theme (addon-themes) for the story.
+// `globals.theme` picks the toolbar theme for the story.
 export const Light: Story = {
   globals: { theme: "light" },
   play: async ({ canvas }) => {

@@ -30,7 +30,6 @@
     "@graphql-codegen/typed-document-node": "^7.2.0",
     "@graphql-codegen/typescript-operations": "^6.2.0",
     "@graphql-typed-document-node/core": "^3.2.0",
-    "@storybook/addon-themes": "^10.6.5",
     "@storybook/addon-vitest": "^10.6.5",
     "@storybook/nextjs-vite": "^10.6.5",
     "@testing-library/dom": "^10.4.2",

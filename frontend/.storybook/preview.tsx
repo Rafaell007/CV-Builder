@@ -1,6 +1,7 @@
-import { withThemeByDataAttribute } from "@storybook/addon-themes";
-import type { Preview, ReactRenderer } from "@storybook/nextjs-vite";
+import type { Preview } from "@storybook/nextjs-vite";
+import { THEMES } from "@/shared/preferences";
 import { roboto } from "@/shared/styles";
+import { withAppProviders } from "./withAppProviders";
 // Same global styles as app/layout.tsx: tokens, light/dark themes, base styles.
 import "@/shared/styles/global.css";
 
@@ -12,14 +13,16 @@ const preview: Preview = {
     // Components use the App Router (next/navigation), not the Pages Router.
     nextjs: { appDirectory: true },
   },
-  decorators: [
-    // Toolbar theme switcher. Sets <html data-theme="light|dark">, the attribute themes.css reacts to.
-    withThemeByDataAttribute<ReactRenderer>({
-      themes: { light: "light", dark: "dark" },
-      defaultTheme: "light",
-      attributeName: "data-theme",
-    }),
-  ],
+  // Toolbar theme switcher (core Storybook, no addon). withAppProviders applies it through the preferences store.
+  // https://storybook.js.org/docs/essentials/toolbars-and-globals
+  globalTypes: {
+    theme: {
+      description: "Color theme",
+      toolbar: { title: "Theme", icon: "mirror", items: [...THEMES], dynamicTitle: true },
+    },
+  },
+  initialGlobals: { theme: "light" },
+  decorators: [withAppProviders],
 };
 
 export default preview;
