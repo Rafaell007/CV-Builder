@@ -89,3 +89,57 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+  # Separate job so the slower browser tests run in parallel with the checks above.
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    # Same Postgres as the checks job. e2e:db creates, migrates and seeds cv_builder_test in it.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: cv_builder
+          POSTGRES_PASSWORD: cv_builder
+          POSTGRES_DB: cv_builder
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U cv_builder -d cv_builder"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The backend build needs the generated Prisma client (git-ignored).
+      - name: Generate Prisma client
+        run: pnpm --filter @cv-builder/backend db:generate
+
+      # Not cached: Playwright says restoring the cache takes about as long as downloading (playwright.dev/docs/ci).
+      - name: Install Chromium
+        run: pnpm --filter @cv-builder/e2e exec playwright install --with-deps chromium
+
+      # playwright.config.ts seeds the database, builds both apps and starts them on ports 3100 / 4100.
+      - name: E2E tests
+        run: pnpm test:e2e
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v5
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: e2e/playwright-report/
+          retention-days: 14
