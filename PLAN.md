@@ -521,7 +521,8 @@ Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE 
 |---|---|---|
 | `BACKEND_URL` | frontend | Backend origin for rewrites and server-side requests |
 | `DATABASE_URL` | backend | PostgreSQL |
-| `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | backend | Token signing |
+| `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | backend | Token signing (access JWT) and keyed hashing (refresh tokens); 32 characters or more |
+| `NODE_ENV` | backend | `development` (default), `test` or `production`; in production the auth cookies are `Secure` |
 | `FRONTEND_URL` | backend | Absolute links in emails |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | backend | Mail |
 | `PORT` | backend | HTTP port (default 4000) |
