@@ -426,6 +426,7 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
   - Route groups `(auth)` / `(app)` with placeholder pages (§6).
   - Design tokens from Figma, light/dark themes with CSS Modules; theme and language preferences in React Context + cookies (D5); Radix UI installed.
   - **(Should)** Storybook 10 with the theme switcher.
+  - **Storybook done (S0.4c):** `@storybook/nextjs-vite` in `frontend/.storybook/`; `preview.tsx` loads `global.css` and the Roboto font from `shared/styles/fonts.ts` (also used by `app/layout.tsx`), and `@storybook/addon-themes` switches `<html data-theme>` from the toolbar. Component stories sit next to their component in `src/`; Storybook-only samples (`ThemeSample`) live in `.storybook/`. `@storybook/addon-vitest` adds a `storybook` Vitest project (Chromium browser mode) next to `unit`, so `pnpm test` runs every story with the `test` tag (the default) and its `play` function; CI's checks job installs Chromium for it. `eslint-plugin-storybook` lints stories.
   - Done when: a page renders `health` through Apollo; theme switch persists without flash; Storybook runs (if done).
   - Depends on: S0.1, S0.2.
 
