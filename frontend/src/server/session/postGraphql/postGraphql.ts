@@ -1,6 +1,8 @@
 import type { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { print } from "graphql";
 
+const REQUEST_TIMEOUT_MS = 5_000;
+
 export type GraphqlResult<TData> = {
   data: TData | null;
   // `extensions.code` of every GraphQL error, e.g. UNAUTHENTICATED.
@@ -15,7 +17,7 @@ type GraphqlBody<TData> = {
 };
 
 /**
- * Sends one operation to the backend with the user's cookies. A network failure or a non-JSON answer
+ * Sends one operation to the backend with the user's cookies. A network failure, a timeout or a non-JSON answer
  * throws; GraphQL errors are returned as `errorCodes`.
  */
 export async function postGraphql<TData, TVariables extends Record<string, never>>(
@@ -28,6 +30,8 @@ export async function postGraphql<TData, TVariables extends Record<string, never
     headers: { "content-type": "application/json", ...(cookieHeader && { cookie: cookieHeader }) },
     body: JSON.stringify({ query: print(document) }),
     cache: "no-store",
+    // A hung backend must not block every protected page request.
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   const body = (await response.json()) as GraphqlBody<TData>;
   return {
