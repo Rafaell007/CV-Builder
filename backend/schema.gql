@@ -8,8 +8,10 @@ type Health {
 
 type Mutation {
   refresh: Boolean!
+  resendVerificationCode: Boolean!
   signIn(input: SignInInput!): SessionUser!
   signOut: Boolean!
+  verifyEmail(input: VerifyEmailInput!): SessionUser!
 }
 
 type Query {
@@ -34,4 +36,8 @@ type SessionUser {
 input SignInInput {
   email: String!
   password: String!
+}
+
+input VerifyEmailInput {
+  code: String!
 }
