@@ -6,6 +6,31 @@ type Health {
   status: String!
 }
 
+type Mutation {
+  signIn(input: SignInInput!): SessionUser!
+  signOut: Boolean!
+}
+
 type Query {
   health: Health!
+  me: SessionUser
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+type SessionUser {
+  email: String!
+  firstName: String
+  id: ID!
+  isVerified: Boolean!
+  lastName: String
+  role: Role!
+}
+
+input SignInInput {
+  email: String!
+  password: String!
 }
