@@ -187,8 +187,8 @@ The full log is in [PLAN.md §2.3](PLAN.md). The ones that shape the code most:
 | `BACKEND_URL` | frontend | Backend origin for rewrites and server-side requests | in use |
 | `DATABASE_URL` | backend | PostgreSQL connection string | in use |
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | backend | Token signing | planned |
-| `FRONTEND_URL` | backend | Absolute links in emails | planned |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | backend | Mail | planned |
+| `FRONTEND_URL` | backend | Absolute links in emails (default `http://localhost:3000`) | in use |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | backend | Mail (defaults reach Mailpit) | in use |
 | `PORT` | backend | HTTP port (default 4000) | in use |
 | `TEST_DATABASE_URL` | backend | Integration test database, name must end in `_test` (optional, has a default) | in use |
 
