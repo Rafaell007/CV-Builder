@@ -1,6 +1,6 @@
 // Public env only. Server secrets live in src/server/env.ts (PLAN D9).
 // Next.js inlines NEXT_PUBLIC_* only when accessed as a literal property.
-const required = (key: string, value: string | undefined): string => {
+export const required = (key: string, value: string | undefined): string => {
   if (!value) throw new Error(`Missing env variable: ${key}`);
   return value;
 };

@@ -12,6 +12,7 @@ Use Node 24 and pnpm 12 (`.nvmrc`, `packageManager`); run from the repo root. Ea
 - `pnpm lint` · `pnpm typecheck` · `pnpm test` · `pnpm format:check` · `pnpm build`
 - One app: `pnpm --filter @cv-builder/frontend <script>` or `pnpm --filter @cv-builder/backend <script>`
 - `docker compose up -d` — PostgreSQL + Mailpit
+- `pnpm --filter @cv-builder/frontend codegen` — regenerate the frontend's GraphQL types after `schema.gql` or a `.graphql` file changes (`dev`, `build`, `typecheck`, `test` run it first)
 - `pnpm --filter @cv-builder/backend schema:generate` — regenerate `backend/schema.gql` (needs the database and `DATABASE_URL`); CI fails when the committed file differs
 
 Run `lint`, `typecheck` and the tests of the app you changed. The frontend has no test script until S0.5.
@@ -31,7 +32,7 @@ Run `lint`, `typecheck` and the tests of the app you changed. The frontend has n
 - Fractal layout: children live inside the parent; shared code moves to the nearest common ancestor; frontend imports only via a folder's `index.ts`.
 - A file with a test is a folder: `X/` holds `X.ts(x)`, `X.test.ts(x)` and `index.ts` (role files by role: `x.utils.ts` → `utils/`, `x.store.ts` → `store/`). Files without a test stay plain. Example: `frontend/src/shared/preferences/`.
 - Each feature folder and non-obvious shared component has a short `README.md`: purpose, exports, where used, `docs/` link. Simple components get none.
-- No `.js` files, no `any`. `process.env` only in `frontend/src/env.ts` and the backend config module (exception: `backend/prisma.config.ts`, Prisma CLI config outside Nest).
+- No `.js` files, no `any`. `process.env` only in `frontend/src/env.ts` (public), `frontend/src/server/env.ts` (server only) and the backend config module (exceptions: `backend/prisma.config.ts` and `frontend/next.config.ts`, tool configs that run outside the app).
 - New env var: add to the app's `.env.example` and PLAN.md §10.
 - Contract changes (`schema.gql`) are called out in the PR and agreed with the frontend side.
 

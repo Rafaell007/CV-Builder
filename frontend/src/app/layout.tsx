@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
+import { ApolloClientProvider } from "@/shared/apollo";
 import { DEFAULT_LANGUAGE, PreferencesProvider, PreferencesScript } from "@/shared/preferences";
 import "@/shared/styles/global.css";
 
@@ -22,7 +23,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <PreferencesScript />
       </head>
       <body>
-        <PreferencesProvider>{children}</PreferencesProvider>
+        <ApolloClientProvider>
+          <PreferencesProvider>{children}</PreferencesProvider>
+        </ApolloClientProvider>
       </body>
     </html>
   );
