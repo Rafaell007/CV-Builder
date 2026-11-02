@@ -15,15 +15,27 @@ export interface GraphQLResult {
   setCookies: string[];
 }
 
-/** Sends one GraphQL operation. `cookies` are `name=value` pairs, as a browser would send back. */
+/**
+ * Sends one GraphQL operation. `cookies` are `name=value` pairs, as a browser would send back;
+ * `headers` are extra request headers, such as `X-Forwarded-For`.
+ */
 export async function graphqlRequest(
   app: INestApplication,
   query: string,
-  { cookies = [], variables }: { cookies?: string[]; variables?: Record<string, unknown> } = {},
+  {
+    cookies = [],
+    headers = {},
+    variables,
+  }: {
+    cookies?: string[];
+    headers?: Record<string, string>;
+    variables?: Record<string, unknown>;
+  } = {},
 ): Promise<GraphQLResult> {
   const response = await request(app.getHttpServer())
     .post("/graphql")
     .set("Cookie", cookies.join("; "))
+    .set(headers)
     .send({ query, variables })
     .expect(200);
 

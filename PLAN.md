@@ -523,6 +523,7 @@ Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE 
 | `DATABASE_URL` | backend | PostgreSQL |
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | backend | Token signing (access JWT) and keyed hashing (refresh tokens); 32 characters or more |
 | `THROTTLE_LIMIT`, `THROTTLE_TTL_SECONDS` | backend | Rate limit per client IP and operation (D23): at most `THROTTLE_LIMIT` calls in `THROTTLE_TTL_SECONDS` seconds (defaults 10 and 60) |
+| `TRUST_PROXY_HOPS` | backend | Number of proxies in front of the backend (default 0: none, `X-Forwarded-For` is ignored). Set it behind a proxy (production), so `req.ip` and the rate limit (D23) see the client IP |
 | `NODE_ENV` | backend | `development` (default), `test` or `production`; in production the auth cookies are `Secure` |
 | `FRONTEND_URL` | backend | Absolute links in emails |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | backend | Mail |

@@ -23,6 +23,17 @@ describe("validateEnvironment", () => {
     );
   });
 
+  it("trusts no proxy by default and accepts a number of proxies", () => {
+    expect(validateEnvironment(VALID).TRUST_PROXY_HOPS).toBe(0);
+    expect(validateEnvironment({ ...VALID, TRUST_PROXY_HOPS: "1" }).TRUST_PROXY_HOPS).toBe(1);
+  });
+
+  it.each(["-1", "1.5", "yes"])("throws for invalid TRUST_PROXY_HOPS %s", (hops) => {
+    expect(() => validateEnvironment({ ...VALID, TRUST_PROXY_HOPS: hops })).toThrow(
+      /Invalid environment variables:\nTRUST_PROXY_HOPS/,
+    );
+  });
+
   it("converts PORT from a string to a number", () => {
     expect(validateEnvironment({ ...VALID, PORT: "5000" }).PORT).toBe(5000);
   });
