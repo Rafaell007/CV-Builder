@@ -1,0 +1,14 @@
+query Me {
+  me {
+    id
+    email
+    firstName
+    lastName
+    role
+    isVerified
+  }
+}
+
+mutation Refresh {
+  refresh
+}
