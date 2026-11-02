@@ -192,8 +192,8 @@ The full log is in [PLAN.md §2.3](PLAN.md). The ones that shape the code most:
 | `BACKEND_URL` | frontend | Backend origin for rewrites and server-side requests | in use |
 | `DATABASE_URL` | backend | PostgreSQL connection string | in use |
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | backend | Token signing | planned |
-| `FRONTEND_URL` | backend | Absolute links in emails | planned |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | backend | Mail | planned |
+| `FRONTEND_URL` | backend | Absolute links in emails (default `http://localhost:3000`) | in use |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | backend | Mail (defaults reach Mailpit) | in use |
 | `PORT` | backend | HTTP port (default 4000) | in use |
 | `THROTTLE_LIMIT`, `THROTTLE_TTL_SECONDS` | backend | Rate limit per client IP and operation (defaults: 10 calls in 60 s) | in use |
 | `TRUST_PROXY_HOPS` | backend | Number of proxies in front of the backend (default 0); set it in production so the rate limit sees the client IP | in use |

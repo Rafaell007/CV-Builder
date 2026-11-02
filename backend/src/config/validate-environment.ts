@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { plainToInstance } from "class-transformer";
 import { validateSync } from "class-validator";
-import { Environment } from "./environment";
+import { Environment, PRODUCTION_REQUIRED } from "./environment";
 
 /** Fail fast: throws one readable error listing every invalid variable, so the app never starts misconfigured. */
 export function validateEnvironment(raw: Record<string, unknown>): Environment {
@@ -10,11 +10,22 @@ export function validateEnvironment(raw: Record<string, unknown>): Environment {
     exposeUnsetFields: false, // keep the class defaults (e.g. PORT = 4000) for variables that are not set
   });
   const errors = validateSync(environment, { skipMissingProperties: false });
+  const details = errors.map(
+    (error) => `${error.property}: ${Object.values(error.constraints ?? {}).join(", ")}`,
+  );
 
-  if (errors.length > 0) {
-    const details = errors.map(
-      (error) => `${error.property}: ${Object.values(error.constraints ?? {}).join(", ")}`,
-    );
+  // The defaults fill unset variables, so these checks read the raw input.
+  if (environment.NODE_ENV === "production") {
+    for (const name of PRODUCTION_REQUIRED) {
+      if (!raw[name])
+        details.push(`${name}: must be set in production, the default is for local use`);
+    }
+  }
+  if (Boolean(environment.SMTP_USER) !== Boolean(environment.SMTP_PASS)) {
+    details.push("SMTP_USER: SMTP_USER and SMTP_PASS must be set together, or both left empty");
+  }
+
+  if (details.length > 0) {
     throw new Error(`Invalid environment variables:\n${details.join("\n")}`);
   }
 

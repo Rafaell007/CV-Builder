@@ -89,6 +89,68 @@ describe("validateEnvironment", () => {
     );
   });
 
+  it("defaults the mail settings to Mailpit and the local frontend", () => {
+    const environment = validateEnvironment(VALID);
+
+    expect(environment.FRONTEND_URL).toBe("http://localhost:3000");
+    expect(environment.SMTP_HOST).toBe("localhost");
+    expect(environment.SMTP_PORT).toBe(1025);
+    expect(environment.SMTP_USER).toBeUndefined();
+    expect(environment.MAIL_FROM).toContain("no-reply@");
+  });
+
+  it("converts SMTP_PORT from a string to a number", () => {
+    expect(validateEnvironment({ ...VALID, SMTP_PORT: "587" }).SMTP_PORT).toBe(587);
+  });
+
+  it.each(["abc", "0", "70000"])("throws for invalid SMTP_PORT %s", (port) => {
+    expect(() => validateEnvironment({ ...VALID, SMTP_PORT: port })).toThrow(
+      /Invalid environment variables:\nSMTP_PORT/,
+    );
+  });
+
+  it.each(["", "not-a-url", "localhost:3000"])("throws for invalid FRONTEND_URL %p", (url) => {
+    expect(() => validateEnvironment({ ...VALID, FRONTEND_URL: url })).toThrow(
+      /Invalid environment variables:\nFRONTEND_URL/,
+    );
+  });
+
+  describe("in production", () => {
+    const MAIL = {
+      FRONTEND_URL: "https://cv.example.com",
+      SMTP_HOST: "smtp.example.com",
+      SMTP_PORT: "465",
+      MAIL_FROM: "CV Builder <no-reply@example.com>",
+    };
+    const PRODUCTION = { ...VALID, NODE_ENV: "production", ...MAIL };
+
+    it("accepts the environment when the mail settings are set", () => {
+      expect(validateEnvironment(PRODUCTION).FRONTEND_URL).toBe("https://cv.example.com");
+    });
+
+    it.each(Object.keys(MAIL))("throws when %s is not set", (name) => {
+      expect(() => validateEnvironment({ ...PRODUCTION, [name]: undefined })).toThrow(
+        new RegExp(`Invalid environment variables:\\n${name}: must be set in production`),
+      );
+    });
+  });
+
+  describe("SMTP login", () => {
+    it.each([
+      ["SMTP_USER", { SMTP_USER: "user" }],
+      ["SMTP_PASS", { SMTP_PASS: "secret" }],
+    ])("throws when only %s is set", (_name, login) => {
+      expect(() => validateEnvironment({ ...VALID, ...login })).toThrow(
+        /Invalid environment variables:\nSMTP_USER: .*together/,
+      );
+    });
+
+    it("accepts both set, or both empty as in .env.example", () => {
+      expect(() => validateEnvironment({ ...VALID, SMTP_USER: "u", SMTP_PASS: "p" })).not.toThrow();
+      expect(() => validateEnvironment({ ...VALID, SMTP_USER: "", SMTP_PASS: "" })).not.toThrow();
+    });
+  });
+
   it("lists every invalid variable in one error", () => {
     expect(() => validateEnvironment({ PORT: "abc" })).toThrow(/PORT: .*\nDATABASE_URL: /s);
   });

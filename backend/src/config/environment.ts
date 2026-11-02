@@ -1,5 +1,8 @@
 import { Type } from "class-transformer";
-import { IsIn, IsInt, IsString, IsUrl, Max, MinLength, Min } from "class-validator";
+import { IsIn, IsInt, IsOptional, IsString, IsUrl, Max, MinLength, Min } from "class-validator";
+
+/** Variables whose local defaults must not be used in production. `validateEnvironment` requires them to be set there. */
+export const PRODUCTION_REQUIRED = ["FRONTEND_URL", "SMTP_HOST", "SMTP_PORT", "MAIL_FROM"] as const;
 
 /** Every environment variable the backend reads. New variables go here, in `.env.example` and in PLAN.md §10. */
 export class Environment {
@@ -48,4 +51,32 @@ export class Environment {
   @IsInt()
   @Min(0)
   TRUST_PROXY_HOPS = 0;
+
+  // Absolute links in emails. The default is the local frontend; production must set it.
+  @IsUrl({ require_protocol: true, require_tld: false })
+  FRONTEND_URL = "http://localhost:3000";
+
+  // Mail. The defaults point at Mailpit from docker-compose.yml, which needs no login. Production must set them.
+  // SMTP_USER and SMTP_PASS are set together or not at all.
+  @IsString()
+  @MinLength(1)
+  SMTP_HOST = "localhost";
+
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(65535)
+  SMTP_PORT = 1025;
+
+  @IsOptional()
+  @IsString()
+  SMTP_USER?: string;
+
+  @IsOptional()
+  @IsString()
+  SMTP_PASS?: string;
+
+  @IsString()
+  @MinLength(1)
+  MAIL_FROM = "CV Builder <no-reply@cv-builder.local>";
 }
