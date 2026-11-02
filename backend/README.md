@@ -98,7 +98,16 @@ Authorization is on the backend (D10). Add decorators to the resolver:
 
 Ownership checks (a user can edit only own data) go into the service. Use `@CurrentUser()` to pass the user in.
 
-The sign-in guard that sets `request.user` comes with authentication (Phase 3). Until then, `@Roles` and `@Verified` answer `UNAUTHENTICATED` on every request.
+The global `JwtAuthGuard` makes every resolver require a signed-in user. It sets `request.user` from the `access_token` cookie. A resolver that anonymous callers may use needs `@Public()`. A request without a valid session gets `UNAUTHENTICATED`. See [modules/auth](src/modules/auth/README.md).
+
+To try it by hand, sign in with a seed user (`user1@example.com`, password `Password123!`) and keep the cookies:
+
+```
+curl -c cookies.txt -H 'Content-Type: application/json' http://localhost:4000/graphql \
+  -d '{"query":"mutation { signIn(input: {email: \"user1@example.com\", password: \"Password123!\"}) { id role } }"}'
+curl -b cookies.txt -H 'Content-Type: application/json' http://localhost:4000/graphql \
+  -d '{"query":"{ me { email role } }"}'
+```
 
 ### 5. Write the tests
 
