@@ -525,8 +525,8 @@ Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE 
 | `THROTTLE_LIMIT`, `THROTTLE_TTL_SECONDS` | backend | Rate limit per client IP and operation (D23): at most `THROTTLE_LIMIT` calls in `THROTTLE_TTL_SECONDS` seconds (defaults 10 and 60) |
 | `TRUST_PROXY_HOPS` | backend | Number of proxies in front of the backend (default 0: none, `X-Forwarded-For` is ignored). Set it behind a proxy (production), so `req.ip` and the rate limit (D23) see the client IP |
 | `NODE_ENV` | backend | `development` (default), `test` or `production`; in production the auth cookies are `Secure` |
-| `FRONTEND_URL` | backend | Absolute links in emails (default `http://localhost:3000`) |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | backend | Mail; the defaults (`localhost`, `1025`, no login) reach Mailpit; `SMTP_USER` and `SMTP_PASS` are optional |
+| `FRONTEND_URL` | backend | Absolute links in emails (default `http://localhost:3000`; required in production) |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | backend | Mail; the defaults (`localhost`, `1025`, no login) reach Mailpit; required in production; `SMTP_USER` and `SMTP_PASS` are optional, but set together |
 | `PORT` | backend | HTTP port (default 4000) |
 | `TEST_DATABASE_URL` | backend | Integration test database, name must end in `_test` (optional, defaults to `cv_builder_test` on localhost) |
 
