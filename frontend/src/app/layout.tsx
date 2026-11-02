@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
-import { Roboto } from "next/font/google";
 import { ApolloClientProvider } from "@/shared/apollo";
 import { DEFAULT_LANGUAGE, PreferencesProvider, PreferencesScript } from "@/shared/preferences";
+import { roboto } from "@/shared/styles";
 import "@/shared/styles/global.css";
-
-const roboto = Roboto({
-  variable: "--font-roboto",
-  weight: ["400", "500", "600"],
-  subsets: ["latin", "latin-ext"],
-});
 
 export const metadata: Metadata = {
   title: "CV Builder",

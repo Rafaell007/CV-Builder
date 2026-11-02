@@ -16,6 +16,7 @@ Use Node 24 and pnpm 12 (`.nvmrc`, `packageManager`); run from the repo root. Ea
 - `pnpm --filter @cv-builder/backend schema:generate` — regenerate `backend/schema.gql` (needs the database and `DATABASE_URL`); CI fails when the committed file differs
 - `pnpm --filter <app> test:cov` — coverage report, fails under 80 % (not in CI until Phase 3); `pnpm --filter @cv-builder/backend test:int` — integration tests (needs Docker)
 - `pnpm test:e2e` — Playwright E2E: seeds `cv_builder_test`, builds both apps and runs them on ports 3100 / 4100 (needs Docker; see `e2e/README.md`)
+- `pnpm storybook` — Storybook at http://localhost:6006; the frontend's `test` also runs every story in Chromium (`playwright install chromium` once; see `frontend/.storybook/README.md`)
 
 Run `lint`, `typecheck` and the tests of the app you changed; run `pnpm test:e2e` when you change a user flow. Frontend tests render through `renderWithProviders` from `@/shared/testing`.
 

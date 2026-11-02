@@ -13,6 +13,7 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
     "test:e2e": "pnpm --filter @cv-builder/e2e test:e2e",
+    "storybook": "pnpm --filter @cv-builder/frontend storybook",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky"
@@ -28,8 +29,10 @@
     "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.4",
     "@commitlint/types": "^21.2.3",
+    "@types/node": "^24.19.2",
     "eslint": "^9",
     "eslint-config-next": "16.4.3",
+    "eslint-plugin-storybook": "^10.6.5",
     "husky": "^9.1.7",
     "jiti": "^2.7.0",
     "lint-staged": "^17.6.0",

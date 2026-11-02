@@ -46,6 +46,7 @@ A feature is added to this table as "done" when its PLAN.md step is merged.
 | Database | PostgreSQL 17 + Prisma 7 | schema, migrations and seed in place |
 | Auth | JWT access and refresh tokens in httpOnly cookies | planned |
 | Tests | Vitest + React Testing Library, Jest + Supertest, Playwright (E2E) | set up |
+| UI development | Storybook 10 (light/dark/system switcher, stories run as tests with accessibility checks) | set up |
 | Quality | ESLint, Prettier, Husky, lint-staged, commitlint | installed |
 | Hosting | Vercel, Render, Neon (optional) | planned |
 
@@ -122,8 +123,9 @@ Run from the repository root; each runs in every workspace that defines it.
 | `pnpm build` | Production build of both apps |
 | `pnpm lint` | ESLint |
 | `pnpm typecheck` | TypeScript, no emit (the frontend also generates Next.js route types) |
-| `pnpm test` | Unit tests (backend integration tests: `pnpm --filter @cv-builder/backend test:int`) |
+| `pnpm test` | Unit tests and the frontend's Storybook tests (backend integration tests: `pnpm --filter @cv-builder/backend test:int`) |
 | `pnpm test:e2e` | Playwright E2E tests against a freshly seeded database (see [E2E tests](#e2e-tests)) |
+| `pnpm storybook` | Storybook at http://localhost:6006 (see [frontend/.storybook/README.md](frontend/.storybook/README.md)) |
 | `pnpm format` · `pnpm format:check` | Format with Prettier, or only check |
 | `pnpm --filter @cv-builder/frontend codegen` | Generate typed GraphQL documents from `backend/schema.gql` into `frontend/src/shared/graphql/generated/` (git-ignored; `dev`, `build`, `typecheck` and `test` run it first) |
 
@@ -134,11 +136,14 @@ Run from the repository root; each runs in every workspace that defines it.
 | Backend unit | Jest + `@nestjs/testing` | `pnpm --filter @cv-builder/backend test` | set up |
 | Backend integration | Jest + Supertest, test database | `pnpm --filter @cv-builder/backend test:int` | set up (health query) |
 | Frontend unit and component | Vitest + React Testing Library + user-event | `pnpm --filter @cv-builder/frontend test` | set up |
+| Frontend stories | Storybook 10 + Vitest browser mode (Chromium) | `pnpm --filter @cv-builder/frontend test` | set up (theme sample) |
 | E2E | Playwright, seeded test database | `pnpm test:e2e` | set up (smoke test) |
 
 Coverage target: over 80 %. `test:cov` prints the report and fails below 80 % in each app: `pnpm --filter @cv-builder/backend test:cov` (threshold in the Jest config in `backend/package.json`) and `pnpm --filter @cv-builder/frontend test:cov` (threshold in `frontend/vitest.config.mts`; HTML report in `frontend/coverage/`). Both are switched on in CI from Phase 3.
 
 Frontend component tests render through `renderWithProviders` from `@/shared/testing` (app providers, Apollo mocks, a user-event `user`); see [frontend/src/shared/testing/README.md](frontend/src/shared/testing/README.md).
+
+The frontend's `test` runs two Vitest projects: `unit` (jsdom) and `storybook`, which renders every story in headless Chromium and runs its `play` function. Install the browser once per machine with `pnpm --filter @cv-builder/frontend exec playwright install chromium`; see [frontend/.storybook/README.md](frontend/.storybook/README.md).
 
 Integration tests need the database running (`docker compose up -d`). They use a separate database, `cv_builder_test`, which is created and migrated automatically on the first run. Files run one at a time and every table is truncated before each test file. The database name must end in `_test`, otherwise the run aborts, so development data is never touched. Set `TEST_DATABASE_URL` to use another server.
 
