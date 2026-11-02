@@ -62,4 +62,16 @@ describe("global validation pipe", () => {
 
     expect(error.fieldErrors.map(({ field }) => field)).toEqual(["email", "address.floor"]);
   });
+
+  it("fails loudly on a property that has no validator instead of dropping it", async () => {
+    const error = await failureOf({
+      email: "ada@example.com",
+      address: { floor: 3 },
+      nickname: "ada",
+    });
+
+    expect(error.fieldErrors).toEqual([
+      { field: "nickname", messages: ["property nickname should not exist"] },
+    ]);
+  });
 });

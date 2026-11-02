@@ -1,6 +1,8 @@
-import { Catch, HttpException, HttpStatus, Logger } from "@nestjs/common";
-import type { GqlExceptionFilter } from "@nestjs/graphql";
+import { ArgumentsHost, Catch, HttpException, HttpStatus, Logger } from "@nestjs/common";
+import { BaseExceptionFilter } from "@nestjs/core";
+import type { GqlContextType } from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
+import { Prisma } from "../../generated/prisma/client";
 import { ErrorCode } from "./error-code";
 import { ValidationFailedException } from "./validation-failed.exception";
 
@@ -12,12 +14,28 @@ const CODE_BY_STATUS: ReadonlyMap<number, ErrorCode> = new Map([
   [HttpStatus.CONFLICT, ErrorCode.Conflict],
 ]);
 
-/** Maps every error thrown while resolving a request to a GraphQL error with `extensions.code` (D7). */
+const CODE_BY_PRISMA_ERROR: ReadonlyMap<string, ErrorCode> = new Map([
+  ["P2002", ErrorCode.Conflict], // unique constraint failed
+  ["P2025", ErrorCode.NotFound], // record to update or delete not found
+]);
+
+/**
+ * Maps every error thrown while resolving a GraphQL request to a GraphQL error with `extensions.code` (D7).
+ * Plain HTTP requests (for example an unknown route) keep Nest's default JSON response.
+ */
 @Catch()
-export class GraphQLExceptionFilter implements GqlExceptionFilter {
+export class GraphQLExceptionFilter extends BaseExceptionFilter {
   private readonly logger = new Logger(GraphQLExceptionFilter.name);
 
-  catch(exception: unknown): GraphQLError {
+  catch(exception: unknown, host: ArgumentsHost): GraphQLError | void {
+    if (host.getType<GqlContextType>() !== "graphql") {
+      super.catch(exception, host);
+      return;
+    }
+    return this.toGraphQLError(exception);
+  }
+
+  private toGraphQLError(exception: unknown): GraphQLError {
     if (exception instanceof GraphQLError) return exception;
 
     if (exception instanceof ValidationFailedException) {
@@ -34,6 +52,15 @@ export class GraphQLExceptionFilter implements GqlExceptionFilter {
         return new GraphQLError(exception.message, {
           extensions: reason === undefined ? { code } : { code, reason },
         });
+      }
+    }
+
+    if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+      const code = CODE_BY_PRISMA_ERROR.get(exception.code);
+      if (code !== undefined) {
+        // The Prisma message names tables and columns, so the client gets a fixed text instead.
+        const message = code === ErrorCode.Conflict ? "Already exists" : "Not found";
+        return new GraphQLError(message, { extensions: { code } });
       }
     }
 

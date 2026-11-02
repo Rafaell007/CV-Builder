@@ -103,6 +103,10 @@ describe("API conventions in a sample module", () => {
     await app.init();
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   afterAll(async () => {
     await app.close();
   });
@@ -188,7 +192,13 @@ describe("API conventions in a sample module", () => {
       expect(body.errors[0].message).toBe("Internal server error");
       expect(body.errors[0].extensions.code).toBe("INTERNAL_SERVER_ERROR");
       expect(JSON.stringify(body)).not.toContain("hunter2");
-      jest.restoreAllMocks();
+    });
+
+    it("answers an unknown HTTP route with a normal 404 instead of hanging", async () => {
+      const response = await request(app.getHttpServer()).get("/nope");
+
+      expect(response.status).toBe(404);
+      expect(response.body).toMatchObject({ statusCode: 404 });
     });
   });
 

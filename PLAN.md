@@ -183,7 +183,7 @@ Browser ──► Next.js (frontend/)                                   NestJS (
 - **Authorization:** see D10. The UI only hides what the user may not do.
 - **Errors:** see D7. Unknown errors are logged and returned as `INTERNAL_SERVER_ERROR` without details.
 - **List pattern:** every list query takes `search`, `sort { field, direction }`, `page { number, size }` and returns `{ items, total }` (shared GraphQL building blocks, S2.2).
-- **Verification:** unverified users can sign in and use the app after LATER; verified-only actions (D16) fail with `FORBIDDEN` and code `EMAIL_NOT_VERIFIED`.
+- **Verification:** unverified users can sign in and use the app after LATER; verified-only actions (D16) fail with `FORBIDDEN` and `extensions.reason: EMAIL_NOT_VERIFIED`.
 
 ---
 

@@ -83,8 +83,8 @@ Throw Nest exceptions in the service. The global exception filter maps them (D7)
 | `ValidationFailedException` | `BAD_USER_INPUT` (with `fieldErrors`) |
 | `UnauthorizedException` | `UNAUTHENTICATED` |
 | `ForbiddenException` | `FORBIDDEN` |
-| `NotFoundException` | `NOT_FOUND` |
-| `ConflictException` | `CONFLICT` |
+| `NotFoundException`, Prisma `P2025` (record not found) | `NOT_FOUND` |
+| `ConflictException`, Prisma `P2002` (unique constraint) | `CONFLICT` |
 | any other error | `INTERNAL_SERVER_ERROR` (logged, no details sent to the client) |
 
 ### 4. Protect a resolver
