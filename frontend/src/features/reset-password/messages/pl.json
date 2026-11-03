@@ -11,7 +11,6 @@
   "submit": "Zatwierdź",
   "goToSignIn": "Przejdź do logowania",
   "requestNewLink": "Poproś o nowy link",
-  "success": "Hasło zostało zmienione. Możesz się zalogować nowym hasłem.",
   "errors": {
     "passwordRequired": "Hasło jest wymagane",
     "passwordTooShort": "Hasło musi mieć co najmniej {min, plural, one {# znak} few {# znaki} other {# znaków}}",

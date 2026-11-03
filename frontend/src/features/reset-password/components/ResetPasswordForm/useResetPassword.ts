@@ -4,6 +4,7 @@ import { useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { ResetPasswordDocument } from "@/shared/graphql";
+import { useRouter } from "@/shared/i18n";
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "@/shared/utils";
 import type {
   ResetPasswordErrorKey,
@@ -16,6 +17,9 @@ import { isTokenError, toResetPasswordFailure, validateResetPassword } from "./u
 const FIELDS: readonly ResetPasswordField[] = ["newPassword", "confirmPassword"];
 const EMPTY_VALUES: ResetPasswordValues = { newPassword: "", confirmPassword: "" };
 
+// The router adds the language.
+export const SIGN_IN_PATH = "/sign-in";
+
 export type ResetPasswordFieldProps = {
   value: string;
   error: string | undefined;
@@ -27,17 +31,20 @@ export type ResetPasswordFieldProps = {
  * State of the reset-password form. A field shows its client-side error after it was left or after a submit,
  * and the error updates while the user types. The values stay when the request fails (AC-25).
  * The backend decides if the token is good (AC-12); a bad token ends the form in `tokenError`.
- * The backend does not sign the user in, so `done` leads to the sign-in page (AC-22).
+ * The backend does not sign the user in, so a good reset leads to the sign-in page (AC-22).
  */
 export function useResetPassword(token: string) {
+  const router = useRouter();
   const t = useTranslations("resetPassword.errors");
   const [values, setValues] = useState<ResetPasswordValues>(EMPTY_VALUES);
   const [touched, setTouched] = useState<ReadonlySet<ResetPasswordField>>(new Set());
   const [failure, setFailure] = useState<ResetPasswordErrorKey | null>(null);
-  const [done, setDone] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
   const [resetPassword, { loading }] = useMutation(ResetPasswordDocument);
 
   const validation = validateResetPassword(values);
+  // `redirecting` keeps the form locked between the answer and the page change (AC-11).
+  const pending = loading || redirecting;
 
   function translate(key: ResetPasswordErrorKey | undefined): string | undefined {
     return key === undefined
@@ -59,13 +66,16 @@ export function useResetPassword(token: string) {
   }
 
   function submit() {
-    if (loading) return;
+    if (pending) return;
     setTouched(new Set(FIELDS));
     if (Object.keys(validation).length > 0) return;
 
     setFailure(null);
     resetPassword({ variables: { input: { token, newPassword: values.newPassword } } }).then(
-      () => setDone(true),
+      () => {
+        setRedirecting(true);
+        router.push(SIGN_IN_PATH);
+      },
       (error: unknown) => setFailure(toResetPasswordFailure(error)),
     );
   }
@@ -75,8 +85,7 @@ export function useResetPassword(token: string) {
 
   return {
     getFieldProps,
-    pending: loading,
-    done,
+    pending,
     tokenError,
     formError: failure !== null && !isTokenError(failure) ? translate(failure) : undefined,
     onSubmit: (event: FormEvent<HTMLFormElement>) => {

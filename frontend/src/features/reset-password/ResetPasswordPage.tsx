@@ -17,7 +17,7 @@ export function ResetPasswordPage({ token }: ResetPasswordPageProps) {
         <h1 className={styles.title}>{t("title")}</h1>
         <p className={styles.subtitle}>{t("subtitle")}</p>
         {token === undefined || token === "" ? (
-          <ResetPasswordNotice tone="error" message={t("errors.tokenInvalid")} offerNewLink />
+          <ResetPasswordNotice message={t("errors.tokenInvalid")} />
         ) : (
           <ResetPasswordForm token={token} />
         )}

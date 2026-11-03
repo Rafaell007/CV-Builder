@@ -11,7 +11,6 @@
   "submit": "Submit",
   "goToSignIn": "Go to sign in",
   "requestNewLink": "Request a new link",
-  "success": "Your password was changed. You can sign in with the new password.",
   "errors": {
     "passwordRequired": "Password is required",
     "passwordTooShort": "Password must be at least {min} characters long",

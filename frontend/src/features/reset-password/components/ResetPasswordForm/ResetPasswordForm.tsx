@@ -13,11 +13,10 @@ export type ResetPasswordFormProps = {
 
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const t = useTranslations("resetPassword");
-  const { getFieldProps, pending, done, tokenError, formError, onSubmit } = useResetPassword(token);
+  const { getFieldProps, pending, tokenError, formError, onSubmit } = useResetPassword(token);
 
-  if (done) return <ResetPasswordNotice tone="success" message={t("success")} />;
   if (tokenError !== undefined) {
-    return <ResetPasswordNotice tone="error" message={t(`errors.${tokenError}`)} offerNewLink />;
+    return <ResetPasswordNotice message={t(`errors.${tokenError}`)} />;
   }
 
   return (

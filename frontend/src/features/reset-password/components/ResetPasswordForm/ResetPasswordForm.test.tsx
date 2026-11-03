@@ -1,8 +1,15 @@
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ResetPasswordDocument } from "@/shared/graphql";
-import { renderWithProviders, screen } from "@/shared/testing";
+import { renderWithProviders, screen, waitFor } from "@/shared/testing";
 import { ResetPasswordForm } from "./index";
+
+const push = vi.fn();
+// The real router needs the Next.js app router, which tests do not have. It adds the language itself.
+vi.mock("@/shared/i18n", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/shared/i18n")>()),
+  useRouter: () => ({ push }),
+}));
 
 const TOKEN = "token-from-the-mail";
 const PASSWORD = "Password123!";
@@ -32,6 +39,7 @@ const submit = () => screen.getByRole("button", { name: "Submit" });
 
 describe("ResetPasswordForm", () => {
   beforeEach(() => {
+    push.mockReset();
     vi.spyOn(console, "error").mockImplementation(() => undefined); // the Apollo error link logs failures
   });
 
@@ -70,7 +78,7 @@ describe("ResetPasswordForm", () => {
 
     expect(screen.getByText("Password is required")).toBeInTheDocument();
     expect(screen.getByText("Confirm Password is required")).toBeInTheDocument();
-    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(push).not.toHaveBeenCalled();
   });
 
   it("refuses a weak password and a confirmation that does not match", async () => {
@@ -99,7 +107,7 @@ describe("ResetPasswordForm", () => {
     expect(screen.getByLabelText("New Password")).toHaveAttribute("type", "password");
   });
 
-  it("sends the token and the new password, then confirms and leads to sign-in", async () => {
+  it("sends the token and the new password, then goes to the sign-in page", async () => {
     const { user } = renderWithProviders(<ResetPasswordForm token={TOKEN} />, {
       mocks: [resetPasswordMock(SUCCESS)],
     });
@@ -107,14 +115,7 @@ describe("ResetPasswordForm", () => {
     await fillForm(user);
     await user.click(submit());
 
-    expect(await screen.findByRole("status")).toHaveTextContent(
-      "Your password was changed. You can sign in with the new password.",
-    );
-    expect(screen.queryByLabelText("New Password")).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Go to sign in" })).toHaveAttribute(
-      "href",
-      "/en/sign-in",
-    );
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/sign-in"));
   });
 
   it("is busy while the request runs and sends it only once", async () => {
@@ -130,7 +131,8 @@ describe("ResetPasswordForm", () => {
     // aria-disabled, not disabled: the shared Button keeps the focus while it is busy
     expect(submit()).toHaveAttribute("aria-disabled", "true");
     expect(submit()).toHaveAttribute("aria-busy", "true");
-    expect(await screen.findByRole("status")).toBeInTheDocument();
+    await waitFor(() => expect(push).toHaveBeenCalledTimes(1));
+    expect(submit()).toHaveAttribute("aria-disabled", "true"); // still locked until the page changes
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
@@ -172,6 +174,7 @@ describe("ResetPasswordForm", () => {
     expect(screen.getByLabelText("New Password")).toHaveValue(PASSWORD);
     expect(screen.getByLabelText("Confirm Password")).toHaveValue(PASSWORD);
     expect(submit()).not.toHaveAttribute("aria-disabled");
+    expect(push).not.toHaveBeenCalled();
   });
 
   it("shows a friendly message for a network error and keeps the values", async () => {
