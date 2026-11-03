@@ -13,5 +13,6 @@ The global catalog of projects (page 27) and the project roles. Admin only, exce
   - `deleteProject` is called for a project that a CV uses (D18), or
   - `updateProject` changes the dates and CV entries would fall outside them (D25). An empty CV end date ("Present") is not checked. The check runs only when a date changes. It runs with the update in one serializable transaction, so if a CV changes at the same time, the update fails with `CONFLICT` ("Try again").
 - **Authorization:** `@Roles(Role.ADMIN)` on `ProjectsResolver`. `ProjectRolesResolver` has no role, so every signed-in user may use it.
+- **Used by CV projects:** `project-environment.ts` holds `WITH_ENVIRONMENT` and `toProject`. The CVs module uses them to return the project inside a `CvProject` (see [CVs README](../cvs/README.md)).
 - **Tests:** `*.spec.ts` next to the code; `backend/test/projects.int-spec.ts` runs every operation over HTTP against the test database.
 - **Docs:** [projects page](../../../../docs/pages/27-projects-page.md) · [PLAN.md S5.5, D18, D25](../../../../PLAN.md)
