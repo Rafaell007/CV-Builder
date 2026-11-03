@@ -30,7 +30,7 @@ export function PageState({ kind, onRetry, rows = DEFAULT_SKELETON_ROWS, labels 
 
   if (kind === "error") {
     return (
-      <div className={styles.message} role="alert">
+      <div className={`${styles.message} ${styles.error}`} role="alert">
         <p className={styles.text}>{text.error}</p>
         {onRetry && (
           <button type="button" className={styles.retry} onClick={onRetry}>

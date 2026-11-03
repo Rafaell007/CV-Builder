@@ -40,7 +40,7 @@
 }
 
 /* Error text uses the main colour so it stays readable in both themes. */
-[role="alert"] .text {
+.error .text {
   color: var(--color-text);
 }
 

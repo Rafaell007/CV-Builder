@@ -27,9 +27,9 @@ export function Menu({ items, label = "Actions" }: MenuProps) {
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content className={styles.content} align="end" sideOffset={4}>
-          {items.map((item) => (
+          {items.map((item, index) => (
             <DropdownMenu.Item
-              key={item.label}
+              key={`${index}-${item.label}`}
               className={`${styles.item} ${item.destructive ? styles.destructive : ""}`}
               disabled={item.disabled}
               onSelect={item.onSelect}

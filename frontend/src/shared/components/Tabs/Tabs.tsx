@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/shared/i18n";
 import { getActiveTabIndex } from "./utils";
 import styles from "./Tabs.module.css";
 
@@ -9,7 +9,7 @@ export interface TabItem {
 
 export interface TabsProps {
   items: ReadonlyArray<TabItem>;
-  /** Current route, from `usePathname()` in the layout. The tab that matches it is active. */
+  /** Current route, from `usePathname()` of `@/shared/i18n` (no language prefix). The tab that matches it is active. */
   pathname: string;
   /** Accessible name of the navigation landmark. Callers pass a translated text. */
   label?: string;
