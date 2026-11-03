@@ -197,6 +197,10 @@ Predictions for KAN-77 (2026-11-03): not drawn in Figma, chosen by us; fix here 
 - Textarea: invalid state like the input; resizes vertically only.
 - Search field hover and focus: input borders; height 40px (the 45px border box is a layer artefact); the light inner shadow (spread 30px #F5F5F7) is ignored.
 - Helper text: Error text style in #626262 / #AEAEAE.
+- Invalid label is red inside the empty field too (Figma draws invalid only with a value).
+- The label moves without animation (none drawn).
+
+Accessibility over Figma (2026-11-03): Figma's placeholder colour fails WCAG AA contrast (4.5:1): #C4C4C6 on #F5F5F7 is 1.59:1, #626262 on #2E2E2E about 2.3:1. The field label resting inside an empty field and the search placeholder use the grey text colour instead (#626262 / #AEAEAE, the floated label's colour). `--color-text-placeholder` stays in the tokens with its Figma value.
 - Dark IconButton active icon #656565 is read as #626262 (not in the palette). Dark search icon #C4C4C6 is kept as drawn.
 - Secondary dark hover has no border in Figma; the border takes the fill colour, so the button keeps its size.
 - 1440 › SIGN IN "Forgot password" (dark text #C4C4C6) differs from DS Ghost (#F5F5F7); we follow DS.
