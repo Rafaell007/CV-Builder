@@ -1,0 +1,29 @@
+{
+  "pageTitle": "Resetowanie hasła | CV Builder",
+  "title": "Resetowanie hasła",
+  "subtitle": "Wpisz nowe hasło i potwierdź je",
+  "newPassword": "Nowe hasło",
+  "confirmPassword": "Potwierdź hasło",
+  "showPassword": "Pokaż hasło",
+  "hidePassword": "Ukryj hasło",
+  "showConfirmPassword": "Pokaż potwierdzenie hasła",
+  "hideConfirmPassword": "Ukryj potwierdzenie hasła",
+  "submit": "Zatwierdź",
+  "goToSignIn": "Przejdź do logowania",
+  "requestNewLink": "Poproś o nowy link",
+  "success": "Hasło zostało zmienione. Możesz się zalogować nowym hasłem.",
+  "errors": {
+    "passwordRequired": "Hasło jest wymagane",
+    "passwordTooShort": "Hasło musi mieć co najmniej {min, plural, one {# znak} few {# znaki} other {# znaków}}",
+    "passwordTooLong": "Hasło może mieć najwyżej {max, plural, one {# znak} few {# znaki} other {# znaków}}",
+    "passwordWeak": "Hasło musi zawierać co najmniej jedną literę i jedną cyfrę",
+    "confirmRequired": "Potwierdzenie hasła jest wymagane",
+    "confirmMismatch": "Hasła nie są takie same",
+    "tokenInvalid": "Ten link do resetowania hasła jest nieprawidłowy",
+    "tokenExpired": "Ten link do resetowania hasła wygasł",
+    "tokenUsed": "Ten link do resetowania hasła został już użyty",
+    "tooManyRequests": "Zbyt wiele prób, spróbuj ponownie później",
+    "invalidInput": "Sprawdź wpisane dane i spróbuj ponownie",
+    "unexpected": "Coś poszło nie tak. Spróbuj ponownie później"
+  }
+}
