@@ -1,6 +1,6 @@
 # E2E tests
 
-Playwright tests that drive a real browser through the whole app: Next.js → NestJS → PostgreSQL (PLAN §11.4, D14). Specs live in one folder per area (`smoke/`, `session/`, `i18n/`, `sign-up/`, later `cvs/`, …). Every page URL starts with the language (`/en/users`); a path without one is redirected, so specs may use either. `support/signIn.ts` signs a seeded account in through the API until the sign-in page exists (S3.4); most specs start with it, because protected pages redirect without a session.
+Playwright tests that drive a real browser through the whole app: Next.js → NestJS → PostgreSQL (PLAN §11.4, D14). Specs live in one folder per area (`smoke/`, `session/`, `auth/`, `i18n/`, `sign-up/`, later `cvs/`, …). Every page URL starts with the language (`/en/users`); a path without one is redirected, so specs may use either. `support/signIn.ts` signs a seeded account in through the API (not through the page, which `auth/` covers); most specs start with it, because protected pages redirect without a session.
 
 ## Run
 

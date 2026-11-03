@@ -3,11 +3,12 @@ import type { BrowserContext } from "@playwright/test";
 // Seeded accounts (root README, "Seed data and test users").
 export const ADMIN_EMAIL = "admin@example.com";
 export const USER_EMAIL = "user1@example.com";
-const PASSWORD = "Password123!";
+export const PASSWORD = "Password123!";
 
 /**
- * Signs in through the frontend's /graphql. The sign-in page comes with S3.4; until then the session
- * cookies are set by calling the mutation. The browser context keeps them like after a normal sign-in.
+ * Signs in through the frontend's /graphql, without the sign-in page: faster, and a broken page cannot fail
+ * unrelated specs. The browser context keeps the cookies like after a normal sign-in. The page itself is
+ * covered by auth/sign-in.spec.ts.
  */
 export async function signIn(context: BrowserContext, email: string): Promise<void> {
   const response = await context.request.post("/graphql", {

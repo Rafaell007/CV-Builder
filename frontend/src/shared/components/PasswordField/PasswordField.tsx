@@ -64,7 +64,8 @@ export function PasswordField({
         />
         {/* aria-label on Toggle too, so Radix does not add its English default */}
         <PasswordToggleField.Toggle asChild aria-label={toggleLabel} disabled={disabled}>
-          <IconButton aria-label={toggleLabel} className={styles.toggle}>
+          {/* Radix gives the button the input's id too; an id of its own keeps ids unique (label and aria-controls still point at the input). */}
+          <IconButton id={`${controlId}-toggle`} aria-label={toggleLabel} className={styles.toggle}>
             {visible ? <VisibilityOffIcon /> : <VisibilityIcon />}
           </IconButton>
         </PasswordToggleField.Toggle>

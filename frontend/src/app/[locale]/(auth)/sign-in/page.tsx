@@ -1,8 +1,5 @@
-// Placeholder (PLAN §6); the real page comes with its own step.
+import { SignIn } from "@/features/sign-in";
+
 export default function SignInPage() {
-  return (
-    <main>
-      <h1>Sign in</h1>
-    </main>
-  );
+  return <SignIn />;
 }
