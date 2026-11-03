@@ -89,6 +89,14 @@ export class CvsService {
   }
 
   /**
+   * Throws NOT_FOUND unless the user may use the CV. Code that works on the data of a CV (for
+   * example its projects) calls this first, so the ownership rule lives in one place.
+   */
+  async assertAccessible(user: AuthUser, id: string): Promise<void> {
+    await this.findAccessible(user, id);
+  }
+
+  /**
    * The CV, if the user may use it. Someone else's CV answers NOT_FOUND, the same as a missing one,
    * so a user cannot find out which ids exist by changing the id in a request.
    */

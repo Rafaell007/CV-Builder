@@ -192,6 +192,28 @@ describe("CvsService.get", () => {
   });
 });
 
+describe("CvsService.assertAccessible", () => {
+  it("passes for an own CV", async () => {
+    prisma.cv.findUnique.mockResolvedValue(storedCv());
+
+    await expect(service.assertAccessible(USER, "cv-1")).resolves.toBeUndefined();
+  });
+
+  it("passes for an admin on the CV of another user", async () => {
+    prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-2" }));
+
+    await expect(service.assertAccessible(ADMIN, "cv-1")).resolves.toBeUndefined();
+  });
+
+  it("answers NOT_FOUND for the CV of another user", async () => {
+    prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-2" }));
+
+    expect(await rejection(service.assertAccessible(USER, "cv-1"))).toBeInstanceOf(
+      NotFoundException,
+    );
+  });
+});
+
 describe("CvsService.create", () => {
   const input = { name: "New", education: "BSc", description: "Text" };
 

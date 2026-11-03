@@ -1,4 +1,4 @@
-import { ParseUUIDPipe, UnauthorizedException } from "@nestjs/common";
+import { ParseUUIDPipe } from "@nestjs/common";
 import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { CurrentUser, Verified } from "../../common/auth";
 import type { AuthUser } from "../../common/auth";
@@ -8,6 +8,7 @@ import { CvsArgs } from "./dto/cvs.args";
 import { UpdateCvInput } from "./dto/update-cv.input";
 import { Cv } from "./models/cv";
 import { CvPage } from "./models/cv-page";
+import { requireUser } from "./require-user";
 
 /** Reading needs a session; creating, changing and deleting also need a verified email (D16). */
 @Resolver(() => Cv)
@@ -53,10 +54,4 @@ export class CvsResolver {
   ): Promise<Cv> {
     return this.cvsService.delete(requireUser(user), id);
   }
-}
-
-// The global guard has already refused anonymous calls; this keeps the type honest.
-function requireUser(user: AuthUser | undefined): AuthUser {
-  if (user === undefined) throw new UnauthorizedException("Sign in to continue");
-  return user;
 }
