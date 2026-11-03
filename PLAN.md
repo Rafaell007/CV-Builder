@@ -455,6 +455,7 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
 
 - [ ] **S1.1 Form controls** — Button, IconButton, TextField, PasswordField (toggle), Textarea, Select, MultiSelect, DatePicker, OtpField, SearchField (debounced); RHF + Zod helpers and server field-error mapping. Stories + tests.
 - [ ] **S1.2 Data display** — DataTable (columns, sort indicator, row actions slot), Pagination, Menu (one open, Escape/outside close), Tabs, Breadcrumbs, Avatar, PageState (loading skeleton, empty, no results, error + retry). Stories + tests.
+  - **Done (S1.2a, KAN-79):** `DataTable` and `Pagination` in `frontend/src/shared/components/` (README in each folder). Both are controlled, so the page owns `search`, `sort` and `page`; sort uses the backend `SortInput` shape and `Pagination` uses page size 10 (D19). Story `Shared/DataTable → Sample` shows mocked data that sorts, searches, pages and shows row actions. Menu, Tabs, Breadcrumbs, Avatar and PageState are still open (S1.2b).
 - [ ] **S1.3 Overlays and feedback** — Modal / FormModal (focus trap, Escape, primary disabled until valid and dirty), ConfirmModal, Toast notifications, SelectionToolbar ("REMOVE (n)"). Stories + tests.
 - [ ] **S1.4 App layout** — `(app)` layout: sidebar by role (§6), active item, profile section + menu, header with breadcrumbs, Device Error gate (< 768 px, CSS media query only, D28), No Internet state. Depends on S1.2, S3.1 (`me`).
 
@@ -585,4 +586,5 @@ Over 80 % per app, excluding generated code, configs, `main.ts` and route files.
 | 2026-10-30 | S2.1a Prisma schema and initial migration | — | 19 models from §7 checked against docs pages 10–27, indexes, `init` + `add_date_checks` migrations; project `endDate` is required (page 27) |
 | 2026-10-30 | S0.5b Backend test setup | — | Jest unit + coverage scripts, Supertest integration tests on a separate `_test` database (serial, truncated per file), injectable `Clock`; sample health tests |
 | 2026-11-02 | S3.3 BE Mail | — | `MailModule` with Nodemailer, templates for the verification code and the reset link, Mailpit defaults for the mail variables, unit tests with a mocked transport, integration test against Mailpit (CI starts Mailpit) |
+| 2026-11-03 | S1.2a UI kit: DataTable and Pagination | — | Controlled `DataTable` (sortable headers, row click, row actions slot, selection, loading and empty slots) and `Pagination` (page size 10); stories with a mocked sample, unit and story tests |
 | 2026-11-03 | S3.5 Sign Up | #26 | `signUp` mutation (argon2 hash, unverified `USER`, first code mailed, cookies, `CONFLICT` + `EMAIL_TAKEN`, throttled), `/sign-up` page in `en` and `pl` with the shared form controls, E2E spec checks the code in Mailpit (CI e2e job starts Mailpit) |
