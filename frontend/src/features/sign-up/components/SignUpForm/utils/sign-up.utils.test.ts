@@ -8,8 +8,10 @@ const VALID = {
   confirmPassword: "Password123!",
 };
 
-function graphQLError(code: string): CombinedGraphQLErrors {
-  return new CombinedGraphQLErrors({ errors: [{ message: "failed", extensions: { code } }] });
+function graphQLError(code: string, reason?: string): CombinedGraphQLErrors {
+  return new CombinedGraphQLErrors({
+    errors: [{ message: "failed", extensions: { code, ...(reason && { reason }) } }],
+  });
 }
 
 describe("validateSignUp", () => {
@@ -68,7 +70,7 @@ describe("validateSignUp", () => {
 
 describe("toSignUpFailure", () => {
   it("puts a taken email under the email field", () => {
-    expect(toSignUpFailure(graphQLError("CONFLICT"))).toEqual({
+    expect(toSignUpFailure(graphQLError("CONFLICT", "EMAIL_TAKEN"))).toEqual({
       field: "email",
       errorKey: "emailTaken",
     });
@@ -85,5 +87,12 @@ describe("toSignUpFailure", () => {
       errorKey: "unexpected",
     });
     expect(toSignUpFailure(new TypeError("Failed to fetch")).errorKey).toBe("unexpected");
+  });
+
+  it("does not blame the email for a CONFLICT with another reason", () => {
+    expect(toSignUpFailure(graphQLError("CONFLICT"))).toEqual({
+      field: null,
+      errorKey: "unexpected",
+    });
   });
 });

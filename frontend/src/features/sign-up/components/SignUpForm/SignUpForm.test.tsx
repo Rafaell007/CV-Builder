@@ -33,8 +33,10 @@ const SUCCESS = {
   },
 };
 
-function failure(code: string) {
-  return { errors: [new GraphQLError("failed", { extensions: { code } })] };
+function failure(code: string, reason?: string) {
+  return {
+    errors: [new GraphQLError("failed", { extensions: { code, ...(reason && { reason }) } })],
+  };
 }
 
 async function fillForm(
@@ -155,7 +157,7 @@ describe("SignUpForm", () => {
 
   it("shows a taken email under the email field and keeps the values", async () => {
     const { user } = renderWithProviders(<SignUpForm />, {
-      mocks: [signUpMock(failure("CONFLICT"))],
+      mocks: [signUpMock(failure("CONFLICT", "EMAIL_TAKEN"))],
     });
 
     await fillForm(user);
@@ -176,7 +178,7 @@ describe("SignUpForm", () => {
 
   it("removes the taken-email message when the email is changed", async () => {
     const { user } = renderWithProviders(<SignUpForm />, {
-      mocks: [signUpMock(failure("CONFLICT"))],
+      mocks: [signUpMock(failure("CONFLICT", "EMAIL_TAKEN"))],
     });
     await fillForm(user);
     await user.click(submit());
