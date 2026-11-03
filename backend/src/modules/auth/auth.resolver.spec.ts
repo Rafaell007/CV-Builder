@@ -20,6 +20,11 @@ function setup() {
     signIn: jest
       .fn()
       .mockResolvedValue({ user: USER, accessToken: "access", refreshToken: "refresh" }),
+    signUp: jest.fn().mockResolvedValue({
+      user: { ...USER, isVerified: false },
+      accessToken: "access",
+      refreshToken: "refresh",
+    }),
     signOut: jest.fn().mockResolvedValue(undefined),
     refresh: jest.fn().mockResolvedValue({ accessToken: "access-2", refreshToken: "refresh-2" }),
     findSessionUser: jest.fn().mockResolvedValue(USER),
@@ -45,6 +50,30 @@ describe("AuthResolver", () => {
       accessToken: "access",
       refreshToken: "refresh",
     });
+  });
+
+  it("signUp returns the new user and sets both cookies", async () => {
+    const { resolver, authService, cookies, context } = setup();
+    const input = { email: "new@example.com", password: "Password123!" };
+
+    await expect(resolver.signUp(input, context)).resolves.toEqual({ ...USER, isVerified: false });
+
+    expect(authService.signUp).toHaveBeenCalledWith(input);
+    expect(cookies.set).toHaveBeenCalledWith(context.res, {
+      accessToken: "access",
+      refreshToken: "refresh",
+    });
+  });
+
+  it("signUp sets no cookie when the email is taken", async () => {
+    const { resolver, authService, cookies, context } = setup();
+    authService.signUp.mockRejectedValue(new Error("An account with this email already exists"));
+
+    await expect(
+      resolver.signUp({ email: "a@b.co", password: "Password123!" }, context),
+    ).rejects.toThrow();
+
+    expect(cookies.set).not.toHaveBeenCalled();
   });
 
   it("signIn sets no cookie when the credentials are wrong", async () => {

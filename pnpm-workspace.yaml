@@ -10,3 +10,4 @@ allowBuilds:
   prisma: false
   esbuild: false
   "@apollo/protobufjs": false
+  "@swc/core": false

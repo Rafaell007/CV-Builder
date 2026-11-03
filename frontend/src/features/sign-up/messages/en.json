@@ -1,0 +1,33 @@
+{
+  "pageTitle": "Sign up | CV Builder",
+  "title": "Sign up now",
+  "subtitle": "Welcome! Sign up to continue",
+  "tabs": {
+    "label": "Authentication",
+    "signIn": "SIGN IN",
+    "signUp": "SIGN UP"
+  },
+  "email": "Email",
+  "password": "Password",
+  "confirmPassword": "Confirm Password",
+  "showPassword": "Show password",
+  "hidePassword": "Hide password",
+  "showConfirmPassword": "Show confirm password",
+  "hideConfirmPassword": "Hide confirm password",
+  "createAccount": "Create account",
+  "haveAccount": "I have an account",
+  "errors": {
+    "emailRequired": "Email is required",
+    "emailInvalid": "Please enter a valid email address",
+    "passwordRequired": "Password is required",
+    "passwordTooShort": "Password must be at least {min} characters long",
+    "passwordTooLong": "Password must be at most {max} characters long",
+    "passwordWeak": "Password must contain at least one letter and one digit",
+    "confirmRequired": "Confirm Password is required",
+    "confirmMismatch": "Passwords do not match",
+    "emailTaken": "An account with this email already exists",
+    "tooManyRequests": "Too many attempts, try again later",
+    "invalidInput": "Please check the entered values and try again",
+    "unexpected": "Something went wrong. Please try again later"
+  }
+}

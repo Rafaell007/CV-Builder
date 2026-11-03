@@ -21,6 +21,10 @@ type EnvironmentSkill {
   name: String!
 }
 
+input ForgotPasswordInput {
+  email: String!
+}
+
 type Health {
   status: String!
 }
@@ -28,10 +32,13 @@ type Health {
 type Mutation {
   createProject(input: CreateProjectInput!): Project!
   deleteProject(id: ID!): Boolean!
+  forgotPassword(input: ForgotPasswordInput!): Boolean!
   refresh: Boolean!
   resendVerificationCode: Boolean!
+  resetPassword(input: ResetPasswordInput!): Boolean!
   signIn(input: SignInInput!): SessionUser!
   signOut: Boolean!
+  signUp(input: SignUpInput!): SessionUser!
   updateProject(input: UpdateProjectInput!): Project!
   verifyEmail(input: VerifyEmailInput!): SessionUser!
 }
@@ -70,6 +77,11 @@ type Query {
   projects(page: PageInput! = {number: 1, size: 20}, search: String, sort: SortInput): ProjectPage!
 }
 
+input ResetPasswordInput {
+  newPassword: String!
+  token: String!
+}
+
 enum Role {
   ADMIN
   USER
@@ -85,6 +97,11 @@ type SessionUser {
 }
 
 input SignInInput {
+  email: String!
+  password: String!
+}
+
+input SignUpInput {
   email: String!
   password: String!
 }

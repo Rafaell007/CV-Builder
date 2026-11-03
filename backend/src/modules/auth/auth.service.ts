@@ -1,12 +1,16 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { ConflictException, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { randomUUID } from "node:crypto";
 import type { AuthUser } from "../../common/auth";
 import { Clock } from "../../common/clock";
+import { Prisma } from "../../generated/prisma/client";
 import { PrismaService } from "../../prisma/prisma.service";
 import type { SignInInput } from "./dto/sign-in.input";
+import type { SignUpInput } from "./dto/sign-up.input";
 import type { SessionUser } from "./models/session-user";
+import { SESSION_USER_SELECT } from "./models/session-user.select";
 import { hashPassword, verifyPassword } from "./password";
 import { REFRESH_TOKEN_TTL_MS, TokenService } from "./token.service";
+import { VerificationService } from "./verification.service";
 
 export interface SessionTokens {
   accessToken: string;
@@ -22,25 +26,57 @@ export const REFRESH_GRACE_WINDOW_MS = 30 * 1000;
 
 const SESSION_ENDED = "Session ended, sign in again";
 
-export const SESSION_USER_SELECT = {
-  id: true,
-  email: true,
-  role: true,
-  isVerified: true,
-  firstName: true,
-  lastName: true,
-} as const;
+/** `extensions.reason` of the `CONFLICT` error of `signUp`. The frontend shows its own message for it. */
+export const EMAIL_TAKEN_REASON = "EMAIL_TAKEN";
 
 @Injectable()
 export class AuthService {
   // Checked when the email is unknown, so that "no such user" takes as long as "wrong password".
   private unknownUserHash?: Promise<string>;
+  private readonly logger = new Logger(AuthService.name);
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly tokens: TokenService,
     private readonly clock: Clock,
+    private readonly verification: VerificationService,
   ) {}
+
+  /**
+   * Creates an unverified user with the default role, mails the first verification code and opens a session.
+   * The unique index on `email` decides between two parallel requests; the loser gets `CONFLICT`.
+   */
+  async signUp({ email, password }: SignUpInput): Promise<SignedInSession> {
+    const passwordHash = await hashPassword(password);
+
+    let user: SessionUser;
+    try {
+      // `role` and `isVerified` are not passed: the database defaults are `USER` and `false`.
+      user = await this.prisma.user.create({
+        data: { email: email.trim().toLowerCase(), passwordHash },
+        select: SESSION_USER_SELECT,
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+        throw new ConflictException({
+          message: "An account with this email already exists",
+          reason: EMAIL_TAKEN_REASON,
+        });
+      }
+      throw error;
+    }
+
+    try {
+      await this.verification.issueCode(user);
+    } catch (error) {
+      // The account exists, so sign-up still works. The user can ask for a new code on the verification page.
+      this.logger.warn(
+        `Could not send the first verification code to user ${user.id}: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+
+    return { user, ...(await this.issueTokens(user.id, randomUUID())) };
+  }
 
   /** Checks the credentials and opens a session. The error never says which of the two was wrong. */
   async signIn({ email, password }: SignInInput): Promise<SignedInSession> {

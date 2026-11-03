@@ -22,7 +22,7 @@ Run `lint`, `typecheck` and the tests of the app you changed; run `pnpm test:e2e
 
 ## Where things are
 
-- `frontend/src/app/` — routes only; `frontend/src/features/<name>/` — one folder per feature; `frontend/src/shared/` — UI kit, styles, apollo, utils
+- `frontend/src/app/[locale]/` — routes only, every URL starts with the language (`/en/users`); `frontend/src/i18n/` — next-intl wiring; `frontend/src/features/<name>/` — one folder per feature; `frontend/src/shared/` — UI kit, styles, apollo, utils
 - `backend/src/modules/<name>/` — one Nest module per domain; `backend/src/common/` — guards, filters, pagination; `backend/prisma/` — schema, migrations, seed
 - `backend/schema.gql` — generated GraphQL contract; the frontend generates its types from it
 - `e2e/` — Playwright workspace package: `playwright.config.ts` and specs, one folder per area
@@ -33,7 +33,7 @@ Run `lint`, `typecheck` and the tests of the app you changed; run `pnpm test:e2e
 - Frontend components are representational: props in, JSX out. Logic goes into composed hooks and pure typed utils. Styling only with CSS Modules + design tokens.
 - Backend resolvers are thin; services hold business rules, ownership checks and Prisma calls. Inputs validated with class-validator. Authorization on the backend.
 - One responsibility per file; one exported component per file, named like the file.
-- Fractal layout: children live inside the parent; shared code moves to the nearest common ancestor; frontend imports only via a folder's `index.ts`.
+- Fractal layout: children live inside the parent; shared code moves to the nearest common ancestor; frontend imports only via a folder's `index.ts` (exception: `messages/*.json`, imported directly by `src/i18n/loadMessages`).
 - A file with a test is a folder: `X/` holds `X.ts(x)`, `X.test.ts(x)` and `index.ts` (role files by role: `x.utils.ts` → `utils/`, `x.store.ts` → `store/`). Files without a test stay plain. Example: `frontend/src/shared/preferences/`.
 - Each feature folder and non-obvious shared component has a short `README.md`: purpose, exports, where used, `docs/` link. Simple components get none.
 - No `.js` files, no `any`. `process.env` only in `frontend/src/env.ts` (public), `frontend/src/server/env.ts` (server only) and the backend config module (exceptions: `backend/prisma.config.ts`, `backend/prisma/seed.ts`, `frontend/next.config.ts` and `e2e/playwright.config.ts`, scripts and tool configs that run outside the app).
