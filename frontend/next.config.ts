@@ -11,6 +11,9 @@ const nextConfig: NextConfig = {
   agentRules: false,
   cacheComponents: true,
   partialPrefetching: true,
+  // Needed for src/app/global-not-found.tsx: there is no root layout, so unmatched paths need their own page.
+  // https://nextjs.org/docs/app/api-reference/file-conventions/not-found
+  experimental: { globalNotFound: true },
   // The main page after sign-in is the employees list (PLAN D17). Not permanent: browsers would cache it.
   // `/` without a language is sent to `/{locale}` by the proxy first (next-intl), then here.
   redirects: async () => [
