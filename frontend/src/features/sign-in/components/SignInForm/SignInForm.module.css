@@ -1,0 +1,25 @@
+/* Distances between the elements come from Figma, SIGN IN › Form (docs/design-tokens.md › Spacing). */
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 36px;
+  width: 100%;
+}
+
+/* Empty most of the time: takes no space until a message arrives. */
+.serverError {
+  margin: 0;
+  color: var(--color-error);
+  font: var(--text-error);
+  letter-spacing: var(--text-error-ls);
+  text-align: center;
+}
+
+.serverError:empty {
+  display: none;
+}
+
+.submit {
+  margin-top: var(--space-2);
+}
