@@ -39,7 +39,14 @@ export default defineConfig({
         "pnpm --filter @cv-builder/backend e2e:db && pnpm --filter @cv-builder/backend build && pnpm --filter @cv-builder/backend start",
       // GraphQL answers a plain GET with 400, which Playwright counts as ready.
       url: `${BACKEND_URL}/graphql`,
-      env: { PORT: "4100", DATABASE_URL, TEST_DATABASE_URL: DATABASE_URL },
+      // Every spec runs from one IP and most start with a sign-in, so the default limit of 10 calls per minute
+      // (D23) would answer TOO_MANY_REQUESTS. The throttle itself is covered by the backend tests.
+      env: {
+        PORT: "4100",
+        DATABASE_URL,
+        TEST_DATABASE_URL: DATABASE_URL,
+        THROTTLE_LIMIT: "1000",
+      },
       reuseExistingServer: false,
       timeout: SERVER_START_TIMEOUT_MS,
     },
