@@ -11,6 +11,7 @@ Sign-in, sign-out, token refresh, email verification and the current user. Sets 
   - **`@Verified()`:** the guard and `EMAIL_NOT_VERIFIED` are in [common/auth](../../common/auth/README.md).
 - **Password reset (D20, D22, D32):** `forgotPassword(input: { email })` and `resetPassword(input: { token, newPassword })`. Both are `@Public()` and use `GqlThrottlerGuard`. Both return `true`. `PasswordResetService` holds the rules.
   - **`forgotPassword`:** answers `true` for every valid email, also an unknown one, and then sends no mail, so the answer never shows who is registered. For a known email it deletes the older tokens, stores a new one and mails the link. A failed mail is logged (message only, never the token) and does not change the answer.
+  - **Known trade-off:** a new `forgotPassword` request deletes the older links of that user. Anyone who knows an email can therefore end the link the user waits for. `GqlThrottlerGuard` limits how often this can happen.
   - **Token:** 32 random bytes (`crypto.randomBytes`), valid 1 h, single use. Only a keyed hash is stored (`PasswordResetToken.tokenHash`). `createdAt` and `expiresAt` come from `Clock`.
   - **`resetPassword`:** checks the token, then in one transaction marks it used, saves the new password hash, deletes the other tokens of the user and deletes all refresh tokens of the user (D22). Two parallel requests cannot both use one token. It does not sign the user in: the page sends the user to Sign In.
   - **Password rule:** 8 to 128 characters with a letter and a digit, the same as sign-up (D32).
