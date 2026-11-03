@@ -63,3 +63,8 @@ export const Invalid: Story = {
 };
 
 export const Disabled: Story = { args: { defaultValue: "secret1", disabled: true } };
+
+// The eye button keeps the disabled grey, not the invalid red.
+export const DisabledInvalid: Story = {
+  args: { defaultValue: "secret1", disabled: true, error: "Password is incorrect" },
+};
