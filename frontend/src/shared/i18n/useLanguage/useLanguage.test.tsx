@@ -17,6 +17,7 @@ const wrapper = ({ children }: { children: ReactNode }) => (
 
 afterEach(() => {
   replace.mockClear();
+  window.history.replaceState(null, "", "/");
 });
 
 describe("useLanguage", () => {
@@ -33,5 +34,14 @@ describe("useLanguage", () => {
     act(() => result.current.setLanguage("en"));
 
     expect(replace).toHaveBeenCalledWith("/settings", { locale: "en" });
+  });
+
+  it("keeps the query string, so a search or a page number survives the switch", () => {
+    window.history.replaceState(null, "", "/pl/settings?search=ann&page=3");
+    const { result } = renderHook(() => useLanguage(), { wrapper });
+
+    act(() => result.current.setLanguage("en"));
+
+    expect(replace).toHaveBeenCalledWith("/settings?search=ann&page=3", { locale: "en" });
   });
 });
