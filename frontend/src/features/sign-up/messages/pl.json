@@ -1,0 +1,33 @@
+{
+  "pageTitle": "Rejestracja | CV Builder",
+  "title": "Zarejestruj się",
+  "subtitle": "Witaj! Zarejestruj się, aby kontynuować",
+  "tabs": {
+    "label": "Logowanie i rejestracja",
+    "signIn": "ZALOGUJ SIĘ",
+    "signUp": "ZAREJESTRUJ SIĘ"
+  },
+  "email": "E-mail",
+  "password": "Hasło",
+  "confirmPassword": "Potwierdź hasło",
+  "showPassword": "Pokaż hasło",
+  "hidePassword": "Ukryj hasło",
+  "showConfirmPassword": "Pokaż potwierdzenie hasła",
+  "hideConfirmPassword": "Ukryj potwierdzenie hasła",
+  "createAccount": "Utwórz konto",
+  "haveAccount": "Mam już konto",
+  "errors": {
+    "emailRequired": "E-mail jest wymagany",
+    "emailInvalid": "Podaj poprawny adres e-mail",
+    "passwordRequired": "Hasło jest wymagane",
+    "passwordTooShort": "Hasło musi mieć co najmniej {min, plural, one {# znak} few {# znaki} other {# znaków}}",
+    "passwordTooLong": "Hasło może mieć najwyżej {max, plural, one {# znak} few {# znaki} other {# znaków}}",
+    "passwordWeak": "Hasło musi zawierać co najmniej jedną literę i jedną cyfrę",
+    "confirmRequired": "Potwierdzenie hasła jest wymagane",
+    "confirmMismatch": "Hasła nie są takie same",
+    "emailTaken": "Konto z tym adresem e-mail już istnieje",
+    "tooManyRequests": "Zbyt wiele prób, spróbuj ponownie później",
+    "invalidInput": "Sprawdź wpisane dane i spróbuj ponownie",
+    "unexpected": "Coś poszło nie tak. Spróbuj ponownie później"
+  }
+}

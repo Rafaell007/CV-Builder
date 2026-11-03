@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { SignUpPage } from "@/features/sign-up";
 
-export const metadata: Metadata = { title: "Sign up | CV Builder" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("signUp");
+  return { title: t("pageTitle") };
+}
 
 export default SignUpPage;

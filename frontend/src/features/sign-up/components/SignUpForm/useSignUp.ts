@@ -1,16 +1,17 @@
 "use client";
 
 import { useMutation } from "@apollo/client/react";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { MeDocument, SignUpDocument } from "@/shared/graphql";
-import type { SignUpField, SignUpFailure, SignUpValues } from "./sign-up.types";
-import { toSignUpFailure, validateSignUp } from "./utils";
+import { useRouter } from "@/shared/i18n";
+import type { SignUpErrorKey, SignUpField, SignUpFailure, SignUpValues } from "./sign-up.types";
+import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, toSignUpFailure, validateSignUp } from "./utils";
 
 const FIELDS: readonly SignUpField[] = ["email", "password", "confirmPassword"];
 const EMPTY_VALUES: SignUpValues = { email: "", password: "", confirmPassword: "" };
 
-// The new user is signed in but not verified yet; the code is in their mailbox.
+// The new user is signed in but not verified yet; the code is in their mailbox. The router adds the language.
 export const VERIFY_EMAIL_PATH = "/verify-email";
 
 export type SignUpFieldProps = {
@@ -26,6 +27,7 @@ export type SignUpFieldProps = {
  */
 export function useSignUp() {
   const router = useRouter();
+  const t = useTranslations("signUp.errors");
   const [values, setValues] = useState<SignUpValues>(EMPTY_VALUES);
   const [touched, setTouched] = useState<ReadonlySet<SignUpField>>(new Set());
   const [failure, setFailure] = useState<SignUpFailure | null>(null);
@@ -36,14 +38,20 @@ export function useSignUp() {
   // `redirecting` keeps the form locked between the answer and the page change (AC-13).
   const pending = loading || redirecting;
 
+  function translate(key: SignUpErrorKey | undefined): string | undefined {
+    return key === undefined
+      ? undefined
+      : t(key, { min: PASSWORD_MIN_LENGTH, max: PASSWORD_MAX_LENGTH });
+  }
+
   function getFieldProps(field: SignUpField): SignUpFieldProps {
     const clientError = touched.has(field) ? validation[field] : undefined;
     const serverError =
-      field === "email" && failure?.field === "email" ? failure.message : undefined;
+      field === "email" && failure?.field === "email" ? failure.errorKey : undefined;
 
     return {
       value: values[field],
-      error: clientError ?? serverError,
+      error: translate(clientError ?? serverError),
       onChange: (event) => {
         const { value } = event.target;
         setValues((current) => ({ ...current, [field]: value }));
@@ -78,7 +86,7 @@ export function useSignUp() {
   return {
     getFieldProps,
     pending,
-    formError: failure?.field === null ? failure.message : undefined,
+    formError: failure?.field === null ? translate(failure.errorKey) : undefined,
     onSubmit: (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       void submit();

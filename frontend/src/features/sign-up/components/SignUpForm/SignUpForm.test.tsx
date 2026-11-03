@@ -3,11 +3,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SignUpDocument } from "@/shared/graphql";
 import { renderWithProviders, screen, waitFor } from "@/shared/testing";
 import { SignUpForm } from "./index";
-import { SIGN_UP_MESSAGES } from "./utils";
 
 const push = vi.fn();
-vi.mock("next/navigation", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("next/navigation")>()),
+// The real router needs the Next.js app router, which tests do not have. It adds the language itself.
+vi.mock("@/shared/i18n", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/shared/i18n")>()),
   useRouter: () => ({ push }),
 }));
 
@@ -63,7 +63,22 @@ describe("SignUpForm", () => {
     expect(submit()).toBeEnabled();
     expect(screen.getByRole("link", { name: "I have an account" })).toHaveAttribute(
       "href",
-      "/sign-in",
+      "/en/sign-in",
+    );
+  });
+
+  it("shows the form and its messages in Polish", async () => {
+    const { user } = renderWithProviders(<SignUpForm />, { locale: "pl" });
+
+    await user.type(screen.getByLabelText("Hasło"), "Pass123");
+    await user.click(screen.getByRole("button", { name: "Utwórz konto" }));
+
+    expect(screen.getByText("E-mail jest wymagany")).toBeInTheDocument();
+    expect(screen.getByText("Hasło musi mieć co najmniej 8 znaków")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Pokaż potwierdzenie hasła" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Mam już konto" })).toHaveAttribute(
+      "href",
+      "/pl/sign-in",
     );
   });
 
@@ -72,9 +87,9 @@ describe("SignUpForm", () => {
 
     await user.click(submit());
 
-    expect(screen.getByText(SIGN_UP_MESSAGES.emailRequired)).toBeInTheDocument();
-    expect(screen.getByText(SIGN_UP_MESSAGES.passwordRequired)).toBeInTheDocument();
-    expect(screen.getByText(SIGN_UP_MESSAGES.confirmRequired)).toBeInTheDocument();
+    expect(screen.getByText("Email is required")).toBeInTheDocument();
+    expect(screen.getByText("Password is required")).toBeInTheDocument();
+    expect(screen.getByText("Confirm Password is required")).toBeInTheDocument();
     expect(push).not.toHaveBeenCalled();
   });
 
@@ -83,11 +98,11 @@ describe("SignUpForm", () => {
 
     await user.type(screen.getByLabelText("Email"), "not-an-email");
     await user.tab();
-    expect(screen.getByText(SIGN_UP_MESSAGES.emailInvalid)).toBeInTheDocument();
+    expect(screen.getByText("Please enter a valid email address")).toBeInTheDocument();
 
     await user.clear(screen.getByLabelText("Email"));
     await user.type(screen.getByLabelText("Email"), EMAIL);
-    expect(screen.queryByText(SIGN_UP_MESSAGES.emailInvalid)).not.toBeInTheDocument();
+    expect(screen.queryByText("Please enter a valid email address")).not.toBeInTheDocument();
   });
 
   it("refuses a short password and a confirmation that does not match", async () => {
@@ -96,8 +111,8 @@ describe("SignUpForm", () => {
     await fillForm(user, { password: "Pass123", confirm: "Pass1234" });
     await user.click(submit());
 
-    expect(screen.getByText(SIGN_UP_MESSAGES.passwordTooShort)).toBeInTheDocument();
-    expect(screen.getByText(SIGN_UP_MESSAGES.confirmMismatch)).toBeInTheDocument();
+    expect(screen.getByText("Password must be at least 8 characters long")).toBeInTheDocument();
+    expect(screen.getByText("Passwords do not match")).toBeInTheDocument();
   });
 
   it("shows and hides each password", async () => {
@@ -146,8 +161,12 @@ describe("SignUpForm", () => {
     await fillForm(user);
     await user.click(submit());
 
-    expect(await screen.findByText(SIGN_UP_MESSAGES.emailTaken)).toBeInTheDocument();
-    expect(screen.getByLabelText("Email")).toHaveAccessibleDescription(SIGN_UP_MESSAGES.emailTaken);
+    expect(
+      await screen.findByText("An account with this email already exists"),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Email")).toHaveAccessibleDescription(
+      "An account with this email already exists",
+    );
     expect(screen.getByLabelText("Email")).toHaveValue(EMAIL);
     expect(screen.getByLabelText("Password")).toHaveValue(PASSWORD);
     expect(screen.getByLabelText("Confirm Password")).toHaveValue(PASSWORD);
@@ -161,11 +180,11 @@ describe("SignUpForm", () => {
     });
     await fillForm(user);
     await user.click(submit());
-    await screen.findByText(SIGN_UP_MESSAGES.emailTaken);
+    await screen.findByText("An account with this email already exists");
 
     await user.type(screen.getByLabelText("Email"), "x");
 
-    expect(screen.queryByText(SIGN_UP_MESSAGES.emailTaken)).not.toBeInTheDocument();
+    expect(screen.queryByText("An account with this email already exists")).not.toBeInTheDocument();
   });
 
   it("shows a friendly message for a server error and keeps the values", async () => {
@@ -176,7 +195,9 @@ describe("SignUpForm", () => {
     await fillForm(user);
     await user.click(submit());
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(SIGN_UP_MESSAGES.unexpected);
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Something went wrong. Please try again later",
+    );
     expect(screen.getByLabelText("Email")).toHaveValue(EMAIL);
     expect(push).not.toHaveBeenCalled();
   });
@@ -194,7 +215,9 @@ describe("SignUpForm", () => {
     await fillForm(user);
     await user.click(submit());
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(SIGN_UP_MESSAGES.unexpected);
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Something went wrong. Please try again later",
+    );
     expect(screen.getByLabelText("Password")).toHaveValue(PASSWORD);
   });
 
@@ -206,6 +229,8 @@ describe("SignUpForm", () => {
     await fillForm(user);
     await user.click(submit());
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(SIGN_UP_MESSAGES.tooManyRequests);
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Too many attempts, try again later",
+    );
   });
 });
