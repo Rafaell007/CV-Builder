@@ -87,8 +87,9 @@ describe("ForgotPasswordForm", () => {
 
   it("is busy while the request runs and sends it only once", async () => {
     // One mock only: a second request would find no mock and show an error.
+    // The delay must outlast the two clicks below, which are slow on a loaded machine.
     const { user } = renderWithProviders(<ForgotPasswordForm />, {
-      mocks: [forgotPasswordMock(SUCCESS, 50)],
+      mocks: [forgotPasswordMock(SUCCESS, 500)],
     });
 
     await user.type(screen.getByLabelText("Email"), EMAIL);

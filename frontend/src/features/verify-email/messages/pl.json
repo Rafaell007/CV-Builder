@@ -1,0 +1,26 @@
+{
+  "pageTitle": "Weryfikacja e-maila | CV Builder",
+  "title": "Weryfikacja e-maila",
+  "subtitle": "Wpisz kod weryfikacyjny, który wysłaliśmy na Twój adres e-mail.",
+  "code": "Kod weryfikacyjny",
+  "digit": "Cyfra {position} z {length}",
+  "confirm": "Potwierdź",
+  "later": "Później",
+  "errors": {
+    "codeRequired": "Kod weryfikacyjny jest wymagany",
+    "codeIncomplete": "Wpisz poprawny 6-cyfrowy kod",
+    "codeInvalid": "Nieprawidłowy kod weryfikacyjny",
+    "codeExpired": "Kod weryfikacyjny wygasł",
+    "codeUsed": "Kod weryfikacyjny został już użyty",
+    "tooManyAttempts": "Zbyt wiele błędnych kodów. Poproś o nowy kod",
+    "tooManyRequests": "Zbyt wiele prób, spróbuj ponownie później",
+    "unexpected": "Coś poszło nie tak. Spróbuj ponownie później"
+  },
+  "resend": {
+    "button": "Wyślij kod ponownie",
+    "wait": "Wyślij kod ponownie za {seconds} s",
+    "sent": "Kod weryfikacyjny został wysłany",
+    "cooldown": "Poczekaj przed poproszeniem o kolejny kod",
+    "failed": "Coś poszło nie tak. Spróbuj ponownie później"
+  }
+}

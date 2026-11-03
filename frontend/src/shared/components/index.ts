@@ -6,6 +6,7 @@ export * from "./DataTable";
 export * from "./IconButton";
 export * from "./icons";
 export * from "./Menu";
+export * from "./OtpField";
 export * from "./PageState";
 export * from "./Pagination";
 export * from "./PasswordField";

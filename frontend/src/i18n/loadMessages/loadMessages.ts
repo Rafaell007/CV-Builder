@@ -4,6 +4,7 @@ import type health from "@/features/health/messages/en.json";
 import type resetPassword from "@/features/reset-password/messages/en.json";
 import type signIn from "@/features/sign-in/messages/en.json";
 import type signUp from "@/features/sign-up/messages/en.json";
+import type verifyEmail from "@/features/verify-email/messages/en.json";
 import type common from "@/shared/i18n/messages/en.json";
 
 // One namespace per messages folder. A feature that gets a `messages/` folder is added here (PLAN §4).
@@ -15,6 +16,7 @@ export type Messages = {
   resetPassword: typeof resetPassword;
   signIn: typeof signIn;
   signUp: typeof signUp;
+  verifyEmail: typeof verifyEmail;
 };
 
 // One dynamic import per language, so a request loads only the messages of its own language.
@@ -27,6 +29,7 @@ const loaders: Record<Locale, () => Promise<Messages>> = {
     resetPassword: (await import("@/features/reset-password/messages/en.json")).default,
     signIn: (await import("@/features/sign-in/messages/en.json")).default,
     signUp: (await import("@/features/sign-up/messages/en.json")).default,
+    verifyEmail: (await import("@/features/verify-email/messages/en.json")).default,
   }),
   pl: async () => ({
     common: (await import("@/shared/i18n/messages/pl.json")).default,
@@ -35,6 +38,7 @@ const loaders: Record<Locale, () => Promise<Messages>> = {
     resetPassword: (await import("@/features/reset-password/messages/pl.json")).default,
     signIn: (await import("@/features/sign-in/messages/pl.json")).default,
     signUp: (await import("@/features/sign-up/messages/pl.json")).default,
+    verifyEmail: (await import("@/features/verify-email/messages/pl.json")).default,
   }),
 };
 
