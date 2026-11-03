@@ -4,6 +4,7 @@ The shared frame of TextField, PasswordField and Textarea: the bordered box, the
 
 - `Field`: renders the box around its children (the control, plus e.g. the password toggle), a Radix `Label` and the text below. The error replaces the helper text.
 - `useFieldIds`: ids for the label, helper and error, and `controlProps` (`id`, `aria-invalid`, `aria-describedby`) to spread onto the control.
+- `fieldInputClassName`: the shared look of the control itself (value text, disabled colour, autofill). Put it on the `<input>` / `<textarea>`.
 
 States are CSS only, read from the control: focus, filled, `aria-invalid`, `disabled`. "Filled" uses `:placeholder-shown`, so **the control must have `placeholder=" "`**; the label plays the placeholder's role.
 

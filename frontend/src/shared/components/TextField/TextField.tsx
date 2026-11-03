@@ -1,6 +1,5 @@
 import type { ComponentProps } from "react";
-import { Field, useFieldIds } from "../Field";
-import styles from "./TextField.module.css";
+import { Field, fieldInputClassName, useFieldIds } from "../Field";
 
 // Normal <input> props (incl. `ref`, so React Hook Form's register works), minus the placeholder:
 // the floating label takes its place (Figma), and Field needs placeholder=" " to know when the field is filled.
@@ -35,7 +34,13 @@ export function TextField({
       error={error}
       className={className}
     >
-      <input {...props} {...controlProps} type={type} placeholder=" " className={styles.input} />
+      <input
+        {...props}
+        {...controlProps}
+        type={type}
+        placeholder=" "
+        className={fieldInputClassName}
+      />
     </Field>
   );
 }
