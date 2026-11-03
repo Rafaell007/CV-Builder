@@ -1,0 +1,123 @@
+.page {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+}
+
+.form {
+  display: flex;
+  width: 100%;
+  max-width: 400px;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.title {
+  margin: 0;
+  font: var(--text-title);
+  letter-spacing: var(--text-title-ls);
+  text-align: center;
+}
+
+.subtitle {
+  margin: 0;
+  font: var(--text-body);
+  letter-spacing: var(--text-body-ls);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-6);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  font: var(--text-button);
+  letter-spacing: var(--text-button-ls);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primary {
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+  box-shadow: var(--shadow-button);
+}
+
+.primary:active:not(:disabled) {
+  box-shadow: var(--shadow-button-active);
+}
+
+.primary:disabled {
+  border-color: var(--color-disabled-bg);
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.secondary {
+  background: transparent;
+  /* Red text has 2.5:1 contrast on the dark background; the red border keeps the look. */
+  color: var(--color-text);
+}
+
+.secondary:hover {
+  background: var(--color-surface);
+}
+
+.primary:focus-visible,
+.secondary:focus-visible,
+.link:focus-visible {
+  outline: 2px solid var(--color-input-border-focus);
+  outline-offset: 2px;
+}
+
+.resend {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.link {
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: var(--text-button);
+  letter-spacing: var(--text-button-ls);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link:disabled {
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+}
+
+.statusSuccess,
+.statusError {
+  margin: 0;
+  font: var(--text-caption);
+  letter-spacing: var(--text-caption-ls);
+}
+
+.statusSuccess {
+  color: var(--color-text-secondary);
+}
+
+.statusError {
+  color: var(--color-error);
+}

@@ -1,8 +1,5 @@
-// Placeholder (PLAN §6); the real page comes with its own step.
+import { VerifyEmail } from "@/features/verification";
+
 export default function VerifyEmailPage() {
-  return (
-    <main>
-      <h1>Verify email</h1>
-    </main>
-  );
+  return <VerifyEmail />;
 }
