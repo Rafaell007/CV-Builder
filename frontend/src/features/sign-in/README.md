@@ -9,4 +9,5 @@ The `/sign-in` page (PLAN S3.4, KAN-87): tabs, welcome text and the email + pass
 - The mutation is named `SignIn`, so the session link never tries to refresh the session for it ([session](../../shared/session/README.md)).
 - Texts: `messages/` (`signIn` namespace, `en` and `pl`).
 - Used by: `app/[locale]/(auth)/sign-in/page.tsx`. A signed-in user never sees the page: the proxy redirects to `/users`.
+- To do (from KAN-92): after a good password reset, the reset-password page redirects here, but this page shows no "password changed" message. Add one when this page is next picked up (docs AC-22 of the reset password page).
 - Docs: [docs/pages/02-sign-in-page.md](../../../../docs/pages/02-sign-in-page.md). E2E: `e2e/auth/sign-in.spec.ts`.
