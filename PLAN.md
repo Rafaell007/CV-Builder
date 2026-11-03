@@ -491,7 +491,7 @@ Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE 
 - [ ] **S5.2 Positions** — AC per positions.
 - [ ] **S5.3 Skills catalog** — with `skillCategories`; type from category. AC per skills-admin.
 - [ ] **S5.4 Languages catalog** — ISO unique. AC per languages-admin.
-- [ ] **S5.5 Projects** — with `projectRoles`; date rules; environment as skill tags; search name/domain; delete blocked when used in a CV; date change blocked when CV projects would fall outside (D25). AC per projects.
+- [ ] **S5.5 Projects** — with `projectRoles`; date rules; environment as skill tags; search name/domain; delete blocked when used in a CV; date change blocked when CV projects would fall outside (D25). AC per projects. BE done (KAN-101, S5.5a), FE pending.
 
 ### Phase 6 — Users
 
