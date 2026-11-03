@@ -189,7 +189,8 @@ Predictions for KAN-77 (2026-11-03): not drawn in Figma, chosen by us; fix here 
 
 - Focus border: text input #626262, password and textarea #2E2E2E in light, as drawn (each component follows Figma).
 - Keyboard focus on buttons and icon buttons: 2px outline #626262 / #F5F5F7, offset 2px, only on `:focus-visible`.
-- Button loading: disabled colours, label kept, 16px spinner in the text colour.
+- Button loading: disabled colours, label kept, 16px spinner (2px stroke) in the text colour, 8px before the label.
+- Primary button shadow only in the default state (the screens draw only that state; DS hover/active have none).
 - Password hidden-state icon: Material "visibility-off" (the 16×16 Figma glyph is not identified).
 - Disabled input value: 16px like every other value (Figma shows 14px in one sample).
 - Button width: `min-width: 160px` with 30px side inset. The SIGN IN button (50px inset at 160px) comes out the same; ghost keeps 30px, not 28px.

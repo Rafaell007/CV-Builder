@@ -1,2 +1,3 @@
 // Public entry for components shared across unrelated features.
-export {};
+export * from "./Button";
+export * from "./icons";
