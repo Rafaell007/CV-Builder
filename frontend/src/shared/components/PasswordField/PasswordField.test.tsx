@@ -17,6 +17,16 @@ describe("PasswordField", () => {
     expect(screen.getByRole("button", { name: "Show password" })).toBeInTheDocument();
   });
 
+  it("gives the input and the eye button different ids, and the button controls the input", () => {
+    renderPasswordField();
+
+    const input = screen.getByLabelText("Password");
+    const button = screen.getByRole("button", { name: "Show password" });
+
+    expect(button.id).not.toBe(input.id);
+    expect(button).toHaveAttribute("aria-controls", input.id);
+  });
+
   it("shows the value with the eye button and returns focus to the input", async () => {
     const { user } = renderPasswordField();
     const input = screen.getByLabelText("Password");

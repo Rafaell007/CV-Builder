@@ -2,6 +2,7 @@ import type { Locale } from "next-intl";
 import type forgotPassword from "@/features/forgot-password/messages/en.json";
 import type health from "@/features/health/messages/en.json";
 import type resetPassword from "@/features/reset-password/messages/en.json";
+import type signIn from "@/features/sign-in/messages/en.json";
 import type signUp from "@/features/sign-up/messages/en.json";
 import type common from "@/shared/i18n/messages/en.json";
 
@@ -12,6 +13,7 @@ export type Messages = {
   forgotPassword: typeof forgotPassword;
   health: typeof health;
   resetPassword: typeof resetPassword;
+  signIn: typeof signIn;
   signUp: typeof signUp;
 };
 
@@ -23,6 +25,7 @@ const loaders: Record<Locale, () => Promise<Messages>> = {
     forgotPassword: (await import("@/features/forgot-password/messages/en.json")).default,
     health: (await import("@/features/health/messages/en.json")).default,
     resetPassword: (await import("@/features/reset-password/messages/en.json")).default,
+    signIn: (await import("@/features/sign-in/messages/en.json")).default,
     signUp: (await import("@/features/sign-up/messages/en.json")).default,
   }),
   pl: async () => ({
@@ -30,6 +33,7 @@ const loaders: Record<Locale, () => Promise<Messages>> = {
     forgotPassword: (await import("@/features/forgot-password/messages/pl.json")).default,
     health: (await import("@/features/health/messages/pl.json")).default,
     resetPassword: (await import("@/features/reset-password/messages/pl.json")).default,
+    signIn: (await import("@/features/sign-in/messages/pl.json")).default,
     signUp: (await import("@/features/sign-up/messages/pl.json")).default,
   }),
 };
