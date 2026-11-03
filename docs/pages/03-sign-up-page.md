@@ -144,12 +144,13 @@ Requirements:
 Validation:
 
 - Field is required
-- Password must contain at least 6 characters
+- Password must contain at least 8 characters, with at least one letter and one digit (PLAN D32)
 - Password must satisfy the password policy defined by the application
 Example validation messages:
 
 - `Password is required`
-- `Password must be at least 6 characters long`
+- `Password must be at least 8 characters long`
+- `Password must contain at least one letter and one digit`
 
 ---
 
@@ -376,7 +377,7 @@ The user must receive appropriate visual feedback for each state.
 | AC-3 | Sign Up tab is active by default |
 | AC-4 | Sign In tab navigates to the Sign In page |
 | AC-5 | Email field accepts valid email addresses |
-| AC-6 | Password must contain at least 6 characters |
+| AC-6 | Password must contain at least 8 characters, with at least one letter and one digit |
 | AC-7 | Confirm Password must match Password |
 | AC-8 | Password visibility toggle functions correctly |
 | AC-9 | Validation messages are displayed for invalid input |

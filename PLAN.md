@@ -161,6 +161,7 @@ Same stack and setup order as the other intern team (D2).
 | D29 | 2026-10-28 | Steps are tagged **Must / Should / Could** (§9); Could steps are dropped first when time runs out | Fixed deadline |
 | D30 | 2026-10-28 | Demo runs locally (Docker + seed). Deploy stays optional | Free-tier cold starts (~50 s) and upload limits are demo risks |
 | D31 | 2026-10-28 | Integration branch renamed `developement` → `development` | Typo would spread into CI, README and deploy settings |
+| D32 | 2026-11-03 | Password rule at sign-up: 8 to 128 characters with at least one letter and one digit. Sign-in keeps 6 to 128, so older and seed accounts still work. Reset and change password (S3.8, S4.4) use the sign-up rule | Sign-up page "password policy defined by the application" (AC-6 said only 6); Rafal asked for a stricter rule |
 
 ### 2.4 Open decisions
 
@@ -352,7 +353,7 @@ Checked against `docs/pages/10` to `27` in S2.1a. Conventions:
 
 | Model | Fields | Rules |
 |---|---|---|
-| User | id, email unique (≤ 255), passwordHash, role `ADMIN`/`USER`, isVerified, firstName? (≤ 100), lastName? (≤ 100), departmentId?, positionId?, createdAt, updatedAt | delete cascades (D13). Sign-up and admin create take only email + password (≥ 6 characters); names, department and position are required by the profile update, not by the database |
+| User | id, email unique (≤ 255), passwordHash, role `ADMIN`/`USER`, isVerified, firstName? (≤ 100), lastName? (≤ 100), departmentId?, positionId?, createdAt, updatedAt | delete cascades (D13). Sign-up takes only email + password (8 to 128 characters with a letter and a digit, D32); admin create takes email + password too; names, department and position are required by the profile update, not by the database |
 | Avatar | userId (PK), data (bytes), mimeType, updatedAt | ≤ 5 MB, PNG/JPG/JPEG/GIF (D11) |
 | Department · Position | id, name unique (≤ 100), createdAt, updatedAt | delete blocked when used |
 | SkillCategory | id, name unique (≤ 100), type (short text), createdAt, updatedAt | seeded; a skill's type comes from its category and is not stored on `Skill` (page 17); delete blocked while it has skills |
