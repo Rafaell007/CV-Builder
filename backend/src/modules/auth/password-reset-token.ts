@@ -1,5 +1,5 @@
 import { createHmac, randomBytes } from "node:crypto";
-import { PASSWORD_RESET_VALID_HOURS } from "../mail/templates/password-reset.template";
+import { PASSWORD_RESET_VALID_HOURS } from "../mail";
 
 /** How long a reset link works (D20). The mail text names the same time. */
 export const PASSWORD_RESET_TOKEN_TTL_MS = PASSWORD_RESET_VALID_HOURS * 60 * 60 * 1000;
