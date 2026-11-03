@@ -54,6 +54,11 @@ async function rejection(call: Promise<unknown>): Promise<unknown> {
   throw new Error("The call did not fail");
 }
 
+/** What Prisma throws when update or delete finds no record. */
+function missingRecordError(): Error {
+  return Object.assign(new Error("Record not found"), { code: "P2025" });
+}
+
 const service = new CvsService(prisma as unknown as PrismaService);
 
 beforeEach(() => {
@@ -270,6 +275,13 @@ describe("CvsService.update", () => {
     expect(await rejection(service.update(USER, input))).toBeInstanceOf(NotFoundException);
     expect(prisma.cv.update).not.toHaveBeenCalled();
   });
+
+  it("answers NOT_FOUND when the CV is deleted after the access check", async () => {
+    prisma.cv.findUnique.mockResolvedValue(storedCv());
+    prisma.cv.update.mockRejectedValue(missingRecordError());
+
+    expect(await rejection(service.update(USER, input))).toBeInstanceOf(NotFoundException);
+  });
 });
 
 describe("CvsService.delete", () => {
@@ -298,5 +310,20 @@ describe("CvsService.delete", () => {
 
     expect(await rejection(service.delete(USER, "cv-1"))).toBeInstanceOf(NotFoundException);
     expect(prisma.cv.delete).not.toHaveBeenCalled();
+  });
+
+  it("answers NOT_FOUND when the CV is deleted after the access check", async () => {
+    prisma.cv.findUnique.mockResolvedValue(storedCv());
+    prisma.cv.delete.mockRejectedValue(missingRecordError());
+
+    expect(await rejection(service.delete(USER, "cv-1"))).toBeInstanceOf(NotFoundException);
+  });
+
+  it("passes on other database errors", async () => {
+    const failure = new Error("connection lost");
+    prisma.cv.findUnique.mockResolvedValue(storedCv());
+    prisma.cv.delete.mockRejectedValue(failure);
+
+    expect(await rejection(service.delete(USER, "cv-1"))).toBe(failure);
   });
 });

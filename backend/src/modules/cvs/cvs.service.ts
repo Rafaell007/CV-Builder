@@ -74,12 +74,18 @@ export class CvsService {
 
   async update(user: AuthUser, { id, ...data }: UpdateCvInput): Promise<Cv> {
     await this.findAccessible(user, id);
-    return toCv(await this.prisma.cv.update({ where: { id }, data, ...CV_WITH_OWNER }));
+    return toCv(
+      await this.prisma.cv
+        .update({ where: { id }, data, ...CV_WITH_OWNER })
+        .catch(rethrowMissingCv),
+    );
   }
 
   async delete(user: AuthUser, id: string): Promise<Cv> {
     await this.findAccessible(user, id);
-    return toCv(await this.prisma.cv.delete({ where: { id }, ...CV_WITH_OWNER }));
+    return toCv(
+      await this.prisma.cv.delete({ where: { id }, ...CV_WITH_OWNER }).catch(rethrowMissingCv),
+    );
   }
 
   /**
@@ -99,6 +105,17 @@ export class CvsService {
 function searchConditions(search: string, isAdmin: boolean): Prisma.CvWhereInput[] {
   const contains = { contains: search, mode: "insensitive" as const };
   return isAdmin ? [{ name: contains }, { user: { email: contains } }] : [{ name: contains }];
+}
+
+/**
+ * Another request can delete the CV between the access check and the write. Prisma then throws
+ * P2025 (record not found). The user gets NOT_FOUND, not a server error.
+ */
+function rethrowMissingCv(error: unknown): never {
+  if (error instanceof Error && "code" in error && error.code === "P2025") {
+    throw new NotFoundException("CV not found");
+  }
+  throw error;
 }
 
 function forbiddenCv(): ForbiddenException {
