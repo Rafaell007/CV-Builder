@@ -1,6 +1,7 @@
 import { Field, ID, InputType } from "@nestjs/graphql";
 import { IsNotEmpty, IsOptional, IsString, IsUUID, MaxLength } from "class-validator";
-import { Trim } from "./cv-fields";
+import { Trim } from "../../../common/validation";
+import { MAX_DESCRIPTION_LENGTH } from "./cv-fields";
 
 /** Checked again on the server, because the checks in the browser are not a security measure (cvs page AC). */
 @InputType()
@@ -23,6 +24,9 @@ export class CreateCvInput {
   @Trim()
   @IsString()
   @IsNotEmpty({ message: "Description is required" })
+  @MaxLength(MAX_DESCRIPTION_LENGTH, {
+    message: `Description must not exceed ${MAX_DESCRIPTION_LENGTH} characters`,
+  })
   description!: string;
 
   /** Admins only: the owner of the new CV. Without it, the CV belongs to the signed-in user. */

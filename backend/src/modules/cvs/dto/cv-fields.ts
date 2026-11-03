@@ -1,5 +1,2 @@
-import { Transform } from "class-transformer";
-
-/** Trims text input, so a name of only spaces counts as empty. */
-export const Trim = (): PropertyDecorator =>
-  Transform(({ value }: { value: unknown }) => (typeof value === "string" ? value.trim() : value));
+/** Same cap as the description of a project. The database column has no limit, so the API sets one. */
+export const MAX_DESCRIPTION_LENGTH = 2000;
