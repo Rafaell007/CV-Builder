@@ -8,21 +8,9 @@ import type { UpdateProjectInput } from "./dto/update-project.input";
 import type { Project } from "./models/project";
 import type { ProjectPage } from "./models/project-page";
 import { normalizeProjectDates } from "./project-dates";
+import { toProject, WITH_ENVIRONMENT } from "./project-environment";
 
 const SORT_FIELDS = ["name", "startDate", "endDate"] as const;
-
-const WITH_ENVIRONMENT = {
-  skills: {
-    select: { skill: { select: { id: true, name: true } } },
-    orderBy: { skill: { name: "asc" } },
-  },
-} satisfies Prisma.ProjectInclude;
-
-type ProjectRow = Prisma.ProjectGetPayload<{ include: typeof WITH_ENVIRONMENT }>;
-
-function toProject({ skills, ...project }: ProjectRow): Project {
-  return { ...project, environment: skills.map(({ skill }) => skill) };
-}
 
 function countLabel(count: number): string {
   return `${count} ${count === 1 ? "CV" : "CVs"}`;
