@@ -1,0 +1,11 @@
+# Named SignIn: the session link never refreshes the session for it (shared/session).
+mutation SignIn($input: SignInInput!) {
+  signIn(input: $input) {
+    id
+    email
+    firstName
+    lastName
+    role
+    isVerified
+  }
+}
