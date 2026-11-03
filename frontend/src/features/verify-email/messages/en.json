@@ -1,0 +1,26 @@
+{
+  "pageTitle": "Email verification | CV Builder",
+  "title": "Email verification",
+  "subtitle": "Enter the verification code we sent to your email.",
+  "code": "Verification code",
+  "digit": "Digit {position} of {length}",
+  "confirm": "Confirm",
+  "later": "Later",
+  "errors": {
+    "codeRequired": "Verification code is required",
+    "codeIncomplete": "Please enter a valid 6-digit code",
+    "codeInvalid": "Invalid verification code",
+    "codeExpired": "Verification code has expired",
+    "codeUsed": "Verification code has already been used",
+    "tooManyAttempts": "Too many wrong codes. Request a new code",
+    "tooManyRequests": "Too many attempts, try again later",
+    "unexpected": "Something went wrong. Please try again later"
+  },
+  "resend": {
+    "button": "Resend code",
+    "wait": "Resend code in {seconds} s",
+    "sent": "Verification code sent",
+    "cooldown": "Please wait before requesting another code",
+    "failed": "Something went wrong. Please try again later"
+  }
+}
