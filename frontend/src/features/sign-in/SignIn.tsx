@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { AuthTabs } from "./components/AuthTabs";
+import { AuthTabs } from "@/shared/components";
 import { SignInForm } from "./components/SignInForm";
 import styles from "./SignIn.module.css";
 
@@ -9,12 +9,15 @@ export function SignIn() {
 
   return (
     <main className={styles.page}>
-      <div className={styles.card}>
-        <AuthTabs active="sign-in" />
-        <header className={styles.header}>
-          <h1 className={styles.title}>{t("title")}</h1>
-          <p className={styles.subtitle}>{t("subtitle")}</p>
-        </header>
+      <AuthTabs
+        active="sign-in"
+        label={t("tabs.label")}
+        signInLabel={t("tabs.signIn")}
+        signUpLabel={t("tabs.signUp")}
+      />
+      <div className={styles.content}>
+        <h1 className={styles.title}>{t("title")}</h1>
+        <p className={styles.subtitle}>{t("subtitle")}</p>
         <SignInForm />
       </div>
     </main>

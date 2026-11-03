@@ -1,8 +1,8 @@
 {
   "tabs": {
     "label": "Authentication",
-    "signIn": "Sign in",
-    "signUp": "Sign up"
+    "signIn": "SIGN IN",
+    "signUp": "SIGN UP"
   },
   "title": "Welcome back",
   "subtitle": "Hello again! Sign in to continue",

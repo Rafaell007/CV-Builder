@@ -162,6 +162,7 @@ Same stack and setup order as the other intern team (D2).
 | D30 | 2026-10-28 | Demo runs locally (Docker + seed). Deploy stays optional | Free-tier cold starts (~50 s) and upload limits are demo risks |
 | D31 | 2026-10-28 | Integration branch renamed `developement` → `development` | Typo would spread into CI, README and deploy settings |
 | D32 | 2026-11-03 | Language in the URL: every route lives under `app/[locale]/` (`/en/users`, `/pl/users`), next-intl `localePrefix: "always"`. The proxy sends a path without a language to the one saved in the `locale` cookie (1 year), else the browser language (Accept-Language) if supported, else `en`; visiting a language saves it. Pages read the locale with `next/root-params` and are prerendered per language | next-intl default and the documented way to keep static rendering with Cache Components; reading the cookie on the server would make every route dynamic (D5) ([routing](https://next-intl.dev/docs/routing/configuration), [root params](https://next-intl.dev/blog/nextjs-root-params)) |
+| D33 | 2026-11-03 | Password rule at sign-up: 8 to 128 characters with at least one letter and one digit. Sign-in keeps 6 to 128, so older and seed accounts still work. Reset and change password (S3.8, S4.4) use the sign-up rule | Sign-up page "password policy defined by the application" (AC-6 said only 6); a stricter rule was agreed in the PR review |
 
 ### 2.4 Open decisions
 
@@ -357,7 +358,7 @@ Checked against `docs/pages/10` to `27` in S2.1a. Conventions:
 
 | Model | Fields | Rules |
 |---|---|---|
-| User | id, email unique (≤ 255), passwordHash, role `ADMIN`/`USER`, isVerified, firstName? (≤ 100), lastName? (≤ 100), departmentId?, positionId?, createdAt, updatedAt | delete cascades (D13). Sign-up and admin create take only email + password (≥ 6 characters); names, department and position are required by the profile update, not by the database |
+| User | id, email unique (≤ 255), passwordHash, role `ADMIN`/`USER`, isVerified, firstName? (≤ 100), lastName? (≤ 100), departmentId?, positionId?, createdAt, updatedAt | delete cascades (D13). Sign-up takes only email + password (8 to 128 characters with a letter and a digit, D33); admin create takes email + password too; names, department and position are required by the profile update, not by the database |
 | Avatar | userId (PK), data (bytes), mimeType, updatedAt | ≤ 5 MB, PNG/JPG/JPEG/GIF (D11) |
 | Department · Position | id, name unique (≤ 100), createdAt, updatedAt | delete blocked when used |
 | SkillCategory | id, name unique (≤ 100), type (short text), createdAt, updatedAt | seeded; a skill's type comes from its category and is not stored on `Skill` (page 17); delete blocked while it has skills |
@@ -454,6 +455,10 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
 
 - [ ] **S1.1 Form controls** — Button, IconButton, TextField, PasswordField (toggle), Textarea, Select, MultiSelect, DatePicker, OtpField, SearchField (debounced); RHF + Zod helpers and server field-error mapping. Stories + tests.
 - [ ] **S1.2 Data display** — DataTable (columns, sort indicator, row actions slot), Pagination, Menu (one open, Escape/outside close), Tabs, Breadcrumbs, Avatar, PageState (loading skeleton, empty, no results, error + retry). Stories + tests.
+  - **Done (S1.2a, KAN-79):** `DataTable` and `Pagination` in `frontend/src/shared/components/` (README in each folder). Both are controlled, so the page owns `search`, `sort` and `page`; sort uses the backend `SortInput` shape and `Pagination` uses page size 10 (D19). Story `Shared/DataTable → Sample` shows mocked data that sorts, searches, pages and shows row actions. Menu, Tabs, Breadcrumbs, Avatar and PageState are still open (S1.2b).
+  - **Open items (S1.2a):** (1) both components use English default texts; the first list page must pass translated `labels` (S0.6). (2) A list query must send `page: { number, size: DEFAULT_PAGE_SIZE }` (10), because the backend default is 20; add a test on the Users page. (3) The page clears `selectedIds` and resets `page` when search or sort changes. More in the READMEs of both components ("Known issues").
+  - **Local gotcha:** `pnpm --filter @cv-builder/frontend typecheck` can fail on `.next/dev/types/validator.ts` (old routes such as `admin/departments`) after routes change. Delete `frontend/.next` and run it again; CI is not affected.
+  - **Done (S1.2b, KAN-80):** `Menu`, `Tabs`, `Breadcrumbs`, `Avatar` and `PageState` in `frontend/src/shared/components/` (README for `Menu` and `PageState`). `Menu` is Radix `DropdownMenu`. `Tabs` takes the current `pathname` from the layout and marks the longest matching route; `Avatar` falls back to initials when the image is missing or fails. `PageState` keeps `empty` and `no-results` apart from `error`. Texts are props with English defaults until S0.6.
 - [ ] **S1.3 Overlays and feedback** — Modal / FormModal (focus trap, Escape, primary disabled until valid and dirty), ConfirmModal, Toast notifications, SelectionToolbar ("REMOVE (n)"). Stories + tests.
 - [ ] **S1.4 App layout** — `(app)` layout: sidebar by role (§6), active item, profile section + menu, header with breadcrumbs, Device Error gate (< 768 px, CSS media query only, D28), No Internet state. Depends on S1.2, S3.1 (`me`).
 
@@ -471,10 +476,10 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
 - [x] **S3.3 BE Mail** — Nodemailer module (Mailpit locally), templates: verification code, password reset link (links use `FRONTEND_URL`).
 - [x] **S3.4 Sign In** — BE errors ("Invalid email or password"); FE page. AC per sign-in.
   - **Done (KAN-87):** BE was ready from S3.1 (`UNAUTHENTICATED` + "Invalid email or password"). FE: `features/sign-in/` (tabs, form with React Hook Form + Zod, `SignIn` mutation, redirect to `/users`), texts in `en` and `pl`, component tests and `e2e/auth/sign-in.spec.ts`. React Hook Form, Zod and `@hookform/resolvers` are installed with this step. The eye button of `PasswordField` got its own `id` (Radix gave it the input's id).
-- [ ] **S3.5 Sign Up** — BE `signUp` (unique email, hash, send code, sign in); FE page → `/verify-email`. AC per sign-up. Depends on S3.3.
+- [x] **S3.5 Sign Up** — BE `signUp` (unique email, hash, send code, sign in); FE page → `/verify-email`. AC per sign-up. Depends on S3.3. (PR #26)
 - [ ] **S3.6 Email Verification** — BE `verifyEmail`, `resendVerificationCode` (10 min, single use, D20), `@Verified()`; FE OTP page, CONFIRM, LATER → `/users`. AC per verification.
-- [ ] **S3.7 Forgot Password** (Should) — BE `forgotPassword` (token + mail, same response for unknown emails); FE page. AC per forgot-password.
-- [ ] **S3.8 Reset Password** (Should) — BE `resetPassword` (token check, expiry, single use, revokes sessions D22); FE page. AC per reset-password.
+- [ ] **S3.7 Forgot Password** (Should) — BE `forgotPassword` (token + mail, same response for unknown emails); FE page. AC per forgot-password. BE done (KAN-91), FE pending.
+- [ ] **S3.8 Reset Password** (Should) — BE `resetPassword` (token check, expiry, single use, revokes sessions D22); FE page. AC per reset-password. BE done (KAN-91), FE pending.
 
 ### Phase 4 — System pages and settings
 
@@ -491,7 +496,7 @@ Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE 
 - [ ] **S5.2 Positions** — AC per positions.
 - [ ] **S5.3 Skills catalog** — with `skillCategories`; type from category. AC per skills-admin.
 - [ ] **S5.4 Languages catalog** — ISO unique. AC per languages-admin.
-- [ ] **S5.5 Projects** — with `projectRoles`; date rules; environment as skill tags; search name/domain; delete blocked when used in a CV; date change blocked when CV projects would fall outside (D25). AC per projects.
+- [ ] **S5.5 Projects** — with `projectRoles`; date rules; environment as skill tags; search name/domain; delete blocked when used in a CV; date change blocked when CV projects would fall outside (D25). AC per projects. BE done (KAN-101, S5.5a), FE pending.
 
 ### Phase 6 — Users
 
@@ -585,4 +590,7 @@ Over 80 % per app, excluding generated code, configs, `main.ts` and route files.
 | 2026-10-30 | S2.1a Prisma schema and initial migration | — | 19 models from §7 checked against docs pages 10–27, indexes, `init` + `add_date_checks` migrations; project `endDate` is required (page 27) |
 | 2026-10-30 | S0.5b Backend test setup | — | Jest unit + coverage scripts, Supertest integration tests on a separate `_test` database (serial, truncated per file), injectable `Clock`; sample health tests |
 | 2026-11-02 | S3.3 BE Mail | — | `MailModule` with Nodemailer, templates for the verification code and the reset link, Mailpit defaults for the mail variables, unit tests with a mocked transport, integration test against Mailpit (CI starts Mailpit) |
-| 2026-11-03 | S3.4 Sign In | — | `/sign-in` page: tabs, email + password form with inline checks, show/hide password, loading state, error messages, values kept after a failure, links to Sign Up and Forgot Password, redirect to `/users`; `en` + `pl` texts; component tests and E2E smoke spec |
+| 2026-11-03 | S1.2a UI kit: DataTable and Pagination | — | Controlled `DataTable` (sortable headers, row click, row actions slot, selection, loading and empty slots) and `Pagination` (page size 10); stories with a mocked sample, unit and story tests |
+| 2026-11-03 | S3.5 Sign Up | #26 | `signUp` mutation (argon2 hash, unverified `USER`, first code mailed, cookies, `CONFLICT` + `EMAIL_TAKEN`, throttled), `/sign-up` page in `en` and `pl` with the shared form controls, E2E spec checks the code in Mailpit (CI e2e job starts Mailpit) |
+| 2026-11-03 | S1.2b UI kit: Menu, Tabs, Breadcrumbs, Avatar, PageState | — | `Menu` (one open, Escape and outside click close), route-driven `Tabs`, `Breadcrumbs`, `Avatar` (image or initials), `PageState` (loading skeleton, empty, no results, error + retry); stories and unit tests |
+| 2026-11-03 | S3.4 Sign In | #34 | `/sign-in` page: tabs, email + password form with inline checks, show/hide password, loading state, error messages, values kept after a failure, links to Sign Up and Forgot Password, redirect to `/users`; `en` + `pl` texts; component tests and E2E smoke spec |

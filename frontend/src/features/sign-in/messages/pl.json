@@ -1,8 +1,8 @@
 {
   "tabs": {
     "label": "Uwierzytelnianie",
-    "signIn": "Logowanie",
-    "signUp": "Rejestracja"
+    "signIn": "ZALOGUJ SIĘ",
+    "signUp": "ZAREJESTRUJ SIĘ"
   },
   "title": "Witaj ponownie",
   "subtitle": "Miło Cię znów widzieć! Zaloguj się, aby kontynuować",

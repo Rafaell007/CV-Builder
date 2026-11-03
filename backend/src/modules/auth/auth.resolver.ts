@@ -6,6 +6,7 @@ import { GqlThrottlerGuard } from "../../common/throttling";
 import type { AuthContext } from "./auth-context";
 import { AuthService } from "./auth.service";
 import { SignInInput } from "./dto/sign-in.input";
+import { SignUpInput } from "./dto/sign-up.input";
 import { SessionUser } from "./models/session-user";
 import { SessionCookiesService } from "./session-cookies.service";
 
@@ -24,6 +25,19 @@ export class AuthResolver {
     @Context() { res }: AuthContext,
   ): Promise<SessionUser> {
     const { user, accessToken, refreshToken } = await this.authService.signIn(input);
+    this.cookies.set(res, { accessToken, refreshToken });
+    return user;
+  }
+
+  // The new user is signed in at once, but is not verified yet (D16); the code goes to their mailbox.
+  @Public()
+  @UseGuards(GqlThrottlerGuard)
+  @Mutation(() => SessionUser)
+  async signUp(
+    @Args("input") input: SignUpInput,
+    @Context() { res }: AuthContext,
+  ): Promise<SessionUser> {
+    const { user, accessToken, refreshToken } = await this.authService.signUp(input);
     this.cookies.set(res, { accessToken, refreshToken });
     return user;
   }

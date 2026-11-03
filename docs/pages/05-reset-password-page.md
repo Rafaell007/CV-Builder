@@ -104,12 +104,12 @@ Requirements:
 Validation:
 
 - Field is required
-- Password must contain at least 6 characters
+- Password must contain 8 to 128 characters, with at least one letter and one digit
 - Password must satisfy the password policy defined by the application
 Example validation messages:
 
 - `Password is required`
-- `Password must be at least 6 characters long`
+- `Password must be 8 to 128 characters long and contain a letter and a digit`
 
 ---
 
@@ -371,7 +371,7 @@ The user must receive appropriate visual feedback for each state.
 | AC-2 | Page displays the title and instructional text |
 | AC-3 | New Password field is masked by default |
 | AC-4 | Confirm Password field is masked by default |
-| AC-5 | Password must contain at least 6 characters |
+| AC-5 | Password must contain 8 to 128 characters, with at least one letter and one digit (same rule as the server) |
 | AC-6 | Confirm Password must match New Password |
 | AC-7 | Password visibility toggle functions correctly |
 | AC-8 | Validation messages are displayed for invalid input |
