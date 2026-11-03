@@ -235,6 +235,28 @@ describe("handleRequest", () => {
       expect(location(response)).toBe("http://localhost:3000/en/users");
     });
 
+    it("uses the browser language for a path without a language when nothing is saved", async () => {
+      mockBackend();
+      const request = new NextRequest("http://localhost:3000/users", {
+        headers: { "accept-language": "pl-PL,pl;q=0.9,en;q=0.8" },
+      });
+
+      const response = await proxy(request);
+
+      expect(location(response)).toBe("http://localhost:3000/pl/users");
+    });
+
+    it("prefers the saved language over the browser language", async () => {
+      mockBackend();
+      const request = new NextRequest("http://localhost:3000/users", {
+        headers: { cookie: "locale=en", "accept-language": "pl" },
+      });
+
+      const response = await proxy(request);
+
+      expect(location(response)).toBe("http://localhost:3000/en/users");
+    });
+
     it("keeps the language when the session rules redirect", async () => {
       mockBackend();
 

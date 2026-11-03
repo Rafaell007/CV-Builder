@@ -7,8 +7,9 @@ import { LOCALE_COOKIE, routing } from "@/shared/i18n/routing";
 import { splitLocale } from "@/shared/i18n/utils";
 import { ACCESS_COOKIE, getRouteKind, REFRESH_COOKIE, resolveRedirect } from "@/shared/session";
 
-// Adds the language to paths without one (from the `locale` cookie, else English) and keeps the cookie current.
-// https://next-intl.dev/docs/routing/middleware
+// Adds the language to paths without one and keeps the cookie current. The language comes from the `locale` cookie,
+// else from the browser's Accept-Language header, else English (next-intl's default order: turning detection off
+// would also stop it reading the cookie). https://next-intl.dev/docs/routing/middleware
 const handleI18nRouting = createMiddleware(routing);
 
 // Called by `src/proxy.ts` before every page (PLAN D9): makes sure the URL has a language, refreshes an expired
