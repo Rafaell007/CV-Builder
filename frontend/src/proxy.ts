@@ -7,7 +7,8 @@ export function proxy(request: NextRequest) {
   return handleRequest(request, serverEnv.backendUrl);
 }
 
-// Static: Next.js reads it at build time. Skips the backend rewrites and Next.js internals.
+// Static: Next.js reads it at build time. Skips the backend rewrites, Next.js internals and files with an
+// extension (favicon.ico, robots.txt), which must not get a language prefix. https://next-intl.dev/docs/routing/middleware
 export const config = {
-  matcher: ["/((?!api/|graphql/|graphql$|_next/static|_next/image|favicon\\.ico$).*)"],
+  matcher: ["/((?!api/|graphql/|graphql$|_next/static|_next/image|.*\\..*).*)"],
 };

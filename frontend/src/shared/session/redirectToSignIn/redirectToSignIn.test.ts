@@ -13,7 +13,7 @@ function stubLocation(pathname: string) {
 }
 
 beforeEach(() => {
-  stubLocation("/users");
+  stubLocation("/pl/users");
 });
 
 afterEach(() => {
@@ -22,21 +22,30 @@ afterEach(() => {
 });
 
 describe("redirectToSignIn", () => {
-  it("loads the sign-in page", async () => {
+  it("loads the sign-in page in the current language", async () => {
     const redirectToSignIn = await loadRedirect();
 
     redirectToSignIn();
 
-    expect(assign).toHaveBeenCalledWith("/sign-in");
+    expect(assign).toHaveBeenCalledWith("/pl/sign-in");
   });
 
   it("does nothing on the sign-in page, so it cannot reload in a loop", async () => {
-    stubLocation("/sign-in");
+    stubLocation("/pl/sign-in");
     const redirectToSignIn = await loadRedirect();
 
     redirectToSignIn();
 
     expect(assign).not.toHaveBeenCalled();
+  });
+
+  it("leaves the language to the proxy when the path has none", async () => {
+    stubLocation("/users");
+    const redirectToSignIn = await loadRedirect();
+
+    redirectToSignIn();
+
+    expect(assign).toHaveBeenCalledWith("/sign-in");
   });
 
   it("redirects only once when several requests end the session", async () => {
