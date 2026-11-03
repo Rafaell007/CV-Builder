@@ -41,4 +41,32 @@ describe("useFieldIds", () => {
       });
     },
   );
+
+  it("keeps the caller's aria-describedby after the helper or error id", () => {
+    const { result } = renderHook(() =>
+      useFieldIds({ id: "email", hasHelperText: false, hasError: true, ariaDescribedBy: "hint" }),
+    );
+
+    expect(result.current.controlProps["aria-describedby"]).toBe("email-error hint");
+  });
+
+  it("uses the caller's aria-describedby alone when there is no helper text or error", () => {
+    const { result } = renderHook(() =>
+      useFieldIds({ id: "email", hasHelperText: false, hasError: false, ariaDescribedBy: "hint" }),
+    );
+
+    expect(result.current.controlProps["aria-describedby"]).toBe("hint");
+  });
+
+  it("keeps the caller's aria-invalid when there is no error, and the error wins otherwise", () => {
+    const withoutError = renderHook(() =>
+      useFieldIds({ id: "email", hasHelperText: false, hasError: false, ariaInvalid: true }),
+    );
+    const withError = renderHook(() =>
+      useFieldIds({ id: "email", hasHelperText: false, hasError: true, ariaInvalid: false }),
+    );
+
+    expect(withoutError.result.current.controlProps["aria-invalid"]).toBe(true);
+    expect(withError.result.current.controlProps["aria-invalid"]).toBe(true);
+  });
 });

@@ -44,6 +44,19 @@ describe("TextField", () => {
     expect(input).toHaveAccessibleDescription("Email is required");
   });
 
+  it("keeps the caller's aria-describedby next to the error", () => {
+    renderWithProviders(
+      <>
+        <p id="hint">Use your work address</p>
+        <TextField label="Email" error="Email is required" aria-describedby="hint" />
+      </>,
+    );
+
+    expect(screen.getByRole("textbox", { name: "Email" })).toHaveAccessibleDescription(
+      "Email is required Use your work address",
+    );
+  });
+
   it("can be disabled", () => {
     renderWithProviders(<TextField label="Email" disabled />);
 

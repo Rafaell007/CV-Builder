@@ -38,6 +38,8 @@ export function PasswordField({
     id,
     hasHelperText: Boolean(helperText),
     hasError: Boolean(error),
+    ariaDescribedBy: props["aria-describedby"],
+    ariaInvalid: props["aria-invalid"],
   });
   const toggleLabel = visible ? hidePasswordLabel : showPasswordLabel;
 
