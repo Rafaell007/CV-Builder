@@ -3,7 +3,7 @@
 The `/sign-in` page (PLAN S3.4, KAN-87): tabs, welcome text and the email + password form.
 
 - Exports: `SignIn` (the whole page content; the route only renders it).
-- Tabs: the shared `AuthTabs` (`@/shared/components`), shared with the sign-up page.
+- Tabs: the shared `AuthTabs` (`@/shared/components/AuthTabs`), shared with the sign-up page.
 - `components/SignInForm`: the form. `useSignInForm` holds the form state and the Zod rules (`utils`), `useSignIn` sends the `SignIn` mutation and opens `/users`.
 - Errors: `UNAUTHENTICATED` shows "Invalid email or password" (the backend does not say which one was wrong); anything else shows "Something went wrong". Typed values stay in both cases.
 - The mutation is named `SignIn`, so the session link never tries to refresh the session for it ([session](../../shared/session/README.md)).

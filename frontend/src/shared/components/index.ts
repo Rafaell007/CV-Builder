@@ -1,5 +1,4 @@
 // Public entry for components shared across unrelated features.
-export * from "./AuthTabs";
 export * from "./Avatar";
 export * from "./Breadcrumbs";
 export * from "./Button";
