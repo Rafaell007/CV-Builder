@@ -1,0 +1,17 @@
+{
+  "pageTitle": "Nie pamiętasz hasła | CV Builder",
+  "title": "Nie pamiętasz hasła",
+  "subtitle": "Wyślemy Ci e-mail z dalszymi instrukcjami",
+  "email": "E-mail",
+  "resetPassword": "Zresetuj hasło",
+  "cancel": "Anuluj",
+  "confirmation": "Jeśli konto z tym adresem e-mail istnieje, otrzymasz instrukcje resetowania hasła.",
+  "backToSignIn": "Wróć do logowania",
+  "errors": {
+    "emailRequired": "E-mail jest wymagany",
+    "emailInvalid": "Podaj poprawny adres e-mail",
+    "tooManyRequests": "Zbyt wiele prób, spróbuj ponownie później",
+    "invalidInput": "Sprawdź wpisane dane i spróbuj ponownie",
+    "unexpected": "Coś poszło nie tak. Spróbuj ponownie później"
+  }
+}

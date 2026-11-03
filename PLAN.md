@@ -478,8 +478,8 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
   - **Done (KAN-87):** BE was ready from S3.1 (`UNAUTHENTICATED` + "Invalid email or password"). FE: `features/sign-in/` (tabs, form with React Hook Form + Zod, `SignIn` mutation, redirect to `/users`), texts in `en` and `pl`, component tests and `e2e/auth/sign-in.spec.ts`. React Hook Form, Zod and `@hookform/resolvers` are installed with this step. The eye button of `PasswordField` got its own `id` (Radix gave it the input's id).
 - [x] **S3.5 Sign Up** — BE `signUp` (unique email, hash, send code, sign in); FE page → `/verify-email`. AC per sign-up. Depends on S3.3. (PR #26)
 - [ ] **S3.6 Email Verification** — BE `verifyEmail`, `resendVerificationCode` (10 min, single use, D20), `@Verified()`; FE OTP page, CONFIRM, LATER → `/users`. AC per verification.
-- [ ] **S3.7 Forgot Password** (Should) — BE `forgotPassword` (token + mail, same response for unknown emails); FE page. AC per forgot-password. BE done (KAN-91), FE pending.
-- [ ] **S3.8 Reset Password** (Should) — BE `resetPassword` (token check, expiry, single use, revokes sessions D22); FE page. AC per reset-password. BE done (KAN-91), FE pending.
+- [x] **S3.7 Forgot Password** (Should) — BE `forgotPassword` (token + mail, same response for unknown emails); FE page. AC per forgot-password. BE done (KAN-91), FE done (KAN-92).
+- [x] **S3.8 Reset Password** (Should) — BE `resetPassword` (token check, expiry, single use, revokes sessions D22); FE page. AC per reset-password. BE done (KAN-91), FE done (KAN-92); after a reset the page redirects to `/sign-in`.
 
 ### Phase 4 — System pages and settings
 
@@ -592,5 +592,6 @@ Over 80 % per app, excluding generated code, configs, `main.ts` and route files.
 | 2026-11-02 | S3.3 BE Mail | — | `MailModule` with Nodemailer, templates for the verification code and the reset link, Mailpit defaults for the mail variables, unit tests with a mocked transport, integration test against Mailpit (CI starts Mailpit) |
 | 2026-11-03 | S1.2a UI kit: DataTable and Pagination | — | Controlled `DataTable` (sortable headers, row click, row actions slot, selection, loading and empty slots) and `Pagination` (page size 10); stories with a mocked sample, unit and story tests |
 | 2026-11-03 | S3.5 Sign Up | #26 | `signUp` mutation (argon2 hash, unverified `USER`, first code mailed, cookies, `CONFLICT` + `EMAIL_TAKEN`, throttled), `/sign-up` page in `en` and `pl` with the shared form controls, E2E spec checks the code in Mailpit (CI e2e job starts Mailpit) |
+| 2026-11-03 | S3.7 / S3.8 FE Forgot and Reset Password | #36 | `/forgot-password` (generic confirmation, same for every email) and `/reset-password?token=` (D33 rule, notices for invalid, expired and used links) in `en` and `pl`, shared `emailProblem` and `passwordProblem` in `@/shared/utils` (sign-up uses them too), redirect to `/sign-in` after a reset, E2E specs read the reset link in Mailpit |
 | 2026-11-03 | S1.2b UI kit: Menu, Tabs, Breadcrumbs, Avatar, PageState | — | `Menu` (one open, Escape and outside click close), route-driven `Tabs`, `Breadcrumbs`, `Avatar` (image or initials), `PageState` (loading skeleton, empty, no results, error + retry); stories and unit tests |
 | 2026-11-03 | S3.4 Sign In | #34 | `/sign-in` page: tabs, email + password form with inline checks, show/hide password, loading state, error messages, values kept after a failure, links to Sign Up and Forgot Password, redirect to `/users`; `en` + `pl` texts; component tests and E2E smoke spec |

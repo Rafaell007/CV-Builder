@@ -1,8 +1,10 @@
-// Placeholder (PLAN §6); the real page comes with its own step.
-export default function ForgotPasswordPage() {
-  return (
-    <main>
-      <h1>Forgot password</h1>
-    </main>
-  );
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import { ForgotPasswordPage } from "@/features/forgot-password";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("forgotPassword");
+  return { title: t("pageTitle") };
 }
+
+export default ForgotPasswordPage;
