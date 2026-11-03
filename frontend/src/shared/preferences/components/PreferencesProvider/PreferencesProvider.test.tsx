@@ -31,27 +31,22 @@ const clearCookie = (name: string) => {
 
 afterEach(() => {
   clearCookie("theme");
-  clearCookie("locale");
   document.documentElement.removeAttribute("data-theme");
-  document.documentElement.lang = "";
 });
 
 describe("PreferencesProvider", () => {
-  it("starts with defaults when there are no cookies", () => {
+  it("starts with the default when there is no cookie", () => {
     const { result } = renderHook(() => usePreferences(), { wrapper });
 
     expect(result.current.theme).toBe("system");
-    expect(result.current.language).toBe("en");
   });
 
-  it("starts with the values saved in cookies", () => {
+  it("starts with the theme saved in the cookie", () => {
     document.cookie = "theme=dark; path=/";
-    document.cookie = "locale=pl; path=/";
 
     const { result } = renderHook(() => usePreferences(), { wrapper });
 
     expect(result.current.theme).toBe("dark");
-    expect(result.current.language).toBe("pl");
   });
 
   it("setTheme saves the cookie and sets data-theme", () => {
@@ -71,16 +66,6 @@ describe("PreferencesProvider", () => {
     act(() => result.current.setTheme("system"));
 
     expect(document.documentElement.hasAttribute("data-theme")).toBe(false);
-  });
-
-  it("setLanguage saves the cookie and sets lang", () => {
-    const { result } = renderHook(() => usePreferences(), { wrapper });
-
-    act(() => result.current.setLanguage("pl"));
-
-    expect(result.current.language).toBe("pl");
-    expect(document.cookie).toContain("locale=pl");
-    expect(document.documentElement.lang).toBe("pl");
   });
 
   it("renders the defaults on the server, which cannot read cookies", () => {

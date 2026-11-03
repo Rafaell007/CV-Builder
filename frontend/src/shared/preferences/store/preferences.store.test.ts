@@ -1,28 +1,19 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import {
-  getServerSnapshot,
-  getSnapshot,
-  saveLanguage,
-  saveTheme,
-  subscribe,
-} from "./preferences.store";
+import { getServerSnapshot, getSnapshot, saveTheme, subscribe } from "./preferences.store";
 
 afterEach(() => {
   document.cookie = "theme=; path=/; max-age=0";
-  document.cookie = "locale=; path=/; max-age=0";
   document.documentElement.removeAttribute("data-theme");
-  document.documentElement.lang = "";
 });
 
 describe("getSnapshot", () => {
-  it("reads the saved theme and language from cookies", () => {
+  it("reads the saved theme from the cookie", () => {
     document.cookie = "theme=dark; path=/";
-    document.cookie = "locale=pl; path=/";
 
-    expect(getSnapshot()).toEqual({ theme: "dark", language: "pl" });
+    expect(getSnapshot()).toEqual({ theme: "dark" });
   });
 
-  it("returns the same object while the cookies are unchanged", () => {
+  it("returns the same object while the cookie is unchanged", () => {
     document.cookie = "theme=light; path=/";
 
     expect(getSnapshot()).toBe(getSnapshot());
@@ -38,30 +29,27 @@ describe("getSnapshot", () => {
 });
 
 describe("getServerSnapshot", () => {
-  it("returns the defaults, even when cookies are set", () => {
+  it("returns the default, even when the cookie is set", () => {
     document.cookie = "theme=dark; path=/";
 
-    expect(getServerSnapshot()).toEqual({ theme: "system", language: "en" });
+    expect(getServerSnapshot()).toEqual({ theme: "system" });
   });
 });
 
-describe("saveTheme and saveLanguage", () => {
-  it("save the cookie, update <html> and notify subscribers", () => {
+describe("saveTheme", () => {
+  it("saves the cookie, updates <html> and notifies subscribers", () => {
     const listener = vi.fn();
     const unsubscribe = subscribe(listener);
 
     saveTheme("dark");
-    saveLanguage("pl");
 
     expect(document.cookie).toContain("theme=dark");
-    expect(document.cookie).toContain("locale=pl");
     expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
-    expect(document.documentElement.lang).toBe("pl");
-    expect(listener).toHaveBeenCalledTimes(2);
+    expect(listener).toHaveBeenCalledTimes(1);
     unsubscribe();
   });
 
-  it("stop notifying after unsubscribe", () => {
+  it("stops notifying after unsubscribe", () => {
     const listener = vi.fn();
     subscribe(listener)();
 
