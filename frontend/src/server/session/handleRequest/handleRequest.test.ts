@@ -243,6 +243,15 @@ describe("handleRequest", () => {
       expect(location(response)).toBe("http://localhost:3000/pl/sign-in");
     });
 
+    it("saves the language of the URL in the locale cookie when the session rules redirect", async () => {
+      mockBackend();
+
+      const response = await proxy(requestFor("/users", { locale: "en" }, "pl"));
+
+      expect(location(response)).toBe("http://localhost:3000/pl/sign-in");
+      expect(response.headers.getSetCookie()).toEqual([expect.stringMatching(/^locale=pl;/)]);
+    });
+
     it("saves the language of the URL in the locale cookie", async () => {
       mockBackend();
 

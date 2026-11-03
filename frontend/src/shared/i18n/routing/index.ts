@@ -1,1 +1,1 @@
-﻿export { routing } from "./routing";
+﻿export { LOCALE_COOKIE, routing } from "./routing";

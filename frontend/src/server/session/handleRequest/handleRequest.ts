@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { parseSetCookie } from "../utils";
 import { resolveSession } from "../resolveSession";
 // Not `@/shared/i18n`: its navigation loads the request config (next/root-params), which the proxy cannot import.
-import { routing } from "@/shared/i18n/routing";
+import { LOCALE_COOKIE, routing } from "@/shared/i18n/routing";
 import { splitLocale } from "@/shared/i18n/utils";
 import { ACCESS_COOKIE, getRouteKind, REFRESH_COOKIE, resolveRedirect } from "@/shared/session";
 
@@ -54,10 +54,17 @@ export async function handleRequest(request: NextRequest, backendUrl: string) {
           session.status === "active" ? session.role : null,
         );
 
-  // A redirect stays in the visitor's language: /pl/admin → /pl/sign-in.
-  const response = redirectTo
-    ? NextResponse.redirect(new URL(`/${locale}${redirectTo}`, request.url))
-    : handleI18nRouting(request);
+  // A redirect stays in the visitor's language: /pl/admin → /pl/sign-in. It is built here and not by next-intl,
+  // so it saves the language in the cookie itself, like next-intl does for the other responses: only when it changed.
+  let response: NextResponse;
+  if (redirectTo) {
+    response = NextResponse.redirect(new URL(`/${locale}${redirectTo}`, request.url));
+    if (request.cookies.get(LOCALE_COOKIE.name)?.value !== locale) {
+      response.cookies.set(LOCALE_COOKIE.name, locale, { maxAge: LOCALE_COOKIE.maxAge, path: "/" });
+    }
+  } else {
+    response = handleI18nRouting(request);
+  }
   for (const header of session.setCookies) response.headers.append("set-cookie", header);
   return response;
 }
