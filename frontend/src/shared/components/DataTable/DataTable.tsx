@@ -55,6 +55,7 @@ export function DataTable<Row>({
     ...labels,
   };
   const pageIds = rows.map(getRowId);
+  const selectedLookup = new Set(selectedIds);
   const columnCount = columns.length + (selectable ? 1 : 0) + (renderRowActions ? 1 : 0);
 
   const handleRowKeyDown = (event: KeyboardEvent<HTMLTableRowElement>, row: Row) => {
@@ -79,7 +80,7 @@ export function DataTable<Row>({
 
     return rows.map((row) => {
       const id = getRowId(row);
-      const selected = selectedIds.includes(id);
+      const selected = selectedLookup.has(id);
       return (
         <tr
           key={id}
