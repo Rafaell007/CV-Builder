@@ -1,4 +1,6 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
+import { routing } from "./src/shared/i18n/routing/routing";
 
 // Read here and not in src/server/env.ts: this config runs outside the app (PLAN §5.5).
 // Rewrites are resolved at build time, so `next build` needs it too.
@@ -9,8 +11,18 @@ const nextConfig: NextConfig = {
   agentRules: false,
   cacheComponents: true,
   partialPrefetching: true,
+  // Needed for src/app/global-not-found.tsx: there is no root layout, so unmatched paths need their own page.
+  // https://nextjs.org/docs/app/api-reference/file-conventions/not-found
+  experimental: { globalNotFound: true },
   // The main page after sign-in is the employees list (PLAN D17). Not permanent: browsers would cache it.
-  redirects: async () => [{ source: "/", destination: "/users", permanent: false }],
+  // `/` without a language is sent to `/{locale}` by the proxy first (next-intl), then here.
+  redirects: async () => [
+    {
+      source: `/:locale(${routing.locales.join("|")})`,
+      destination: "/:locale/users",
+      permanent: false,
+    },
+  ],
   // The browser calls the backend through the frontend's own origin, so auth cookies stay first-party (PLAN D8).
   rewrites: async () => [
     { source: "/graphql", destination: `${backendUrl}/graphql` },
@@ -18,4 +30,7 @@ const nextConfig: NextConfig = {
   ],
 };
 
-export default nextConfig;
+// Connects src/i18n/request.ts (its default path) to next-intl. https://next-intl.dev/docs/usage/configuration
+const withNextIntl = createNextIntlPlugin();
+
+export default withNextIntl(nextConfig);

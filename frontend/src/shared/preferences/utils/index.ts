@@ -1,1 +1,1 @@
-export { parseLanguage, parseTheme, readCookie } from "./preferences.utils";
+export { parseTheme, readCookie } from "./preferences.utils";

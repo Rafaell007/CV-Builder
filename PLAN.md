@@ -107,7 +107,7 @@ Same stack and setup order as the other intern team (D2).
 | | UI kit | Radix UI primitives, CSS Modules, design tokens (light/dark) |
 | | Dates | date-fns, react-datepicker |
 | | Forms | React Hook Form + Zod |
-| | i18n (9 languages) | next-intl |
+| | i18n (`en`, `pl`; D27, D32) | next-intl |
 | | UI development | Storybook 10 (stories + component tests with Vitest/Playwright) |
 | Backend | Framework | NestJS 11 (modules, DI, pipes, guards, filters) |
 | | API | GraphQL code-first, Apollo Server 5; generated `schema.gql` = contract |
@@ -134,7 +134,7 @@ Same stack and setup order as the other intern team (D2).
 | D2 | 2026-10-28 | Copy the other intern team's stack and setup order: pnpm monorepo, Next.js + NestJS, Radix UI, Prisma, Storybook. MUI and TanStack Store dropped | New task requires NestJS; the teams can help each other |
 | D3 | 2026-10-28 | GraphQL **code-first**; the generated `backend/schema.gql` is committed and is the contract. Frontend types are generated from it | One source of truth; contract changes are visible in PR diffs |
 | D4 | 2026-10-28 | Contract first: a module's GraphQL types and operations are merged (resolvers may be stubbed) before its frontend step starts | Frontend and backend work in parallel without waiting |
-| D5 | 2026-10-28 | State: server data in the Apollo cache; theme and language in React Context, persisted in cookies; an inline `<head>` script applies them before the first paint (no flash). The server does not read them, so pages stay static under Cache Components | No extra state library needed; reading cookies in the root layout would make every route dynamic ([Next.js guide](https://nextjs.org/docs/app/guides/preventing-flash-before-hydration)) |
+| D5 | 2026-10-28 | State: server data in the Apollo cache; the theme in React Context, persisted in a cookie; an inline `<head>` script applies it before the first paint (no flash). The server does not read it, so pages stay static under Cache Components. The language is in the URL (D32), not in this Context (changed 2026-11-03, S0.6) | No extra state library needed; reading cookies in the root layout would make every route dynamic ([Next.js guide](https://nextjs.org/docs/app/guides/preventing-flash-before-hydration)) |
 | D6 | 2026-10-28 | Rendering: protected pages are SSR per request (Server Components query the backend, forwarding the user's cookies); auth, not-found and device-error pages are static | Protected pages are per-user, so they cannot be SSG |
 | D7 | 2026-10-28 | Errors: one global exception filter maps errors to GraphQL `extensions.code` (`UNAUTHENTICATED`, `FORBIDDEN`, `BAD_USER_INPUT` with field errors, `NOT_FOUND`, `CONFLICT`); the UI shows field errors inline, others as a system error | Consistent error contract |
 | D8 | 2026-10-28 | The browser calls the backend through a Next.js rewrite (`/graphql`, `/api/*` → backend), so auth cookies stay first-party | No CORS or third-party cookie issues, also when deployed on two hosts |
@@ -156,11 +156,12 @@ Same stack and setup order as the other intern team (D2).
 | D24 | 2026-10-28 | An admin cannot delete themselves, remove their own Admin role, or remove the last admin (`CONFLICT`) | The app must never lose its last admin |
 | D25 | 2026-10-28 | Updating a project's dates is blocked (`CONFLICT`, with the count) when CV projects would fall outside them | CvProject dates must stay within the project's dates |
 | D26 | 2026-10-28 | Theme and language are stored only in cookies (client-side), not on the backend | Settings docs allow it; no extra API or migration |
-| D27 | 2026-10-29 | i18n: `en` and `pl`, both fully translated. The language selector lists only supported languages (settings AC-8); a language is added with its code and messages | 9 full translations per feature cost too much for the deadline; listing untranslated languages would show English anyway |
+| D27 | 2026-10-29 | i18n: `en` and `pl`, both fully translated. The language selector lists only supported languages (settings AC-8); a language is added with its code in `shared/i18n/routing` and a `messages/<code>.json` in every messages folder | 9 full translations per feature cost too much for the deadline; listing untranslated languages would show English anyway |
 | D28 | 2026-10-28 | Device Error gate (< 768 px) is CSS-only (media query), no JS width check | No flash of the real page on SSR |
 | D29 | 2026-10-28 | Steps are tagged **Must / Should / Could** (§9); Could steps are dropped first when time runs out | Fixed deadline |
 | D30 | 2026-10-28 | Demo runs locally (Docker + seed). Deploy stays optional | Free-tier cold starts (~50 s) and upload limits are demo risks |
 | D31 | 2026-10-28 | Integration branch renamed `developement` → `development` | Typo would spread into CI, README and deploy settings |
+| D32 | 2026-11-03 | Language in the URL: every route lives under `app/[locale]/` (`/en/users`, `/pl/users`), next-intl `localePrefix: "always"`. The proxy sends a path without a language to the one saved in the `locale` cookie (1 year), else the browser language (Accept-Language) if supported, else `en`; visiting a language saves it. Pages read the locale with `next/root-params` and are prerendered per language | next-intl default and the documented way to keep static rendering with Cache Components; reading the cookie on the server would make every route dynamic (D5) ([routing](https://next-intl.dev/docs/routing/configuration), [root params](https://next-intl.dev/blog/nextjs-root-params)) |
 
 ### 2.4 Open decisions
 
@@ -200,10 +201,14 @@ CV-Builder/
   frontend/
     src/
       app/                               routes only, thin
-        (auth)/                          sign-in, sign-up, verify-email, forgot-password, reset-password
-        (app)/                           users, cvs, skills, languages, settings, admin/*
-        not-found.tsx
-      proxy.ts                           route protection + session refresh
+        [locale]/                        every route under its language (D32): /en/users, /pl/users
+          layout.tsx                     root layout: <html lang>, providers, one static build per language
+          (auth)/                        sign-in, sign-up, verify-email, forgot-password, reset-password
+          (app)/                         users, cvs, skills, languages, settings, admin/*
+          not-found.tsx · [...rest]/     translated 404 for unknown paths
+        global-not-found.tsx             404 for paths the proxy gives no language (files)
+      proxy.ts                           language prefix + route protection + session refresh
+      i18n/                              next-intl wiring: request.ts (locale + messages), loadMessages/ (collects every messages/ folder)
       env.ts · server/env.ts             the only places reading process.env (public · server only)
       features/<feature>/                one folder per feature (shape below)
       shared/
@@ -301,7 +306,7 @@ Rules for all code in this repository.
 - Every unit is a folder that owns its files, tests and children; the same shape repeats at every level.
 - A file and its test are one unit: `X.ts(x)` and `X.test.ts(x)` live in folder `X/` with an `index.ts`. A file without a test stays a plain file. Role files are named by their role: `x.utils.ts` → `utils/`, `x.store.ts` → `store/`. A feature's main component stays at the feature root, since the feature folder is already its folder.
 - Shared code moves to the **nearest common ancestor**; only code used by unrelated features goes to `shared/` (frontend) or `common/` (backend).
-- Frontend folders expose one public `index.ts`; other code imports only from it. Backend modules are imported through their Nest module.
+- Frontend folders expose one public `index.ts`; other code imports only from it. Exception: `messages/*.json` files are imported directly (by `src/i18n/loadMessages`), so a request loads only its own language. Backend modules are imported through their Nest module.
 - Every feature folder and every non-obvious shared component has a short `README.md` (about 5–10 lines): what it does, what it exports, where it is used, link to its `docs/` page. Simple components (e.g. a button) get none. Update it in the same PR when the public API changes.
 
 ### 5.10 Backend code
@@ -317,7 +322,7 @@ Rules for all code in this repository.
 - Each step = branch `feature/<ticket>-<name>` from `development`, PR into `development`, **review and approval by the other developer** (D15), merge commit (no squash).
 - Commit types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`; scope = app or module (`frontend`, `backend`, `cvs`, …); ticket key at the end when the ticket exists.
 - A step is done when format, lint, typecheck and tests pass (CI green), its unit / component / integration tests (§11) are written, the step's acceptance criteria (docs AC IDs) are met, and this file is updated.
-- New user-facing text goes to the feature's `messages/en.json`; other languages may start as copies.
+- New user-facing text goes to the feature's `messages/en.json` and `messages/pl.json`, both translated (D27); a new `messages/` folder is registered in `frontend/src/i18n/loadMessages`. Typecheck and a test fail when the two files have different keys.
 
 ---
 
@@ -435,13 +440,13 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
   - Coverage threshold 80 % in both apps, enforced in CI from Phase 3 on (reported only before that).
   - **Backend done (S0.5b):** `test` (unit), `test:int` (integration, `backend/test/`), `test:cov` (report, fails under 80 %: the threshold is in the Jest config so it works on Windows and macOS; switch CI to it in Phase 3). Integration config `backend/test/jest-integration.json`; the `_test` database is created and migrated by a global setup and truncated before each test file. `Clock` lives in `backend/src/common/clock/`. CI runs `test:int` against its Postgres service.
   - Playwright config at the root with a seeded run.
-  - **Frontend done (S0.5a):** `frontend/vitest.setup.ts` adds jest-dom matchers and cleans up after each test (Vitest globals stay off). `renderWithProviders` in `frontend/src/shared/testing/` wraps `PreferencesProvider` + `MockedProvider` and returns a user-event `user`; S0.6 adds the next-intl provider there. `test:cov` (v8, all of `src/` except tests, routes, generated code and `index.ts`; fails under 80 %; switch CI to it in Phase 3).
+  - **Frontend done (S0.5a):** `frontend/vitest.setup.ts` adds jest-dom matchers and cleans up after each test (Vitest globals stay off). `renderWithProviders` in `frontend/src/shared/testing/` wraps `NextIntlClientProvider` (option `locale`) + `PreferencesProvider` + `MockedProvider` and returns a user-event `user`. `test:cov` (v8, all of `src/` except tests, routes, generated code and `index.ts`; fails under 80 %; switch CI to it in Phase 3).
   - **E2E done (S0.5a):** `e2e/` is a workspace package (so lint and typecheck cover it) with `playwright.config.ts`; `pnpm test:e2e` runs `e2e:db` (backend: creates, migrates, empties and seeds `cv_builder_test`, no `migrate reset`), then production builds of both apps on ports 3100 / 4100, so `pnpm dev` and the development database are never used. CI runs it in a separate `e2e` job and uploads the HTML report.
   - Done when: one sample test per level runs locally and in CI.
   - Depends on: S0.2, S0.3.
 
 - [ ] **S0.6 i18n**
-  - next-intl, `en` and `pl` (D27), locale from the preference cookie, per-feature `messages/`.
+  - next-intl, `en` and `pl` (D27), locale in the URL and remembered in the `locale` cookie (D32), per-feature `messages/`.
   - Done when: switching language changes texts and persists.
   - Depends on: S0.4.
 

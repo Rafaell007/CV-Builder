@@ -9,15 +9,10 @@ const wrapper = ({ children }: { children: ReactNode }) => (
 );
 
 describe("usePreferences", () => {
-  it("returns the preferences and setters inside PreferencesProvider", () => {
+  it("returns the theme and its setter inside PreferencesProvider", () => {
     const { result } = renderHook(() => usePreferences(), { wrapper });
 
-    expect(result.current).toEqual({
-      theme: "system",
-      language: "en",
-      setTheme: expect.any(Function),
-      setLanguage: expect.any(Function),
-    });
+    expect(result.current).toEqual({ theme: "system", setTheme: expect.any(Function) });
   });
 
   it("throws when used outside PreferencesProvider", () => {
