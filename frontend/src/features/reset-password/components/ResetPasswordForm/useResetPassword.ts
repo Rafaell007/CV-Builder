@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { ResetPasswordDocument } from "@/shared/graphql";
 import { useRouter } from "@/shared/i18n";
+import { SIGN_IN_PATH } from "@/shared/session";
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "@/shared/utils";
 import type {
   ResetPasswordErrorKey,
@@ -16,9 +17,6 @@ import { isTokenError, toResetPasswordFailure, validateResetPassword } from "./u
 
 const FIELDS: readonly ResetPasswordField[] = ["newPassword", "confirmPassword"];
 const EMPTY_VALUES: ResetPasswordValues = { newPassword: "", confirmPassword: "" };
-
-// The router adds the language.
-export const SIGN_IN_PATH = "/sign-in";
 
 export type ResetPasswordFieldProps = {
   value: string;
