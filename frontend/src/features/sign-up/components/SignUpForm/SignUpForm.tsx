@@ -1,8 +1,7 @@
 "use client";
 
-import { Button, ButtonLink } from "./components/Button";
-import { PasswordField } from "./components/PasswordField";
-import { TextField } from "./components/TextField";
+import Link from "next/link";
+import { Button, PasswordField, TextField } from "@/shared/components";
 import styles from "./SignUpForm.module.css";
 import { useSignUp } from "./useSignUp";
 
@@ -26,6 +25,8 @@ export function SignUpForm() {
           name="password"
           autoComplete="new-password"
           required
+          showPasswordLabel="Show password"
+          hidePasswordLabel="Hide password"
         />
         <PasswordField
           {...getFieldProps("confirmPassword")}
@@ -33,6 +34,8 @@ export function SignUpForm() {
           name="confirmPassword"
           autoComplete="new-password"
           required
+          showPasswordLabel="Show confirm password"
+          hidePasswordLabel="Hide confirm password"
         />
       </div>
       {formError !== undefined && (
@@ -41,10 +44,12 @@ export function SignUpForm() {
         </p>
       )}
       <div className={styles.actions}>
-        <Button type="submit" loading={pending}>
+        <Button type="submit" loading={pending} className={styles.submit}>
           Create account
         </Button>
-        <ButtonLink href="/sign-in">I have an account</ButtonLink>
+        <Button asChild variant="ghost">
+          <Link href="/sign-in">I have an account</Link>
+        </Button>
       </div>
     </form>
   );

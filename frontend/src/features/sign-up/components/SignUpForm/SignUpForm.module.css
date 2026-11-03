@@ -20,6 +20,12 @@
   gap: var(--space-2);
 }
 
+/* Estimate from docs/images/03-sign-up-page.jpg: CREATE ACCOUNT is about 220px wide.
+   Two classes, so it wins over the shared Button's min-width whatever the CSS order. */
+.actions .submit {
+  min-width: 220px;
+}
+
 .error {
   margin: 0;
   color: var(--color-error);

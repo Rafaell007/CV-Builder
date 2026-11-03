@@ -6,7 +6,10 @@ import { SignUpForm } from "./index";
 import { SIGN_UP_MESSAGES } from "./utils";
 
 const push = vi.fn();
-vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
+vi.mock("next/navigation", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("next/navigation")>()),
+  useRouter: () => ({ push }),
+}));
 
 const EMAIL = "new@example.com";
 const PASSWORD = "Password123!";
@@ -104,6 +107,12 @@ describe("SignUpForm", () => {
 
     expect(screen.getByLabelText("Password")).toHaveAttribute("type", "text");
     expect(screen.getByLabelText("Confirm Password")).toHaveAttribute("type", "password");
+
+    await user.click(screen.getByRole("button", { name: "Show confirm password" }));
+    expect(screen.getByLabelText("Confirm Password")).toHaveAttribute("type", "text");
+
+    await user.click(screen.getByRole("button", { name: "Hide password" }));
+    expect(screen.getByLabelText("Password")).toHaveAttribute("type", "password");
   });
 
   it("sends the trimmed email and the password, then goes to the verification page", async () => {
@@ -122,10 +131,11 @@ describe("SignUpForm", () => {
     await user.click(submit());
     await user.click(submit());
 
-    expect(submit()).toBeDisabled();
+    // aria-disabled, not disabled: the shared Button keeps the focus while it is busy
+    expect(submit()).toHaveAttribute("aria-disabled", "true");
     expect(submit()).toHaveAttribute("aria-busy", "true");
     await waitFor(() => expect(push).toHaveBeenCalledTimes(1));
-    expect(submit()).toBeDisabled(); // still locked until the page changes
+    expect(submit()).toHaveAttribute("aria-disabled", "true"); // still locked until the page changes
   });
 
   it("shows a taken email under the email field and keeps the values", async () => {
@@ -141,7 +151,7 @@ describe("SignUpForm", () => {
     expect(screen.getByLabelText("Email")).toHaveValue(EMAIL);
     expect(screen.getByLabelText("Password")).toHaveValue(PASSWORD);
     expect(screen.getByLabelText("Confirm Password")).toHaveValue(PASSWORD);
-    expect(submit()).toBeEnabled();
+    expect(submit()).not.toHaveAttribute("aria-disabled");
     expect(push).not.toHaveBeenCalled();
   });
 
