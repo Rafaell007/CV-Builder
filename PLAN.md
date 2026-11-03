@@ -471,7 +471,7 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
 - [ ] **S3.2 FE Session** — `proxy.ts` (no session → `/sign-in`, refresh before render, signed-in on auth pages → `/users`, admin-only routes), error link refresh-then-redirect, `useCurrentUser`. Depends on S3.1, S0.4.
 - [x] **S3.3 BE Mail** — Nodemailer module (Mailpit locally), templates: verification code, password reset link (links use `FRONTEND_URL`).
 - [ ] **S3.4 Sign In** — BE errors ("Invalid email or password"); FE page. AC per sign-in.
-- [x] **S3.5 Sign Up** — BE `signUp` (unique email, hash, send code, sign in); FE page → `/verify-email`. AC per sign-up. Depends on S3.3. (PR #26; the page brings its own minimal form controls, they move to S1.1)
+- [x] **S3.5 Sign Up** — BE `signUp` (unique email, hash, send code, sign in); FE page → `/verify-email`. AC per sign-up. Depends on S3.3. (PR #26)
 - [ ] **S3.6 Email Verification** — BE `verifyEmail`, `resendVerificationCode` (10 min, single use, D20), `@Verified()`; FE OTP page, CONFIRM, LATER → `/users`. AC per verification.
 - [ ] **S3.7 Forgot Password** (Should) — BE `forgotPassword` (token + mail, same response for unknown emails); FE page. AC per forgot-password.
 - [ ] **S3.8 Reset Password** (Should) — BE `resetPassword` (token check, expiry, single use, revokes sessions D22); FE page. AC per reset-password.
@@ -585,4 +585,4 @@ Over 80 % per app, excluding generated code, configs, `main.ts` and route files.
 | 2026-10-30 | S2.1a Prisma schema and initial migration | — | 19 models from §7 checked against docs pages 10–27, indexes, `init` + `add_date_checks` migrations; project `endDate` is required (page 27) |
 | 2026-10-30 | S0.5b Backend test setup | — | Jest unit + coverage scripts, Supertest integration tests on a separate `_test` database (serial, truncated per file), injectable `Clock`; sample health tests |
 | 2026-11-02 | S3.3 BE Mail | — | `MailModule` with Nodemailer, templates for the verification code and the reset link, Mailpit defaults for the mail variables, unit tests with a mocked transport, integration test against Mailpit (CI starts Mailpit) |
-| 2026-11-03 | S3.5 Sign Up | #26 | `signUp` mutation (argon2 hash, unverified `USER`, first code mailed, cookies, `CONFLICT` + `EMAIL_TAKEN`, throttled), `/sign-up` page with its own minimal controls in `features/sign-up`, E2E spec checks the code in Mailpit (CI e2e job starts Mailpit) |
+| 2026-11-03 | S3.5 Sign Up | #26 | `signUp` mutation (argon2 hash, unverified `USER`, first code mailed, cookies, `CONFLICT` + `EMAIL_TAKEN`, throttled), `/sign-up` page in `en` and `pl` with the shared form controls, E2E spec checks the code in Mailpit (CI e2e job starts Mailpit) |

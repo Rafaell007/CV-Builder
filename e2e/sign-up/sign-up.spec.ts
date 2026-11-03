@@ -89,6 +89,17 @@ test("creates an account, signs the user in and mails the code", async ({ page, 
   expect(mail?.Subject).toBe("Your CV Builder verification code");
 });
 
+test("shows the page in Polish and keeps the language on its links", async ({ page }) => {
+  await page.goto("/pl/sign-up");
+
+  await expect(page.getByRole("heading", { name: "Zarejestruj się" })).toBeVisible();
+  await page.getByRole("button", { name: "Utwórz konto" }).click();
+  await expect(page.getByText("E-mail jest wymagany")).toBeVisible();
+
+  await page.getByRole("link", { name: "Mam już konto" }).click();
+  await expect(page).toHaveURL(/\/pl\/sign-in$/);
+});
+
 test("a signed-in user cannot open the sign-up page", async ({ page }) => {
   await fill(page, newEmail());
   await createAccount(page).click();
