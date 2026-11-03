@@ -467,8 +467,8 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
 - [ ] **S3.4 Sign In** — BE errors ("Invalid email or password"); FE page. AC per sign-in.
 - [ ] **S3.5 Sign Up** — BE `signUp` (unique email, hash, send code, sign in); FE page → `/verify-email`. AC per sign-up. Depends on S3.3.
 - [ ] **S3.6 Email Verification** — BE `verifyEmail`, `resendVerificationCode` (10 min, single use, D20), `@Verified()`; FE OTP page, CONFIRM, LATER → `/users`. AC per verification.
-- [ ] **S3.7 Forgot Password** (Should) — BE `forgotPassword` (token + mail, same response for unknown emails); FE page. AC per forgot-password.
-- [ ] **S3.8 Reset Password** (Should) — BE `resetPassword` (token check, expiry, single use, revokes sessions D22); FE page. AC per reset-password.
+- [ ] **S3.7 Forgot Password** (Should) — BE `forgotPassword` (token + mail, same response for unknown emails); FE page. AC per forgot-password. BE done (KAN-91), FE pending.
+- [ ] **S3.8 Reset Password** (Should) — BE `resetPassword` (token check, expiry, single use, revokes sessions D22); FE page. AC per reset-password. BE done (KAN-91), FE pending.
 
 ### Phase 4 — System pages and settings
 
