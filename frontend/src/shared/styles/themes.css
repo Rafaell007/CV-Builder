@@ -36,6 +36,7 @@
   --color-input-border-focus: var(--palette-grey-500);
   /* Password and textarea draw a darker focus border than the text input in light Figma */
   --color-input-border-focus-strong: var(--palette-grey-700);
+  --color-error-text: var(--palette-red);
   --color-disabled-bg: var(--palette-grey-400);
   --color-disabled-text: var(--palette-grey-200);
   --color-input-disabled-bg: var(--palette-grey-300);
@@ -79,6 +80,8 @@
   --color-input-border-hover: var(--palette-grey-100);
   --color-input-border-focus: var(--palette-grey-100);
   --color-input-border-focus-strong: var(--palette-grey-100);
+  /* #c63031 on #2e2e2e is 2.5:1; error text needs 4.5:1 (docs/design-tokens.md) */
+  --color-error-text: var(--palette-red-light);
   --color-disabled-bg: var(--palette-grey-500);
   --color-disabled-text: var(--palette-grey-400);
   --color-input-disabled-bg: var(--palette-grey-500);
@@ -125,6 +128,7 @@
     --color-input-border-hover: var(--palette-grey-100);
     --color-input-border-focus: var(--palette-grey-100);
     --color-input-border-focus-strong: var(--palette-grey-100);
+    --color-error-text: var(--palette-red-light);
     --color-disabled-bg: var(--palette-grey-500);
     --color-disabled-text: var(--palette-grey-400);
     --color-input-disabled-bg: var(--palette-grey-500);

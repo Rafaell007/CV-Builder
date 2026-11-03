@@ -201,6 +201,8 @@ Predictions for KAN-77 (2026-11-03): not drawn in Figma, chosen by us; fix here 
 - The label moves without animation (none drawn).
 
 Accessibility over Figma (2026-11-03): Figma's placeholder colour fails WCAG AA contrast (4.5:1): #C4C4C6 on #F5F5F7 is 1.59:1, #626262 on #2E2E2E about 2.3:1. The field label resting inside an empty field and the search placeholder use the grey text colour instead (#626262 / #AEAEAE, the floated label's colour). `--color-text-placeholder` stays in the tokens with its Figma value.
+
+Error text in dark (2026-11-03): #C63031 on #2E2E2E is 2.5:1. In dark, error text and the invalid label use #E9B0B0 (palette red-light, about 7:1) via `--color-error-text`; the invalid border and the password eye keep #C63031. Light is unchanged.
 - Dark IconButton active icon #656565 is read as #626262 (not in the palette). Dark search icon #C4C4C6 is kept as drawn.
 - Secondary dark hover has no border in Figma; the border takes the fill colour, so the button keeps its size.
 - 1440 › SIGN IN "Forgot password" (dark text #C4C4C6) differs from DS Ghost (#F5F5F7); we follow DS.

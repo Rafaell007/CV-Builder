@@ -90,7 +90,7 @@
 
 /* Prediction: red inside and above; Figma draws invalid only with a value */
 .control:where(:has([aria-invalid="true"])) .label {
-  color: var(--color-error);
+  color: var(--color-error-text);
 }
 
 /* 1px below the border, 12px from the left (Figma "Invalid" error text) */
@@ -103,7 +103,7 @@
 }
 
 .error {
-  color: var(--color-error);
+  color: var(--color-error-text);
 }
 
 .helper {
