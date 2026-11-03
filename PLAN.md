@@ -449,6 +449,7 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
 
 - [ ] **S1.1 Form controls** — Button, IconButton, TextField, PasswordField (toggle), Textarea, Select, MultiSelect, DatePicker, OtpField, SearchField (debounced); RHF + Zod helpers and server field-error mapping. Stories + tests.
 - [ ] **S1.2 Data display** — DataTable (columns, sort indicator, row actions slot), Pagination, Menu (one open, Escape/outside close), Tabs, Breadcrumbs, Avatar, PageState (loading skeleton, empty, no results, error + retry). Stories + tests.
+  - **Done (S1.2b, KAN-80):** `Menu`, `Tabs`, `Breadcrumbs`, `Avatar` and `PageState` in `frontend/src/shared/components/` (README for `Menu` and `PageState`). `Menu` is Radix `DropdownMenu`. `Tabs` takes the current `pathname` from the layout and marks the longest matching route; `Avatar` falls back to initials when the image is missing or fails. `PageState` keeps `empty` and `no-results` apart from `error`. Texts are props with English defaults until S0.6.
 - [ ] **S1.3 Overlays and feedback** — Modal / FormModal (focus trap, Escape, primary disabled until valid and dirty), ConfirmModal, Toast notifications, SelectionToolbar ("REMOVE (n)"). Stories + tests.
 - [ ] **S1.4 App layout** — `(app)` layout: sidebar by role (§6), active item, profile section + menu, header with breadcrumbs, Device Error gate (< 768 px, CSS media query only, D28), No Internet state. Depends on S1.2, S3.1 (`me`).
 
@@ -579,3 +580,4 @@ Over 80 % per app, excluding generated code, configs, `main.ts` and route files.
 | 2026-10-30 | S2.1a Prisma schema and initial migration | — | 19 models from §7 checked against docs pages 10–27, indexes, `init` + `add_date_checks` migrations; project `endDate` is required (page 27) |
 | 2026-10-30 | S0.5b Backend test setup | — | Jest unit + coverage scripts, Supertest integration tests on a separate `_test` database (serial, truncated per file), injectable `Clock`; sample health tests |
 | 2026-11-02 | S3.3 BE Mail | — | `MailModule` with Nodemailer, templates for the verification code and the reset link, Mailpit defaults for the mail variables, unit tests with a mocked transport, integration test against Mailpit (CI starts Mailpit) |
+| 2026-11-03 | S1.2b UI kit: Menu, Tabs, Breadcrumbs, Avatar, PageState | — | `Menu` (one open, Escape and outside click close), route-driven `Tabs`, `Breadcrumbs`, `Avatar` (image or initials), `PageState` (loading skeleton, empty, no results, error + retry); stories and unit tests |
