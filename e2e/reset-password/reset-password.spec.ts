@@ -100,9 +100,8 @@ test("the link from the mail sets a new password, once", async ({ page, request 
   await fill(page, NEW_PASSWORD);
   await submit(page).click();
 
-  await expect(page.getByRole("status")).toHaveText(
-    "Your password was changed. You can sign in with the new password.",
-  );
+  // The backend does not sign the user in, so the page leads to the sign-in page.
+  await expect(page).toHaveURL(/\/sign-in$/);
   expect(await canSignIn(request, email, NEW_PASSWORD)).toBe(true);
   expect(await canSignIn(request, email, OLD_PASSWORD)).toBe(false);
 
