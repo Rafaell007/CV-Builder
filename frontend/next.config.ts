@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
 
 // Read here and not in src/server/env.ts: this config runs outside the app (PLAN §5.5).
 // Rewrites are resolved at build time, so `next build` needs it too.
@@ -18,4 +19,7 @@ const nextConfig: NextConfig = {
   ],
 };
 
-export default nextConfig;
+// Connects src/i18n/request.ts (its default path) to next-intl. https://next-intl.dev/docs/usage/configuration
+const withNextIntl = createNextIntlPlugin();
+
+export default withNextIntl(nextConfig);
