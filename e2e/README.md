@@ -1,10 +1,10 @@
 # E2E tests
 
-Playwright tests that drive a real browser through the whole app: Next.js → NestJS → PostgreSQL (PLAN §11.4, D14). Specs live in one folder per area (`smoke/`, `session/`, `i18n/`, `sign-up/`, later `cvs/`, …). Every page URL starts with the language (`/en/users`); a path without one is redirected, so specs may use either. `support/signIn.ts` signs a seeded account in through the API until the sign-in page exists (S3.4); most specs start with it, because protected pages redirect without a session.
+Playwright tests that drive a real browser through the whole app: Next.js → NestJS → PostgreSQL (PLAN §11.4, D14). Specs live in one folder per area (`smoke/`, `session/`, `i18n/`, `sign-up/`, `forgot-password/`, `reset-password/`, later `cvs/`, …). Every page URL starts with the language (`/en/users`); a path without one is redirected, so specs may use either. `support/signIn.ts` signs a seeded account in through the API until the sign-in page exists (S3.4); most specs start with it, because protected pages redirect without a session.
 
 ## Run
 
-Needs Docker (`docker compose up -d`, which also starts Mailpit: the `sign-up` spec reads the verification mail through `support/mailpit.ts`) and, once per machine, the browser: `pnpm --filter @cv-builder/e2e exec playwright install chromium`.
+Needs Docker (`docker compose up -d`, which also starts Mailpit: the `sign-up` spec reads the verification mail and the `forgot-password` and `reset-password` specs read the reset link, all through `support/mailpit.ts`) and, once per machine, the browser: `pnpm --filter @cv-builder/e2e exec playwright install chromium`.
 
 ```
 pnpm test:e2e
