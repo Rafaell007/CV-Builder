@@ -1,0 +1,26 @@
+/* The value text; the box, label and messages are styled by Field. Values: docs/design-tokens.md › Components */
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  /* The focus indicator is Field's border colour */
+  outline: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: var(--text-input);
+  letter-spacing: var(--text-input-ls);
+}
+
+.input:disabled {
+  color: var(--color-input-disabled-text);
+  cursor: not-allowed;
+}
+
+/* Browser autofill paints its own background; cover it with the page colour so both themes stay as drawn */
+.input:autofill {
+  box-shadow: inset 0 0 0 100px var(--color-bg);
+  -webkit-text-fill-color: var(--color-text);
+}
