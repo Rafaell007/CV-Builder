@@ -124,7 +124,9 @@ describe("sign up", () => {
 
   it.each([
     ["an invalid email", "not-an-email", TEST_PASSWORD],
-    ["a password shorter than 6 characters", NEW_EMAIL, "12345"],
+    ["a password shorter than 8 characters", NEW_EMAIL, "Pass123"],
+    ["a password without a digit", NEW_EMAIL, "PasswordOnly"],
+    ["a password without a letter", NEW_EMAIL, "12345678"],
     ["a password longer than 128 characters", NEW_EMAIL, "a".repeat(129)],
   ])("refuses %s with BAD_USER_INPUT and creates nothing", async (_name, email, password) => {
     const { body, setCookies } = await signUp(email, password);
@@ -133,6 +135,12 @@ describe("sign up", () => {
     expect(setCookies).toEqual([]);
     expect(mailed).toEqual([]);
     await expect(prisma.user.count({ where: { email: NEW_EMAIL } })).resolves.toBe(0);
+  });
+
+  it("accepts a password of exactly 8 characters with a letter and a digit", async () => {
+    const { body } = await signUp(NEW_EMAIL, "Passw0rd");
+
+    expect(body.errors).toBeUndefined();
   });
 
   it("never returns the password or its hash", async () => {
