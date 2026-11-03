@@ -2,6 +2,13 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input CreateCvInput {
+  description: String!
+  education: String!
+  name: String!
+  userId: ID
+}
+
 input CreateProjectInput {
   description: String!
   domain: String!
@@ -9,6 +16,22 @@ input CreateProjectInput {
   environmentIds: [ID!]! = []
   name: String!
   startDate: DateTime!
+}
+
+type Cv {
+  createdAt: DateTime!
+  description: String!
+  education: String!
+  id: ID!
+  name: String!
+  ownerEmail: String!
+  updatedAt: DateTime!
+  userId: ID!
+}
+
+type CvPage {
+  items: [Cv!]!
+  total: Int!
 }
 
 """
@@ -30,7 +53,9 @@ type Health {
 }
 
 type Mutation {
+  createCv(input: CreateCvInput!): Cv!
   createProject(input: CreateProjectInput!): Project!
+  deleteCv(id: ID!): Cv!
   deleteProject(id: ID!): Boolean!
   forgotPassword(input: ForgotPasswordInput!): Boolean!
   refresh: Boolean!
@@ -39,6 +64,7 @@ type Mutation {
   signIn(input: SignInInput!): SessionUser!
   signOut: Boolean!
   signUp(input: SignUpInput!): SessionUser!
+  updateCv(input: UpdateCvInput!): Cv!
   updateProject(input: UpdateProjectInput!): Project!
   verifyEmail(input: VerifyEmailInput!): SessionUser!
 }
@@ -71,6 +97,8 @@ type ProjectRole {
 }
 
 type Query {
+  cv(id: ID!): Cv!
+  cvs(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput, userId: ID): CvPage!
   health: Health!
   me: SessionUser
   projectRoles: [ProjectRole!]!
@@ -114,6 +142,13 @@ enum SortDirection {
 input SortInput {
   direction: SortDirection! = ASC
   field: String!
+}
+
+input UpdateCvInput {
+  description: String!
+  education: String!
+  id: ID!
+  name: String!
 }
 
 input UpdateProjectInput {
