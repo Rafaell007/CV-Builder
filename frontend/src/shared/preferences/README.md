@@ -1,9 +1,9 @@
 # Preferences
 
-Theme (`light` / `dark` / `system`) and language (`en` / `pl`), saved in the `theme` and `locale` cookies for 1 year (PLAN D5, D26, D27).
+Theme (`light` / `dark` / `system`), saved in the `theme` cookie for 1 year (PLAN D5, D26). The language is not a preference here: it lives in the URL (`/en/...`, `/pl/...`), see [`shared/i18n`](../i18n/README.md).
 
-- `PreferencesScript`: inline `<head>` script; applies the saved values to `<html data-theme lang>` before the first paint, so there is no flash. The server never reads the cookies, which keeps pages static under Cache Components.
-- `PreferencesProvider` + `usePreferences()`: `{ theme, language, setTheme, setLanguage }`. State comes from `store/` through `useSyncExternalStore`: the server and hydration use the defaults, then the saved values, so components that display a preference never cause a hydration mismatch. Setters save the cookie and update `<html>`.
-- `THEMES`, `LANGUAGES`, `Theme`, `Language`: options and types for selectors.
+- `PreferencesScript`: inline `<head>` script; applies the saved theme to `<html data-theme>` before the first paint, so there is no flash. The server never reads the cookie, which keeps pages static under Cache Components.
+- `PreferencesProvider` + `usePreferences()`: `{ theme, setTheme }`. State comes from `store/` through `useSyncExternalStore`: the server and hydration use the default, then the saved value, so components that display the theme never cause a hydration mismatch. `setTheme` saves the cookie and updates `<html>`.
+- `THEMES`, `Theme`: options and type for the theme selector.
 
-Used by: `app/layout.tsx` (script + provider), the Settings page (S4.4). Colours per theme: `shared/styles/themes.css`. Pattern: [Next.js, preventing flash before hydration](https://nextjs.org/docs/app/guides/preventing-flash-before-hydration), [React, useSyncExternalStore](https://react.dev/reference/react/useSyncExternalStore).
+Used by: `app/[locale]/layout.tsx` (script + provider), the Settings page (S4.4). Colours per theme: `shared/styles/themes.css`. Pattern: [Next.js, preventing flash before hydration](https://nextjs.org/docs/app/guides/preventing-flash-before-hydration), [React, useSyncExternalStore](https://react.dev/reference/react/useSyncExternalStore).

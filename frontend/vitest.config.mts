@@ -28,6 +28,9 @@ export default defineConfig(({ mode }) => {
             name: "unit",
             environment: "jsdom",
             setupFiles: ["./vitest.setup.ts"],
+            // next-intl imports `next/navigation` without an extension, which Node's ESM loader rejects;
+            // inlining lets Vite resolve it. https://next-intl.dev/docs/environments/testing
+            server: { deps: { inline: ["next-intl"] } },
           },
         },
         {

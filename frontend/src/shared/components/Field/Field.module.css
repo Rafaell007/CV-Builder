@@ -1,0 +1,136 @@
+/*
+ * Values: docs/design-tokens.md › Components › Text input, password, textarea.
+ * The border is drawn on .control (Figma's "Fieldset"), so the password toggle sits inside it.
+ * States come from the control itself (CSS only): :focus-within, :placeholder-shown (filled), aria-invalid, :disabled.
+ * State selectors use :where() so they all have the same specificity and the later rule wins.
+ */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.control {
+  --field-focus-border: var(--color-input-border-focus);
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: var(--space-12);
+  /* Text 12px from the outer edge = 11px inside the 1px border */
+  padding: 0 11px;
+  border: 1px solid var(--color-input-border);
+}
+
+.multiline {
+  align-items: stretch;
+  height: auto;
+  padding: 11px;
+}
+
+.strongFocus {
+  --field-focus-border: var(--color-input-border-focus-strong);
+}
+
+.control:where(:hover) {
+  border-color: var(--color-input-border-hover);
+}
+
+.control:where(:focus-within) {
+  border-color: var(--field-focus-border);
+}
+
+.control:where(:has([aria-invalid="true"])) {
+  border-color: var(--color-error);
+}
+
+.control:where(:has(:is(input, textarea):disabled)) {
+  border-color: var(--color-input-border);
+  background: var(--color-input-disabled-bg);
+}
+
+/*
+ * Empty and not focused: the label shows inside, where the value will be (Figma "Default").
+ * Grey text, not Figma's placeholder colour: that has 1.59:1 contrast, WCAG AA needs 4.5:1 (docs/design-tokens.md).
+ */
+.label {
+  position: absolute;
+  top: 50%;
+  left: 11px;
+  max-width: calc(100% - 22px);
+  overflow: hidden;
+  transform: translateY(-50%);
+  color: var(--color-text-secondary);
+  font: var(--text-input);
+  letter-spacing: var(--text-input-ls);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+.multiline .label {
+  top: 11px;
+  transform: none;
+}
+
+/* Focused or filled: the label moves above the border, 15px high, 0px gap (Figma "Active") */
+.control:where(:focus-within, :has(:is(input, textarea):not(:placeholder-shown))) .label {
+  top: -1px;
+  transform: translateY(-100%);
+  font: var(--text-label);
+  line-height: 15px;
+  letter-spacing: var(--text-label-ls);
+}
+
+/* Textarea: 1px gap to the border */
+.multiline:where(:focus-within, :has(textarea:not(:placeholder-shown))) .label {
+  top: -2px;
+}
+
+/* Prediction: red inside and above; Figma draws invalid only with a value */
+.control:where(:has([aria-invalid="true"])) .label {
+  color: var(--color-error-text);
+}
+
+/* 1px below the border, 12px from the left (Figma "Invalid" error text) */
+.error,
+.helper {
+  margin: 1px 0 0;
+  padding: 0 var(--space-3);
+  font: var(--text-error);
+  letter-spacing: var(--text-error-ls);
+}
+
+.error {
+  color: var(--color-error-text);
+}
+
+.helper {
+  color: var(--color-text-secondary);
+}
+
+/* The <input> / <textarea> inside the box (fieldInputClassName). Field's border is its focus indicator. */
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: var(--text-input);
+  letter-spacing: var(--text-input-ls);
+}
+
+.input:disabled {
+  color: var(--color-input-disabled-text);
+  cursor: not-allowed;
+}
+
+/* Browser autofill paints its own background; cover it with the page colour so both themes stay as drawn */
+.input:autofill {
+  box-shadow: inset 0 0 0 100px var(--color-bg);
+  -webkit-text-fill-color: var(--color-text);
+}

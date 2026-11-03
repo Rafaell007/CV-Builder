@@ -2,24 +2,19 @@
 
 import { useLayoutEffect, useMemo, useSyncExternalStore, type ReactNode } from "react";
 import { PreferencesContext } from "../../PreferencesContext";
-import { applyLanguage, applyTheme } from "../../preferences.browser";
-import { getServerSnapshot, getSnapshot, saveLanguage, saveTheme, subscribe } from "../../store";
+import { applyTheme } from "../../preferences.browser";
+import { getServerSnapshot, getSnapshot, saveTheme, subscribe } from "../../store";
 
 export function PreferencesProvider({ children }: { children: ReactNode }) {
-  const { theme, language } = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const { theme } = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  // Dev Strict Mode remount clears <html> attributes; re-apply the saved values (no-op in production).
-  // Reads the cookies, not the rendered value, which is still the server default during hydration.
+  // Dev Strict Mode remount clears <html> attributes; re-apply the saved value (no-op in production).
+  // Reads the cookie, not the rendered value, which is still the server default during hydration.
   useLayoutEffect(() => {
-    const saved = getSnapshot();
-    applyTheme(saved.theme);
-    applyLanguage(saved.language);
+    applyTheme(getSnapshot().theme);
   }, []);
 
-  const value = useMemo(
-    () => ({ theme, language, setTheme: saveTheme, setLanguage: saveLanguage }),
-    [theme, language],
-  );
+  const value = useMemo(() => ({ theme, setTheme: saveTheme }), [theme]);
 
   return <PreferencesContext value={value}>{children}</PreferencesContext>;
 }
