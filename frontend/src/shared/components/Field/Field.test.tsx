@@ -48,4 +48,11 @@ describe("Field", () => {
     expect(input).toHaveAccessibleDescription("Email is required");
     expect(screen.queryByText("We never share it")).not.toBeInTheDocument();
   });
+
+  // A live region, so a screen reader announces an error that appears while focus is elsewhere.
+  it("announces the error", () => {
+    renderWithProviders(<EmailField error="Email is required" />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Email is required");
+  });
 });
