@@ -1,4 +1,5 @@
-import { splitLocale } from "@/shared/i18n";
+// Not `@/shared/i18n`: the proxy imports `@/shared/session`, and the i18n entry would bring navigation into it.
+import { splitLocale } from "@/shared/i18n/utils";
 import { SIGN_IN_PATH } from "../session.constants";
 
 let redirecting = false;

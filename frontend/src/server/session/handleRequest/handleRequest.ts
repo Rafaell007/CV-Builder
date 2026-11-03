@@ -2,7 +2,9 @@ import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { parseSetCookie } from "../utils";
 import { resolveSession } from "../resolveSession";
-import { routing, splitLocale } from "@/shared/i18n";
+// Not `@/shared/i18n`: its navigation loads the request config (next/root-params), which the proxy cannot import.
+import { routing } from "@/shared/i18n/routing";
+import { splitLocale } from "@/shared/i18n/utils";
 import { ACCESS_COOKIE, getRouteKind, REFRESH_COOKIE, resolveRedirect } from "@/shared/session";
 
 // Adds the language to paths without one (from the `locale` cookie, else English) and keeps the cookie current.

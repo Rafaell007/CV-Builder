@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
-import { routing } from "./src/shared/i18n/routing";
+import { routing } from "./src/shared/i18n/routing/routing";
 
 // Read here and not in src/server/env.ts: this config runs outside the app (PLAN §5.5).
 // Rewrites are resolved at build time, so `next build` needs it too.
