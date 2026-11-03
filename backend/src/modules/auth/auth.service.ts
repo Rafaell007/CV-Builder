@@ -5,6 +5,7 @@ import { Clock } from "../../common/clock";
 import { PrismaService } from "../../prisma/prisma.service";
 import type { SignInInput } from "./dto/sign-in.input";
 import type { SessionUser } from "./models/session-user";
+import { SESSION_USER_SELECT } from "./models/session-user.select";
 import { hashPassword, verifyPassword } from "./password";
 import { REFRESH_TOKEN_TTL_MS, TokenService } from "./token.service";
 
@@ -21,15 +22,6 @@ export interface SignedInSession extends SessionTokens {
 export const REFRESH_GRACE_WINDOW_MS = 30 * 1000;
 
 const SESSION_ENDED = "Session ended, sign in again";
-
-export const SESSION_USER_SELECT = {
-  id: true,
-  email: true,
-  role: true,
-  isVerified: true,
-  firstName: true,
-  lastName: true,
-} as const;
 
 @Injectable()
 export class AuthService {
