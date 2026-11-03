@@ -1,7 +1,1 @@
-export {
-  getServerSnapshot,
-  getSnapshot,
-  saveLanguage,
-  saveTheme,
-  subscribe,
-} from "./preferences.store";
+export { getServerSnapshot, getSnapshot, saveTheme, subscribe } from "./preferences.store";

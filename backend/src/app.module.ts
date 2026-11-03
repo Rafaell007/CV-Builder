@@ -7,6 +7,7 @@ import { ClockModule } from "./common/clock";
 import { AppConfigModule } from "./config";
 import { AuthModule } from "./modules/auth/auth.module";
 import { HealthModule } from "./modules/health/health.module";
+import { ProjectsModule } from "./modules/projects/projects.module";
 import { PrismaModule } from "./prisma/prisma.module";
 
 @Module({
@@ -27,6 +28,7 @@ import { PrismaModule } from "./prisma/prisma.module";
       context: ({ req, res }: { req: unknown; res: unknown }) => ({ req, res }),
     }),
     HealthModule,
+    ProjectsModule,
   ],
 })
 export class AppModule {}

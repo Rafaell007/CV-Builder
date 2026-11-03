@@ -1,0 +1,40 @@
+/* Values: docs/design-tokens.md › Components › IconButton (40×40, radius 20, 24px icon at 8px inset) */
+
+.iconButton {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-10);
+  height: var(--space-10);
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-round);
+  background: transparent;
+  color: var(--color-icon);
+  cursor: pointer;
+}
+
+/* Prediction: not drawn in Figma; same ring as Button */
+.iconButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.iconButton:hover {
+  border-color: var(--color-icon-button-hover-border);
+}
+
+.iconButton:active {
+  background: var(--color-icon-button-active-bg);
+  border-color: var(--color-icon-button-active-border);
+  color: var(--color-icon-button-active-icon);
+}
+
+/* Last, so it wins over hover and active (same specificity) */
+.iconButton:disabled {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-icon-disabled);
+  cursor: not-allowed;
+}

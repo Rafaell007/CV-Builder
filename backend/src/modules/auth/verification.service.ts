@@ -11,8 +11,8 @@ import { Clock } from "../../common/clock";
 import type { Environment } from "../../config";
 import { PrismaService } from "../../prisma/prisma.service";
 import { MailService } from "../mail";
-import { SESSION_USER_SELECT } from "./auth.service";
 import type { SessionUser } from "./models/session-user";
+import { SESSION_USER_SELECT } from "./models/session-user.select";
 import {
   generateVerificationCode,
   hashesMatch,

@@ -1,19 +1,21 @@
-import { UnauthorizedException } from "@nestjs/common";
+import { ConflictException, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { Clock } from "../../common/clock";
 import type { Environment } from "../../config";
+import { Prisma } from "../../generated/prisma/client";
 import { Role } from "../../generated/prisma/enums";
 import type { PrismaService } from "../../prisma/prisma.service";
-import { AuthService, REFRESH_GRACE_WINDOW_MS } from "./auth.service";
+import { AuthService, EMAIL_TAKEN_REASON, REFRESH_GRACE_WINDOW_MS } from "./auth.service";
 import { hashPassword } from "./password";
 import { REFRESH_TOKEN_TTL_MS, TokenService } from "./token.service";
+import type { VerificationService } from "./verification.service";
 
 const NOW = new Date("2026-07-12T10:00:00.000Z");
 const PASSWORD = "Password123!";
 
 const prisma = {
-  user: { findUnique: jest.fn() },
+  user: { findUnique: jest.fn(), create: jest.fn() },
   refreshToken: {
     create: jest.fn(),
     findUnique: jest.fn(),
@@ -21,6 +23,8 @@ const prisma = {
     deleteMany: jest.fn(),
   },
 };
+
+const verification = { issueCode: jest.fn() };
 
 const config = new ConfigService<Environment, true>({
   JWT_ACCESS_SECRET: "unit-test-access-secret-0123456789abc",
@@ -30,11 +34,92 @@ const tokens = new TokenService(new JwtService(), config);
 const clock: Clock = { now: () => NOW };
 
 function createService(): AuthService {
-  return new AuthService(prisma as unknown as PrismaService, tokens, clock);
+  return new AuthService(
+    prisma as unknown as PrismaService,
+    tokens,
+    clock,
+    verification as unknown as VerificationService,
+  );
 }
 
 describe("AuthService", () => {
   beforeEach(() => jest.resetAllMocks());
+
+  describe("signUp", () => {
+    const SIGNED_UP = {
+      id: "user-2",
+      email: "new@example.com",
+      role: Role.USER,
+      isVerified: false,
+      firstName: null,
+      lastName: null,
+    };
+
+    function uniqueViolation(): Prisma.PrismaClientKnownRequestError {
+      return new Prisma.PrismaClientKnownRequestError("Unique constraint failed", {
+        code: "P2002",
+        clientVersion: "test",
+      });
+    }
+
+    it("creates an unverified user with a hashed password, mails a code and opens a session", async () => {
+      prisma.user.create.mockResolvedValue(SIGNED_UP);
+
+      const session = await createService().signUp({
+        email: "  New@Example.com ",
+        password: PASSWORD,
+      });
+
+      const [{ data }] = prisma.user.create.mock.calls[0] as [{ data: Record<string, string> }];
+      expect(data["email"]).toBe("new@example.com");
+      expect(data["passwordHash"]).not.toBe(PASSWORD);
+      expect(data["passwordHash"]).toMatch(/^\$argon2id\$/);
+      expect(data).not.toHaveProperty("role");
+      expect(data).not.toHaveProperty("isVerified");
+      expect(verification.issueCode).toHaveBeenCalledWith(SIGNED_UP);
+      expect(session.user).toEqual(SIGNED_UP);
+      await expect(tokens.verifyAccessToken(session.accessToken)).resolves.toBe("user-2");
+      expect(prisma.refreshToken.create).toHaveBeenCalledTimes(1);
+    });
+
+    it("answers CONFLICT with the reason EMAIL_TAKEN when the email exists", async () => {
+      prisma.user.create.mockRejectedValue(uniqueViolation());
+
+      const result = createService().signUp({ email: "new@example.com", password: PASSWORD });
+
+      await expect(result).rejects.toBeInstanceOf(ConflictException);
+      await expect(result).rejects.toMatchObject({
+        response: {
+          message: "An account with this email already exists",
+          reason: EMAIL_TAKEN_REASON,
+        },
+      });
+      expect(verification.issueCode).not.toHaveBeenCalled();
+      expect(prisma.refreshToken.create).not.toHaveBeenCalled();
+    });
+
+    it("passes other database errors on unchanged", async () => {
+      const failure = new Error("connection lost");
+      prisma.user.create.mockRejectedValue(failure);
+
+      await expect(
+        createService().signUp({ email: "new@example.com", password: PASSWORD }),
+      ).rejects.toBe(failure);
+    });
+
+    it("still opens the session when the mail cannot be sent", async () => {
+      prisma.user.create.mockResolvedValue(SIGNED_UP);
+      verification.issueCode.mockRejectedValue(new Error("SMTP down"));
+
+      const session = await createService().signUp({
+        email: "new@example.com",
+        password: PASSWORD,
+      });
+
+      expect(session.user).toEqual(SIGNED_UP);
+      expect(prisma.refreshToken.create).toHaveBeenCalledTimes(1);
+    });
+  });
 
   describe("signIn", () => {
     async function storedUser(): Promise<Record<string, unknown>> {
