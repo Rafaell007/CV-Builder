@@ -1,8 +1,6 @@
-// Placeholder (PLAN §6); the real page comes with its own step.
-export default function SignUpPage() {
-  return (
-    <main>
-      <h1>Sign up</h1>
-    </main>
-  );
-}
+import type { Metadata } from "next";
+import { SignUpPage } from "@/features/sign-up";
+
+export const metadata: Metadata = { title: "Sign up | CV Builder" };
+
+export default SignUpPage;
