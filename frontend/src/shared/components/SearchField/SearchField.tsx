@@ -34,7 +34,9 @@ export function SearchField({
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     onKeyDown?.(event);
-    if (event.key === "Enter") {
+    // Enter that confirms an IME composition (e.g. Japanese) is not a search. Enter alone must not submit a form around the field.
+    if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+      event.preventDefault();
       cancel();
       onSearch(event.currentTarget.value);
     }

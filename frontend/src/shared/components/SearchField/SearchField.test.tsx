@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { act, renderWithProviders, screen } from "@/shared/testing";
+import { act, fireEvent, renderWithProviders, screen } from "@/shared/testing";
 import { SearchField } from "./SearchField";
 
 describe("SearchField", () => {
@@ -58,5 +58,27 @@ describe("SearchField", () => {
     act(() => vi.advanceTimersByTime(300));
 
     expect(onSearch).toHaveBeenCalledExactlyOnceWith("");
+  });
+
+  it("does not submit a form around it on Enter", async () => {
+    const onSubmit = vi.fn((event: SubmitEvent) => event.preventDefault());
+    const { user } = renderWithProviders(
+      <form onSubmit={(event) => onSubmit(event.nativeEvent as SubmitEvent)}>
+        <SearchField label="Search employees" onSearch={vi.fn()} />
+        <button type="submit">Go</button>
+      </form>,
+    );
+
+    await user.type(screen.getByRole("searchbox", { name: "Search employees" }), "react{Enter}");
+
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("ignores Enter while an input method is composing text", () => {
+    const { onSearch, input } = setup();
+
+    fireEvent.keyDown(input, { key: "Enter", isComposing: true });
+
+    expect(onSearch).not.toHaveBeenCalled();
   });
 });
