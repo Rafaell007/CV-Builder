@@ -56,7 +56,6 @@ export class CvProjectsService {
 
   async add(user: AuthUser, input: AddCvProjectInput): Promise<CvProject> {
     await this.cvs.assertAccessible(user, input.cvId);
-    await this.assertRolesExist(input.roleIds);
 
     const row = await this.inTransaction((tx) => this.createEntry(tx, input));
     return toCvProject(row);
@@ -69,7 +68,6 @@ export class CvProjectsService {
     });
     if (existing === null) throw cvProjectNotFound();
     await this.cvs.assertAccessible(user, existing.cvId);
-    await this.assertRolesExist(input.roleIds);
 
     const row = await this.inTransaction((tx) => this.changeEntry(tx, input));
     return toCvProject(row);
@@ -89,6 +87,7 @@ export class CvProjectsService {
     tx: Prisma.TransactionClient,
     { cvId, projectId, roleIds, responsibilities, ...dates }: AddCvProjectInput,
   ): Promise<CvProjectRow> {
+    await this.assertRolesExist(tx, roleIds);
     const project = await tx.project.findUnique({
       where: { id: projectId },
       select: { startDate: true, endDate: true },
@@ -114,6 +113,7 @@ export class CvProjectsService {
     tx: Prisma.TransactionClient,
     { id, roleIds, responsibilities, ...dates }: UpdateCvProjectInput,
   ): Promise<CvProjectRow> {
+    await this.assertRolesExist(tx, roleIds);
     const entry = await tx.cvProject.findUnique({
       where: { id },
       select: { project: { select: { startDate: true, endDate: true } } },
@@ -132,8 +132,9 @@ export class CvProjectsService {
     });
   }
 
-  private async assertRolesExist(roleIds: string[]): Promise<void> {
-    const found = await this.prisma.projectRole.count({ where: { id: { in: roleIds } } });
+  /** Runs inside the serializable transaction, so a role that is deleted at the same time cannot slip through. */
+  private async assertRolesExist(tx: Prisma.TransactionClient, roleIds: string[]): Promise<void> {
+    const found = await tx.projectRole.count({ where: { id: { in: roleIds } } });
     if (found !== roleIds.length) {
       throw new ValidationFailedException([
         { field: "roleIds", messages: ["roleIds must contain only existing roles"] },
@@ -191,7 +192,8 @@ function cvProjectNotFound(): NotFoundException {
  * - P2002: the project is already in this CV (the unique index, AC-31). It also covers two
  *   requests that add the same project at the same time.
  * - P2034: another request changed the same data at the same time.
- * - P2003: the CV was deleted after the access check.
+ * - P2003: the CV was deleted after the access check. The project and the roles are checked
+ *   inside the same serializable transaction, so a parallel delete of them gives P2034 instead.
  */
 function translateDatabaseError(error: unknown): unknown {
   if (!(error instanceof Prisma.PrismaClientKnownRequestError)) return error;

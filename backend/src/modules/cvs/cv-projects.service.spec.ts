@@ -300,6 +300,16 @@ describe("CvProjectsService.add", () => {
     expect(prisma.cvProject.create).not.toHaveBeenCalled();
   });
 
+  it("checks the roles inside the transaction, not before it", async () => {
+    const tx = { ...prisma, projectRole: { count: jest.fn().mockResolvedValue(1) } };
+    transaction.mockImplementationOnce((work: (client: unknown) => Promise<unknown>) => work(tx));
+
+    await service.add(USER, addInput());
+
+    expect(tx.projectRole.count).toHaveBeenCalledTimes(1);
+    expect(prisma.projectRole.count).not.toHaveBeenCalled();
+  });
+
   it("rejects dates outside the project, using the dates stored in the catalog", async () => {
     await expect(
       service.add(USER, addInput({ startDate: new Date("2025-01-01T00:00:00Z") })),
@@ -401,6 +411,16 @@ describe("CvProjectsService.update", () => {
       fieldErrors: [{ field: "roleIds", messages: ["roleIds must contain only existing roles"] }],
     });
     expect(prisma.cvProject.update).not.toHaveBeenCalled();
+  });
+
+  it("checks the roles inside the transaction, not before it", async () => {
+    const tx = { ...prisma, projectRole: { count: jest.fn().mockResolvedValue(2) } };
+    transaction.mockImplementationOnce((work: (client: unknown) => Promise<unknown>) => work(tx));
+
+    await service.update(USER, updateInput());
+
+    expect(tx.projectRole.count).toHaveBeenCalledTimes(1);
+    expect(prisma.projectRole.count).not.toHaveBeenCalled();
   });
 
   it("answers NOT_FOUND when the entry is removed after the access check", async () => {
