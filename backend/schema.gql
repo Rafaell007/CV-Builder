@@ -9,6 +9,15 @@ input CreateCvInput {
   userId: ID
 }
 
+input CreateProjectInput {
+  description: String!
+  domain: String!
+  endDate: DateTime!
+  environmentIds: [ID!]! = []
+  name: String!
+  startDate: DateTime!
+}
+
 type Cv {
   createdAt: DateTime!
   description: String!
@@ -30,18 +39,33 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type EnvironmentSkill {
+  id: ID!
+  name: String!
+}
+
+input ForgotPasswordInput {
+  email: String!
+}
+
 type Health {
   status: String!
 }
 
 type Mutation {
   createCv(input: CreateCvInput!): Cv!
+  createProject(input: CreateProjectInput!): Project!
   deleteCv(id: ID!): Cv!
+  deleteProject(id: ID!): Boolean!
+  forgotPassword(input: ForgotPasswordInput!): Boolean!
   refresh: Boolean!
   resendVerificationCode: Boolean!
+  resetPassword(input: ResetPasswordInput!): Boolean!
   signIn(input: SignInInput!): SessionUser!
   signOut: Boolean!
+  signUp(input: SignUpInput!): SessionUser!
   updateCv(input: UpdateCvInput!): Cv!
+  updateProject(input: UpdateProjectInput!): Project!
   verifyEmail(input: VerifyEmailInput!): SessionUser!
 }
 
@@ -50,11 +74,40 @@ input PageInput {
   size: Int! = 20
 }
 
+type Project {
+  createdAt: DateTime!
+  description: String!
+  domain: String!
+  endDate: DateTime!
+  environment: [EnvironmentSkill!]!
+  id: ID!
+  name: String!
+  startDate: DateTime!
+  updatedAt: DateTime!
+}
+
+type ProjectPage {
+  items: [Project!]!
+  total: Int!
+}
+
+type ProjectRole {
+  id: ID!
+  name: String!
+}
+
 type Query {
   cv(id: ID!): Cv!
-  cvs(page: PageInput! = {number: 1, size: 20}, search: String, sort: SortInput, userId: ID): CvPage!
+  cvs(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput, userId: ID): CvPage!
   health: Health!
   me: SessionUser
+  projectRoles: [ProjectRole!]!
+  projects(page: PageInput! = {number: 1, size: 20}, search: String, sort: SortInput): ProjectPage!
+}
+
+input ResetPasswordInput {
+  newPassword: String!
+  token: String!
 }
 
 enum Role {
@@ -76,6 +129,11 @@ input SignInInput {
   password: String!
 }
 
+input SignUpInput {
+  email: String!
+  password: String!
+}
+
 enum SortDirection {
   ASC
   DESC
@@ -91,6 +149,16 @@ input UpdateCvInput {
   education: String!
   id: ID!
   name: String!
+}
+
+input UpdateProjectInput {
+  description: String!
+  domain: String!
+  endDate: DateTime!
+  environmentIds: [ID!]! = []
+  id: ID!
+  name: String!
+  startDate: DateTime!
 }
 
 input VerifyEmailInput {

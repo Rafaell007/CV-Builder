@@ -1,0 +1,49 @@
+.list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.button {
+  min-width: var(--space-10);
+  height: var(--space-10);
+  padding: 0 var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text);
+  font: var(--text-button);
+  letter-spacing: var(--text-button-ls);
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled) {
+  background: var(--color-surface);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-input-border-focus);
+  outline-offset: 2px;
+}
+
+/* The current page: the selected page is filled with the primary colour. */
+.button[aria-current="page"] {
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+}
+
+.button:disabled {
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+.gap {
+  min-width: var(--space-6);
+  color: var(--color-text-secondary);
+  font: var(--text-button);
+  text-align: center;
+}

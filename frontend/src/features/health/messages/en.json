@@ -1,0 +1,5 @@
+{
+  "checking": "Checking the backend…",
+  "status": "Backend health ({source, select, server {server} other {client}}): {status}",
+  "unavailable": "unavailable"
+}

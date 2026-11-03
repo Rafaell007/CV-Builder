@@ -1,6 +1,6 @@
 # Storybook
 
-Storybook 10 shows components one at a time, outside the app, in light, dark and system theme. Every story is also a test (render, `play` function, accessibility checks). Plan: [PLAN.md §9 S0.4](../../PLAN.md).
+Storybook 10 shows components one at a time, outside the app, in light, dark and system theme and in every language (`en`, `pl`). Every story is also a test (render, `play` function, accessibility checks). Plan: [PLAN.md §9 S0.4](../../PLAN.md).
 
 ## Run
 
@@ -11,15 +11,17 @@ Storybook 10 shows components one at a time, outside the app, in light, dark and
 ## Files
 
 - `main.ts`: framework (`@storybook/nextjs-vite`), where stories are found, addons (a11y, docs, vitest).
-- `preview.tsx`: applies to every story: global styles and tokens, the Roboto font, the Theme toolbar (light / dark / system, from `THEMES`), accessibility checks that fail the test, a docs page per component.
-- `withAppProviders.tsx`: global decorator; wraps every story in `PreferencesProvider` and Apollo `MockedProvider`, like `renderWithProviders` in unit tests. The toolbar theme is saved through `usePreferences().setTheme`, so the preferences store is the only thing that sets `<html data-theme>`.
+- `preview.tsx`: applies to every story: global styles and tokens, the Roboto font, the Theme toolbar (light / dark / system, from `THEMES`), the Language toolbar (from `routing.locales`) with a loader that loads its messages, accessibility checks that fail the test, a docs page per component.
+- `withAppProviders.tsx`: global decorator; wraps every story in `NextIntlClientProvider` (real messages, toolbar language, sets `<html lang>`), `PreferencesProvider` and Apollo `MockedProvider`, like `renderWithProviders` in unit tests. The toolbar theme is saved through `usePreferences().setTheme`, so the preferences store is the only thing that sets `<html data-theme>`.
 - `ThemeSample/`: Storybook-only sample; its stories check that each theme applies the right `--color-bg` from `themes.css`.
+- `LanguageSample/`: Storybook-only sample; its stories check that the toolbar language shows the real messages.
 
 ## Writing a story
 
 Put `X.stories.tsx` next to the component in `src/`. Name stories after the state they show. See `ThemeSample/ThemeSample.stories.tsx`.
 
 - Theme: `globals: { theme: "dark" }` forces one (`"light" | "dark" | "system"`).
+- Language: `globals: { locale: "pl" }` forces one; texts come from the real `messages/` files.
 - Checks: a `play` function with `expect` from `storybook/test`.
 - GraphQL: `parameters: { apollo: { mocks: [...] } }`, same mock format as `renderWithProviders` (`MockLink.MockedResponse`). A query without a mock gets an error.
 - Accessibility: violations fail the test. For a known issue that must not block, use `parameters: { a11y: { test: "todo" } }` (warning only) and fix it in the same ticket.

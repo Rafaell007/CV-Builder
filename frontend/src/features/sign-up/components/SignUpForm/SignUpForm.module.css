@@ -1,0 +1,35 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+  width: 100%;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 36px; /* Figma: 36px between the inputs */
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Estimate from docs/images/03-sign-up-page.jpg: CREATE ACCOUNT is about 220px wide.
+   Two classes, so it wins over the shared Button's min-width whatever the CSS order. */
+.actions .submit {
+  min-width: 220px;
+}
+
+.error {
+  margin: 0;
+  color: var(--color-error);
+  font: var(--text-error);
+  letter-spacing: var(--text-error-ls);
+  text-align: center;
+}

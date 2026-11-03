@@ -244,6 +244,19 @@ describe("cvs", () => {
       });
     });
 
+    it("refuses a description of more than 2000 characters", async () => {
+      const { body } = await call(ann, CREATE, {
+        input: { ...NEW_CV, description: "x".repeat(2001) },
+      });
+
+      expect(errorOf(body)?.extensions).toMatchObject({
+        code: "BAD_USER_INPUT",
+        fieldErrors: [
+          { field: "description", messages: ["Description must not exceed 2000 characters"] },
+        ],
+      });
+    });
+
     it("needs a verified email (D16)", async () => {
       const { body } = await call(unverified, CREATE, { input: NEW_CV });
 

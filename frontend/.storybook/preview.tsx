@@ -1,7 +1,8 @@
 import type { Preview } from "@storybook/nextjs-vite";
+import { routing } from "@/shared/i18n";
 import { THEMES } from "@/shared/preferences";
 import { roboto } from "@/shared/styles";
-import { withAppProviders } from "./withAppProviders";
+import { loadAppMessages, withAppProviders } from "./withAppProviders";
 // Same global styles as app/layout.tsx: tokens, light/dark themes, base styles.
 import "@/shared/styles/global.css";
 
@@ -18,15 +19,25 @@ const preview: Preview = {
     // `parameters: { a11y: { test: "todo" } }` (warning only). https://storybook.js.org/docs/writing-tests/accessibility-testing
     a11y: { test: "error" },
   },
-  // Toolbar theme switcher (core Storybook, no addon). withAppProviders applies it through the preferences store.
-  // https://storybook.js.org/docs/essentials/toolbars-and-globals
+  // Toolbar theme and language switchers (core Storybook, no addon). withAppProviders applies the theme through
+  // the preferences store and the language through next-intl. https://storybook.js.org/docs/essentials/toolbars-and-globals
   globalTypes: {
     theme: {
       description: "Color theme",
       toolbar: { title: "Theme", icon: "mirror", items: [...THEMES], dynamicTitle: true },
     },
+    locale: {
+      description: "Language",
+      toolbar: {
+        title: "Language",
+        icon: "globe",
+        items: [...routing.locales],
+        dynamicTitle: true,
+      },
+    },
   },
-  initialGlobals: { theme: "light" },
+  initialGlobals: { theme: "light", locale: routing.defaultLocale },
+  loaders: [loadAppMessages],
   decorators: [withAppProviders],
 };
 
