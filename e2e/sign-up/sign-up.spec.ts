@@ -42,9 +42,9 @@ test("shows validation messages and sends nothing for invalid values", async ({ 
   await expect(page.getByText("Password is required", { exact: true })).toBeVisible();
   await expect(page.getByText("Confirm Password is required")).toBeVisible();
 
-  await fill(page, "not-an-email", "12345", "123456");
+  await fill(page, "not-an-email", "Pass123", "Pass1234");
   await expect(page.getByText("Please enter a valid email address")).toBeVisible();
-  await expect(page.getByText("Password must be at least 6 characters long")).toBeVisible();
+  await expect(page.getByText("Password must be at least 8 characters long")).toBeVisible();
   await expect(page.getByText("Passwords do not match")).toBeVisible();
   await expect(page).toHaveURL(/\/sign-up$/);
 });

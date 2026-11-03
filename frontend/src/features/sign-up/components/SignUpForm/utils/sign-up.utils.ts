@@ -3,16 +3,19 @@ import type { SignUpErrors, SignUpFailure, SignUpValues } from "../sign-up.types
 
 // Same limits as the backend's SignUpInput, which checks them again (sign-up page AC-14).
 export const EMAIL_MAX_LENGTH = 255;
-export const PASSWORD_MIN_LENGTH = 6;
+export const PASSWORD_MIN_LENGTH = 8;
 export const PASSWORD_MAX_LENGTH = 128;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// At least one letter and one digit (D32). Sign-in does not check it, so older passwords still work.
+const LETTER_AND_DIGIT_PATTERN = /^(?=.*\p{L})(?=.*\d)/u;
 
 export const SIGN_UP_MESSAGES = {
   emailRequired: "Email is required",
   emailInvalid: "Please enter a valid email address",
   passwordRequired: "Password is required",
   passwordTooShort: `Password must be at least ${PASSWORD_MIN_LENGTH} characters long`,
+  passwordWeak: "Password must contain at least one letter and one digit",
   passwordTooLong: `Password must be at most ${PASSWORD_MAX_LENGTH} characters long`,
   confirmRequired: "Confirm Password is required",
   confirmMismatch: "Passwords do not match",
@@ -37,6 +40,8 @@ export function validateSignUp({ email, password, confirmPassword }: SignUpValue
     errors.password = SIGN_UP_MESSAGES.passwordTooShort;
   } else if (password.length > PASSWORD_MAX_LENGTH) {
     errors.password = SIGN_UP_MESSAGES.passwordTooLong;
+  } else if (!LETTER_AND_DIGIT_PATTERN.test(password)) {
+    errors.password = SIGN_UP_MESSAGES.passwordWeak;
   }
 
   if (confirmPassword === "") errors.confirmPassword = SIGN_UP_MESSAGES.confirmRequired;

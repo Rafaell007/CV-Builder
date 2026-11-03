@@ -90,7 +90,7 @@ describe("SignUpForm", () => {
   it("refuses a short password and a confirmation that does not match", async () => {
     const { user } = renderWithProviders(<SignUpForm />);
 
-    await fillForm(user, { password: "12345", confirm: "123456" });
+    await fillForm(user, { password: "Pass123", confirm: "Pass1234" });
     await user.click(submit());
 
     expect(screen.getByText(SIGN_UP_MESSAGES.passwordTooShort)).toBeInTheDocument();

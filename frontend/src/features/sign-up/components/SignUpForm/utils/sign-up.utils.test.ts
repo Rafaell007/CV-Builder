@@ -36,18 +36,30 @@ describe("validateSignUp", () => {
     expect(validateSignUp({ ...VALID, email: "  new@example.com " })).toEqual({});
   });
 
-  it("checks the password length (6 to 128 characters)", () => {
-    expect(validateSignUp({ ...VALID, password: "12345" }).password).toBe(
+  it("checks the password length (8 to 128 characters)", () => {
+    expect(validateSignUp({ ...VALID, password: "Pass123" }).password).toBe(
       SIGN_UP_MESSAGES.passwordTooShort,
     );
+    expect(validateSignUp({ ...VALID, password: "Passw0rd", confirmPassword: "Passw0rd" })).toEqual(
+      {},
+    );
     expect(
-      validateSignUp({ ...VALID, password: "a".repeat(6), confirmPassword: "a".repeat(6) }),
-    ).toEqual({});
-    expect(
-      validateSignUp({ ...VALID, password: "a".repeat(129), confirmPassword: "a".repeat(129) })
-        .password,
+      validateSignUp({
+        ...VALID,
+        password: `a1${"a".repeat(127)}`,
+        confirmPassword: `a1${"a".repeat(127)}`,
+      }).password,
     ).toBe(SIGN_UP_MESSAGES.passwordTooLong);
   });
+
+  it.each(["PasswordOnly", "12345678", "!!!!!!!!!"])(
+    "requires a letter and a digit in the password %s",
+    (password) => {
+      expect(validateSignUp({ ...VALID, password, confirmPassword: password }).password).toBe(
+        SIGN_UP_MESSAGES.passwordWeak,
+      );
+    },
+  );
 
   it("requires the confirmation to match the password", () => {
     expect(validateSignUp({ ...VALID, confirmPassword: "Password123?" }).confirmPassword).toBe(
