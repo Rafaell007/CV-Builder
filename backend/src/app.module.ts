@@ -6,6 +6,7 @@ import { ApiConventionsModule } from "./common/api-conventions";
 import { ClockModule } from "./common/clock";
 import { AppConfigModule } from "./config";
 import { AuthModule } from "./modules/auth/auth.module";
+import { CvsModule } from "./modules/cvs/cvs.module";
 import { HealthModule } from "./modules/health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 
@@ -27,6 +28,7 @@ import { PrismaModule } from "./prisma/prisma.module";
       context: ({ req, res }: { req: unknown; res: unknown }) => ({ req, res }),
     }),
     HealthModule,
+    CvsModule,
   ],
 })
 export class AppModule {}
