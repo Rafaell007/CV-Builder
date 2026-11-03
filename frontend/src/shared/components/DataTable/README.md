@@ -10,4 +10,11 @@ Table for a backend list page. It only renders; the page owns the query state (`
 - **States:** `loading` shows `loadingContent` in the body and keeps the header; `emptyContent` shows when there are no rows.
 - **Texts:** the `labels` prop replaces the English defaults (a11y texts only; pass translated ones).
 
+## Known issues
+
+- **English texts only.** The defaults of `labels` (`Actions`, `Select all rows`, `Select row <id>`) are English because i18n (S0.6) was not in place when this was built. Every page must pass translated `labels`. The `loadingContent` and `emptyContent` slots are also the page's job.
+- **Selection is not cleared by the table.** `selectedIds` stays when the page changes, and also when search or sort changes. The page decides when to clear it (for example after a delete or a new search). Rows that are no longer in the result stay in `selectedIds` until the page removes them.
+- **Row click is not a link.** A clickable row has `tabIndex` but no link or button role. If a row opens a detail page, think about adding a real link in one cell for screen readers.
+- **Lookups are plain arrays.** `toggleId` and `getSelectAllState` in `utils/selection.utils.ts` use `includes()`. This is fine for 10 rows per page. Use a `Set` if the page size grows a lot. The row check in `DataTable.tsx` already uses a `Set`.
+
 Used by: every list page (Users, CVs, …). Pair it with [Pagination](../Pagination/README.md). The Storybook story `Shared/DataTable → Sample` shows a table with mocked data. Docs: [docs/pages/10-users-page.md](../../../../../docs/pages/10-users-page.md).
