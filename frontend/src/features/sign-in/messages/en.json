@@ -1,0 +1,23 @@
+{
+  "tabs": {
+    "label": "Authentication",
+    "signIn": "Sign in",
+    "signUp": "Sign up"
+  },
+  "title": "Welcome back",
+  "subtitle": "Hello again! Sign in to continue",
+  "email": "Email",
+  "password": "Password",
+  "showPassword": "Show password",
+  "hidePassword": "Hide password",
+  "submit": "Sign in",
+  "forgotPassword": "Forgot password",
+  "errors": {
+    "emailRequired": "Email is required",
+    "emailInvalid": "Please enter a valid email address",
+    "passwordRequired": "Password is required",
+    "passwordTooShort": "Password must be at least 6 characters long",
+    "invalidCredentials": "Invalid email or password",
+    "unexpected": "Something went wrong. Please try again later"
+  }
+}
