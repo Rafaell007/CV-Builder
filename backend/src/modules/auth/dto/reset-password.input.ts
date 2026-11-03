@@ -1,7 +1,7 @@
 import { Field, InputType } from "@nestjs/graphql";
 import { IsString, Length, Matches, MaxLength, MinLength } from "class-validator";
 
-/** At least one letter and one digit (D32). The same rule as sign-up; sign-in does not use it, so older, weaker passwords still work. */
+/** At least one letter and one digit (D33). The same rule as sign-up; sign-in does not use it, so older, weaker passwords still work. */
 const LETTER_AND_DIGIT = /^(?=.*\p{L})(?=.*\d)/u;
 
 /** Checked again on the server, because the checks in the browser are not a security measure (reset password page AC-12). */

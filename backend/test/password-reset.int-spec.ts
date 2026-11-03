@@ -220,7 +220,7 @@ describe("forgot and reset password", () => {
       ["no digit", "Abcdefghij"],
       ["no letter", "1234567890"],
       ["129 characters", `a1${"b".repeat(127)}`],
-    ])("keeps the old password when the new one has %s (AC-5, D32)", async (_name, weak) => {
+    ])("keeps the old password when the new one has %s (AC-5, D33)", async (_name, weak) => {
       const { body } = await reset(lastToken(), weak);
 
       expect(body.errors?.[0]?.extensions.code).toBe("BAD_USER_INPUT");
@@ -229,7 +229,7 @@ describe("forgot and reset password", () => {
       expect((await reset(lastToken())).body).toEqual({ data: { resetPassword: true } });
     });
 
-    it("accepts a password of exactly 8 characters with a letter and a digit (D32)", async () => {
+    it("accepts a password of exactly 8 characters with a letter and a digit (D33)", async () => {
       const { body } = await reset(lastToken(), "Abcdef12");
 
       expect(body).toEqual({ data: { resetPassword: true } });

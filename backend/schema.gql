@@ -17,6 +17,7 @@ type Mutation {
   resetPassword(input: ResetPasswordInput!): Boolean!
   signIn(input: SignInInput!): SessionUser!
   signOut: Boolean!
+  signUp(input: SignUpInput!): SessionUser!
   verifyEmail(input: VerifyEmailInput!): SessionUser!
 }
 
@@ -45,6 +46,11 @@ type SessionUser {
 }
 
 input SignInInput {
+  email: String!
+  password: String!
+}
+
+input SignUpInput {
   email: String!
   password: String!
 }

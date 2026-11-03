@@ -133,6 +133,18 @@ jobs:
           --health-timeout 3s
           --health-retries 10
 
+      # Catches the mail of the sign-up E2E spec, like the mailpit service in docker-compose.yml.
+      mailpit:
+        image: axllent/mailpit:v1.32
+        ports:
+          - 1025:1025
+          - 8025:8025
+        options: >-
+          --health-cmd "/mailpit readyz"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
     steps:
       - uses: actions/checkout@v7
 
