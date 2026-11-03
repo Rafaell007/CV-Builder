@@ -1,13 +1,27 @@
+import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { parseSetCookie } from "../utils";
 import { resolveSession } from "../resolveSession";
+// Not `@/shared/i18n`: its navigation loads the request config (next/root-params), which the proxy cannot import.
+import { LOCALE_COOKIE, routing } from "@/shared/i18n/routing";
+import { splitLocale } from "@/shared/i18n/utils";
 import { ACCESS_COOKIE, getRouteKind, REFRESH_COOKIE, resolveRedirect } from "@/shared/session";
 
-// Called by `src/proxy.ts` before every page (PLAN D9): refreshes an expired session, then sends the visitor where the route
-// rules say. It only improves navigation; the backend still checks every request (PLAN D10).
+// Adds the language to paths without one and keeps the cookie current. The language comes from the `locale` cookie,
+// else from the browser's Accept-Language header, else English (next-intl's default order: turning detection off
+// would also stop it reading the cookie). https://next-intl.dev/docs/routing/middleware
+const handleI18nRouting = createMiddleware(routing);
+
+// Called by `src/proxy.ts` before every page (PLAN D9): makes sure the URL has a language, refreshes an expired
+// session, then sends the visitor where the route rules say. It only improves navigation; the backend still
+// checks every request (PLAN D10).
 export async function handleRequest(request: NextRequest, backendUrl: string) {
-  const kind = getRouteKind(request.nextUrl.pathname);
-  if (kind === "public") return NextResponse.next();
+  // No language yet: next-intl redirects to the same path with one, and the session is checked on that request.
+  const { locale, path } = splitLocale(request.nextUrl.pathname);
+  if (!locale) return handleI18nRouting(request);
+
+  const kind = getRouteKind(path);
+  if (kind === "public") return handleI18nRouting(request);
 
   const session = await resolveSession({
     backendUrl,
@@ -21,7 +35,8 @@ export async function handleRequest(request: NextRequest, backendUrl: string) {
       request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim() === "https",
   });
 
-  // Cookies the backend issued or cleared while checking: the page being rendered must see them too.
+  // Cookies the backend issued or cleared while checking: the page being rendered must see them too,
+  // so they go into the request before next-intl passes it on.
   for (const header of session.setCookies) {
     const cookie = parseSetCookie(header);
     if (!cookie) continue;
@@ -40,9 +55,17 @@ export async function handleRequest(request: NextRequest, backendUrl: string) {
           session.status === "active" ? session.role : null,
         );
 
-  const response = redirectTo
-    ? NextResponse.redirect(new URL(redirectTo, request.url))
-    : NextResponse.next({ request: { headers: request.headers } });
+  // A redirect stays in the visitor's language: /pl/admin → /pl/sign-in. It is built here and not by next-intl,
+  // so it saves the language in the cookie itself, like next-intl does for the other responses: only when it changed.
+  let response: NextResponse;
+  if (redirectTo) {
+    response = NextResponse.redirect(new URL(`/${locale}${redirectTo}`, request.url));
+    if (request.cookies.get(LOCALE_COOKIE.name)?.value !== locale) {
+      response.cookies.set(LOCALE_COOKIE.name, locale, { maxAge: LOCALE_COOKIE.maxAge, path: "/" });
+    }
+  } else {
+    response = handleI18nRouting(request);
+  }
   for (const header of session.setCookies) response.headers.append("set-cookie", header);
   return response;
 }

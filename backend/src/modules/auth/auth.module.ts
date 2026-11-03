@@ -6,6 +6,8 @@ import { MailModule } from "../mail";
 import { AuthResolver } from "./auth.resolver";
 import { AuthService } from "./auth.service";
 import { JwtAuthGuard } from "./jwt-auth.guard";
+import { PasswordResetResolver } from "./password-reset.resolver";
+import { PasswordResetService } from "./password-reset.service";
 import { SessionCookiesService } from "./session-cookies.service";
 import { TokenService } from "./token.service";
 import { VerificationResolver } from "./verification.resolver";
@@ -22,6 +24,8 @@ import { VerificationService } from "./verification.service";
     AuthService,
     VerificationResolver,
     VerificationService,
+    PasswordResetResolver,
+    PasswordResetService,
     TokenService,
     SessionCookiesService,
     { provide: APP_GUARD, useClass: JwtAuthGuard },

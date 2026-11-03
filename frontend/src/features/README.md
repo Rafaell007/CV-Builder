@@ -11,6 +11,7 @@ One folder per feature. Each feature folder has the same shape, and so does ever
   useFeature/             # composed hook: useFeature.ts, useFeature.test.ts, index.ts
   utils/                  # feature.utils.ts, feature.utils.test.ts, index.ts
   feature.types.ts
+  messages/               # en.json, pl.json: the feature's texts, same keys (see shared/i18n/README.md)
   components/
     Child/                # same shape, one level down
 ```

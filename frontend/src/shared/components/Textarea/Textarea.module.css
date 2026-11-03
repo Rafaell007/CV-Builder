@@ -1,0 +1,14 @@
+/*
+ * Values: docs/design-tokens.md › Components › Text input, password, textarea.
+ * `textarea.textarea` outweighs Field's shared input class, whatever order the two CSS files load in.
+ */
+
+/* 120px box = 96px text area + 11px padding + 1px border, top and bottom */
+textarea.textarea {
+  height: 96px;
+  min-height: 96px;
+  /* Prediction: Figma shows no resize handle; vertical only keeps the layout width */
+  resize: vertical;
+  font: var(--text-textarea);
+  letter-spacing: var(--text-textarea-ls);
+}

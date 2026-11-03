@@ -30,6 +30,8 @@
   --text-body-ls: 0.15px;
   --text-input: 400 16px/23px var(--font-family);
   --text-input-ls: 0.15px;
+  --text-textarea: 400 14px/24px var(--font-family);
+  --text-textarea-ls: 0.15px;
   --text-notification-title: 500 16px/16px var(--font-family);
   --text-notification-title-ls: 0.15px;
   --text-table-header: 500 14px/24px var(--font-family);

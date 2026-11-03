@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseLanguage, parseTheme, readCookie } from "./preferences.utils";
+import { parseTheme, readCookie } from "./preferences.utils";
 
 describe("parseTheme", () => {
   it.each(["light", "dark", "system"])("returns %s when it is a valid theme", (theme) => {
@@ -12,20 +12,6 @@ describe("parseTheme", () => {
 
   it("falls back to system when there is no value", () => {
     expect(parseTheme(undefined)).toBe("system");
-  });
-});
-
-describe("parseLanguage", () => {
-  it.each(["en", "pl"])("returns %s when it is a supported language", (language) => {
-    expect(parseLanguage(language)).toBe(language);
-  });
-
-  it("falls back to en for an unsupported language", () => {
-    expect(parseLanguage("fr")).toBe("en");
-  });
-
-  it("falls back to en when there is no value", () => {
-    expect(parseLanguage(undefined)).toBe("en");
   });
 });
 

@@ -33,8 +33,10 @@ Font: **Roboto** everywhere. LH = line height, LS = letter spacing (px). DS = pa
 | Text grey | #626262 | #AEAEAE | labels, inactive nav |
 | Placeholder | #C4C4C6 | #626262 | DS › Input › Default |
 | Input border | #AEAEAE | #AEAEAE | DS › Input › Default |
-| Input border hover | #626262 | not found | DS › Input › Hover |
+| Input border hover | #626262 | #F5F5F7 | DS › Input › Hover (dark: read 2026-11-03) |
 | Input border focus | #626262 | #F5F5F7 | DS › Input › Active |
+| Input border focus, password + textarea | #2E2E2E | #F5F5F7 | DS › Input & Textarea › Password / Textarea › Active |
+| Input disabled text | #AEAEAE | #AEAEAE | DS › Input › Disabled |
 | Input border invalid | #C63031 | #C63031 | DS › Input › Invalid |
 | Input disabled fill | #C4C4C6 | #626262 | DS › Input › Disabled |
 | Divider (table) | #AEAEAE 1px | #626262 1px | DS › Table › Data |
@@ -57,6 +59,7 @@ Font: **Roboto** everywhere. LH = line height, LS = letter spacing (px). DS = pa
 | Heading | 400 · 24 · 32 · 0 | 1440 › USER PROFILE › user name |
 | Body | 400 · 16 · 24 · 0.15 | 1440 › SIGN IN subtitle; sidebar nav item |
 | Input value / placeholder | 400 · 16 · 23 · 0.15 | DS › Input |
+| Textarea value | 400 · 14 · 24 · 0.15 | DS › Input & Textarea › Textarea › Active |
 | Notification title | 500 · 16 · 16 · 0.15 | DS › Notifications |
 | Table header | 500 · 14 · 24 · 0.15 | DS › Table |
 | Table cell | 400 · 14 · 20 · 0.15 | DS › Table |
@@ -114,7 +117,63 @@ Off-grid values (exact, per component):
 | Primary button (light + dark) | 0 1px 5px 0 rgb(0 0 0 / 12%), 0 2px 2px 0 rgb(0 0 0 / 14%), 0 3px 1px -2px rgb(0 0 0 / 20%) | 1440 › SIGN IN, SIGN UP buttons |
 | Secondary button, active (light only) | 0 4px 4px 0 rgb(0 0 0 / 25%) | DS › Buttons › Secondary › Active |
 
-Component-level details (secondary, ghost and select states) are left for the component tickets.
+## Components
+
+Read on 2026-11-03 (DS › Buttons, DS › Input & Textarea, 1440 › SIGN IN, 1440 › USERS). "Both" = same in light and dark. Select states are left for their ticket.
+
+### Button (height 48, radius 40, text = Button style)
+
+Side inset 30px, top/bottom 16px. Figma widths (160, ghost 220) are sample widths.
+
+| Variant | State | Light | Dark |
+|---|---|---|---|
+| Primary | default | fill #C63031, text #F5F5F7 | same |
+| Primary | hover | no fill, border 1px + text #C63031 | same |
+| Primary | active | fill #E9B0B0, border 1px + text #C63031 | same |
+| Primary | disabled | fill #AEAEAE, text #E2E2E4 | fill #626262, text #AEAEAE |
+| Text (DS "Primary (V2)") | default | no fill, no border, text #C63031 | same |
+| Text | hover / active / disabled | as Primary | as Primary |
+| Secondary | default | no fill, border 1px + text #626262 | fill #454545, border 1px #E2E2E4, text #F5F5F7 |
+| Secondary | hover | fill #AEAEAE, border 1px #626262, text #F5F5F7 | fill #E2E2E4, no border, text #454545 |
+| Secondary | active | fill + border #626262, text #F5F5F7, shadow 0 4px 4px rgb(0 0 0 / 25%) | no fill, border 1px #E2E2E4, text #F5F5F7, no shadow |
+| Secondary | disabled | as Primary | as Primary |
+| Ghost | default | no fill, no border, text #626262 | text #F5F5F7 |
+| Ghost | hover | border 1px #626262, text #626262 | border 1px #E2E2E4, text #F5F5F7 |
+| Ghost | active | fill #AEAEAE, border 1px #626262, text #626262 | fill #E2E2E4, border 1px #454545, text #454545 |
+| Ghost | disabled | as Primary | as Primary |
+
+### IconButton (40×40, radius 20, icon 24×24 at 8px inset)
+
+| State | Light | Dark |
+|---|---|---|
+| default | no fill, no border, icon #626262 | icon #F5F5F7 |
+| hover | border 1px #626262, icon #626262 | border 1px #E2E2E4, icon #F5F5F7 |
+| active | fill #AEAEAE, border 1px #626262, icon #F5F5F7 | fill #F5F5F7, border 1px #E2E2E4, icon #656565 |
+| disabled | icon #AEAEAE | same |
+
+### Text input, password, textarea
+
+Input 48px high, text inset left 12px, top 14px; no radius, no fill. Textarea 120px high, 12px inset all sides. Borders are 1px.
+
+| State | Light | Dark |
+|---|---|---|
+| default | border #AEAEAE, label shown as placeholder inside (#C4C4C6) | border #AEAEAE, placeholder #626262 |
+| hover | border #626262 | border #F5F5F7 |
+| active (focus or filled) | border #626262 (password, textarea #2E2E2E), value #2E2E2E, label above | border #F5F5F7, value #F5F5F7 |
+| invalid | border + label + error text #C63031 | same |
+| disabled | fill #C4C4C6, border #AEAEAE, value #AEAEAE | fill #626262 |
+
+- Label (Label style): above the border with 0px gap (textarea: 1px), left 12px; colour #626262 / #AEAEAE; invalid #C63031.
+- Error text (Error style): 1px below the border, left 12px.
+- Password eye button: IconButton size, top 4px, right 6px. Icon: #626262 / #F5F5F7; disabled #AEAEAE; invalid #C63031. Shown: "visibility" glyph; hidden-state glyph 16×16 (not identified).
+
+### Search field (1440 › USERS › Header)
+
+40px high, radius 40, border 1px #AEAEAE. Icon 24×24 at left 12px; text left 43px (icon → text 7px). Placeholder as input. Icon #626262 / #C4C4C6. Only the default state is drawn.
+
+### Icons
+
+No icon names in the file, but every glyph matches Google Material Icons by size and position: more-vert (4×16 at 10,4), visibility (22×15 at 1,4.5), search (17.49 at 3,3), chevron-right (7.41×12 at 8.59,6). We use Material Icons paths (Apache 2.0).
 
 ## Decisions where Figma is unclear
 
@@ -124,5 +183,26 @@ There is no designer to ask; we follow Figma as closely as possible and decide t
 - DS primary button has no shadow, but the screens do; we follow the screens.
 - No dark notifications; we use the light colours.
 - The input state "Active" means focus.
-- Dark input hover border: not found; we keep the default border (#AEAEAE) on hover.
 - Off-grid spacing (30, 15, 14, 22, 42, 36, 44, 26, 73px) is kept exact, not rounded.
+
+Predictions for KAN-77 (2026-11-03): not drawn in Figma, chosen by us; fix here and in the token when a better source appears.
+
+- Focus border: text input #626262, password and textarea #2E2E2E in light, as drawn (each component follows Figma).
+- Keyboard focus on buttons and icon buttons: 2px outline #626262 / #F5F5F7, offset 2px, only on `:focus-visible`.
+- Button loading: disabled colours, label kept, 16px spinner (2px stroke) in the text colour, 8px before the label.
+- Primary button shadow only in the default state (the screens draw only that state; DS hover/active have none).
+- Password hidden-state icon: Material "visibility-off" (the 16×16 Figma glyph is not identified).
+- Disabled input value: 16px like every other value (Figma shows 14px in one sample).
+- Button width: `min-width: 160px` with 30px side inset. The SIGN IN button (50px inset at 160px) comes out the same; ghost keeps 30px, not 28px.
+- Textarea: invalid state like the input; resizes vertically only.
+- Search field hover and focus: input borders; height 40px (the 45px border box is a layer artefact); the light inner shadow (spread 30px #F5F5F7) is ignored.
+- Helper text: Error text style in #626262 / #AEAEAE.
+- Invalid label is red inside the empty field too (Figma draws invalid only with a value).
+- The label moves without animation (none drawn).
+
+Accessibility over Figma (2026-11-03): Figma's placeholder colour fails WCAG AA contrast (4.5:1): #C4C4C6 on #F5F5F7 is 1.59:1, #626262 on #2E2E2E about 2.3:1. The field label resting inside an empty field and the search placeholder use the grey text colour instead (#626262 / #AEAEAE, the floated label's colour). `--color-text-placeholder` stays in the tokens with its Figma value.
+
+Error text in dark (2026-11-03): #C63031 on #2E2E2E is 2.5:1. In dark, error text and the invalid label use #E9B0B0 (palette red-light, about 7:1) via `--color-error-text`; the invalid border and the password eye keep #C63031. Light is unchanged.
+- Dark IconButton active icon #656565 is read as #626262 (not in the palette). Dark search icon #C4C4C6 is kept as drawn.
+- Secondary dark hover has no border in Figma; the border takes the fill colour, so the button keeps its size.
+- 1440 › SIGN IN "Forgot password" (dark text #C4C4C6) differs from DS Ghost (#F5F5F7); we follow DS.
