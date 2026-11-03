@@ -7,7 +7,7 @@ export const PASSWORD_MIN_LENGTH = 8;
 export const PASSWORD_MAX_LENGTH = 128;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-// At least one letter and one digit (D32). Sign-in does not check it, so older passwords still work.
+// At least one letter and one digit (D33). Sign-in does not check it, so older passwords still work.
 const LETTER_AND_DIGIT_PATTERN = /^(?=.*\p{L})(?=.*\d)/u;
 
 export const SIGN_UP_MESSAGES = {

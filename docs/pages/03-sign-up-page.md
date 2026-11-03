@@ -144,7 +144,7 @@ Requirements:
 Validation:
 
 - Field is required
-- Password must contain at least 8 characters, with at least one letter and one digit (PLAN D32)
+- Password must contain at least 8 characters, with at least one letter and one digit (PLAN D33)
 - Password must satisfy the password policy defined by the application
 Example validation messages:
 

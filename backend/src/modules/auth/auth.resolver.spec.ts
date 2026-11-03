@@ -70,7 +70,7 @@ describe("AuthResolver", () => {
     authService.signUp.mockRejectedValue(new Error("An account with this email already exists"));
 
     await expect(
-      resolver.signUp({ email: "a@b.co", password: "123456" }, context),
+      resolver.signUp({ email: "a@b.co", password: "Password123!" }, context),
     ).rejects.toThrow();
 
     expect(cookies.set).not.toHaveBeenCalled();
