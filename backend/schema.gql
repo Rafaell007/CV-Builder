@@ -2,13 +2,19 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input ForgotPasswordInput {
+  email: String!
+}
+
 type Health {
   status: String!
 }
 
 type Mutation {
+  forgotPassword(input: ForgotPasswordInput!): Boolean!
   refresh: Boolean!
   resendVerificationCode: Boolean!
+  resetPassword(input: ResetPasswordInput!): Boolean!
   signIn(input: SignInInput!): SessionUser!
   signOut: Boolean!
   verifyEmail(input: VerifyEmailInput!): SessionUser!
@@ -17,6 +23,11 @@ type Mutation {
 type Query {
   health: Health!
   me: SessionUser
+}
+
+input ResetPasswordInput {
+  newPassword: String!
+  token: String!
 }
 
 enum Role {
