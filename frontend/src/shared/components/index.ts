@@ -2,4 +2,5 @@
 export * from "./Button";
 export * from "./IconButton";
 export * from "./icons";
+export * from "./PasswordField";
 export * from "./TextField";
