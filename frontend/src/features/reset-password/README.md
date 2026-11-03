@@ -7,6 +7,6 @@ The `/reset-password?token=` page (PLAN S3.8, KAN-92): new password and confirm 
 - The frontend never decides if a token is good: the backend answers on submit. A bad token replaces the form with `ResetPasswordNotice`. A link without a token shows the "invalid" notice at once and sends no request.
 - `components/ResetPasswordNotice`: the end of the page. After success it says the password was changed and offers GO TO SIGN IN. The backend does not sign the user in (backend auth README), so the user signs in with the new password. For a bad token it also offers "Request a new link" (`/forgot-password`).
 - Texts: `messages/en.json` and `pl.json` (namespace `resetPassword`). Links use `Link` from `@/shared/i18n`, so they keep the language.
-- Tests: component tests next to the code, mocked GraphQL through `renderWithProviders`; E2E in [`e2e/forgot-password`](../../../../e2e/forgot-password) (the whole flow, with the link read from Mailpit).
+- Tests: component tests next to the code, mocked GraphQL through `renderWithProviders`; E2E in [`e2e/reset-password`](../../../../e2e/reset-password) (the whole flow, with the link read from Mailpit).
 
 Docs: [reset password page](../../../../docs/pages/05-reset-password-page.md) · [backend auth module](../../../../backend/src/modules/auth/README.md)
