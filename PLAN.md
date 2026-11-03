@@ -212,8 +212,8 @@ CV-Builder/
       env.ts · server/env.ts             the only places reading process.env (public · server only)
       features/<feature>/                one folder per feature (shape below)
       shared/
-        ui/                              UI kit on Radix: Button, TextField, PasswordField, Select, MultiSelect,
-                                         DatePicker, OtpField, DataTable, Pagination, Menu, Modal, ConfirmModal,
+        components/                      UI kit on Radix: Button, IconButton, TextField, PasswordField, Textarea,
+                                         Select, MultiSelect, DatePicker, OtpField, DataTable, Pagination, Menu, Modal, ConfirmModal,
                                          Toast, Tabs, Breadcrumbs, PageState, SearchField
         styles/                          design tokens, light/dark themes, global CSS
         apollo/ hooks/ utils/ i18n/ preferences/
