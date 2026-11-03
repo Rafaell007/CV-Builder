@@ -36,8 +36,13 @@ const prisma = {
   },
   skill: { count: jest.fn() },
   cvProject: { count: jest.fn() },
-  $transaction: jest.fn((operations: Promise<unknown>[]) => Promise.all(operations)),
+  $transaction: jest.fn(),
 };
+
+/** Runs a batch (array) like Prisma does, or an interactive callback with the same mock client. */
+function runTransaction(work: Promise<unknown>[] | ((tx: typeof prisma) => Promise<unknown>)) {
+  return typeof work === "function" ? work(prisma) : Promise.all(work);
+}
 
 function createService(): ProjectsService {
   return new ProjectsService(prisma as unknown as PrismaService);
@@ -60,9 +65,7 @@ const page = (): PageInput => new PageInput();
 describe("ProjectsService", () => {
   beforeEach(() => {
     jest.resetAllMocks();
-    prisma.$transaction.mockImplementation((operations: Promise<unknown>[]) =>
-      Promise.all(operations),
-    );
+    prisma.$transaction.mockImplementation(runTransaction);
   });
 
   describe("list", () => {
@@ -285,6 +288,25 @@ describe("ProjectsService", () => {
       await expect(attempt).rejects.toThrow(ConflictException);
       await expect(attempt).rejects.toThrow("2 CVs");
       expect(prisma.project.update).not.toHaveBeenCalled();
+    });
+
+    it("runs the check and the update in one serializable transaction", async () => {
+      await createService().update(input());
+
+      expect(prisma.$transaction).toHaveBeenCalledWith(expect.any(Function), {
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      });
+    });
+
+    it("fails with CONFLICT when the database stops a parallel change (P2034)", async () => {
+      prisma.$transaction.mockRejectedValue(
+        new Prisma.PrismaClientKnownRequestError("Write conflict", {
+          code: "P2034",
+          clientVersion: "test",
+        }),
+      );
+
+      await expect(createService().update(input())).rejects.toThrow(ConflictException);
     });
 
     it("uses the singular for one CV", async () => {

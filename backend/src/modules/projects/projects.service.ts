@@ -78,31 +78,49 @@ export class ProjectsService {
 
   async update(input: UpdateProjectInput): Promise<Project> {
     const dates = normalizeProjectDates(input.startDate, input.endDate);
-    const existing = await this.prisma.project.findUnique({
-      where: { id: input.id },
-      select: { startDate: true, endDate: true },
-    });
-    if (existing === null) throw new NotFoundException("Project not found");
     await this.assertSkillsExist(input.environmentIds);
 
-    const datesChanged =
-      existing.startDate.getTime() !== dates.startDate.getTime() ||
-      existing.endDate.getTime() !== dates.endDate.getTime();
-    if (datesChanged) await this.assertCvProjectsFitDates(input.id, dates);
+    try {
+      // Serializable: a CV that adds an entry while we check the dates makes one of the two fail, so no entry ends up outside the dates (D25).
+      const row = await this.prisma.$transaction(
+        async (tx) => {
+          const existing = await tx.project.findUnique({
+            where: { id: input.id },
+            select: { startDate: true, endDate: true },
+          });
+          if (existing === null) throw new NotFoundException("Project not found");
 
-    const row = await this.prisma.project.update({
-      where: { id: input.id },
-      data: {
-        name: input.name,
-        domain: input.domain,
-        description: input.description,
-        ...dates,
-        // Replaces the whole environment; the nested write runs in one transaction.
-        skills: { deleteMany: {}, create: input.environmentIds.map((skillId) => ({ skillId })) },
-      },
-      include: WITH_ENVIRONMENT,
-    });
-    return toProject(row);
+          const datesChanged =
+            existing.startDate.getTime() !== dates.startDate.getTime() ||
+            existing.endDate.getTime() !== dates.endDate.getTime();
+          if (datesChanged) await this.assertCvProjectsFitDates(tx, input.id, dates);
+
+          return tx.project.update({
+            where: { id: input.id },
+            data: {
+              name: input.name,
+              domain: input.domain,
+              description: input.description,
+              ...dates,
+              // Replaces the whole environment.
+              skills: {
+                deleteMany: {},
+                create: input.environmentIds.map((skillId) => ({ skillId })),
+              },
+            },
+            include: WITH_ENVIRONMENT,
+          });
+        },
+        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+      );
+      return toProject(row);
+    } catch (error) {
+      // P2034: the database stopped this update because another request changed the same data at the same time.
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2034") {
+        throw new ConflictException("The project was changed at the same time. Try again");
+      }
+      throw error;
+    }
   }
 
   async delete(id: string): Promise<void> {
@@ -139,10 +157,11 @@ export class ProjectsService {
 
   /** D25: CV project dates must stay within the project's dates. An empty CV end date means "Present". */
   private async assertCvProjectsFitDates(
+    tx: Prisma.TransactionClient,
     projectId: string,
     { startDate, endDate }: { startDate: Date; endDate: Date },
   ): Promise<void> {
-    const outside = await this.prisma.cvProject.count({
+    const outside = await tx.cvProject.count({
       where: {
         projectId,
         OR: [
