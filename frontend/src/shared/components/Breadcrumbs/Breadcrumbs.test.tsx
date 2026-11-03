@@ -12,8 +12,11 @@ describe("Breadcrumbs", () => {
   it("renders the earlier items as links", () => {
     renderWithProviders(<Breadcrumbs items={items} />);
 
-    expect(screen.getByRole("link", { name: "Users" })).toHaveAttribute("href", "/users");
-    expect(screen.getByRole("link", { name: "Jan Kowalski" })).toHaveAttribute("href", "/users/1");
+    expect(screen.getByRole("link", { name: "Users" })).toHaveAttribute("href", "/en/users");
+    expect(screen.getByRole("link", { name: "Jan Kowalski" })).toHaveAttribute(
+      "href",
+      "/en/users/1",
+    );
   });
 
   it("renders the last item as the current page, not as a link", () => {

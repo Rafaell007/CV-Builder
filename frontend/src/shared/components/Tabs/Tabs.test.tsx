@@ -12,7 +12,10 @@ describe("Tabs", () => {
   it("renders every tab as a link", () => {
     renderWithProviders(<Tabs items={items} pathname="/users/1" />);
 
-    expect(screen.getByRole("link", { name: "Skills" })).toHaveAttribute("href", "/users/1/skills");
+    expect(screen.getByRole("link", { name: "Skills" })).toHaveAttribute(
+      "href",
+      "/en/users/1/skills",
+    );
     expect(screen.getAllByRole("link")).toHaveLength(3);
   });
 
