@@ -1,12 +1,12 @@
 import { Field, InputType } from "@nestjs/graphql";
-import { Transform } from "class-transformer";
 import { IsEmail, IsString, MaxLength, MinLength } from "class-validator";
+import { Trim } from "../../../common/validation";
 
 /** Checked again on the server, because the checks in the browser are not a security measure (sign-in page AC-20). */
 @InputType()
 export class SignInInput {
   @Field()
-  @Transform(({ value }: { value: unknown }) => (typeof value === "string" ? value.trim() : value))
+  @Trim()
   @IsEmail()
   @MaxLength(255)
   email!: string;
