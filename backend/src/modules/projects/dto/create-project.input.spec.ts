@@ -1,6 +1,7 @@
+import { randomUUID } from "node:crypto";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
-import { CreateProjectInput } from "./create-project.input";
+import { CreateProjectInput, MAX_ENVIRONMENT_SKILLS } from "./create-project.input";
 import { UpdateProjectInput } from "./update-project.input";
 
 const ID = "6f1d3c52-8a0e-4f6c-9a43-2b7d5e1c9a10";
@@ -29,6 +30,17 @@ describe("CreateProjectInput", () => {
     delete withoutEnvironment.environmentIds;
 
     expect(plainToInstance(CreateProjectInput, withoutEnvironment).environmentIds).toEqual([]);
+  });
+
+  it("accepts the largest environment and rejects one skill more", async () => {
+    const ids = Array.from({ length: MAX_ENVIRONMENT_SKILLS + 1 }, () => randomUUID());
+
+    await expect(
+      failedFields({ ...VALID, environmentIds: ids.slice(0, MAX_ENVIRONMENT_SKILLS) }),
+    ).resolves.toEqual([]);
+    await expect(failedFields({ ...VALID, environmentIds: ids })).resolves.toEqual([
+      "environmentIds",
+    ]);
   });
 
   it.each(["name", "domain", "description"])(
