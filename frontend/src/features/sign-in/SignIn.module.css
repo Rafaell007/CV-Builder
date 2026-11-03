@@ -1,0 +1,41 @@
+/* Centered card. Distances: docs/design-tokens.md › Spacing (heading → subtitle 22, subtitle → email 42). */
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--space-8) var(--space-4);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-10);
+  width: 100%;
+  max-width: 480px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  /* 42px to the email field: 40px gap of the card + 2px. */
+  margin-bottom: 2px;
+  text-align: center;
+}
+
+.title,
+.subtitle {
+  margin: 0;
+}
+
+.title {
+  font: var(--text-title);
+  letter-spacing: var(--text-title-ls);
+}
+
+.subtitle {
+  font: var(--text-body);
+  letter-spacing: var(--text-body-ls);
+}
