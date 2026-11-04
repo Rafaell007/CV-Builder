@@ -1,4 +1,6 @@
-import { useImperativeHandle, useState, type FocusEvent, type Ref } from "react";
+import { useState, type Ref } from "react";
+import { useElementByIdRef } from "@/shared/hooks";
+import { createFocusLeaveHandler } from "@/shared/utils";
 import type { CalendarView } from "./datePicker.types";
 
 export type UseDatePickerOptions = {
@@ -16,9 +18,7 @@ export function useDatePicker({ onValueChange, onBlur, ref, controlId }: UseDate
   const [view, setView] = useState<CalendarView>("day");
 
   // react-datepicker keeps its own ref on the input; the caller gets the same element, found by its id.
-  useImperativeHandle(ref, () => document.getElementById(controlId) as HTMLInputElement, [
-    controlId,
-  ]);
+  useElementByIdRef(ref, controlId);
 
   return {
     view,
@@ -35,8 +35,6 @@ export function useDatePicker({ onValueChange, onBlur, ref, controlId }: UseDate
     shouldCloseOnSelect: view === "day",
     onCalendarClose: () => setView("day"),
     // Focus moving between the input and the calendar stays inside the field: not a blur for the form.
-    onFocusLeave: (event: FocusEvent<HTMLElement>) => {
-      if (!event.currentTarget.contains(event.relatedTarget)) onBlur?.();
-    },
+    onFocusLeave: createFocusLeaveHandler(onBlur),
   };
 }
