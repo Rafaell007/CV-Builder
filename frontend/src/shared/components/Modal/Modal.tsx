@@ -16,6 +16,8 @@ export interface ModalProps {
   closeLabel: string;
   /** Buttons, right-aligned under the content. */
   footer?: ReactNode;
+  /** Runs when the modal opens, before Radix focuses its first button; `event.preventDefault()` keeps your own focus. */
+  onOpenAutoFocus?: (event: Event) => void;
   children?: ReactNode;
 }
 
@@ -30,16 +32,23 @@ export function Modal({
   description,
   closeLabel,
   footer,
+  onOpenAutoFocus,
   children,
 }: ModalProps) {
   const returnFocus = useReturnFocus();
+
+  function handleOpenAutoFocus(event: Event) {
+    returnFocus.onOpenAutoFocus();
+    onOpenAutoFocus?.(event);
+  }
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className={styles.overlay} />
         <Dialog.Content
-          {...returnFocus}
+          onOpenAutoFocus={handleOpenAutoFocus}
+          onCloseAutoFocus={returnFocus.onCloseAutoFocus}
           className={styles.content}
           // Without a Description part Radix asks for an explicit "no description".
           {...(description === undefined && { "aria-describedby": undefined })}

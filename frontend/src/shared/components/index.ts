@@ -5,6 +5,7 @@ export * from "./Button";
 export * from "./CloseButton";
 export * from "./DataTable";
 export * from "./DatePicker";
+export * from "./FormModal";
 export * from "./IconButton";
 export * from "./icons";
 export * from "./Menu";
