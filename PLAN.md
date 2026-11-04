@@ -217,7 +217,7 @@ CV-Builder/
                                          Select, MultiSelect, DatePicker, OtpField, DataTable, Pagination, Menu, Modal, ConfirmModal,
                                          Toast, Tabs, Breadcrumbs, PageState, SearchField
         styles/                          design tokens, light/dark themes, global CSS
-        apollo/ hooks/ utils/ i18n/ preferences/
+        apollo/ forms/ hooks/ utils/ i18n/ preferences/
         graphql/                         generated typed documents (codegen output, not edited)
   backend/
     schema.gql                           generated contract (committed)
