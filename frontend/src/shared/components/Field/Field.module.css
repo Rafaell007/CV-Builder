@@ -42,7 +42,7 @@
   border-color: var(--color-input-border-hover);
 }
 
-.control:where(:focus-within, :has([aria-expanded="true"])) {
+.control:where(:focus-within, :has([role="combobox"][aria-expanded="true"])) {
   border-color: var(--field-focus-border);
 }
 
@@ -85,7 +85,7 @@
 .control:where(
     :focus-within,
     [data-filled],
-    :has([aria-expanded="true"]),
+    :has([role="combobox"][aria-expanded="true"]),
     :has(:is(input, textarea):not(:placeholder-shown))
   )
   .label {
