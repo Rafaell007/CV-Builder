@@ -17,6 +17,9 @@
   --color-warning-border: var(--palette-yellow-dark);
   --color-info: var(--palette-blue);
   --color-info-border: var(--palette-blue-dark);
+  /* Toast text: Figma's #335D35 on green fails WCAG AA, so success, warning and info use dark grey (docs/design-tokens.md) */
+  --color-notification-text: var(--palette-grey-700);
+  --color-notification-error-text: var(--palette-grey-100);
   --color-input-disabled-text: var(--palette-grey-400);
   --color-icon-disabled: var(--palette-grey-400);
   --color-chip-remove-bg: var(--palette-grey-400);
