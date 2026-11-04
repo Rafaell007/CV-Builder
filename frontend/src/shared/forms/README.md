@@ -15,5 +15,3 @@ Used by: every form with server validation. Reference: `SampleForm.stories.tsx` 
 - No `Controller` wrapper. Every form wires `Controller` by hand (see `SampleForm.stories.tsx`). Add one when a third form repeats the same code.
 - `applyServerFieldErrors` focuses only the first server error. A server error on a field that is not in the `fields` list is not shown inline. It returns `false`, so the caller must show a general error.
 - No helper translates Zod messages (PLAN.md has the i18n rule). The caller translates them.
-- `getMessage(field, serverMessages)` takes a hint that no caller uses. Remove it if it stays unused.
-- The `DatePickerLabels` object is copied into the stories, the DatePicker test and `SampleForm`. Move it to one shared test and story fixture.

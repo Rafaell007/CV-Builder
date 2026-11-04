@@ -2,18 +2,7 @@ import { createRef, useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders, screen, within } from "@/shared/testing";
 import { DatePicker, type DatePickerProps } from "./DatePicker";
-import type { DatePickerLabels } from "./datePicker.types";
-
-const LABELS: DatePickerLabels = {
-  calendar: "Choose a date",
-  previousMonth: "Previous month",
-  nextMonth: "Next month",
-  previousYears: "Previous years",
-  nextYears: "Next years",
-  chooseDayPrefix: "Choose",
-  unavailableDayPrefix: "Not available",
-  monthPrefix: "Month",
-};
+import { DATE_PICKER_EXAMPLE_LABELS as LABELS } from "./datePicker.fixtures";
 
 // Wednesday, 4 November 2026
 const NOV_4 = new Date(2026, 10, 4);

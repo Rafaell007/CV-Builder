@@ -6,6 +6,7 @@ import { expect, fn } from "storybook/test";
 import { z } from "zod";
 import {
   Button,
+  DATE_PICKER_EXAMPLE_LABELS,
   DatePicker,
   MultiSelect,
   OtpField,
@@ -32,17 +33,6 @@ const SKILLS = [
   { value: "nest", label: "NestJS" },
   { value: "postgres", label: "PostgreSQL" },
 ];
-
-const DATE_LABELS = {
-  calendar: "Choose a date",
-  previousMonth: "Previous month",
-  nextMonth: "Next month",
-  previousYears: "Previous years",
-  nextYears: "Next years",
-  chooseDayPrefix: "Choose",
-  unavailableDayPrefix: "Not available",
-  monthPrefix: "Month",
-};
 
 const MESSAGES = {
   emailRequired: "Enter an email",
@@ -218,7 +208,7 @@ function SampleForm(props: SampleFormProps) {
           <DatePicker
             label="Start date"
             locale="en"
-            labels={DATE_LABELS}
+            labels={DATE_PICKER_EXAMPLE_LABELS}
             name={field.name}
             value={field.value}
             onValueChange={field.onChange}

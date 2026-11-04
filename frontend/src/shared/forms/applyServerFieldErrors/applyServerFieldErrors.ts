@@ -5,8 +5,8 @@ export type ApplyServerFieldErrorsOptions<TValues extends FieldValues> = {
   // The form fields the server checks. A server field outside this list cannot be shown inline.
   fields: readonly Path<TValues>[];
   // The translated text under the field. The server's own messages are English (class-validator),
-  // so they are passed only as a hint and never shown as they are.
-  getMessage: (field: Path<TValues>, serverMessages: readonly string[]) => string;
+  // so they are never shown as they are.
+  getMessage: (field: Path<TValues>) => string;
 };
 
 /**
@@ -28,12 +28,8 @@ export function applyServerFieldErrors<TValues extends FieldValues>(
     (fieldError): fieldError is { field: Path<TValues>; messages: string[] } =>
       isFormField(fieldError.field),
   );
-  shown.forEach(({ field, messages }, index) => {
-    setError(
-      field,
-      { type: "server", message: getMessage(field, messages) },
-      { shouldFocus: index === 0 },
-    );
+  shown.forEach(({ field }, index) => {
+    setError(field, { type: "server", message: getMessage(field) }, { shouldFocus: index === 0 });
   });
 
   return fieldErrors.length > 0 && shown.length === fieldErrors.length;

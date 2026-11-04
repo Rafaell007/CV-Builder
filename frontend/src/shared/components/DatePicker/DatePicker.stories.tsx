@@ -2,23 +2,13 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import { expect, fn } from "storybook/test";
 import { DatePicker, type DatePickerProps } from "./DatePicker";
+import { DATE_PICKER_EXAMPLE_LABELS as LABELS } from "./datePicker.fixtures";
 
 // Colours as Chromium reports them (docs/design-tokens.md › Date picker)
 const RED = "rgb(198, 48, 49)";
 const GREY_100 = "rgb(245, 245, 247)";
 const GREY_400 = "rgb(174, 174, 174)";
 const GREY_500 = "rgb(98, 98, 98)";
-
-const LABELS = {
-  calendar: "Choose a date",
-  previousMonth: "Previous month",
-  nextMonth: "Next month",
-  previousYears: "Previous years",
-  nextYears: "Next years",
-  chooseDayPrefix: "Choose",
-  unavailableDayPrefix: "Not available",
-  monthPrefix: "Month",
-};
 
 // DatePicker is controlled: the story holds the value, as a form does.
 function StatefulDatePicker(args: DatePickerProps) {
