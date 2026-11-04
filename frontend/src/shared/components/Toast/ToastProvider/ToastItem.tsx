@@ -1,8 +1,8 @@
 import { Toast } from "radix-ui";
 import type { AnimationEvent } from "react";
-import { CloseButton } from "../CloseButton";
-import { ANNOUNCEMENT_BY_VARIANT } from "./toast.constants";
-import type { ToastContent, ToastVariant } from "./Toast.types";
+import { CloseButton } from "../../CloseButton";
+import { ANNOUNCEMENT_BY_VARIANT } from "../toast.constants";
+import type { ToastContent, ToastVariant } from "../Toast.types";
 import styles from "./ToastItem.module.css";
 
 export interface ToastItemProps extends ToastContent {

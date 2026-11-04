@@ -1,0 +1,22 @@
+/* Values: docs/design-tokens.md › "Decisions where Figma is unclear" › Toast
+   (bottom-right, 24 from the edges, newest at the bottom, 8 apart) */
+
+/* Above modals (z-index 20) */
+.viewport {
+  position: fixed;
+  right: var(--space-6);
+  bottom: var(--space-6);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* An open modal sets `pointer-events: none` on <body>; shown toasts stay clickable.
+   Only while toasts are shown, so the empty list never catches clicks meant for the page. */
+.viewport:not(:empty) {
+  pointer-events: auto;
+}

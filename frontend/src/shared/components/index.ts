@@ -21,3 +21,4 @@ export * from "./Select";
 export * from "./Tabs";
 export * from "./Textarea";
 export * from "./TextField";
+export * from "./Toast";
