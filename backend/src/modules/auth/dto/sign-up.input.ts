@@ -1,6 +1,6 @@
 import { Field, InputType } from "@nestjs/graphql";
-import { Transform } from "class-transformer";
 import { IsEmail, IsString, Matches, MaxLength, MinLength } from "class-validator";
+import { Trim } from "../../../common/validation";
 
 /** At least one letter and one digit (D33). Sign-in does not use it, so older, weaker passwords still work. */
 const LETTER_AND_DIGIT = /^(?=.*\p{L})(?=.*\d)/u;
@@ -9,7 +9,7 @@ const LETTER_AND_DIGIT = /^(?=.*\p{L})(?=.*\d)/u;
 @InputType()
 export class SignUpInput {
   @Field()
-  @Transform(({ value }: { value: unknown }) => (typeof value === "string" ? value.trim() : value))
+  @Trim()
   @IsEmail()
   @MaxLength(255)
   email!: string;

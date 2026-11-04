@@ -2,6 +2,69 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input AddCvProjectInput {
+  cvId: ID!
+  endDate: DateTime
+  projectId: ID!
+  responsibilities: String
+  roleIds: [ID!]!
+  startDate: DateTime!
+}
+
+input CreateCvInput {
+  description: String!
+  education: String!
+  name: String!
+  userId: ID
+}
+
+input CreateProjectInput {
+  description: String!
+  domain: String!
+  endDate: DateTime!
+  environmentIds: [ID!]! = []
+  name: String!
+  startDate: DateTime!
+}
+
+type Cv {
+  createdAt: DateTime!
+  description: String!
+  education: String!
+  id: ID!
+  name: String!
+  ownerEmail: String!
+  updatedAt: DateTime!
+  userId: ID!
+}
+
+type CvPage {
+  items: [Cv!]!
+  total: Int!
+}
+
+type CvProject {
+  createdAt: DateTime!
+  cvId: ID!
+  endDate: DateTime
+  id: ID!
+  project: Project!
+  responsibilities: String
+  roles: [ProjectRole!]!
+  startDate: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type EnvironmentSkill {
+  id: ID!
+  name: String!
+}
+
 input ForgotPasswordInput {
   email: String!
 }
@@ -11,19 +74,65 @@ type Health {
 }
 
 type Mutation {
+  addCvProject(input: AddCvProjectInput!): CvProject!
+  createCv(input: CreateCvInput!): Cv!
+  createProject(input: CreateProjectInput!): Project!
+  deleteCv(id: ID!): Cv!
+  deleteProject(id: ID!): Boolean!
   forgotPassword(input: ForgotPasswordInput!): Boolean!
   refresh: Boolean!
+  removeCvProjects(input: RemoveCvProjectsInput!): Boolean!
   resendVerificationCode: Boolean!
   resetPassword(input: ResetPasswordInput!): Boolean!
   signIn(input: SignInInput!): SessionUser!
   signOut: Boolean!
   signUp(input: SignUpInput!): SessionUser!
+  updateCv(input: UpdateCvInput!): Cv!
+  updateCvProject(input: UpdateCvProjectInput!): CvProject!
+  updateProject(input: UpdateProjectInput!): Project!
   verifyEmail(input: VerifyEmailInput!): SessionUser!
 }
 
+input PageInput {
+  number: Int! = 1
+  size: Int! = 20
+}
+
+type Project {
+  createdAt: DateTime!
+  description: String!
+  domain: String!
+  endDate: DateTime!
+  environment: [EnvironmentSkill!]!
+  id: ID!
+  name: String!
+  startDate: DateTime!
+  updatedAt: DateTime!
+}
+
+type ProjectPage {
+  items: [Project!]!
+  total: Int!
+}
+
+type ProjectRole {
+  id: ID!
+  name: String!
+}
+
 type Query {
+  cv(id: ID!): Cv!
+  cvProjects(cvId: ID!, search: String, sort: SortInput): [CvProject!]!
+  cvs(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput, userId: ID): CvPage!
   health: Health!
   me: SessionUser
+  projectRoles: [ProjectRole!]!
+  projects(page: PageInput! = {number: 1, size: 20}, search: String, sort: SortInput): ProjectPage!
+}
+
+input RemoveCvProjectsInput {
+  cvId: ID!
+  ids: [ID!]!
 }
 
 input ResetPasswordInput {
@@ -53,6 +162,41 @@ input SignInInput {
 input SignUpInput {
   email: String!
   password: String!
+}
+
+enum SortDirection {
+  ASC
+  DESC
+}
+
+input SortInput {
+  direction: SortDirection! = ASC
+  field: String!
+}
+
+input UpdateCvInput {
+  description: String!
+  education: String!
+  id: ID!
+  name: String!
+}
+
+input UpdateCvProjectInput {
+  endDate: DateTime
+  id: ID!
+  responsibilities: String
+  roleIds: [ID!]!
+  startDate: DateTime!
+}
+
+input UpdateProjectInput {
+  description: String!
+  domain: String!
+  endDate: DateTime!
+  environmentIds: [ID!]! = []
+  id: ID!
+  name: String!
+  startDate: DateTime!
 }
 
 input VerifyEmailInput {

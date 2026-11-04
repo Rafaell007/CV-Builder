@@ -1,0 +1,17 @@
+{
+  "pageTitle": "Forgot password | CV Builder",
+  "title": "Forgot password",
+  "subtitle": "We will send you an email with further instructions",
+  "email": "Email",
+  "resetPassword": "Reset password",
+  "cancel": "Cancel",
+  "confirmation": "If an account with this email exists, you will receive password reset instructions.",
+  "backToSignIn": "Back to sign in",
+  "errors": {
+    "emailRequired": "Email is required",
+    "emailInvalid": "Please enter a valid email address",
+    "tooManyRequests": "Too many attempts, try again later",
+    "invalidInput": "Please check the entered values and try again",
+    "unexpected": "Something went wrong. Please try again later"
+  }
+}

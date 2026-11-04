@@ -1,0 +1,36 @@
+.list {
+  display: flex;
+  gap: var(--space-6);
+  margin: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--color-border);
+  list-style: none;
+}
+
+.tab {
+  display: block;
+  padding: var(--space-3) 0;
+  border-bottom: 2px solid transparent;
+  color: var(--color-text);
+  font: var(--text-tab);
+  letter-spacing: var(--text-tab-ls);
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.tab:hover {
+  color: var(--color-primary);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--color-input-border-focus);
+  outline-offset: 2px;
+}
+
+/* Active tab: red text and a 2px red underline (Figma, SIGN IN tabs). */
+.tab[aria-current="page"] {
+  border-bottom-color: var(--color-primary);
+  color: var(--color-primary);
+  font: var(--text-tab-active);
+  letter-spacing: var(--text-tab-ls);
+}

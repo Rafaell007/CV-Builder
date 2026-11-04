@@ -1,29 +1,16 @@
 import { CombinedGraphQLErrors } from "@apollo/client";
+import { emailProblem, passwordProblem } from "@/shared/utils";
 import type { SignUpErrors, SignUpFailure, SignUpValues } from "../sign-up.types";
 
-// Same limits as the backend's SignUpInput, which checks them again (sign-up page AC-14).
-export const EMAIL_MAX_LENGTH = 255;
-export const PASSWORD_MIN_LENGTH = 8;
-export const PASSWORD_MAX_LENGTH = 128;
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-// At least one letter and one digit (D33). Sign-in does not check it, so older passwords still work.
-const LETTER_AND_DIGIT_PATTERN = /^(?=.*\p{L})(?=.*\d)/u;
-
 // The first problem of each field, as a message key; a field without an entry is valid.
+// The email and password rules are shared with the other auth pages and the backend's SignUpInput (sign-up page AC-14).
 export function validateSignUp({ email, password, confirmPassword }: SignUpValues): SignUpErrors {
   const errors: SignUpErrors = {};
-  const trimmedEmail = email.trim();
+  const emailError = emailProblem(email);
+  const passwordError = passwordProblem(password);
 
-  if (trimmedEmail === "") errors.email = "emailRequired";
-  else if (trimmedEmail.length > EMAIL_MAX_LENGTH || !EMAIL_PATTERN.test(trimmedEmail)) {
-    errors.email = "emailInvalid";
-  }
-
-  if (password === "") errors.password = "passwordRequired";
-  else if (password.length < PASSWORD_MIN_LENGTH) errors.password = "passwordTooShort";
-  else if (password.length > PASSWORD_MAX_LENGTH) errors.password = "passwordTooLong";
-  else if (!LETTER_AND_DIGIT_PATTERN.test(password)) errors.password = "passwordWeak";
+  if (emailError !== undefined) errors.email = emailError;
+  if (passwordError !== undefined) errors.password = passwordError;
 
   if (confirmPassword === "") errors.confirmPassword = "confirmRequired";
   else if (confirmPassword !== password) errors.confirmPassword = "confirmMismatch";

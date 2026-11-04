@@ -455,6 +455,10 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
 
 - [ ] **S1.1 Form controls** — Button, IconButton, TextField, PasswordField (toggle), Textarea, Select, MultiSelect, DatePicker, OtpField, SearchField (debounced); RHF + Zod helpers and server field-error mapping. Stories + tests.
 - [ ] **S1.2 Data display** — DataTable (columns, sort indicator, row actions slot), Pagination, Menu (one open, Escape/outside close), Tabs, Breadcrumbs, Avatar, PageState (loading skeleton, empty, no results, error + retry). Stories + tests.
+  - **Done (S1.2a, KAN-79):** `DataTable` and `Pagination` in `frontend/src/shared/components/` (README in each folder). Both are controlled, so the page owns `search`, `sort` and `page`; sort uses the backend `SortInput` shape and `Pagination` uses page size 10 (D19). Story `Shared/DataTable → Sample` shows mocked data that sorts, searches, pages and shows row actions. Menu, Tabs, Breadcrumbs, Avatar and PageState are still open (S1.2b).
+  - **Open items (S1.2a):** (1) both components use English default texts; the first list page must pass translated `labels` (S0.6). (2) A list query must send `page: { number, size: DEFAULT_PAGE_SIZE }` (10), because the backend default is 20; add a test on the Users page. (3) The page clears `selectedIds` and resets `page` when search or sort changes. More in the READMEs of both components ("Known issues").
+  - **Local gotcha:** `pnpm --filter @cv-builder/frontend typecheck` can fail on `.next/dev/types/validator.ts` (old routes such as `admin/departments`) after routes change. Delete `frontend/.next` and run it again; CI is not affected.
+  - **Done (S1.2b, KAN-80):** `Menu`, `Tabs`, `Breadcrumbs`, `Avatar` and `PageState` in `frontend/src/shared/components/` (README for `Menu` and `PageState`). `Menu` is Radix `DropdownMenu`. `Tabs` takes the current `pathname` from the layout and marks the longest matching route; `Avatar` falls back to initials when the image is missing or fails. `PageState` keeps `empty` and `no-results` apart from `error`. Texts are props with English defaults until S0.6.
 - [ ] **S1.3 Overlays and feedback** — Modal / FormModal (focus trap, Escape, primary disabled until valid and dirty), ConfirmModal, Toast notifications, SelectionToolbar ("REMOVE (n)"). Stories + tests.
 - [ ] **S1.4 App layout** — `(app)` layout: sidebar by role (§6), active item, profile section + menu, header with breadcrumbs, Device Error gate (< 768 px, CSS media query only, D28), No Internet state. Depends on S1.2, S3.1 (`me`).
 
@@ -470,11 +474,13 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
 - [ ] **S3.1 BE Auth core** — `signIn`, `signOut`, `refresh`, `me`; argon2, JWT cookies, refresh rotation with grace window and family revoke (D9, D21), throttling (D23); guards active globally. Integration tests for each guard.
 - [ ] **S3.2 FE Session** — `proxy.ts` (no session → `/sign-in`, refresh before render, signed-in on auth pages → `/users`, admin-only routes), error link refresh-then-redirect, `useCurrentUser`. Depends on S3.1, S0.4.
 - [x] **S3.3 BE Mail** — Nodemailer module (Mailpit locally), templates: verification code, password reset link (links use `FRONTEND_URL`).
-- [ ] **S3.4 Sign In** — BE errors ("Invalid email or password"); FE page. AC per sign-in.
+- [x] **S3.4 Sign In** — BE errors ("Invalid email or password"); FE page. AC per sign-in.
+  - **Done (KAN-87):** BE was ready from S3.1 (`UNAUTHENTICATED` + "Invalid email or password"). FE: `features/sign-in/` (tabs, form with React Hook Form + Zod, `SignIn` mutation, redirect to `/users`), texts in `en` and `pl`, component tests and `e2e/auth/sign-in.spec.ts`. React Hook Form, Zod and `@hookform/resolvers` are installed with this step. The eye button of `PasswordField` got its own `id` (Radix gave it the input's id).
 - [x] **S3.5 Sign Up** — BE `signUp` (unique email, hash, send code, sign in); FE page → `/verify-email`. AC per sign-up. Depends on S3.3. (PR #26)
-- [ ] **S3.6 Email Verification** — BE `verifyEmail`, `resendVerificationCode` (10 min, single use, D20), `@Verified()`; FE OTP page, CONFIRM, LATER → `/users`. AC per verification.
-- [ ] **S3.7 Forgot Password** (Should) — BE `forgotPassword` (token + mail, same response for unknown emails); FE page. AC per forgot-password. BE done (KAN-91), FE pending.
-- [ ] **S3.8 Reset Password** (Should) — BE `resetPassword` (token check, expiry, single use, revokes sessions D22); FE page. AC per reset-password. BE done (KAN-91), FE pending.
+- [x] **S3.6 Email Verification** — BE `verifyEmail`, `resendVerificationCode` (10 min, single use, D20), `@Verified()`; FE OTP page, CONFIRM, LATER → `/users`. AC per verification. BE done (KAN-89), FE done (KAN-90).
+  - **Done (KAN-90):** `features/verify-email/` (page, form, RESEND with a 60 s countdown, LATER, a verified user is sent to `/users`), texts in `en` and `pl`, component tests and `e2e/verify-email` (the code is read in Mailpit). `OtpField` (part of S1.1) was built with this step in `shared/components/OtpField` (Radix `unstable_OneTimePasswordField`, stories and tests).
+- [x] **S3.7 Forgot Password** (Should) — BE `forgotPassword` (token + mail, same response for unknown emails); FE page. AC per forgot-password. BE done (KAN-91), FE done (KAN-92).
+- [x] **S3.8 Reset Password** (Should) — BE `resetPassword` (token check, expiry, single use, revokes sessions D22); FE page. AC per reset-password. BE done (KAN-91), FE done (KAN-92); after a reset the page redirects to `/sign-in`.
 
 ### Phase 4 — System pages and settings
 
@@ -491,7 +497,7 @@ Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE 
 - [ ] **S5.2 Positions** — AC per positions.
 - [ ] **S5.3 Skills catalog** — with `skillCategories`; type from category. AC per skills-admin.
 - [ ] **S5.4 Languages catalog** — ISO unique. AC per languages-admin.
-- [ ] **S5.5 Projects** — with `projectRoles`; date rules; environment as skill tags; search name/domain; delete blocked when used in a CV; date change blocked when CV projects would fall outside (D25). AC per projects.
+- [ ] **S5.5 Projects** — with `projectRoles`; date rules; environment as skill tags; search name/domain; delete blocked when used in a CV; date change blocked when CV projects would fall outside (D25). AC per projects. BE done (KAN-101, S5.5a), FE pending.
 
 ### Phase 6 — Users
 
@@ -506,7 +512,7 @@ Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE 
 - [ ] **S7.1 CVs list** — BE `cvs` (own vs all, search, sort, page, CRUD); FE `/cvs`. AC per cvs.
 - [ ] **S7.2 CV Details** — FE `/cvs/[cvId]` layout, tabs, breadcrumbs; details form (dirty-check UPDATE); BE `updateCv`. AC per cv-details.
 - [ ] **S7.3 CV Skills** — BE `cvs/skills` (only the owner's skills, no duplicates, mastery per CV); FE reuses `features/skills`. AC per cv-skills.
-- [ ] **S7.4 CV Projects** — BE `cvs/projects` (dates within project, ≥ 1 role); FE add / update modal with read-only project fields. AC per cv-projects. Depends on S5.5.
+- [ ] **S7.4 CV Projects** — BE `cvs/projects` (dates within project, ≥ 1 role); FE add / update modal with read-only project fields. AC per cv-projects. Depends on S5.5. BE done (KAN-115, S7.4a), FE pending; the catalog query for non-admin users is still open (see `backend/src/modules/cvs/README.md`).
 - [ ] **S7.5 CV Preview** — BE `cvPreview` aggregate (experience years, last used, unique domains); FE preview layout. AC per cv-preview.
 - [ ] **S7.6 Export PDF** (Should) — BE `exportCvPdf` (D12); FE EXPORT PDF action, file name from CV name, disabled when no data. AC per cv-preview.
 - [ ] **S7.7 User CVs tab** — FE reuses the CVs list filtered by user; create assigns to that user. AC per user-cvs. Depends on S7.1, S6.2.
@@ -585,4 +591,10 @@ Over 80 % per app, excluding generated code, configs, `main.ts` and route files.
 | 2026-10-30 | S2.1a Prisma schema and initial migration | — | 19 models from §7 checked against docs pages 10–27, indexes, `init` + `add_date_checks` migrations; project `endDate` is required (page 27) |
 | 2026-10-30 | S0.5b Backend test setup | — | Jest unit + coverage scripts, Supertest integration tests on a separate `_test` database (serial, truncated per file), injectable `Clock`; sample health tests |
 | 2026-11-02 | S3.3 BE Mail | — | `MailModule` with Nodemailer, templates for the verification code and the reset link, Mailpit defaults for the mail variables, unit tests with a mocked transport, integration test against Mailpit (CI starts Mailpit) |
+| 2026-11-03 | S1.2a UI kit: DataTable and Pagination | — | Controlled `DataTable` (sortable headers, row click, row actions slot, selection, loading and empty slots) and `Pagination` (page size 10); stories with a mocked sample, unit and story tests |
 | 2026-11-03 | S3.5 Sign Up | #26 | `signUp` mutation (argon2 hash, unverified `USER`, first code mailed, cookies, `CONFLICT` + `EMAIL_TAKEN`, throttled), `/sign-up` page in `en` and `pl` with the shared form controls, E2E spec checks the code in Mailpit (CI e2e job starts Mailpit) |
+| 2026-11-03 | S3.7 / S3.8 FE Forgot and Reset Password | #36 | `/forgot-password` (generic confirmation, same for every email) and `/reset-password?token=` (D33 rule, notices for invalid, expired and used links) in `en` and `pl`, shared `emailProblem` and `passwordProblem` in `@/shared/utils` (sign-up uses them too), redirect to `/sign-in` after a reset, E2E specs read the reset link in Mailpit |
+| 2026-11-03 | S1.2b UI kit: Menu, Tabs, Breadcrumbs, Avatar, PageState | — | `Menu` (one open, Escape and outside click close), route-driven `Tabs`, `Breadcrumbs`, `Avatar` (image or initials), `PageState` (loading skeleton, empty, no results, error + retry); stories and unit tests |
+| 2026-11-03 | S3.4 Sign In | #34 | `/sign-in` page: tabs, email + password form with inline checks, show/hide password, loading state, error messages, values kept after a failure, links to Sign Up and Forgot Password, redirect to `/users`; `en` + `pl` texts; component tests and E2E smoke spec |
+| 2026-11-03 | S3.6b FE Email Verification + S1.1b OtpField | #38 | `/verify-email` page: six-box `OtpField` (typing and paste), CONFIRM with loading and no double send, RESEND with a 60 s countdown, LATER → `/users`, backend error messages inline, code kept after a failure, a verified user is sent to `/users`; `en` + `pl` texts; component tests, `OtpField` stories and `e2e/verify-email` (code read in Mailpit) |
+| 2026-11-03 | S7.4a BE CV Projects | #39 | `cvProjects` (search name/domain, sort name/start/end), `addCvProject`, `updateCvProject`, `removeCvProjects` (bulk, all or nothing); dates within the project, ≥ 1 role, one project per CV, ownership through `CvsService.assertAccessible`; serializable transaction for D25; unit + integration tests |

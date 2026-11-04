@@ -5,8 +5,9 @@ import { useTranslations } from "next-intl";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { MeDocument, SignUpDocument } from "@/shared/graphql";
 import { useRouter } from "@/shared/i18n";
+import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "@/shared/utils";
 import type { SignUpErrorKey, SignUpField, SignUpFailure, SignUpValues } from "./sign-up.types";
-import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, toSignUpFailure, validateSignUp } from "./utils";
+import { toSignUpFailure, validateSignUp } from "./utils";
 
 const FIELDS: readonly SignUpField[] = ["email", "password", "confirmPassword"];
 const EMPTY_VALUES: SignUpValues = { email: "", password: "", confirmPassword: "" };

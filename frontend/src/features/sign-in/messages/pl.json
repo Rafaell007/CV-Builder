@@ -1,0 +1,23 @@
+{
+  "tabs": {
+    "label": "Uwierzytelnianie",
+    "signIn": "ZALOGUJ SIĘ",
+    "signUp": "ZAREJESTRUJ SIĘ"
+  },
+  "title": "Witaj ponownie",
+  "subtitle": "Miło Cię znów widzieć! Zaloguj się, aby kontynuować",
+  "email": "E-mail",
+  "password": "Hasło",
+  "showPassword": "Pokaż hasło",
+  "hidePassword": "Ukryj hasło",
+  "submit": "Zaloguj się",
+  "forgotPassword": "Nie pamiętam hasła",
+  "errors": {
+    "emailRequired": "E-mail jest wymagany",
+    "emailInvalid": "Wpisz poprawny adres e-mail",
+    "passwordRequired": "Hasło jest wymagane",
+    "passwordTooShort": "Hasło musi mieć co najmniej 6 znaków",
+    "invalidCredentials": "Nieprawidłowy e-mail lub hasło",
+    "unexpected": "Coś poszło nie tak. Spróbuj ponownie później"
+  }
+}

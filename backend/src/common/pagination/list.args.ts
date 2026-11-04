@@ -1,8 +1,9 @@
 import { ArgsType, Field } from "@nestjs/graphql";
-import { Transform, Type } from "class-transformer";
+import { Type } from "class-transformer";
 import { IsOptional, IsString, MaxLength, ValidateNested } from "class-validator";
 import { PageInput } from "./page.input";
 import { SortInput } from "./sort.input";
+import { Trim } from "../validation";
 
 /** The arguments of every list query (PLAN.md §3): `users(search: "ada", sort: {...}, page: {...})`. */
 @ArgsType()
@@ -11,7 +12,7 @@ export class ListArgs {
   @IsOptional()
   @IsString()
   @MaxLength(100)
-  @Transform(({ value }: { value: unknown }) => (typeof value === "string" ? value.trim() : value))
+  @Trim()
   search?: string;
 
   @Field(() => SortInput, { nullable: true })

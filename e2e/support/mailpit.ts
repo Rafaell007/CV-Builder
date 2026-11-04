@@ -18,3 +18,17 @@ export async function findMails(recipient: string): Promise<MailpitMessage[]> {
     }),
   );
 }
+
+/** The 6-digit code in the newest verification mail to `recipient`, or undefined while no mail arrived. */
+export async function findVerificationCode(recipient: string): Promise<string | undefined> {
+  const mail = (await findMails(recipient)).find(({ Subject }) =>
+    Subject.includes("verification code"),
+  );
+  return mail?.Text.match(/verification code is: (\d{6})/)?.[1];
+}
+
+/** The `token` of the reset link in the newest reset mail to `recipient`, or undefined while no mail arrived. */
+export async function findResetToken(recipient: string): Promise<string | undefined> {
+  const mail = (await findMails(recipient)).find(({ Subject }) => Subject.includes("Reset your"));
+  return mail?.Text.match(/[?&]token=([^\s&]+)/)?.[1];
+}

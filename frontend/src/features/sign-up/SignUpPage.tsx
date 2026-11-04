@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { AuthTabs } from "./components/AuthTabs";
+import { AuthTabs } from "@/shared/components/AuthTabs";
 import { SignUpForm } from "./components/SignUpForm";
 import styles from "./SignUpPage.module.css";
 

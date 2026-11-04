@@ -28,6 +28,9 @@ export default defineConfig(({ mode }) => {
             name: "unit",
             environment: "jsdom",
             setupFiles: ["./vitest.setup.ts"],
+            // The first test of handleRequest.test.ts loads next-intl and Next.js cold, which takes more than
+            // the default 5 s on a busy CI runner.
+            testTimeout: 20_000,
             // next-intl imports `next/navigation` without an extension, which Node's ESM loader rejects;
             // inlining lets Vite resolve it. https://next-intl.dev/docs/environments/testing
             server: { deps: { inline: ["next-intl"] } },
