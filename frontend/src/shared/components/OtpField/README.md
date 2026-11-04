@@ -9,3 +9,8 @@ A code input with one box per digit (default 6), built on Radix [`unstable_OneTi
 - The component does not decide if a code is good. The caller does (for the verification page: the backend).
 - `unstable_` means the Radix API may change in a minor release: check this component after a `radix-ui` upgrade.
 - Used by: the verify-email page. Docs: [06-verification-page](../../../../../docs/pages/06-verification-page.md).
+
+## Known issues (found in the KAN-78 review)
+
+- In KAN-78 the digit font changed from `--text-heading` to `--text-input`, the focus border from `-focus-strong` to `-focus`, and the error colour to `--color-error-text`. This changes the verify-email page. Confirm the font size with the designer.
+- No E2E check covers these styles.

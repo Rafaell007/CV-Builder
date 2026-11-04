@@ -11,3 +11,13 @@ A date field with a calendar popup: [react-datepicker](https://github.com/Hacker
 - `onBlur` runs only when focus leaves the field and its calendar. Mouse clicks in the calendar keep focus in the input (see `CalendarDialog`).
 - The popup sits under the field, not in a portal: inside a clipping container (`overflow: hidden`), give it room.
 - Used by: project and CV project forms (start and end dates). Values: [docs/design-tokens.md › Date picker](../../../../../docs/design-tokens.md#date-picker-ds).
+
+## Known issues (found in the KAN-78 review)
+
+- No way to clear the date with a button. The End Date is optional on [docs/pages/23](../../../../../docs/pages/23-cv-projects-page.md), so a user must delete the text by hand. Add a clear control when that page is built.
+- No example or test of a start and end date pair linked with `minDate` and `maxDate`. Add one when the project forms are built.
+- A typed text that is not a date sets the value to `null` without an error message. The form (Zod) must report a missing date.
+- The calendar is a fixed 449px wide. On a phone narrower than that it overflows. Make it fit the screen when the mobile layout is designed.
+- The month list, the year list and the 12-year paging are not in the design (see [docs/design-tokens.md](../../../../../docs/design-tokens.md#date-picker-ds)). Confirm them with the designer.
+- The `pl` and `en-GB` format choice is a product decision. Confirm it.
+- The ref given to `ref` is read from the DOM by id once (`useElementByIdRef`). It is not refreshed if react-datepicker replaces the input.

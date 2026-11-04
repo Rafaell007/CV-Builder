@@ -13,3 +13,7 @@ Controls without an `<input>` (Select, MultiSelect) use a `role="combobox"` butt
 The floated label sits 15px above the border, outside the box: the form leaves that space.
 
 Values: [docs/design-tokens.md › Components](../../../../../docs/design-tokens.md#components).
+
+## Known issues (found in the KAN-78 review)
+
+- Field knows about MultiSelect: the `--field-height` variable and the `[role="combobox"]` selectors. Change Field and MultiSelect together.
