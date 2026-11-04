@@ -5,7 +5,8 @@ import userEvent, { type UserEvent } from "@testing-library/user-event";
 import { NextIntlClientProvider, type Locale } from "next-intl";
 import type { ReactElement, ReactNode } from "react";
 import { loadMessages, type Messages } from "@/i18n/loadMessages";
-import { ToastProvider } from "@/shared/components";
+// The folder, not the shared/components barrel: every test would load the whole kit, and component tests would import themselves in a cycle.
+import { ToastProvider } from "@/shared/components/Toast";
 import { routing } from "@/shared/i18n";
 import { PreferencesProvider } from "@/shared/preferences";
 
