@@ -8,6 +8,8 @@ The shared frame of TextField, PasswordField and Textarea: the bordered box, the
 
 States are CSS only, read from the control: focus, filled, `aria-invalid`, `disabled`. "Filled" uses `:placeholder-shown`, so **the control must have `placeholder=" "`**; the label plays the placeholder's role.
 
+Controls without an `<input>` (Select, MultiSelect) use a `role="combobox"` button: they pass `filled`, and their open list (`aria-expanded="true"`) counts as focus, because the list lives in a portal outside the box. `controlClassName` adds a control's own state colours; it may set `--field-border`, the default border colour.
+
 The floated label sits 15px above the border, outside the box: the form leaves that space.
 
 Values: [docs/design-tokens.md › Components](../../../../../docs/design-tokens.md#components).

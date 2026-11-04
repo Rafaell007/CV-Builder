@@ -2,7 +2,10 @@
  * Values: docs/design-tokens.md › Components › Text input, password, textarea.
  * The border is drawn on .control (Figma's "Fieldset"), so the password toggle sits inside it.
  * States come from the control itself (CSS only): :focus-within, :placeholder-shown (filled), aria-invalid, :disabled.
+ * Controls without an <input> add: data-filled (Field's `filled` prop), aria-expanded (open list, which lives in a
+ * portal, so focus is outside the box) and a disabled [role="combobox"] button.
  * State selectors use :where() so they all have the same specificity and the later rule wins.
+ * --field-border: the default border colour; a control's controlClassName may change it (Select draws its own).
  */
 
 .field {
@@ -20,7 +23,7 @@
   height: var(--space-12);
   /* Text 12px from the outer edge = 11px inside the 1px border */
   padding: 0 11px;
-  border: 1px solid var(--color-input-border);
+  border: 1px solid var(--field-border, var(--color-input-border));
 }
 
 .multiline {
@@ -37,7 +40,7 @@
   border-color: var(--color-input-border-hover);
 }
 
-.control:where(:focus-within) {
+.control:where(:focus-within, :has([aria-expanded="true"])) {
   border-color: var(--field-focus-border);
 }
 
@@ -45,7 +48,7 @@
   border-color: var(--color-error);
 }
 
-.control:where(:has(:is(input, textarea):disabled)) {
+.control:where(:has(:is(input, textarea, [role="combobox"]):disabled)) {
   border-color: var(--color-input-border);
   background: var(--color-input-disabled-bg);
 }
@@ -75,7 +78,13 @@
 }
 
 /* Focused or filled: the label moves above the border, 15px high, 0px gap (Figma "Active") */
-.control:where(:focus-within, :has(:is(input, textarea):not(:placeholder-shown))) .label {
+.control:where(
+    :focus-within,
+    [data-filled],
+    :has([aria-expanded="true"]),
+    :has(:is(input, textarea):not(:placeholder-shown))
+  )
+  .label {
   top: -1px;
   transform: translateY(-100%);
   font: var(--text-label);

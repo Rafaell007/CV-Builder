@@ -4,5 +4,6 @@ export * from "./IconButton";
 export * from "./icons";
 export * from "./PasswordField";
 export * from "./SearchField";
+export * from "./Select";
 export * from "./Textarea";
 export * from "./TextField";

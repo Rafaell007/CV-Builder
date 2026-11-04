@@ -14,7 +14,11 @@ export type FieldProps = {
   multiline?: boolean;
   // Password and textarea draw a darker focus border than the text input in light Figma.
   focusBorder?: "default" | "strong";
+  // For controls without an <input> (Select, MultiSelect): has a value, so the label stays above the border.
+  filled?: boolean;
   className?: string | undefined;
+  // Extra class on the bordered box, for a control's own state colours (e.g. Select's fill when open).
+  controlClassName?: string | undefined;
   // The <input> / <textarea>, plus anything inside the border (e.g. the password toggle).
   children: ReactNode;
 };
@@ -28,20 +32,23 @@ export function Field({
   error,
   multiline = false,
   focusBorder = "default",
+  filled = false,
   className,
+  controlClassName,
   children,
 }: FieldProps) {
   const controlClasses = [
     styles.control,
     multiline && styles.multiline,
     focusBorder === "strong" && styles.strongFocus,
+    controlClassName,
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
     <div className={[styles.field, className].filter(Boolean).join(" ")}>
-      <div className={controlClasses}>
+      <div className={controlClasses} data-filled={filled || undefined}>
         {children}
         <Label.Root htmlFor={controlId} className={styles.label}>
           {label}
