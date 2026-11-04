@@ -3,6 +3,7 @@ export * from "./Avatar";
 export * from "./Breadcrumbs";
 export * from "./Button";
 export * from "./CloseButton";
+export * from "./ConfirmModal";
 export * from "./DataTable";
 export * from "./DatePicker";
 export * from "./FormModal";
