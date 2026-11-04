@@ -17,6 +17,7 @@ export * from "./PageState";
 export * from "./Pagination";
 export * from "./PasswordField";
 export * from "./SearchField";
+export * from "./SelectionToolbar";
 export * from "./Select";
 export * from "./Tabs";
 export * from "./Textarea";
