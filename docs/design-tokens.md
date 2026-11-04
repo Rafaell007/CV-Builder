@@ -248,6 +248,8 @@ Predictions for KAN-77 (2026-11-03): not drawn in Figma, chosen by us; fix here 
 
 Accessibility over Figma (2026-11-03): Figma's placeholder colour fails WCAG AA contrast (4.5:1): #C4C4C6 on #F5F5F7 is 1.59:1, #626262 on #2E2E2E about 2.3:1. The field label resting inside an empty field and the search placeholder use the grey text colour instead (#626262 / #AEAEAE, the floated label's colour). `--color-text-placeholder` stays in the tokens with its Figma value.
 
+Calendar days outside the month (2026-11-04): Figma #AEAEAE / #626262 is about 2:1 and these days can be picked. They use the grey text colour (#626262 / #AEAEAE, 4.5:1 or more); only the strikethrough sets disabled days apart.
+
 Error text in dark (2026-11-03): #C63031 on #2E2E2E is 2.5:1. In dark, error text and the invalid label use #E9B0B0 (palette red-light, about 7:1) via `--color-error-text`; the invalid border and the password eye keep #C63031. Light is unchanged.
 - Dark IconButton active icon #656565 is read as #626262 (not in the palette). Dark search icon #C4C4C6 is kept as drawn.
 - Secondary dark hover has no border in Figma; the border takes the fill colour, so the button keeps its size.
@@ -264,4 +266,6 @@ Predictions for KAN-78 (2026-11-03): not drawn, or drawn inconsistently, in DS; 
 - Date picker dark border on all four sides (drawn without the bottom: read as an artefact).
 - Calendar: the highlighted circle is the selected day; today is a 1px #C63031 ring with the normal text colour; hover is a circle in the option hover fill (#AEAEAE / #626262). Day cells 41×41. Month and year buttons switch to a month or year list.
 - Calendar icon: Material "calendar_today" outlined (the 18×18 glyph is not identified).
+- Calendar layout below the header (not drawn): 8px under the header row, weekday row 24px, day rows 41px with no gap; the popup grows with a 6-week month. Month and year lists: 3 per row, 8px apart, radius 4, hover and selected as the days. Header buttons: option hover fill on hover and while their list is open. Arrows in the day view page months; the year list pages 12 years; the month list has no arrows. Invalid: the calendar icon turns red, as the select chevron.
+- English dates use British English (dd/MM/yyyy, Monday first): US English names days "November 4th", which fails axe (the visible "4" is not a word of the name).
 - Code boxes: the whole 48×48 box is the input (the 23×23 inner input is a layer); digit in the Input value style, centred; hover, focus, invalid and disabled as the text input; boxes 16px apart.

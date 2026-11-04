@@ -18,6 +18,8 @@
   --palette-yellow-dark: #7f5c00;
   --palette-blue: #29b6f6;
   --palette-blue-dark: #145b7b;
+  /* Date picker shadow (light): #5E5BE6 at 15% */
+  --palette-indigo-shadow: rgb(94 91 230 / 15%);
 
   /* Typography: font shorthand (weight size/line-height family) + letter spacing */
   --font-family: var(--font-roboto, "Roboto"), sans-serif;
