@@ -69,6 +69,8 @@ Font: **Roboto** everywhere. LH = line height, LS = letter spacing (px). DS = pa
 | Label | 400 · 12 · 23 · 0.15 | DS › Input › label |
 | Notification text | 400 · 12 · 20 · 0.15 | DS › Notifications |
 | Error text | 400 · 12 · 16 · 0.15 | DS › Input › Invalid |
+| Calendar heading (`--text-calendar-heading`) | 500 · 18 · 24 · 0 | Date picker › month and year buttons, weekdays |
+| Calendar day (`--text-calendar-day`) | 400 · 18 · 24 · 0 | Date picker › day numbers, today |
 
 ## Spacing
 
@@ -108,6 +110,8 @@ Off-grid values (exact, per component):
 | Input, select dropdown | 0 |
 | Row menu | 8px |
 | Notification | 12px |
+| Multi-select chip (`--radius-chip`) | 12px |
+| Calendar month and year cells (`--radius-small`) | 4px |
 | Avatar | 50% (circle) |
 | Sidebar nav item | 0 200px 200px 0 (right side round) |
 
