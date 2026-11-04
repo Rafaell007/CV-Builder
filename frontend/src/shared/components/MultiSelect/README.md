@@ -12,7 +12,6 @@ Several choices from a list, shown as chips inside the shared `Field` frame. The
 
 ## Known issues (found in the KAN-78 review)
 
-- The label's `htmlFor` points at a `div` (the Downshift toggle), which a label cannot focus. A click on the label does not focus the field. Screen readers are served by `aria-labelledby`.
 - `SelectOption` is imported from the sibling `../Select` folder. Move the type to the nearest common ancestor if a third component needs it.
 - `Field` knows about MultiSelect (`--field-height`, the combobox selector). Change both together.
 - The CSS repeats the Select CSS on purpose (see the comment in `MultiSelect.module.css`). Keep the two in step.

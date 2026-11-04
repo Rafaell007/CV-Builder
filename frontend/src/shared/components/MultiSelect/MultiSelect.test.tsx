@@ -33,6 +33,14 @@ function TestMultiSelect({ initialValue = [], onValueChange, ...props }: TestMul
 }
 
 describe("MultiSelect", () => {
+  it("moves focus to the field when the label is clicked", async () => {
+    const { user } = renderWithProviders(<TestMultiSelect />);
+
+    await user.click(screen.getByText("Skills", { selector: "label" }));
+
+    expect(screen.getByRole("combobox", { name: "Skills" })).toHaveFocus();
+  });
+
   it("is a combobox named by its label, with no chips until something is chosen", () => {
     renderWithProviders(<TestMultiSelect />);
 

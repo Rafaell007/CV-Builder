@@ -75,6 +75,7 @@ export function MultiSelect({
       label={label}
       controlId={controlId}
       labelId={labelId}
+      onLabelClick={() => document.getElementById(controlId)?.focus()}
       helperId={helperId}
       errorId={errorId}
       helperText={helperText}
