@@ -24,8 +24,10 @@ export function useDatePicker({ onValueChange, onBlur, ref, controlId }: UseDate
     view,
     showMonthList: () => setView("month"),
     showYearList: () => setView("year"),
-    onPick: (date: Date | null) => {
-      if (view === "year") setView("month");
+    // react-datepicker calls onChange for a pick and for typed text; typed text always sets the value, whatever the view.
+    onPick: (date: Date | null, event?: { type: string } | undefined) => {
+      if (event?.type === "change") onValueChange(date);
+      else if (view === "year") setView("month");
       else if (view === "month") setView("day");
       else onValueChange(date);
     },

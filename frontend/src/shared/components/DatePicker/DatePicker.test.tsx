@@ -121,6 +121,19 @@ describe("DatePicker", () => {
     expect(onValueChange).toHaveBeenLastCalledWith(new Date(2027, 0, 15));
   });
 
+  it("takes a typed date while the year list is open", async () => {
+    const onValueChange = vi.fn();
+    const { user } = renderWithProviders(<TestDatePicker onValueChange={onValueChange} />);
+    const input = screen.getByRole("textbox", { name: "Start date" });
+
+    await user.click(input);
+    await user.click(screen.getByRole("button", { name: "2026" }));
+    await user.clear(input);
+    await user.type(input, "15/01/2027");
+
+    expect(onValueChange).toHaveBeenLastCalledWith(new Date(2027, 0, 15));
+  });
+
   it("marks days outside minDate as not available", async () => {
     const onValueChange = vi.fn();
     const { user } = renderWithProviders(
