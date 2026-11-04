@@ -67,6 +67,8 @@
 .calendar {
   box-sizing: border-box;
   width: 449px;
+  /* On a phone narrower than 449px the popup shrinks to the screen minus the page gutters */
+  max-width: calc(100vw - 2 * var(--space-4));
   padding: var(--space-6) var(--space-8);
   border: 1px solid var(--color-input-border);
   border-radius: 0 0 var(--radius-menu) var(--radius-menu);
