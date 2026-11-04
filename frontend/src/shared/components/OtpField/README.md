@@ -2,7 +2,8 @@
 
 A code input with one box per digit (default 6), built on Radix [`unstable_OneTimePasswordField`](https://www.radix-ui.com/primitives/docs/components/one-time-password-field).
 
-- Export: `OtpField` (props: `label`, `getDigitLabel`, `value`, `onValueChange`, `length`, `error`, `disabled`, `name`, `className`).
+- Export: `OtpField` (props: `label`, `getDigitLabel`, `value`, `onValueChange`, `length`, `error`, `disabled`, `name`, `onBlur`, `ref`, `className`).
+- Works with React Hook Form like the other fields: `onBlur` runs only when focus leaves all the boxes (not between them); `ref` receives the first box, so the form can focus the field on an error.
 - Controlled: the caller keeps the value (a string of digits). Radix moves the focus while the user types, moves it back on Backspace and spreads a pasted code over the boxes. Only digits are accepted.
 - The names of the group and of each box come from the caller (translated). The error shows under the boxes and every box points to it with `aria-describedby`.
 - The component does not decide if a code is good. The caller does (for the verification page: the backend).

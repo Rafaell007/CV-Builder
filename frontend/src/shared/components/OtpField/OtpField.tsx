@@ -1,5 +1,5 @@
 import { unstable_OneTimePasswordField as OneTimePasswordField } from "radix-ui";
-import { useId } from "react";
+import { useId, useImperativeHandle, type FocusEvent, type Ref } from "react";
 import styles from "./OtpField.module.css";
 
 export type OtpFieldProps = {
@@ -13,6 +13,10 @@ export type OtpFieldProps = {
   error?: string | undefined;
   disabled?: boolean;
   name?: string;
+  // Runs when focus leaves all the boxes, not when it moves between them (React Hook Form's field.onBlur).
+  onBlur?: () => void;
+  // On the first box, so React Hook Form can focus the field (field.ref).
+  ref?: Ref<HTMLInputElement>;
   className?: string | undefined;
 };
 
@@ -32,12 +36,25 @@ export function OtpField({
   error,
   disabled,
   name,
+  onBlur,
+  ref,
   className,
 }: OtpFieldProps) {
   const errorId = useId();
+  const firstBoxId = useId();
+
+  // Radix keeps its own refs on the boxes; the caller gets the first box, found by its id.
+  useImperativeHandle(ref, () => document.getElementById(firstBoxId) as HTMLInputElement, [
+    firstBoxId,
+  ]);
+
+  // Focus moving from box to box stays inside the field: not a blur for the form.
+  const onFocusLeave = (event: FocusEvent<HTMLDivElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget)) onBlur?.();
+  };
 
   return (
-    <div className={[styles.field, className].filter(Boolean).join(" ")}>
+    <div className={[styles.field, className].filter(Boolean).join(" ")} onBlur={onFocusLeave}>
       <OneTimePasswordField.Root
         role="group"
         aria-label={label}
@@ -52,6 +69,7 @@ export function OtpField({
         {Array.from({ length }, (_, index) => (
           <OneTimePasswordField.Input
             key={index}
+            id={index === 0 ? firstBoxId : undefined}
             className={styles.box}
             aria-label={getDigitLabel(index + 1, length)}
             aria-invalid={error ? true : undefined}

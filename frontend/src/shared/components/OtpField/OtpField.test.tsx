@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { describe, expect, it } from "vitest";
+import { createRef, useState } from "react";
+import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders, screen } from "@/shared/testing";
 import { OtpField, type OtpFieldProps } from "./OtpField";
 
@@ -89,6 +89,41 @@ describe("OtpField", () => {
     renderWithProviders(<Harness disabled />);
 
     for (const textbox of screen.getAllByRole("textbox")) expect(textbox).toBeDisabled();
+  });
+
+  it("does not report a blur while the focus moves between the boxes", async () => {
+    const onBlur = vi.fn();
+    const { user } = renderWithProviders(<Harness onBlur={onBlur} />);
+
+    await user.click(box(1));
+    await user.keyboard("12");
+
+    expect(box(3)).toHaveFocus();
+    expect(onBlur).not.toHaveBeenCalled();
+  });
+
+  it("reports a blur once when the focus leaves all the boxes", async () => {
+    const onBlur = vi.fn();
+    const { user } = renderWithProviders(
+      <>
+        <Harness onBlur={onBlur} />
+        <button type="button">Next</button>
+      </>,
+    );
+
+    await user.click(box(1));
+    await user.click(screen.getByRole("button", { name: "Next" }));
+
+    expect(onBlur).toHaveBeenCalledOnce();
+  });
+
+  it("gives the first box to the ref, so a form can focus the field", () => {
+    const ref = createRef<HTMLInputElement>();
+    renderWithProviders(<Harness ref={ref} />);
+
+    ref.current?.focus();
+
+    expect(box(1)).toHaveFocus();
   });
 
   it("supports another length", () => {
