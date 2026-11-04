@@ -36,6 +36,8 @@ export function Modal({
   children,
 }: ModalProps) {
   const returnFocus = useReturnFocus();
+  // `false` and `null` come from conditional JSX (`hasHint && hint`); they mean "no description" too.
+  const hasDescription = description !== undefined && description !== null && description !== false;
 
   function handleOpenAutoFocus(event: Event) {
     returnFocus.onOpenAutoFocus();
@@ -51,7 +53,7 @@ export function Modal({
           onCloseAutoFocus={returnFocus.onCloseAutoFocus}
           className={styles.content}
           // Without a Description part Radix asks for an explicit "no description".
-          {...(description === undefined && { "aria-describedby": undefined })}
+          {...(!hasDescription && { "aria-describedby": undefined })}
         >
           <div className={styles.header}>
             <Dialog.Title className={styles.title}>{title}</Dialog.Title>
@@ -59,7 +61,7 @@ export function Modal({
               <CloseButton aria-label={closeLabel} className={styles.close} />
             </Dialog.Close>
           </div>
-          {description !== undefined && (
+          {hasDescription && (
             <Dialog.Description className={styles.description}>{description}</Dialog.Description>
           )}
           {children}

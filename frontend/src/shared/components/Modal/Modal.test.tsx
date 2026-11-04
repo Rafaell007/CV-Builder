@@ -53,6 +53,15 @@ describe("Modal", () => {
     expect(dialog).not.toHaveAttribute("aria-describedby");
   });
 
+  it.each([false, null])(
+    "has no description when it is %s (conditional JSX)",
+    async (description) => {
+      await renderOpen({ description });
+
+      expect(screen.getByRole("dialog")).not.toHaveAttribute("aria-describedby");
+    },
+  );
+
   it("is described by its description", async () => {
     await renderOpen({ description: "Pick a skill and its level." });
 
