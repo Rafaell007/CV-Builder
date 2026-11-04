@@ -8,4 +8,4 @@ Helpers for forms built with React Hook Form + Zod (PLAN §2.2) and for the serv
 
 Fields that get `shouldFocus` need a ref on a focusable element: `register()` does it for inputs; controlled fields (`Controller`) pass `field.ref` to the component.
 
-Used by: every form with server validation (first: the KAN-78 sample form story). Backend side: `backend/src/common/validation/README.md`. Docs: [React Hook Form](https://react-hook-form.com/docs/useform), [resolvers](https://github.com/react-hook-form/resolvers#zod), [Zod](https://zod.dev/).
+Used by: every form with server validation. Reference: `SampleForm.stories.tsx` (Storybook "Forms/Sample form"): every field wired with `register` or `Controller`, client errors, and a mocked `BAD_USER_INPUT` shown under the fields. Backend side: `backend/src/common/validation/README.md`. Docs: [React Hook Form](https://react-hook-form.com/docs/useform), [resolvers](https://github.com/react-hook-form/resolvers#zod), [Zod](https://zod.dev/).
