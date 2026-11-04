@@ -2,5 +2,10 @@
   "appName": "CV Builder",
   "appDescription": "Twórz, edytuj i przeglądaj CV.",
   "employees": "Pracownicy",
-  "pageNotFound": "Nie znaleziono strony"
+  "pageNotFound": "Nie znaleziono strony",
+  "toast": {
+    "label": "Powiadomienie",
+    "close": "Zamknij powiadomienie",
+    "viewport": "Powiadomienia (F8)"
+  }
 }

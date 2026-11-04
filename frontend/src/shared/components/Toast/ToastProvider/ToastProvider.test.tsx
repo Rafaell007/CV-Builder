@@ -3,7 +3,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "@/shared/testing";
 import type { ToastContent, ToastVariant } from "../Toast.types";
 import { useToast } from "../useToast";
-import { ToastProvider, type ToastProviderProps } from "./ToastProvider";
 
 function ShowButton({ variant, ...content }: ToastContent & { variant: ToastVariant }) {
   const toast = useToast();
@@ -14,21 +13,14 @@ function ShowButton({ variant, ...content }: ToastContent & { variant: ToastVari
   );
 }
 
-function renderToasts(
-  buttons: ReadonlyArray<ToastContent & { variant: ToastVariant }>,
-  options: Pick<ToastProviderProps, "duration"> = {},
-) {
+// renderWithProviders wraps the UI in the app's ToastProvider with the real (English) labels.
+function renderToasts(buttons: ReadonlyArray<ToastContent & { variant: ToastVariant }>) {
   return renderWithProviders(
-    <ToastProvider
-      closeLabel="Close"
-      label="Notification"
-      viewportLabel="Notifications (F8)"
-      {...options}
-    >
+    <>
       {buttons.map((button) => (
         <ShowButton key={button.title} {...button} />
       ))}
-    </ToastProvider>,
+    </>,
   );
 }
 
@@ -62,7 +54,9 @@ describe("ToastProvider", () => {
     await user.click(screen.getByRole("button", { name: "Show Heads up" }));
 
     await user.click(
-      within(within(toastArea()).getByRole("listitem")).getByRole("button", { name: "Close" }),
+      within(within(toastArea()).getByRole("listitem")).getByRole("button", {
+        name: "Close notification",
+      }),
     );
 
     await waitFor(() => expect(shownToasts()).toHaveLength(0));
@@ -97,13 +91,13 @@ describe("ToastProvider", () => {
     expect(announcement.closest("[aria-live]")).toHaveAttribute("aria-live", live);
   });
 
-  it("closes a toast after its duration", async () => {
+  it("closes a toast after the default 5 seconds", async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
-    const { user } = renderToasts([{ variant: "warning", title: "Careful" }], { duration: 1000 });
+    const { user } = renderToasts([{ variant: "warning", title: "Careful" }]);
     await user.click(screen.getByRole("button", { name: "Show Careful" }));
     expect(shownToasts()).toHaveLength(1);
 
-    await vi.advanceTimersByTimeAsync(1000);
+    await vi.advanceTimersByTimeAsync(5000);
 
     await waitFor(() => expect(shownToasts()).toHaveLength(0));
   });

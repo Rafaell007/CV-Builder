@@ -5,6 +5,7 @@ import userEvent, { type UserEvent } from "@testing-library/user-event";
 import { NextIntlClientProvider, type Locale } from "next-intl";
 import type { ReactElement, ReactNode } from "react";
 import { loadMessages, type Messages } from "@/i18n/loadMessages";
+import { ToastProvider } from "@/shared/components";
 import { routing } from "@/shared/i18n";
 import { PreferencesProvider } from "@/shared/preferences";
 
@@ -33,11 +34,21 @@ export function renderWithProviders(
   // user-event recommends creating the instance before rendering.
   const user = userEvent.setup();
 
+  const messages = messagesByLocale[locale];
+
   function Providers({ children }: { children: ReactNode }) {
     return (
-      <NextIntlClientProvider locale={locale} messages={messagesByLocale[locale]}>
+      <NextIntlClientProvider locale={locale} messages={messages}>
         <PreferencesProvider>
-          <MockedProvider mocks={mocks}>{children}</MockedProvider>
+          <MockedProvider mocks={mocks}>
+            <ToastProvider
+              closeLabel={messages.common.toast.close}
+              label={messages.common.toast.label}
+              viewportLabel={messages.common.toast.viewport}
+            >
+              {children}
+            </ToastProvider>
+          </MockedProvider>
         </PreferencesProvider>
       </NextIntlClientProvider>
     );

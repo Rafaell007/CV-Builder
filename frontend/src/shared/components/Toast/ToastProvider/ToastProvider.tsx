@@ -15,19 +15,11 @@ export interface ToastProviderProps {
   label: string;
   /** Name of the toast area; name the F8 hotkey in it, e.g. "Notifications (F8)" (Radix also replaces a literal `{hotkey}`). */
   viewportLabel: string;
-  /** Milliseconds before a toast closes; Radix pauses it on hover, focus and window blur. */
-  duration?: number;
   children: ReactNode;
 }
 
 /** Holds the toast list and shows it bottom-right; components show toasts with `useToast()`. */
-export function ToastProvider({
-  closeLabel,
-  label,
-  viewportLabel,
-  duration,
-  children,
-}: ToastProviderProps) {
+export function ToastProvider({ closeLabel, label, viewportLabel, children }: ToastProviderProps) {
   const [toasts, setToasts] = useState<ToastEntry[]>([]);
   const nextId = useRef(0);
 
@@ -56,7 +48,8 @@ export function ToastProvider({
 
   return (
     <ToastContext value={value}>
-      <Toast.Provider label={label} duration={duration}>
+      {/* Radix closes each toast after 5 s, paused on hover, focus and window blur. */}
+      <Toast.Provider label={label}>
         {children}
         {toasts.map(({ id, ...toast }) => (
           <ToastItem

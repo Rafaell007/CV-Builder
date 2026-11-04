@@ -2,5 +2,10 @@
   "appName": "CV Builder",
   "appDescription": "Create, edit and preview CVs.",
   "employees": "Employees",
-  "pageNotFound": "Page not found"
+  "pageNotFound": "Page not found",
+  "toast": {
+    "label": "Notification",
+    "close": "Close notification",
+    "viewport": "Notifications (F8)"
+  }
 }
