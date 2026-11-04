@@ -3,7 +3,7 @@
  * The border is drawn on .control (Figma's "Fieldset"), so the password toggle sits inside it.
  * States come from the control itself (CSS only): :focus-within, :placeholder-shown (filled), aria-invalid, :disabled.
  * Controls without an <input> add: data-filled (Field's `filled` prop), aria-expanded (open list, which lives in a
- * portal, so focus is outside the box) and a disabled [role="combobox"] button.
+ * portal, so focus is outside the box) and a disabled [role="combobox"] (disabled or aria-disabled).
  * State selectors use :where() so they all have the same specificity and the later rule wins.
  * --field-border: the default border colour; a control's controlClassName may change it (Select draws its own).
  */
@@ -20,7 +20,9 @@
   position: relative;
   display: flex;
   align-items: center;
-  height: var(--space-12);
+  /* MultiSelect sets auto: its chips wrap onto new lines */
+  height: var(--field-height, var(--space-12));
+  min-height: var(--space-12);
   /* Text 12px from the outer edge = 11px inside the 1px border */
   padding: 0 11px;
   border: 1px solid var(--field-border, var(--color-input-border));
@@ -48,7 +50,9 @@
   border-color: var(--color-error);
 }
 
-.control:where(:has(:is(input, textarea, [role="combobox"]):disabled)) {
+.control:where(
+  :has(:is(input, textarea, [role="combobox"]):disabled, [role="combobox"][aria-disabled="true"])
+) {
   border-color: var(--color-input-border);
   background: var(--color-input-disabled-bg);
 }

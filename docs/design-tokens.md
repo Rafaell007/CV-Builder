@@ -260,6 +260,7 @@ Predictions for KAN-78 (2026-11-03): not drawn, or drawn inconsistently, in DS; 
 - Open list: page background fill (the frame colour shows through), max height 5 options (235px) then scrolls, no shadow or radius; keyboard highlight uses the hover colours.
 - Dark Select fill #454545 when open or invalid, as drawn; hover keeps #2E2E2E.
 - Multi-select chips wrap onto new lines and the field grows; the row's inset shadow (spread 30px #F5F5F7) is ignored, as in the search field. Unselected checkbox: border in the option text colour (#2E2E2E / #F5F5F7), no check.
+- Multi-select details not drawn: wrapped chip rows 12px apart; checkbox → option text 12px; the × has a 22×22 hit area (circle centred, still 6px from the chip's edge), a 1.5px X stroke and the focus ring when focused; disabled chips have no ×. Chip text line height 22px so the text fits inside the 24px chip with its borders.
 - Date picker dark border on all four sides (drawn without the bottom: read as an artefact).
 - Calendar: the highlighted circle is the selected day; today is a 1px #C63031 ring with the normal text colour; hover is a circle in the option hover fill (#AEAEAE / #626262). Day cells 41×41. Month and year buttons switch to a month or year list.
 - Calendar icon: Material "calendar_today" outlined (the 18×18 glyph is not identified).

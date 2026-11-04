@@ -6,6 +6,8 @@ export type FieldProps = {
   label: string;
   // From useFieldIds: the label points to the control, and the control's aria-describedby to the text below.
   controlId: string;
+  // For a control that is not a labelable element (a div combobox): it points to the label with aria-labelledby.
+  labelId?: string | undefined;
   helperId: string;
   errorId: string;
   helperText?: string | undefined;
@@ -26,6 +28,7 @@ export type FieldProps = {
 export function Field({
   label,
   controlId,
+  labelId,
   helperId,
   errorId,
   helperText,
@@ -50,7 +53,7 @@ export function Field({
     <div className={[styles.field, className].filter(Boolean).join(" ")}>
       <div className={controlClasses} data-filled={filled || undefined}>
         {children}
-        <Label.Root htmlFor={controlId} className={styles.label}>
+        <Label.Root id={labelId} htmlFor={controlId} className={styles.label}>
           {label}
         </Label.Root>
       </div>

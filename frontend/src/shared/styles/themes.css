@@ -19,6 +19,7 @@
   --color-info-border: var(--palette-blue-dark);
   --color-input-disabled-text: var(--palette-grey-400);
   --color-icon-disabled: var(--palette-grey-400);
+  --color-chip-remove-bg: var(--palette-grey-400);
 }
 
 /* Light (default) */
@@ -76,6 +77,8 @@
   --color-option-hover-bg: var(--palette-grey-400);
   --color-option-selected-bg: var(--palette-grey-500);
   --color-option-selected-text: var(--palette-grey-100);
+  --color-chip-border: var(--palette-grey-700);
+  --color-chip-remove-icon: var(--palette-grey-100);
 }
 
 /* Dark: chosen explicitly */
@@ -133,6 +136,8 @@
   --color-option-hover-bg: var(--palette-grey-500);
   --color-option-selected-bg: var(--palette-grey-100);
   --color-option-selected-text: var(--palette-grey-700);
+  --color-chip-border: var(--palette-grey-400);
+  --color-chip-remove-icon: var(--palette-grey-600);
 }
 
 /* Dark: Device settings, when the OS is dark and no theme is forced. Keep in sync with the block above. */
@@ -188,5 +193,7 @@
     --color-option-hover-bg: var(--palette-grey-500);
     --color-option-selected-bg: var(--palette-grey-100);
     --color-option-selected-text: var(--palette-grey-700);
+    --color-chip-border: var(--palette-grey-400);
+    --color-chip-remove-icon: var(--palette-grey-600);
   }
 }
