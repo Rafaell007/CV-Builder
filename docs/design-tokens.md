@@ -217,6 +217,29 @@ Field and list as Select. Selected options show as chips inside the field.
 
 6 boxes, 48×48, 16px apart (the last gap 17 is read as a layer artefact), border 1px #AEAEAE both, radius 0. Inner input 23×23, dark fill #2E2E2E. Only the empty state is drawn.
 
+### Modal (sections ADD SKILL, UPDATE SKILL, REMOVE SKILLS, CONFIRM TO REMOVE SKILLS)
+
+Read on 2026-11-04 for KAN-81. Positions from the modal's top-left.
+
+- Overlay: #121212 at 60% over the whole screen, both themes.
+- Panel: 620 wide, fill #F5F5F7 / #454545, no radius, border or shadow. Padding (measured from children, no auto-layout): 16 top and bottom, 24 left and right.
+- Title: 500 · 20 · 24 · 0.15, text main (#2E2E2E / #F5F5F7), at 16 / 24.
+- Close: 24×24 button at top 14, 24 from the right; 12×12 cross at 7,7, #2E2E2E in light.
+- Form modal (620×284): title → first field 26; fields 572×48, 36 apart; last field → buttons 26.
+- Confirm modal (620×200): message 572 wide in the Body style (400 · 16 · 24 · 0.15), text main; title → message 40, message → buttons 44, bottom 16. The count ("3 skills") is 700 in dark; light read as 500.
+- Button row: right-aligned, 24 apart, 160×48 each. CANCEL secondary (light border + text #2E2E2E, dark #E2E2E4); ADD / UPDATE / CONFIRM primary.
+
+### Selection toolbar (1440 › REMOVE SKILLS)
+
+- Bar at the bottom of the main content, sticky, 852×64 in the sample, no fill (background blur 0.5).
+- Buttons right-aligned, 160×48, 24 apart: CANCEL secondary (border + text #626262 / #E2E2E4), DELETE primary.
+- Count badge inside DELETE: 16×16, radius 20, fill #F5F5F7, number 500 · 12, #C63031.
+- Selected item (page side, not the toolbar): no fill or border; its level bar turns #AEAEAE / #454545 at 90%.
+
+### Toast (DS › Notifications, light only)
+
+280×80, radius 12, border 1px, no shadow; colours in "Colours (semantic)" → Notification. Text: success #335D35, error #F5F5F7 (warning and info not read). Title in the Notification title style at 8 / 16; text in the Notification text style at top 40; close 24×24 at top 8, 12 from the right, 12×12 cross in the text colour. Title LH is 16 in success, 24 in error. Screen position not drawn.
+
 ### Icons
 
 No icon names in the file, but every glyph matches Google Material Icons by size and position: more-vert (4×16 at 10,4), visibility (22×15 at 1,4.5), search (17.49 at 3,3), chevron-right (7.41×12 at 8.59,6). We use Material Icons paths (Apache 2.0).
@@ -269,3 +292,16 @@ Predictions for KAN-78 (2026-11-03): not drawn, or drawn inconsistently, in DS; 
 - Calendar layout below the header (not drawn): 8px under the header row, weekday row 24px, day rows 41px with no gap; the popup grows with a 6-week month. Month and year lists: 3 per row, 8px apart, radius 4, hover and selected as the days. Header buttons: option hover fill on hover and while their list is open. Arrows in the day view page months; the year list pages 12 years; the month list has no arrows. Invalid: the calendar icon turns red, as the select chevron.
 - English dates use British English (dd/MM/yyyy, Monday first): US English names days "November 4th", which fails axe (the visible "4" is not a word of the name).
 - Code boxes: the whole 48×48 box is the input (the 23×23 inner input is a layer); digit in the Input value style, centred; hover, focus, invalid and disabled as the text input; boxes 16px apart.
+
+Predictions for KAN-81 (2026-11-04): not drawn, or drawn inconsistently; chosen by us. Fix here and in the CSS when a better source appears.
+
+- Modal is centred on screen (Figma tops differ by 5px between themes: read as an artefact); width `min(620px, 100% - 32px)`; the content scrolls inside when the screen is too short.
+- Modal CANCEL uses the DS secondary button (#626262 light), as the selection toolbar does; the modal's #2E2E2E light border is read as an inconsistency.
+- Dark close cross #F5F5F7 (text main); not read.
+- Confirm modal: the highlighted part of the message (count) is 700 in both themes; the caller passes it.
+- Selection toolbar: the button text comes from the page (Figma says DELETE, the page doc says REMOVE); the count shows in the badge, the badge is hidden at 0 and the button disabled. The bar gets the page background fill (no fill lets scrolled content show through the sticky bar); the 0.5px blur is ignored.
+- Toast: bottom-right, 24px from the edges, newest at the bottom, 8px apart, max 3. Width 280, height grows with the text (80 is the sample). Title LH 24 (as error; the description at top 40 then sits 8 under it). Dark uses the light colours (as before). Warning and info text are #2E2E2E.
+- Close cross in a toast: same 24×24 button and focus ring as the modal's.
+- Close button (`CloseButton`): cross in the colour of the text around it; hover a 1px border in that colour; keyboard focus the Button ring. The 12×12 cross is centred (Figma 7,7 in the 24 box is 1px off-centre: read as an artefact).
+
+Toast text contrast (2026-11-04): success #335D35 on #66BB6A is 3.2:1 and fails WCAG AA for 12/16px text (the same pattern gives warning 3.5:1 and info 3.2:1). Success, warning and info text use #2E2E2E (5.7–7.8:1); the borders keep their Figma colours. Error text #F5F5F7 on #C63031 is 5.0:1 and stays.
