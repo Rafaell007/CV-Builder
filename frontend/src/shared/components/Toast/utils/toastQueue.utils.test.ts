@@ -22,8 +22,18 @@ describe("addToast", () => {
     ]);
   });
 
-  it("drops toasts that are already closed", () => {
-    expect(addToast([entry("a", false), entry("b")], entry("c"))).toEqual([entry("b"), entry("c")]);
+  it("keeps closing toasts, so their exit animation can finish", () => {
+    expect(addToast([entry("a", false), entry("b")], entry("c"))).toEqual([
+      entry("a", false),
+      entry("b"),
+      entry("c"),
+    ]);
+  });
+
+  it("counts only open toasts towards the limit", () => {
+    const toasts = [entry("a", false), entry("b"), entry("c")];
+
+    expect(addToast(toasts, entry("d"), 3)).toEqual([...toasts, entry("d")]);
   });
 
   it("does not change the list it was given", () => {

@@ -2,18 +2,22 @@ import { MAX_VISIBLE_TOASTS } from "../toast.constants";
 import type { ToastEntry } from "../Toast.types";
 
 /**
- * Appends a toast (newest last). Toasts that already finished closing are dropped, and when more
- * than `max` would be open, the oldest open ones are closed so they can still animate out.
+ * Appends a toast (newest last). When more than `max` would be open, the oldest open ones are closed,
+ * so they still animate out. Closed toasts stay until `removeToast` runs at the end of their exit animation.
  */
 export function addToast(
   toasts: readonly ToastEntry[],
   toast: ToastEntry,
   max: number = MAX_VISIBLE_TOASTS,
 ): ToastEntry[] {
-  const next = [...toasts.filter((entry) => entry.open), toast];
-  const toClose = next.length - max;
+  const next = [...toasts, toast];
+  let toClose = next.filter((entry) => entry.open).length - max;
 
-  return next.map((entry, index) => (index < toClose ? { ...entry, open: false } : entry));
+  return next.map((entry) => {
+    if (toClose <= 0 || !entry.open) return entry;
+    toClose -= 1;
+    return { ...entry, open: false };
+  });
 }
 
 /** Marks a toast closed; it stays in the list until its exit animation ends. */
