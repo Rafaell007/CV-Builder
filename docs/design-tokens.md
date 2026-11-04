@@ -21,6 +21,7 @@ Font: **Roboto** everywhere. LH = line height, LS = letter spacing (px). DS = pa
 | #66BB6A / #335D35 | success fill / border + text |
 | #FFB800 / #7F5C00 | warning fill / border |
 | #29B6F6 / #145B7B | info fill / border |
+| #5E5BE6 at 15% | light: date picker popup and arrow shadow |
 
 ## Colours (semantic)
 
@@ -119,7 +120,7 @@ Off-grid values (exact, per component):
 
 ## Components
 
-Read on 2026-11-03 (DS › Buttons, DS › Input & Textarea, 1440 › SIGN IN, 1440 › USERS). "Both" = same in light and dark. Select states are left for their ticket.
+Read on 2026-11-03 (DS › Buttons, DS › Input & Textarea, 1440 › SIGN IN, 1440 › USERS; Select, Multi-select, Date picker and verification code from DS for KAN-78). "Both" = same in light and dark.
 
 ### Button (height 48, radius 40, text = Button style)
 
@@ -171,6 +172,51 @@ Input 48px high, text inset left 12px, top 14px; no radius, no fill. Textarea 12
 
 40px high, radius 40, border 1px #AEAEAE. Icon 24×24 at left 12px; text left 43px (icon → text 7px). Placeholder as input. Icon #626262 / #C4C4C6. Only the default state is drawn.
 
+### Select (DS)
+
+Field as the text input: 48px high, border 1px, radius 0, no fill of its own (page colour shows through). Value / placeholder Input style at left 12, top 12. Label (Label style) above the border, left 12, shown when open, filled or disabled. Chevron: 24×24 at right 12 (left 364 of 400), top 12; Material chevron (7.41×12) pointing down, up when open.
+
+| State | Border | Fill | Placeholder / value | Chevron | Label |
+|---|---|---|---|---|---|
+| default | #AEAEAE / #626262 | – / #2E2E2E | #C4C4C6 / #626262 | #626262 / #AEAEAE | inside |
+| hover | #626262 / #F5F5F7 | – / #2E2E2E | as default | #626262 / #E2E2E4 | inside |
+| open | #626262 / #F5F5F7 | – / #454545 | as default | #626262 / #E2E2E4 | #626262 / #F5F5F7 |
+| filled | as open | as open | value #2E2E2E / #F5F5F7 | as open | as open |
+| invalid | #C63031 both | – / #454545 | as default | #C63031 both | none drawn |
+| disabled | #AEAEAE both | #C4C4C6 / #626262 | value #AEAEAE both (drawn 14/20) | #AEAEAE both | #626262 / #AEAEAE |
+
+- Error text: drawn 10/16 (not the 12/16 Error style), #C63031, directly under the border, left 12.
+- Open list: field width, attached under the field (no gap). Options 47px high, padding 12, Input text style; 1px border left and right, the last option also bottom. No background, radius, shadow or max height drawn.
+
+| Option | Light | Dark |
+|---|---|---|
+| normal | text #2E2E2E, border #626262 | text + border #F5F5F7 |
+| hover | fill #AEAEAE, text #2E2E2E | fill #626262, text #F5F5F7 |
+| selected | fill #626262, text #F5F5F7 | fill #F5F5F7, text #2E2E2E |
+
+Single select has no check mark.
+
+### Multi-select (DS)
+
+Field and list as Select. Selected options show as chips inside the field.
+
+- Chip: 24px high (168 is a sample width), radius 12, border 1px #2E2E2E / #AEAEAE, no fill; text Input style, left 12, #2E2E2E / #F5F5F7. Disabled: border + text #AEAEAE.
+- Remove: 12×12 circle #AEAEAE, 6px from the chip's right edge, top 6; inside a 6×6 X #F5F5F7 / #454545.
+- Chips 13px apart, in a row at left 12, top 12 of the field. Growth with many chips not drawn.
+- Option rows: checkbox 20×20 at left 12, border 1px; check 13.33×9.17, 2px stroke. On selected rows (fill #626262 / #F5F5F7) border + check are #F5F5F7 / #2E2E2E.
+
+### Date picker (DS)
+
+- Field as Select; border #AEAEAE both; placeholder #C4C4C6 / #626262. Calendar icon 24×24 at right 12, top 12 (18×18 glyph, 2px stroke), #626262 / #AEAEAE.
+- Popup: 449×340 (wider than the 400 field), attached under the field, radius 0 0 8px 8px, border 1px #AEAEAE, no fill. Shadow light only: 1px 1px 4px 1px rgb(94 91 230 / 15%); dark none.
+- Header: 48px row at top 24, sides 32, space-between. Month and year: 500 · 18 · 24, #2E2E2E / #F5F5F7, in buttons 48px high, radius 4, padding 8/12, gap 8. Arrows: 40×40 circles, 9px apart, border 1px; light fill #F5F5F7, border + chevron #626262, popup shadow; dark fill #2E2E2E, border + chevron #F5F5F7. Chevron 7.41×12.
+- Weekday row: 500 · 18 · 24, #2E2E2E / #F5F5F7.
+- Days: 400 · 18 · 24, no cell frames. Current month #2E2E2E / #F5F5F7; outside the month #AEAEAE / #626262; disabled strikethrough #626262 / #AEAEAE. Highlighted day: 41×41 circle #C63031, text 500 #F5F5F7 (only one state drawn).
+
+### Verification code (DS › EMAIL VERIFICATION)
+
+6 boxes, 48×48, 16px apart (the last gap 17 is read as a layer artefact), border 1px #AEAEAE both, radius 0. Inner input 23×23, dark fill #2E2E2E. Only the empty state is drawn.
+
 ### Icons
 
 No icon names in the file, but every glyph matches Google Material Icons by size and position: more-vert (4×16 at 10,4), visibility (22×15 at 1,4.5), search (17.49 at 3,3), chevron-right (7.41×12 at 8.59,6). We use Material Icons paths (Apache 2.0).
@@ -206,3 +252,15 @@ Error text in dark (2026-11-03): #C63031 on #2E2E2E is 2.5:1. In dark, error tex
 - Dark IconButton active icon #656565 is read as #626262 (not in the palette). Dark search icon #C4C4C6 is kept as drawn.
 - Secondary dark hover has no border in Figma; the border takes the fill colour, so the button keeps its size.
 - 1440 › SIGN IN "Forgot password" (dark text #C4C4C6) differs from DS Ghost (#F5F5F7); we follow DS.
+
+Predictions for KAN-78 (2026-11-03): not drawn, or drawn inconsistently, in DS; chosen by us. Fix here and in the CSS when a better source appears.
+
+- Select, multi-select and date picker share the text input's frame, so the KAN-77 decisions apply: label rests inside as the placeholder in the grey text colour (contrast), invalid label red, disabled value 16px (not the drawn 14/20), no label animation.
+- Select error text: the input's Error style (12/16), not the drawn 10/16, so every field's error looks the same.
+- Open list: page background fill (the frame colour shows through), max height 5 options (235px) then scrolls, no shadow or radius; keyboard highlight uses the hover colours.
+- Dark Select fill #454545 when open or invalid, as drawn; hover keeps #2E2E2E.
+- Multi-select chips wrap onto new lines and the field grows; the row's inset shadow (spread 30px #F5F5F7) is ignored, as in the search field. Unselected checkbox: border in the option text colour (#2E2E2E / #F5F5F7), no check.
+- Date picker dark border on all four sides (drawn without the bottom: read as an artefact).
+- Calendar: the highlighted circle is the selected day; today is a 1px #C63031 ring with the normal text colour; hover is a circle in the option hover fill (#AEAEAE / #626262). Day cells 41×41. Month and year buttons switch to a month or year list.
+- Calendar icon: Material "calendar_today" outlined (the 18×18 glyph is not identified).
+- Code boxes: the whole 48×48 box is the input (the 23×23 inner input is a layer); digit in the Input value style, centred; hover, focus, invalid and disabled as the text input; boxes 16px apart.
