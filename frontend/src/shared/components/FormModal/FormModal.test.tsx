@@ -128,6 +128,18 @@ describe("FormModal", () => {
     expect(submit).toHaveBeenCalledOnce();
   });
 
+  it("does not close with CANCEL, × or Escape while the request is pending", async () => {
+    const { user } = await renderOpen(vi.fn(() => new Promise<void>(() => {})));
+
+    await user.type(screen.getByRole("textbox", { name: "Name" }), "React");
+    await user.click(screen.getByRole("button", { name: "Add" }));
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    await user.click(screen.getByRole("button", { name: "Close" }));
+    await user.keyboard("{Escape}");
+
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
   it("closes with CANCEL without sending", async () => {
     const { user, submit } = await renderOpen();
 

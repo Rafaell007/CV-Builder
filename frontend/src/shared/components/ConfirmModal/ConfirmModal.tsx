@@ -40,8 +40,14 @@ export function ConfirmModal({
 }: ConfirmModalProps) {
   const returnFocus = useReturnFocus();
 
+  // While the request runs, Escape, × and CANCEL do nothing: the caller handles the result in this modal.
+  function handleOpenChange(nextOpen: boolean) {
+    if (!nextOpen && isPending) return;
+    onOpenChange(nextOpen);
+  }
+
   return (
-    <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
+    <AlertDialog.Root open={open} onOpenChange={handleOpenChange}>
       <AlertDialog.Portal>
         <AlertDialog.Overlay className={styles.overlay} />
         <AlertDialog.Content

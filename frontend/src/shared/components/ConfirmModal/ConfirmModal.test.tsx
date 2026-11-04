@@ -101,6 +101,17 @@ describe("ConfirmModal", () => {
     expect(remove).toHaveBeenCalledOnce();
   });
 
+  it("does not close with CANCEL, × or Escape while the request is pending", async () => {
+    const { user } = await renderOpen(vi.fn(() => new Promise<void>(() => {})));
+
+    await user.click(screen.getByRole("button", { name: "Confirm" }));
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    await user.click(screen.getByRole("button", { name: "Close" }));
+    await user.keyboard("{Escape}");
+
+    expect(screen.getByRole("alertdialog")).toBeInTheDocument();
+  });
+
   it("does not close on a click outside", async () => {
     await renderOpen();
 

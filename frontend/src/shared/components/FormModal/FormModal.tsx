@@ -52,16 +52,22 @@ export function FormModal({
     onSubmit(event);
   }
 
+  // While the request runs, Escape, the overlay, × and CANCEL do nothing: the caller handles the result here.
+  function handleOpenChange(nextOpen: boolean) {
+    if (!nextOpen && isSubmitting) return;
+    onOpenChange(nextOpen);
+  }
+
   return (
     <Modal
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={handleOpenChange}
       title={title}
       closeLabel={closeLabel}
       onOpenAutoFocus={onOpenAutoFocus}
       footer={
         <>
-          <Button variant="secondary" onClick={() => onOpenChange(false)}>
+          <Button variant="secondary" onClick={() => handleOpenChange(false)}>
             {cancelLabel}
           </Button>
           <Button type="submit" form={formId} disabled={!canSubmit} loading={isSubmitting}>
