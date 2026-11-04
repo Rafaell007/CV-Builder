@@ -1,2 +1,2 @@
 // Public entry for hooks shared across unrelated features.
-export {};
+export { useReturnFocus } from "./useReturnFocus";
