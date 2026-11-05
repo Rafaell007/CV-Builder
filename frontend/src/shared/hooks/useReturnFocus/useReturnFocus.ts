@@ -15,8 +15,10 @@ export function useReturnFocus() {
   return {
     onOpenAutoFocus: () => {
       // Runs before Radix moves focus inside, so this is still the element that opened the dialog.
-      openerRef.current =
-        document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      // The body means nothing was focused (Safari and Firefox on macOS do not focus a clicked button):
+      // there is no opener to return to, and focusing the body would lose the user's place.
+      const active = document.activeElement;
+      openerRef.current = active instanceof HTMLElement && active !== document.body ? active : null;
     },
     onCloseAutoFocus: (event: AutoFocusEvent) => {
       const opener = openerRef.current;
