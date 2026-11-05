@@ -25,8 +25,8 @@
   border-radius: 0;
   background: transparent;
   color: var(--color-text);
-  font: var(--text-heading);
-  letter-spacing: var(--text-heading-ls);
+  font: var(--text-input);
+  letter-spacing: var(--text-input-ls);
   text-align: center;
 }
 
@@ -35,7 +35,7 @@
 }
 
 .box:focus {
-  border-color: var(--color-input-border-focus-strong);
+  border-color: var(--color-input-border-focus);
   outline: none;
 }
 
@@ -57,7 +57,7 @@
 
 .error {
   margin: 0;
-  color: var(--color-error);
+  color: var(--color-error-text);
   font: var(--text-error);
   letter-spacing: var(--text-error-ls);
   text-align: center;

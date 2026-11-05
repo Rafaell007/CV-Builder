@@ -1,0 +1,277 @@
+/*
+ * Values: docs/design-tokens.md › Components › Date picker (+ "Predictions for KAN-78").
+ * The field is the text input's (Field): same borders, label, states. react-datepicker's CSS is not loaded;
+ * its parts are styled here by its global class names, and states by ARIA where it sets them
+ * (aria-selected, aria-current="date", aria-disabled), which is steadier than class names.
+ */
+
+/* The whole box inside the border (Field's 11px padding moved onto the input), so the calendar lines up with it */
+.box {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-self: stretch;
+  min-width: 0;
+  margin: 0 -11px;
+}
+
+.wrapper {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.wrapper :global(.react-datepicker__input-container) {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Text 12px from the left; 48px on the right keeps it clear of the icon */
+.wrapper input {
+  padding: 0 48px 0 11px;
+}
+
+/* 24×24 at 12px from the top and right outer edges; a click on it reaches the input underneath */
+.icon {
+  position: absolute;
+  top: 11px;
+  right: 11px;
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}
+
+/* Prediction: red when invalid, as the select chevron */
+.box:has([aria-invalid="true"]) .icon {
+  color: var(--color-error);
+}
+
+.box:has(input:disabled) .icon {
+  color: var(--color-icon-disabled);
+}
+
+/*
+ * Attached under the field's bottom border, aligned with its outer left edge.
+ * react-datepicker keeps a 10px gap above its popup even without the arrow: -10px + the 1px border.
+ * The Open story checks the position, so a change of that gap in a library update fails the test.
+ */
+.popper {
+  z-index: 1;
+  margin: -9px 0 0 -1px;
+}
+
+/*
+ * Popup: 449px wide (wider than the 400 field), radius 0 0 8 8, 1px border, page fill, shadow in light only.
+ * Inner spacing: the header row at 24px from the top, 32px from the sides (Figma). Below it: prediction.
+ */
+.calendar {
+  box-sizing: border-box;
+  width: 449px;
+  /* On a phone narrower than 449px the popup shrinks to the screen minus the page gutters */
+  max-width: calc(100vw - 2 * var(--space-4));
+  padding: var(--space-6) var(--space-8);
+  border: 1px solid var(--color-input-border);
+  border-radius: 0 0 var(--radius-menu) var(--radius-menu);
+  background: var(--color-bg);
+  box-shadow: var(--shadow-calendar);
+  color: var(--color-text);
+}
+
+/* Screen-reader-only texts and the live region react-datepicker adds (its CSS would hide them) */
+.calendar :global(.react-datepicker__sr-only),
+.calendar :global(.react-datepicker__aria-live) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* 48px row, month + year on the left, arrows on the right */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--space-12);
+  margin-bottom: var(--space-2);
+}
+
+.headerTitle {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* 48 high, radius 4, padding 8/12; text 500 · 18 · 24 */
+.headerButton {
+  height: var(--space-12);
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--color-text);
+  font: var(--text-calendar-heading);
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+/* Hover, here and on the days and lists: --color-surface, one step lighter than the options' hover fill (2026-11-05) */
+.headerButton:hover {
+  background: var(--color-surface);
+}
+
+/* The open list: its button is red text, no fill (docs/images/date-picker-layout.png). In dark the red is the
+   lighter error text colour, as the error texts are: #C63031 on #2E2E2E is 2.5:1 */
+.headerButton[aria-pressed="true"] {
+  color: var(--color-error-text);
+}
+
+.arrows {
+  display: flex;
+  gap: 9px;
+}
+
+/* 40×40 circles, 1px border; light: page fill + the popup's shadow, dark: page fill, no shadow */
+.arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-10);
+  height: var(--space-10);
+  padding: 0;
+  border: 1px solid var(--color-calendar-arrow);
+  border-radius: var(--radius-round);
+  background: var(--color-bg);
+  box-shadow: var(--shadow-calendar);
+  color: var(--color-calendar-arrow);
+  cursor: pointer;
+}
+
+.arrow:disabled {
+  border-color: var(--color-icon-disabled);
+  color: var(--color-icon-disabled);
+  cursor: not-allowed;
+}
+
+.headerButton:focus-visible,
+.arrow:focus-visible,
+.calendar :global(.react-datepicker__day):focus-visible,
+.calendar :global(.react-datepicker__month-text):focus-visible,
+.calendar :global(.react-datepicker__year-text):focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 1px;
+}
+
+/* react-datepicker's own header box around ours: no extra spacing */
+.calendar :global(.react-datepicker__header) {
+  padding: 0;
+}
+
+/* Weekday row and weeks: 7 columns of 41px spread over the 385px row */
+.calendar :global(.react-datepicker__day-names),
+.calendar :global(.react-datepicker__week) {
+  display: flex;
+  justify-content: space-between;
+}
+
+.calendar :global(.react-datepicker__day-name) {
+  width: 41px;
+  font: var(--text-calendar-heading);
+  text-align: center;
+  text-transform: capitalize;
+}
+
+/* Days: 400 · 18 · 24 in 41×41 cells (prediction: cells; Figma draws loose text) */
+.calendar :global(.react-datepicker__day) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 41px;
+  height: 41px;
+  border-radius: var(--radius-round);
+  outline: 0;
+  font: var(--text-calendar-day);
+  cursor: pointer;
+}
+
+/* Figma draws them #AEAEAE / #626262 (about 2:1); they can be picked, so they use the secondary text colour (4.5:1) */
+.calendar :global(.react-datepicker__day--outside-month) {
+  color: var(--color-text-secondary);
+}
+
+/* Prediction: hover and the keyboard cursor use the surface fill (lighter than the options' hover fill) */
+.calendar :global(.react-datepicker__day):hover,
+.calendar :global(.react-datepicker__day--keyboard-selected) {
+  background: var(--color-surface);
+}
+
+/* Prediction: today is a 1px red ring */
+.calendar :global(.react-datepicker__day)[aria-current="date"] {
+  box-shadow: inset 0 0 0 1px var(--color-primary);
+}
+
+/* The selected day: red circle, 500 light text (Figma's only highlighted day) */
+.calendar :global(.react-datepicker__day)[aria-selected="true"] {
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+  font-weight: 500;
+}
+
+.calendar :global(.react-datepicker__day)[aria-disabled="true"] {
+  background: transparent;
+  color: var(--color-text-secondary);
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+/*
+ * Month list (3 × 4) and year list (3 × 4), measured from docs/images/date-picker-layout.png (drawn at 0.757 of the
+ * real size: the 31px day circle there is 41px here): rows 50px apart, the first row about 24px lower than the
+ * weekday row of the day view, the selected item a red rectangle 106 × 34, radius 4, as the selected day is a circle.
+ */
+.calendar :global(.react-datepicker__month-wrapper),
+.calendar :global(.react-datepicker__year-wrapper) {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.calendar :global(.react-datepicker__month-wrapper):first-child,
+.calendar :global(.react-datepicker__year-wrapper):first-child {
+  margin-top: var(--space-6);
+}
+
+.calendar :global(.react-datepicker__year-wrapper) + :global(.react-datepicker__year-wrapper),
+.calendar :global(.react-datepicker__month-wrapper) + :global(.react-datepicker__month-wrapper) {
+  margin-top: var(--space-4);
+}
+
+.calendar :global(.react-datepicker__month-text),
+.calendar :global(.react-datepicker__year-text) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  box-sizing: border-box;
+  width: 106px;
+  height: 34px;
+  padding: 0;
+  border-radius: var(--radius-small);
+  outline: 0;
+  font: var(--text-calendar-day);
+  text-align: center;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.calendar :global(.react-datepicker__month-text):hover,
+.calendar :global(.react-datepicker__year-text):hover,
+.calendar :global(.react-datepicker__month-text--keyboard-selected),
+.calendar :global(.react-datepicker__year-text--keyboard-selected) {
+  background: var(--color-surface);
+}
+
+.calendar :global(.react-datepicker__month-text)[aria-selected="true"],
+.calendar :global(.react-datepicker__year-text--selected) {
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+}

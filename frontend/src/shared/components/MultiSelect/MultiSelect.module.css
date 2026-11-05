@@ -1,0 +1,197 @@
+/*
+ * Values: docs/design-tokens.md › Components › Multi-select, Select (+ "Predictions for KAN-78").
+ * Field and list look like Select; the field-state and option rules below repeat Select's on purpose
+ * (Radix and Downshift mark the states with different attributes). Keep the two files in step.
+ * Open = the toggle's aria-expanded; disabled = its aria-disabled (the toggle is a div).
+ */
+
+/* Field's bordered box (controlClassName). Grows when chips wrap onto new lines (prediction). */
+.control {
+  --field-border: var(--color-select-border);
+  --field-height: auto;
+}
+
+.control:where([data-filled]) {
+  --field-border: var(--color-input-border-focus);
+}
+
+.control:where(:has([aria-expanded="true"]), [data-filled], :has([aria-invalid="true"])):where(
+    :not(:has([aria-disabled="true"]))
+  ) {
+  background: var(--color-select-active-bg);
+}
+
+.control:where(:focus-within, [data-filled], :has([aria-expanded="true"])):where(
+    :not(:has([aria-disabled="true"]))
+  )
+  label {
+  color: var(--color-select-label);
+}
+
+/* The whole box inside the border (Field's 11px padding moved here); chips start 12px from the outer top-left.
+   48px on the right keeps chips clear of the chevron. */
+.box {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+  align-self: stretch;
+  min-width: 0;
+  min-height: 46px;
+  margin: 0 -11px;
+  padding: 11px 48px 11px 11px;
+}
+
+.toggle {
+  position: absolute;
+  inset: 0;
+  outline: 0;
+  cursor: pointer;
+}
+
+.toggle[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+/* 24×24 at 12px from the top and right outer edges */
+.chevron {
+  position: absolute;
+  top: 11px;
+  right: 11px;
+  color: var(--color-select-chevron);
+}
+
+.control:where(:hover, :focus-within, [data-filled], :has([aria-expanded="true"])) .chevron {
+  color: var(--color-select-chevron-active);
+}
+
+.control:where(:has([aria-invalid="true"])) .chevron {
+  color: var(--color-error);
+}
+
+.toggle[aria-disabled="true"] .chevron {
+  color: var(--color-icon-disabled);
+}
+
+.toggle[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+
+/* Chips 13px apart (Figma); the row gap of wrapped chips is a prediction. Free space lets clicks reach the toggle. */
+.chips {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) 13px;
+  min-width: 0;
+  pointer-events: none;
+}
+
+/* 24px high, radius 12, 1px border, no fill; text 12px from the outer left edge */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  height: var(--space-6);
+  padding-left: 11px;
+  border: 1px solid var(--color-chip-border);
+  border-radius: var(--radius-chip);
+  color: var(--color-text);
+  font: var(--text-input);
+  line-height: 22px;
+  letter-spacing: var(--text-input-ls);
+  cursor: default;
+  pointer-events: auto;
+}
+
+.control:where(:has([aria-disabled="true"])) .chip {
+  padding-right: 11px;
+  border-color: var(--color-input-disabled-text);
+  color: var(--color-input-disabled-text);
+}
+
+.chipText {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* 22×22 hit area; the 12px circle inside ends 6px from the chip's outer right edge */
+.remove {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-round);
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Prediction: Figma draws no focus state */
+.remove:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+}
+
+/* Open list: as Select (field width, attached under the bottom border, 5 options then it scrolls) */
+.list {
+  position: absolute;
+  z-index: 1;
+  top: calc(100% + 1px);
+  right: -1px;
+  left: -1px;
+  box-sizing: border-box;
+  max-height: calc(5 * 47px + 1px);
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  border: 1px solid var(--color-option-border);
+  border-top: 0;
+  outline: 0;
+  background: var(--color-bg);
+  list-style: none;
+}
+
+.list[hidden] {
+  display: none;
+}
+
+/* 47px high; checkbox at 12px from the left, text after it */
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  color: var(--color-text);
+  font: var(--text-input);
+  letter-spacing: var(--text-input-ls);
+  cursor: pointer;
+  user-select: none;
+}
+
+.option[data-highlighted] {
+  background: var(--color-option-hover-bg);
+}
+
+.option[aria-selected="true"] {
+  background: var(--color-option-selected-bg);
+  color: var(--color-option-selected-text);
+}
+
+.option[aria-disabled="true"] {
+  color: var(--color-input-disabled-text);
+  cursor: not-allowed;
+}
+
+.optionText {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.checkbox {
+  flex-shrink: 0;
+}

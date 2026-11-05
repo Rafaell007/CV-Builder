@@ -163,6 +163,7 @@ Same stack and setup order as the other intern team (D2).
 | D31 | 2026-10-28 | Integration branch renamed `developement` → `development` | Typo would spread into CI, README and deploy settings |
 | D32 | 2026-11-03 | Language in the URL: every route lives under `app/[locale]/` (`/en/users`, `/pl/users`), next-intl `localePrefix: "always"`. The proxy sends a path without a language to the one saved in the `locale` cookie (1 year), else the browser language (Accept-Language) if supported, else `en`; visiting a language saves it. Pages read the locale with `next/root-params` and are prerendered per language | next-intl default and the documented way to keep static rendering with Cache Components; reading the cookie on the server would make every route dynamic (D5) ([routing](https://next-intl.dev/docs/routing/configuration), [root params](https://next-intl.dev/blog/nextjs-root-params)) |
 | D33 | 2026-11-03 | Password rule at sign-up: 8 to 128 characters with at least one letter and one digit. Sign-in keeps 6 to 128, so older and seed accounts still work. Reset and change password (S3.8, S4.4) use the sign-up rule | Sign-up page "password policy defined by the application" (AC-6 said only 6); a stricter rule was agreed in the PR review |
+| D34 | 2026-11-05 | Date fields: no clear button; the user deletes the text by hand. An empty End Date is shown as "Till now" in lists (the preview says "Present"). Date format: `en` MM/dd/yyyy, `pl` dd.MM.yyyy; the week starts on Sunday. A typed text that is not a date gives the same error as an empty date | Page 23 design shows 08/21/2023 and "Till now"; no clear control is drawn; the date picker holds `null` for both an empty and an invalid text |
 
 ### 2.4 Open decisions
 
@@ -217,7 +218,7 @@ CV-Builder/
                                          Select, MultiSelect, DatePicker, OtpField, DataTable, Pagination, Menu, Modal, ConfirmModal,
                                          Toast, Tabs, Breadcrumbs, PageState, SearchField
         styles/                          design tokens, light/dark themes, global CSS
-        apollo/ hooks/ utils/ i18n/ preferences/
+        apollo/ forms/ hooks/ utils/ i18n/ preferences/
         graphql/                         generated typed documents (codegen output, not edited)
   backend/
     schema.gql                           generated contract (committed)

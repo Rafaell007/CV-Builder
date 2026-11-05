@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
-import { expect } from "storybook/test";
+import { expect, fn } from "storybook/test";
 import { OtpField, type OtpFieldProps } from "./OtpField";
 
 // The field is controlled, so every story needs a small wrapper that keeps the value.
@@ -39,6 +39,19 @@ export const Default: Story = {
 
     await expect(canvas.getByRole("textbox", { name: "Digit 3 of 6" })).toHaveValue("3");
     await expect(canvas.getByRole("textbox", { name: "Digit 4 of 6" })).toHaveFocus();
+  },
+};
+
+// Moving between the boxes is not a blur; leaving the field is.
+export const Blur: Story = {
+  args: { onBlur: fn() },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("textbox", { name: "Digit 1 of 6" }));
+    await userEvent.keyboard("12");
+    await expect(args.onBlur).not.toHaveBeenCalled();
+
+    await userEvent.tab();
+    await expect(args.onBlur).toHaveBeenCalledOnce();
   },
 };
 

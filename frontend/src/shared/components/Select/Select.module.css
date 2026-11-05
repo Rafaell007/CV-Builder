@@ -1,0 +1,132 @@
+/*
+ * Values: docs/design-tokens.md › Components › Select (+ "Predictions for KAN-78").
+ * The frame, label, error text and the hover / focus / invalid / disabled borders come from Field.
+ * Here: Select's own default border, the fill and chevron per state, the label colour in dark, and the list.
+ * Open = the trigger's aria-expanded (the list is in a portal, so focus is outside the box).
+ */
+
+/* Field's bordered box (controlClassName) */
+.control {
+  --field-border: var(--color-select-border);
+}
+
+/* Figma "Filled" = "Open": the darker border stays without focus */
+.control:where([data-filled]) {
+  --field-border: var(--color-input-border-focus);
+}
+
+/* Dark fill #454545 when open, filled or invalid (light: none). Not disabled: Field's disabled fill wins. */
+.control:where(:has([aria-expanded="true"]), [data-filled], :has([aria-invalid="true"])):where(
+    :not(:has(:disabled))
+  ) {
+  background: var(--color-select-active-bg);
+}
+
+/* Floated label: #626262 / #F5F5F7 (the text input's is #AEAEAE in dark). Field's invalid red outweighs this. */
+.control:where(:focus-within, [data-filled], :has([aria-expanded="true"])):where(
+    :not(:has(:disabled))
+  )
+  label {
+  color: var(--color-select-label);
+}
+
+/* Covers the whole box inside the border, so a click anywhere opens the list and the list matches the field's width */
+.trigger {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  align-self: stretch;
+  gap: var(--space-2);
+  min-width: 0;
+  /* Field's padding moved onto the trigger */
+  margin: 0 -11px;
+  padding: 0 11px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: var(--text-input);
+  letter-spacing: var(--text-input-ls);
+  text-align: left;
+  cursor: pointer;
+}
+
+.trigger:disabled {
+  color: var(--color-input-disabled-text);
+  cursor: not-allowed;
+}
+
+.value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* 24×24 at 12px from the right edge (the trigger ends inside Field's 11px padding + 1px border) */
+.chevron {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--color-select-chevron);
+}
+
+.control:where(:hover, :focus-within, [data-filled], :has([aria-expanded="true"])) .chevron {
+  color: var(--color-select-chevron-active);
+}
+
+.control:where(:has([aria-invalid="true"])) .chevron {
+  color: var(--color-error);
+}
+
+.trigger:disabled .chevron {
+  color: var(--color-icon-disabled);
+}
+
+/* Points up while open */
+.trigger[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+
+/*
+ * Open list: the field's width (trigger + its two 1px borders), attached under it, page fill, no radius or shadow.
+ * Border on the sides and bottom (Figma draws it per option: same look). Prediction: max 5 options, then it scrolls.
+ */
+.list {
+  box-sizing: border-box;
+  width: calc(var(--radix-select-trigger-width) + 2px);
+  max-height: min(calc(5 * 47px + 1px), var(--radix-select-content-available-height));
+  border: 1px solid var(--color-option-border);
+  border-top: 0;
+  background: var(--color-bg);
+}
+
+/* 47px high: 12px padding + 23px line */
+.option {
+  overflow: hidden;
+  padding: var(--space-3);
+  outline: 0;
+  color: var(--color-text);
+  font: var(--text-input);
+  letter-spacing: var(--text-input-ls);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Hover and keyboard highlight (Radix highlights the option under the pointer) */
+.option[data-highlighted] {
+  background: var(--color-option-hover-bg);
+}
+
+.option[data-state="checked"] {
+  background: var(--color-option-selected-bg);
+  color: var(--color-option-selected-text);
+}
+
+/* Prediction: not drawn */
+.option[data-disabled] {
+  color: var(--color-input-disabled-text);
+  cursor: not-allowed;
+}

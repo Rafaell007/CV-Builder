@@ -18,6 +18,8 @@
   --palette-yellow-dark: #7f5c00;
   --palette-blue: #29b6f6;
   --palette-blue-dark: #145b7b;
+  /* Date picker shadow (light): #5E5BE6 at 15% */
+  --palette-indigo-shadow: rgb(94 91 230 / 15%);
 
   /* Typography: font shorthand (weight size/line-height family) + letter spacing */
   --font-family: var(--font-roboto, "Roboto"), sans-serif;
@@ -49,6 +51,8 @@
   --text-caption-ls: 0.15px;
   --text-error: 400 12px/16px var(--font-family);
   --text-error-ls: 0.15px;
+  --text-calendar-heading: 500 18px/24px var(--font-family);
+  --text-calendar-day: 400 18px/24px var(--font-family);
 
   /* Spacing: 4px grid. Off-grid Figma values stay exact in component CSS. */
   --space-1: 4px;
@@ -63,8 +67,10 @@
 
   /* Radius */
   --radius-pill: 40px;
+  --radius-small: 4px;
   --radius-menu: 8px;
   --radius-notification: 12px;
+  --radius-chip: 12px;
   --radius-round: 50%;
 
   /* Shadows */
