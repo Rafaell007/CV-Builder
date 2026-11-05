@@ -4,6 +4,7 @@ import type { Decorator, Loader } from "@storybook/nextjs-vite";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { useLayoutEffect } from "react";
 import { loadMessages, type Messages } from "@/i18n/loadMessages";
+import { ToastProvider } from "@/shared/components/Toast";
 import { routing } from "@/shared/i18n";
 import { PreferencesProvider, THEMES, usePreferences, type Theme } from "@/shared/preferences";
 
@@ -50,7 +51,13 @@ export const withAppProviders: Decorator = (Story, { globals, parameters, loaded
         <ThemeFromToolbar theme={theme} />
         <LangFromToolbar locale={locale} />
         <MockedProvider mocks={mocks}>
-          <Story />
+          <ToastProvider
+            closeLabel={messages.common.toast.close}
+            label={messages.common.toast.label}
+            viewportLabel={messages.common.toast.viewport}
+          >
+            <Story />
+          </ToastProvider>
         </MockedProvider>
       </PreferencesProvider>
     </NextIntlClientProvider>

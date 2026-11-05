@@ -3,6 +3,8 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { ApolloClientProvider } from "@/shared/apollo";
+// The folder, not the shared/components barrel: a Server Component would pull every component into the server graph.
+import { ToastProvider } from "@/shared/components/Toast";
 import { routing } from "@/shared/i18n";
 import { PreferencesProvider, PreferencesScript } from "@/shared/preferences";
 import { roboto } from "@/shared/styles";
@@ -23,6 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children, params }: LayoutProps<"/[locale]">) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
+  const t = await getTranslations("common");
 
   return (
     // suppressHydrationWarning: PreferencesScript changes data-theme before React hydrates
@@ -34,7 +37,15 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[lo
         {/* Rendered on the server, it passes this request's locale and messages to Client Components. */}
         <NextIntlClientProvider>
           <ApolloClientProvider>
-            <PreferencesProvider>{children}</PreferencesProvider>
+            <PreferencesProvider>
+              <ToastProvider
+                closeLabel={t("toast.close")}
+                label={t("toast.label")}
+                viewportLabel={t("toast.viewport")}
+              >
+                {children}
+              </ToastProvider>
+            </PreferencesProvider>
           </ApolloClientProvider>
         </NextIntlClientProvider>
       </body>

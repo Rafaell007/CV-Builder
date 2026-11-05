@@ -4,11 +4,10 @@ import { Pagination } from "./Pagination";
 
 describe("Pagination", () => {
   it("renders nothing when all rows fit on one page", () => {
-    const { container } = renderWithProviders(
-      <Pagination page={1} total={10} onPageChange={vi.fn()} />,
-    );
+    renderWithProviders(<Pagination page={1} total={10} onPageChange={vi.fn()} />);
 
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 
   it("uses the page size 10 by default", () => {

@@ -1,0 +1,30 @@
+/* Values: docs/design-tokens.md › Selection toolbar (Figma 1440 › REMOVE SKILLS) and "Decisions where Figma is unclear" */
+
+/* Sticky at the bottom of the content, 64 high. Page background so scrolled content does not show through.
+   Prediction: 8px above and below the 48px buttons; no side padding, so they line up with the content edge. */
+.toolbar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  gap: var(--space-6);
+  align-items: center;
+  justify-content: flex-end;
+  box-sizing: border-box;
+  height: 64px;
+  padding: var(--space-2) 0;
+  background: var(--color-bg);
+}
+
+/* 16×16, radius 20, light fill with the red number; 8 after the label (Button gap) */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--space-4);
+  height: var(--space-4);
+  border-radius: 20px;
+  background: var(--color-text-on-primary);
+  color: var(--color-primary);
+  font: var(--text-badge);
+  letter-spacing: var(--text-badge-ls);
+}

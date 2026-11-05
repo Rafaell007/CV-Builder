@@ -1,0 +1,44 @@
+/*
+ * Values: docs/design-tokens.md › Components › Modal (Figma CONFIRM TO REMOVE SKILLS).
+ * Overlay, panel, title, close, header and footer are Modal's (composes); only the spacing around the message
+ * differs, set through the variables Modal.module.css reads.
+ */
+
+.overlay {
+  composes: overlay from "../Modal/Modal.module.css";
+}
+
+.content {
+  composes: content from "../Modal/Modal.module.css";
+}
+
+/* Message 40 below the title */
+.header {
+  composes: header from "../Modal/Modal.module.css";
+  --modal-header-gap: 40px;
+}
+
+.title {
+  composes: title from "../Modal/Modal.module.css";
+}
+
+.close {
+  composes: close from "../Modal/Modal.module.css";
+}
+
+/* The highlighted part (e.g. the count) is bold: docs/design-tokens.md › Predictions for KAN-81 */
+.message {
+  margin: 0;
+  font: var(--text-body);
+  letter-spacing: var(--text-body-ls);
+}
+
+.message strong {
+  font-weight: 700;
+}
+
+/* Buttons 44 below the message */
+.footer {
+  composes: footer from "../Modal/Modal.module.css";
+  --modal-footer-gap: 44px;
+}

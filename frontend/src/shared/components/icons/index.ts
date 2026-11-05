@@ -4,6 +4,7 @@ export type { IconProps } from "./icons.types";
 export { CalendarTodayIcon } from "./CalendarTodayIcon";
 export { ChevronLeftIcon } from "./ChevronLeftIcon";
 export { ChevronRightIcon } from "./ChevronRightIcon";
+export { CloseIcon } from "./CloseIcon";
 export { ExpandMoreIcon } from "./ExpandMoreIcon";
 export { MoreVertIcon } from "./MoreVertIcon";
 export { SearchIcon } from "./SearchIcon";
