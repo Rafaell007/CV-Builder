@@ -42,7 +42,8 @@ const MESSAGES = {
   descriptionRequired: "Enter a description",
   departmentRequired: "Choose a department",
   skillsRequired: "Choose at least one skill",
-  startDateRequired: "Choose a start date",
+  // One message for an empty field and for typed text that is not a date: the picker holds null in both cases.
+  startDateRequired: "Enter a valid start date",
   codeInvalid: "Enter the 6-digit code",
 };
 
@@ -60,7 +61,7 @@ const sampleSchema = z.object({
   description: z.string().trim().min(1, MESSAGES.descriptionRequired),
   department: z.string().min(1, MESSAGES.departmentRequired),
   skills: z.array(z.string()).min(1, MESSAGES.skillsRequired),
-  // The picker holds null while empty; the submitted value is always a date.
+  // The picker holds null while empty and when the typed text is not a date; the submitted value is always a date.
   startDate: z
     .date()
     .nullable()
