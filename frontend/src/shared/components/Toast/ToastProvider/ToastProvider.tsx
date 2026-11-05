@@ -48,9 +48,12 @@ export function ToastProvider({ closeLabel, label, viewportLabel, children }: To
 
   return (
     <ToastContext value={value}>
-      {/* Radix closes each toast after 5 s, paused on hover, focus and window blur. */}
+      {children}
+      {/* Radix closes each toast after 5 s, paused on hover, focus and window blur.
+          It is a sibling of the children, not their parent: the viewport updates the Radix provider
+          after hydration, and a provider around the children makes React render the whole page twice
+          while the server HTML is still streaming in (two copies of the page in the DOM for ~300 ms). */}
       <Toast.Provider label={label}>
-        {children}
         {toasts.map(({ id, ...toast }) => (
           <ToastItem
             key={id}
