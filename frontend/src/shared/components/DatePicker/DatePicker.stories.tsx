@@ -196,6 +196,85 @@ export const Invalid: Story = {
   },
 };
 
+// Dark theme: the error text and the open-list header use the lighter error red (#E9B0B0, 7:1), not #C63031 (2.5:1)
+const ERROR_TEXT_DARK = "rgb(233, 176, 176)";
+
+// The error state with the calendar open: the field stays invalid and the icon stays red.
+export const InvalidOpen: Story = {
+  args: { value: null, error: "Enter a start date" },
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole("textbox", { name: "Start date" });
+    await userEvent.click(input);
+
+    await expect(canvas.getByRole("dialog", { name: "Choose a date" })).toBeInTheDocument();
+    await expect(input).toBeInvalid();
+    await expect(input).toHaveAccessibleDescription("Enter a start date");
+    await expect(input.closest("div[class*='control']")).toHaveStyle({ borderTopColor: RED });
+  },
+};
+
+export const InvalidDark: Story = {
+  globals: { theme: "dark" },
+  args: { value: null, error: "Enter a start date" },
+  play: async ({ canvas }) => {
+    const input = canvas.getByRole("textbox", { name: "Start date" });
+    await expect(input).toBeInvalid();
+    await expect(input.closest("div[class*='control']")).toHaveStyle({ borderTopColor: RED });
+    await expect(canvas.getByText("Enter a start date")).toHaveStyle({ color: ERROR_TEXT_DARK });
+  },
+};
+
+export const InvalidOpenDark: Story = {
+  globals: { theme: "dark" },
+  args: { value: null, error: "Enter a start date" },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("textbox", { name: "Start date" }));
+
+    await expect(canvas.getByRole("dialog", { name: "Choose a date" })).toBeInTheDocument();
+    await expect(canvas.getByRole("textbox", { name: "Start date" })).toBeInvalid();
+  },
+};
+
+export const EmptyDark: Story = {
+  globals: { theme: "dark" },
+  args: { value: null },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("textbox", { name: "Start date" })).toHaveValue("");
+    await expect(canvas.getByText("Start date")).toHaveStyle({ fontSize: "16px" });
+  },
+};
+
+// Dark month list: the open header button is the light error red, the selected month a red rectangle.
+export const MonthListDark: Story = {
+  globals: { theme: "dark" },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("textbox", { name: "Start date" }));
+    await userEvent.click(canvas.getByRole("button", { name: "November" }));
+
+    await expect(canvas.getByRole("button", { name: "November" })).toHaveStyle({
+      color: ERROR_TEXT_DARK,
+    });
+    await expect(canvas.getByText("January")).toBeInTheDocument();
+    const selected = canvas.getAllByText("November").at(-1)!.closest("[aria-selected='true']");
+    await expect(selected).toHaveStyle({ backgroundColor: RED, color: GREY_100 });
+  },
+};
+
+export const YearListDark: Story = {
+  globals: { theme: "dark" },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("textbox", { name: "Start date" }));
+    await userEvent.click(canvas.getByRole("button", { name: "2026" }));
+
+    await expect(canvas.getByRole("button", { name: "2026" })).toHaveStyle({
+      color: ERROR_TEXT_DARK,
+    });
+    await expect(canvas.getByRole("button", { name: "Next year" })).toBeInTheDocument();
+    const selected = canvas.getAllByText("2026").at(-1)!.closest("[class*='year-text--selected']");
+    await expect(selected).toHaveStyle({ backgroundColor: RED, color: GREY_100 });
+  },
+};
+
 export const Disabled: Story = {
   args: { disabled: true },
   play: async ({ canvas }) => {
