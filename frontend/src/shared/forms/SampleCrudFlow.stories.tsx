@@ -105,7 +105,10 @@ function useSampleCrudFlow({ create, remove }: SampleCrudFlowProps) {
       });
       cancelSelection();
     } catch {
-      // The selection and the modal stay, so the user can try again or cancel.
+      // The modal closes and the selection stays, so the user can press REMOVE again. Closing matters: while a
+      // modal is open Radix hides the rest of the page, so a keyboard user could not reach the error toast
+      // (it stays until closed).
+      setIsConfirmOpen(false);
       toast.error({ title: "Could not remove skills", description: "Try again." });
     } finally {
       setIsRemoving(false);
@@ -254,8 +257,8 @@ export const Create: Story = {
   },
 };
 
-// Delete fails: an error toast shows above the still-open ConfirmModal, can be closed there, is announced
-// to screen readers, and the selection stays.
+// Delete fails: the ConfirmModal closes, the error toast is announced at once and a keyboard user reaches it
+// with F8 and closes it; the selection stays and focus is back on REMOVE.
 export const DeleteFails: Story = {
   args: {
     remove: fn(async () => {
@@ -274,22 +277,25 @@ export const DeleteFails: Story = {
 
     const title = await toasts().findByText("Could not remove skills");
     await expect(args.remove).toHaveBeenCalledWith(["1", "2"]);
-    // Radix hides the page from screen readers while the modal is open; the announcement must not be hidden.
+    await waitFor(() => expect(body.queryByRole("alertdialog")).not.toBeInTheDocument());
     const announcement = await body.findByText(/Notification\s+Could not remove skills/);
     await expect(announcement.closest("[aria-live]")).toHaveAttribute("aria-live", "assertive");
-    await expect(announcement.closest('[aria-hidden="true"]')).toBeNull();
 
-    // user-event refuses to click an element with `pointer-events: none`, so this also checks the toast is clickable.
+    // The selection stays and focus returns to the button that opened the modal.
+    await expect(canvas.getByRole("checkbox", { name: "React" })).toBeChecked();
+    await expect(canvas.getByRole("button", { name: "Remove 2" })).toHaveFocus();
+
+    // The error does not close on its own; F8 moves focus to the toasts, Tab reaches the toast, then its × button.
     const toast = title.closest("li");
     if (!toast) throw new Error("toast not found");
-    await userEvent.click(
-      within(toast).getByRole("button", { name: "Close notification", hidden: true }),
-    );
+    await userEvent.keyboard("[F8]");
+    await userEvent.tab();
+    await expect(toast).toHaveFocus();
+    await userEvent.tab();
+    const close = within(toast).getByRole("button", { name: "Close notification" });
+    await expect(close).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
     await waitFor(() => expect(toast).not.toBeInTheDocument());
-
-    await expect(body.getByRole("alertdialog")).toBeInTheDocument();
-    await userEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
-    await expect(canvas.getByRole("checkbox", { name: "React" })).toBeChecked();
     await expect(canvas.getByRole("button", { name: "Remove 2" })).toBeEnabled();
   },
 };

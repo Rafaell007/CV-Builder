@@ -14,6 +14,7 @@ toast.success({ title: t("skillAdded"), description: t("skillAddedText") });
 - F8 moves focus to the toasts; Tab then reaches each one and its × button.
 - Closing plays an exit animation before the toast leaves the list; with `prefers-reduced-motion` only a short fade.
 - While a modal is open, toasts show above it and stay clickable (`pointer-events: auto`), and screen readers still hear them (Radix announces through its own live region). Like the rest of the page, the toast itself is hidden from screen readers and outside the modal's focus trap until the modal closes.
+- **Because of that, close the modal when a request fails and the error is a toast.** An error toast stays until closed, and a keyboard user cannot reach it behind an open modal. `Forms/Sample CRUD flow › Delete Fails` shows the pattern for `ConfirmModal` (close it, keep the selection, focus returns to REMOVE; F8 then Tab reaches the toast). Open point for `FormModal`: it stays open after a general (non-field) error so the user can retry, which leaves the error toast unreachable by keyboard until the modal closes. Field errors are inline and are not affected. Decide per page whether a general error should close the form or show an inline message.
 
 `ToastProvider` is rendered once by `app/[locale]/layout.tsx` with the `common.toast` texts; `renderWithProviders` and Storybook's `withAppProviders` render it too, so tests and stories can show toasts. Server Components import it from `@/shared/components/Toast`, not the `@/shared/components` barrel.
 
