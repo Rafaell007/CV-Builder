@@ -51,6 +51,11 @@ export const Default: Story = {
     const dialog = await openModal(canvas);
     // --color-modal-bg in light = #f5f5f7
     await expect(dialog).toHaveStyle({ backgroundColor: "rgb(245, 245, 247)", width: "620px" });
+    // Spacing from docs/design-tokens.md: 26 under the title, 26 above the buttons.
+    const header = within(dialog).getByRole("heading", { name: "Add skill" }).parentElement;
+    const footer = within(dialog).getByRole("button", { name: "Cancel" }).parentElement;
+    await expect(header).toHaveStyle({ marginBottom: "26px" });
+    await expect(footer).toHaveStyle({ marginTop: "26px" });
   },
 };
 

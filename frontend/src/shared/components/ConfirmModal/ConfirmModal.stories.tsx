@@ -56,8 +56,13 @@ export const Default: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Remove skills" }));
     const dialog = await body.findByRole("alertdialog", { name: "Remove skills" });
     // --color-modal-bg in light = #f5f5f7
-    await expect(dialog).toHaveStyle({ backgroundColor: "rgb(245, 245, 247)" });
+    await expect(dialog).toHaveStyle({ backgroundColor: "rgb(245, 245, 247)", width: "620px" });
     await expect(within(dialog).getByRole("button", { name: "Cancel" })).toHaveFocus();
+    // Spacing from docs/design-tokens.md: 40 under the title, 44 above the buttons (Modal has 26 and 26).
+    const header = within(dialog).getByRole("heading", { name: "Remove skills" }).parentElement;
+    const footer = within(dialog).getByRole("button", { name: "Cancel" }).parentElement;
+    await expect(header).toHaveStyle({ marginBottom: "40px" });
+    await expect(footer).toHaveStyle({ marginTop: "44px" });
   },
 };
 

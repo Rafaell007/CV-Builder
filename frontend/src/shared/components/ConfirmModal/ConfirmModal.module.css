@@ -1,48 +1,29 @@
 /*
  * Values: docs/design-tokens.md › Components › Modal (Figma CONFIRM TO REMOVE SKILLS).
- * Overlay, panel, title and close are the same as Modal's; only the spacing around the message differs.
+ * Overlay, panel, title, close, header and footer are Modal's (composes); only the spacing around the message
+ * differs, set through the variables Modal.module.css reads.
  */
 
 .overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 20;
-  background: var(--color-overlay);
+  composes: overlay from "../Modal/Modal.module.css";
 }
 
 .content {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  z-index: 20;
-  display: flex;
-  flex-direction: column;
-  width: min(620px, calc(100% - 2 * var(--space-4)));
-  max-height: calc(100% - 2 * var(--space-4));
-  overflow-y: auto;
-  padding: var(--space-4) var(--space-6);
-  background: var(--color-modal-bg);
-  color: var(--color-text);
-  transform: translate(-50%, -50%);
+  composes: content from "../Modal/Modal.module.css";
 }
 
 /* Message 40 below the title */
 .header {
-  display: flex;
-  gap: var(--space-4);
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 40px;
+  composes: header from "../Modal/Modal.module.css";
+  --modal-header-gap: 40px;
 }
 
 .title {
-  margin: 0;
-  font: var(--text-modal-title);
-  letter-spacing: var(--text-modal-title-ls);
+  composes: title from "../Modal/Modal.module.css";
 }
 
 .close {
-  margin-top: -2px;
+  composes: close from "../Modal/Modal.module.css";
 }
 
 /* The highlighted part (e.g. the count) is bold: docs/design-tokens.md › Predictions for KAN-81 */
@@ -56,11 +37,8 @@
   font-weight: 700;
 }
 
-/* Buttons 44 below the message, right-aligned, 24 apart */
+/* Buttons 44 below the message */
 .footer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-6);
-  justify-content: flex-end;
-  margin-top: 44px;
+  composes: footer from "../Modal/Modal.module.css";
+  --modal-footer-gap: 44px;
 }
