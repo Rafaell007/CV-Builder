@@ -102,6 +102,19 @@ describe("ToastProvider", () => {
     await waitFor(() => expect(shownToasts()).toHaveLength(0));
   });
 
+  // WCAG 2.2.1 (timing adjustable): an error the user has to act on must not vanish on its own.
+  it("keeps an error toast open until the user closes it", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const { user } = renderToasts([{ variant: "error", title: "Could not save" }]);
+    await user.click(screen.getByRole("button", { name: "Show Could not save" }));
+
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(shownToasts()).toHaveLength(1);
+
+    await user.click(within(toastArea()).getByRole("button", { name: "Close notification" }));
+    await waitFor(() => expect(shownToasts()).toHaveLength(0));
+  });
+
   it("moves focus to the toast list on F8", async () => {
     const { user } = renderToasts([{ variant: "info", title: "Heads up" }]);
     await user.click(screen.getByRole("button", { name: "Show Heads up" }));

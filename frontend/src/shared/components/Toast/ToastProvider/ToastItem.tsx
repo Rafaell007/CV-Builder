@@ -1,7 +1,7 @@
 import { Toast } from "radix-ui";
 import type { AnimationEvent } from "react";
 import { CloseButton } from "../../CloseButton";
-import { ANNOUNCEMENT_BY_VARIANT } from "../toast.constants";
+import { ANNOUNCEMENT_BY_VARIANT, DURATION_BY_VARIANT } from "../toast.constants";
 import type { ToastContent, ToastVariant } from "../Toast.types";
 import styles from "./ToastItem.module.css";
 
@@ -38,6 +38,7 @@ export function ToastItem({
       open={open}
       onOpenChange={onOpenChange}
       type={ANNOUNCEMENT_BY_VARIANT[variant]}
+      duration={DURATION_BY_VARIANT[variant]}
       onAnimationEnd={handleAnimationEnd}
       className={`${styles.toast} ${styles[variant]}`}
     >

@@ -9,7 +9,7 @@ toast.success({ title: t("skillAdded"), description: t("skillAddedText") });
 
 - `success`, `error`, `warning`, `info`; `title` is required, `description` optional. Texts are already translated.
 - At most 3 at once: a new toast pushes out the oldest. Newest at the bottom, 8px apart, 24px from the corner.
-- Each toast closes after 5 s (Radix default), paused on hover, focus and window blur; × (`closeLabel`), Escape and a swipe right close it earlier.
+- `success`, `warning` and `info` close after 5 s (Radix default), paused on hover, focus and window blur. `error` stays until the user closes it (WCAG 2.2.1: timing adjustable; `DURATION_BY_VARIANT`). × (`closeLabel`), Escape and a swipe right close any toast.
 - Screen readers: error toasts are announced at once (Radix `type="foreground"`), the others when the reader is free (`background`), so a success never cuts off an error.
 - F8 moves focus to the toasts; Tab then reaches each one and its × button.
 - Closing plays an exit animation before the toast leaves the list; with `prefers-reduced-motion` only a short fade.
