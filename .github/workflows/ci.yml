@@ -19,9 +19,87 @@ env:
   JWT_REFRESH_SECRET: ci-only-refresh-secret-not-used-anywhere-else
 
 jobs:
-  checks:
+  # Fast static checks and the build. Runs in parallel with the test jobs below.
+  static-checks:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+
+    env:
+      DATABASE_URL: postgresql://cv_builder:cv_builder@localhost:5432/cv_builder
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      BACKEND_URL: http://localhost:4000
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # Reads the pnpm version from "packageManager" in package.json.
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The typecheck and the build need the generated Prisma client (git-ignored).
+      - name: Generate Prisma client
+        run: pnpm --filter @cv-builder/backend db:generate
+
+      # Generates the frontend's GraphQL types from the committed schema.gql; lint and typecheck use them.
+      - name: Frontend codegen
+        run: pnpm --filter @cv-builder/frontend codegen
+
+      - name: Format
+        run: pnpm format:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Build
+        run: pnpm build
+
+  # Runs in parallel with the other jobs. The slowest one: the Storybook tests start Chromium.
+  frontend-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      BACKEND_URL: http://localhost:4000
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The frontend's Storybook tests run in Chromium (Vitest browser mode). Not cached, like the e2e job.
+      - name: Install Chromium
+        run: pnpm --filter @cv-builder/frontend exec playwright install --with-deps chromium
+
+      # The test script runs codegen first, so no separate codegen step.
+      - name: Test
+        run: pnpm --filter @cv-builder/frontend test
+
+  # Runs in parallel with the other jobs.
+  backend-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      DATABASE_URL: postgresql://cv_builder:cv_builder@localhost:5432/cv_builder
 
     # Same image and credentials as docker-compose.yml. Used by schema:generate and the integration tests.
     services:
@@ -51,15 +129,9 @@ jobs:
           --health-timeout 3s
           --health-retries 10
 
-    env:
-      DATABASE_URL: postgresql://cv_builder:cv_builder@localhost:5432/cv_builder
-      NEXT_PUBLIC_APP_URL: http://localhost:3000
-      BACKEND_URL: http://localhost:4000
-
     steps:
       - uses: actions/checkout@v7
 
-      # Reads the pnpm version from "packageManager" in package.json.
       - uses: pnpm/action-setup@v6
 
       - uses: actions/setup-node@v7
@@ -70,7 +142,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # The typecheck, tests and build need the generated Prisma client (git-ignored).
+      # The tests need the generated Prisma client (git-ignored).
       - name: Generate Prisma client
         run: pnpm --filter @cv-builder/backend db:generate
 
@@ -85,32 +157,12 @@ jobs:
             exit 1
           fi
 
-      # Generates the frontend's GraphQL types from the schema above; the typecheck below uses them.
-      - name: Frontend codegen
-        run: pnpm --filter @cv-builder/frontend codegen
-
-      - name: Format
-        run: pnpm format:check
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Typecheck
-        run: pnpm typecheck
-
-      # The frontend's Storybook tests run in Chromium (Vitest browser mode). Not cached, like the e2e job.
-      - name: Install Chromium
-        run: pnpm --filter @cv-builder/frontend exec playwright install --with-deps chromium
-
-      - name: Test
-        run: pnpm test
+      - name: Unit tests
+        run: pnpm --filter @cv-builder/backend test
 
       # Uses the Postgres service above; the global setup creates and migrates the cv_builder_test database.
       - name: Integration tests
         run: pnpm --filter @cv-builder/backend test:int
-
-      - name: Build
-        run: pnpm build
 
   # Separate job so the slower browser tests run in parallel with the checks above.
   e2e:
