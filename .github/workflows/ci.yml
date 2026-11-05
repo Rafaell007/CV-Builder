@@ -90,8 +90,10 @@ jobs:
         run: pnpm --filter @cv-builder/frontend exec playwright install --with-deps chromium
 
       # The test script runs codegen first, so no separate codegen step.
+      # A private-repo runner has 2 vCPUs and Vitest then starts only 1 worker by default, so the
+      # 73 unit test files ran one after another. Two workers halve the time of the step.
       - name: Test
-        run: pnpm --filter @cv-builder/frontend test
+        run: pnpm --filter @cv-builder/frontend test --maxWorkers=2
 
   # Runs in parallel with the other jobs.
   backend-tests:
