@@ -215,6 +215,7 @@ Field and list as Select. Selected options show as chips inside the field.
 - Popup: 449×340 (wider than the 400 field), attached under the field, radius 0 0 8px 8px, border 1px #AEAEAE, no fill. Shadow light only: 1px 1px 4px 1px rgb(94 91 230 / 15%); dark none.
 - Header: 48px row at top 24, sides 32, space-between. Month and year: 500 · 18 · 24, #2E2E2E / #F5F5F7, in buttons 48px high, radius 4, padding 8/12, gap 8. Arrows: 40×40 circles, 9px apart, border 1px; light fill #F5F5F7, border + chevron #626262, popup shadow; dark fill #2E2E2E, border + chevron #F5F5F7. Chevron 7.41×12.
 - Weekday row: 500 · 18 · 24, #2E2E2E / #F5F5F7.
+- Drawing of all views, light and dark (added 2026-11-05): [images/date-picker-layout.png](images/date-picker-layout.png). It shows the day view, the month list and the year list. See "Date picker layout drawing" below for what it settles.
 - Days: 400 · 18 · 24, no cell frames. Current month #2E2E2E / #F5F5F7; outside the month #AEAEAE / #626262; disabled strikethrough #626262 / #AEAEAE. Highlighted day: 41×41 circle #C63031, text 500 #F5F5F7 (only one state drawn).
 
 ### Verification code (DS › EMAIL VERIFICATION)
@@ -268,8 +269,21 @@ Predictions for KAN-78 (2026-11-03): not drawn, or drawn inconsistently, in DS; 
 - Multi-select chips wrap onto new lines and the field grows; the row's inset shadow (spread 30px #F5F5F7) is ignored, as in the search field. Unselected checkbox: border in the option text colour (#2E2E2E / #F5F5F7), no check.
 - Multi-select details not drawn: wrapped chip rows 12px apart; checkbox → option text 12px; the × has a 22×22 hit area (circle centred, still 6px from the chip's edge), a 1.5px X stroke and the focus ring when focused; disabled chips have no ×. Chip text line height 22px so the text fits inside the 24px chip with its borders.
 - Date picker dark border on all four sides (drawn without the bottom: read as an artefact).
-- Calendar: the highlighted circle is the selected day; today is a 1px #C63031 ring with the normal text colour; hover is a circle in the option hover fill (#AEAEAE / #626262). Day cells 41×41. Month and year buttons switch to a month or year list.
+- Calendar: the highlighted circle is the selected day; today is a 1px #C63031 ring with the normal text colour; hover is a circle in --color-surface (#E2E2E4 / #454545), changed from the option hover fill on 2026-11-05 as too dark; the month list, year list and header buttons hover the same. Day cells 41×41. Month and year buttons switch to a month or year list.
 - Calendar icon: Material "calendar_today" outlined (the 18×18 glyph is not identified).
-- Calendar layout below the header (not drawn): 8px under the header row, weekday row 24px, day rows 41px with no gap; the popup grows with a 6-week month. Month and year lists: 3 per row, 8px apart, radius 4, hover and selected as the days. Header buttons: option hover fill on hover and while their list is open. Arrows in the day view page months; the year list pages 12 years; the month list has no arrows. Invalid: the calendar icon turns red, as the select chevron.
-- English dates use British English (dd/MM/yyyy, Monday first): US English names days "November 4th", which fails axe (the visible "4" is not a word of the name).
+- Calendar layout below the header (not drawn): 8px under the header row, weekday row 24px, day rows 41px with no gap; the popup grows with a 6-week month. Month and year lists: 3 per row, 8px apart, radius 4, hover and selected as the days. Header buttons: option hover fill on hover and while their list is open. Arrows: see "Date picker layout drawing and formats" below. Invalid: the calendar icon turns red, as the select chevron.
+- English month and day names are British English: US English names days "November 4th", which fails axe (the visible "4" is not a word of the name). The date FORMAT is not British: see the decision of 2026-11-05 below.
+
+Date picker layout drawing and formats (2026-11-05, decided by Maciek, PLAN D34): [images/date-picker-layout.png](images/date-picker-layout.png) is a design source. It replaces the "Prediction" above for the month and year lists, where they differ. The code follows it:
+
+- The month list and the year list are drawn (3 per row; 12 months; 12 years, 2022–2033 for 2025). The 12-year paging is therefore in the design.
+- All three views keep the two round arrows in the header (decided 2026-11-05). Day view: they page months. Month list and year list: they move the saved date by one month or one year, so the red selection travels and the value is saved at every click; the list pages itself when the date leaves it (December → January, last year of a page → next page). The drawing does not show this: our choice.
+- Month names in the month list are full ("January").
+- The open list is marked in the header: the month (month list) or the year (year list) is red text, no fill. In dark the red is `--color-error-text` (#E9B0B0), because #C63031 on #2E2E2E has 2.5:1 contrast.
+- The selected month or year is a red rectangle, 106 × 34, radius 4, light text, as the selected day is a red circle. Rows are 50px apart. These sizes are measured from the drawing (shown at 0.757 of real size).
+- The week starts on Sunday in both languages (the drawing shows S M T W T F S).
+- Date format: `en` MM/dd/yyyy (page 23 image: 08/21/2023), `pl` dd.MM.yyyy. The CV preview (page 24) has its own `MM.YYYY` rule.
+- Not changed: the drawing's weekday row shows one letter ("S"); the code shows three ("Sun").
+- Picking steps: day → month list → year list; each click saves the date, the year click closes the calendar. The header month and year buttons are shortcuts into the month and year step.
+- No clear button on date fields; an empty End Date shows as "Till now" in the list. A typed text that is not a date is the same error as an empty date.
 - Code boxes: the whole 48×48 box is the input (the 23×23 inner input is a layer); digit in the Input value style, centred; hover, focus, invalid and disabled as the text input; boxes 16px apart.
