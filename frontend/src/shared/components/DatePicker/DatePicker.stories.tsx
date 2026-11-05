@@ -111,7 +111,7 @@ export const MonthList: Story = {
       "aria-pressed",
       "true",
     );
-    await userEvent.click(canvas.getByText("Mar"));
+    await userEvent.click(canvas.getByText("March"));
     await expect(canvas.getByRole("button", { name: "March" })).toBeInTheDocument();
   },
 };
@@ -120,7 +120,7 @@ export const YearList: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("textbox", { name: "Start date" }));
     await userEvent.click(canvas.getByRole("button", { name: "2026" }));
-    await expect(canvas.getByRole("button", { name: "Next years" })).toBeInTheDocument();
+    await expect(canvas.getByRole("button", { name: "Next year" })).toBeInTheDocument();
   },
 };
 
@@ -140,6 +140,50 @@ export const WithMinDate: Story = {
     await userEvent.click(canvas.getByRole("textbox", { name: "Start date" }));
     await expect(
       canvas.getByRole("gridcell", { name: /Not available .*\b2 November 2026/ }),
+    ).toHaveStyle({ textDecorationLine: "line-through" });
+  },
+};
+
+// Two linked fields, as the project forms use them: the end date's minDate is the start date.
+function DateRangeDemo() {
+  const [start, setStart] = useState<Date | null>(new Date(2026, 10, 10));
+  const [end, setEnd] = useState<Date | null>(null);
+  return (
+    <div style={{ display: "grid", gap: "var(--space-8)" }}>
+      <DatePicker
+        label="Start date"
+        locale="en"
+        labels={LABELS}
+        value={start}
+        onValueChange={setStart}
+        maxDate={end ?? undefined}
+      />
+      <DatePicker
+        label="End date"
+        locale="en"
+        labels={LABELS}
+        value={end}
+        onValueChange={setEnd}
+        minDate={start ?? undefined}
+      />
+    </div>
+  );
+}
+
+// Start 10 November 2026: the end date's calendar crosses out the days before it.
+export const StartAndEndDate: Story = {
+  render: () => <DateRangeDemo />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("textbox", { name: "End date" }));
+    await expect(
+      canvas.getByRole("gridcell", { name: /Not available .*\b9 November 2026/ }),
+    ).toHaveStyle({ textDecorationLine: "line-through" });
+    await userEvent.click(canvas.getByRole("gridcell", { name: /\b20 November 2026/ }));
+
+    // With an end date, the start date's calendar crosses out the days after it.
+    await userEvent.click(canvas.getByRole("textbox", { name: "Start date" }));
+    await expect(
+      canvas.getByRole("gridcell", { name: /Not available .*\b21 November 2026/ }),
     ).toHaveStyle({ textDecorationLine: "line-through" });
   },
 };

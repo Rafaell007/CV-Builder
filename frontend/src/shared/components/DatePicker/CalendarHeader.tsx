@@ -2,7 +2,6 @@ import type { Locale as DateFnsLocale } from "date-fns";
 import { format } from "date-fns";
 import type { ReactDatePickerCustomHeaderProps } from "react-datepicker";
 import { ChevronLeftIcon, ChevronRightIcon } from "../icons";
-import { YEARS_PER_PAGE } from "./datePicker.constants";
 import type { CalendarView, DatePickerLabels } from "./datePicker.types";
 import styles from "./DatePicker.module.css";
 
@@ -10,27 +9,51 @@ export type CalendarHeaderProps = ReactDatePickerCustomHeaderProps & {
   view: CalendarView;
   locale: DateFnsLocale;
   labels: DatePickerLabels;
+  // In the month list and the year list the arrows move the saved date (see useDatePicker); `shownDate` is the
+  // month the calendar shows.
+  isArrowDisabled: (direction: 1 | -1, shownDate: Date) => boolean;
+  onArrowClick: (direction: 1 | -1, shownDate: Date) => void;
   onMonthClick: () => void;
   onYearClick: () => void;
 };
 
-// Figma: month and year buttons on the left, two round arrows on the right.
-// The arrows page months in the day view and 12 years in the year list; the month list has none (the year button
-// opens the years). aria-pressed marks the list that is open.
+// Figma: month and year buttons on the left, two round arrows on the right, in all three views
+// (docs/images/date-picker-layout.png). aria-pressed marks the list that is open; it is drawn red.
+// Arrows: the day view pages months. The month list moves the saved date one month, the year list one year; the list
+// pages by itself when the date leaves it (December → January of the next year).
 export function CalendarHeader({
   date,
   view,
   locale,
   labels,
+  isArrowDisabled,
+  onArrowClick,
   onMonthClick,
   onYearClick,
   decreaseMonth,
   increaseMonth,
-  changeYear,
   prevMonthButtonDisabled,
   nextMonthButtonDisabled,
 }: CalendarHeaderProps) {
   const year = date.getFullYear();
+  const arrows =
+    view === "day"
+      ? {
+          previousLabel: labels.previousMonth,
+          nextLabel: labels.nextMonth,
+          previousDisabled: prevMonthButtonDisabled,
+          nextDisabled: nextMonthButtonDisabled,
+          onPrevious: decreaseMonth,
+          onNext: increaseMonth,
+        }
+      : {
+          previousLabel: view === "month" ? labels.previousMonth : labels.previousYear,
+          nextLabel: view === "month" ? labels.nextMonth : labels.nextYear,
+          previousDisabled: isArrowDisabled(-1, date),
+          nextDisabled: isArrowDisabled(1, date),
+          onPrevious: () => onArrowClick(-1, date),
+          onNext: () => onArrowClick(1, date),
+        };
 
   return (
     <div className={styles.header}>
@@ -53,48 +76,26 @@ export function CalendarHeader({
           {year}
         </button>
       </div>
-      {view === "day" && (
-        <div className={styles.arrows}>
-          <button
-            type="button"
-            aria-label={labels.previousMonth}
-            disabled={prevMonthButtonDisabled}
-            onClick={decreaseMonth}
-            className={styles.arrow}
-          >
-            <ChevronLeftIcon />
-          </button>
-          <button
-            type="button"
-            aria-label={labels.nextMonth}
-            disabled={nextMonthButtonDisabled}
-            onClick={increaseMonth}
-            className={styles.arrow}
-          >
-            <ChevronRightIcon />
-          </button>
-        </div>
-      )}
-      {view === "year" && (
-        <div className={styles.arrows}>
-          <button
-            type="button"
-            aria-label={labels.previousYears}
-            onClick={() => changeYear(year - YEARS_PER_PAGE)}
-            className={styles.arrow}
-          >
-            <ChevronLeftIcon />
-          </button>
-          <button
-            type="button"
-            aria-label={labels.nextYears}
-            onClick={() => changeYear(year + YEARS_PER_PAGE)}
-            className={styles.arrow}
-          >
-            <ChevronRightIcon />
-          </button>
-        </div>
-      )}
+      <div className={styles.arrows}>
+        <button
+          type="button"
+          aria-label={arrows.previousLabel}
+          disabled={arrows.previousDisabled}
+          onClick={arrows.onPrevious}
+          className={styles.arrow}
+        >
+          <ChevronLeftIcon />
+        </button>
+        <button
+          type="button"
+          aria-label={arrows.nextLabel}
+          disabled={arrows.nextDisabled}
+          onClick={arrows.onNext}
+          className={styles.arrow}
+        >
+          <ChevronRightIcon />
+        </button>
+      </div>
     </div>
   );
 }

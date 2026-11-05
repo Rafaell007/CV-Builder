@@ -29,11 +29,38 @@ function TestDatePicker({ initialValue = NOV_4, onValueChange, ...props }: TestD
   );
 }
 
+// A start and an end date linked the way the project forms link them (docs/pages/23): the end cannot be
+// before the start, and the start cannot be after the end. An empty side sets no limit.
+function TestDateRange() {
+  const [start, setStart] = useState<Date | null>(new Date(2026, 10, 10));
+  const [end, setEnd] = useState<Date | null>(null);
+  return (
+    <>
+      <DatePicker
+        label="Start date"
+        locale="en"
+        labels={LABELS}
+        value={start}
+        onValueChange={setStart}
+        maxDate={end ?? undefined}
+      />
+      <DatePicker
+        label="End date"
+        locale="en"
+        labels={LABELS}
+        value={end}
+        onValueChange={setEnd}
+        minDate={start ?? undefined}
+      />
+    </>
+  );
+}
+
 describe("DatePicker", () => {
-  it("is a text box named by its label, showing the date in the locale's short format", () => {
+  it("is a text box named by its label, showing the date in the locale's format (en month first)", () => {
     renderWithProviders(<TestDatePicker />);
 
-    expect(screen.getByRole("textbox", { name: "Start date" })).toHaveValue("04/11/2026");
+    expect(screen.getByRole("textbox", { name: "Start date" })).toHaveValue("11/04/2026");
   });
 
   it("uses the Polish format and names in pl", async () => {
@@ -46,7 +73,7 @@ describe("DatePicker", () => {
     expect(screen.getByRole("button", { name: "listopad" })).toBeInTheDocument();
   });
 
-  it("opens a calendar named by the translated label and picks a day", async () => {
+  it("opens a calendar named by the translated label, picks a day and saves it", async () => {
     const onValueChange = vi.fn();
     const { user } = renderWithProviders(<TestDatePicker onValueChange={onValueChange} />);
 
@@ -55,7 +82,8 @@ describe("DatePicker", () => {
     await user.click(within(calendar).getByRole("gridcell", { name: /20 November 2026/ }));
 
     expect(onValueChange).toHaveBeenCalledWith(new Date(2026, 10, 20));
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    // Not closed: the month step follows
+    expect(screen.getByRole("dialog", { name: "Choose a date" })).toBeInTheDocument();
   });
 
   it("pages months with the arrows", async () => {
@@ -67,20 +95,237 @@ describe("DatePicker", () => {
     expect(screen.getByRole("button", { name: "December" })).toBeInTheDocument();
   });
 
-  it("picks a year, then a month, then a day", async () => {
-    const onValueChange = vi.fn();
-    const { user } = renderWithProviders(<TestDatePicker onValueChange={onValueChange} />);
+  it("starts the week on Sunday", async () => {
+    const { user } = renderWithProviders(<TestDatePicker />);
 
     await user.click(screen.getByRole("textbox", { name: "Start date" }));
-    await user.click(screen.getByRole("button", { name: "2026" }));
-    await user.click(screen.getByRole("button", { name: "Previous years" }));
-    // The header button shows the paged year too; click the one in the list
-    await user.click(screen.getAllByText("2014").at(-1)!);
-    await user.click(screen.getByText("Mar"));
-    await user.click(screen.getByRole("gridcell", { name: /15 March 2014/ }));
 
-    expect(onValueChange).toHaveBeenCalledOnce();
-    expect(onValueChange).toHaveBeenCalledWith(new Date(2014, 2, 15));
+    // 1 November 2026 is a Sunday: it is the first cell, not 26 October
+    expect(screen.getAllByRole("gridcell")[0]).toHaveAccessibleName(/\b1 November 2026/);
+  });
+
+  it("shows full month names in the month list", async () => {
+    const { user } = renderWithProviders(<TestDatePicker />);
+
+    await user.click(screen.getByRole("textbox", { name: "Start date" }));
+    await user.click(screen.getByRole("button", { name: "November" }));
+
+    expect(screen.getByText("January")).toBeInTheDocument();
+    expect(screen.getByText("December")).toBeInTheDocument();
+  });
+
+  describe("arrows of the month list", () => {
+    it("move the saved date by one month, over the year end in both directions", async () => {
+      const onValueChange = vi.fn();
+      const { user } = renderWithProviders(<TestDatePicker onValueChange={onValueChange} />);
+      const input = screen.getByRole("textbox", { name: "Start date" });
+
+      await user.click(input);
+      await user.click(screen.getByRole("button", { name: "November" }));
+      await user.click(screen.getByRole("button", { name: "Next month" }));
+
+      expect(onValueChange).toHaveBeenLastCalledWith(new Date(2026, 11, 4));
+      expect(input).toHaveValue("12/04/2026");
+      expect(screen.getByRole("button", { name: "December" })).toBeInTheDocument();
+
+      await user.click(screen.getByRole("button", { name: "Next month" }));
+
+      expect(input).toHaveValue("01/04/2027");
+      expect(screen.getByRole("button", { name: "January" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "2027" })).toBeInTheDocument();
+
+      await user.click(screen.getByRole("button", { name: "Previous month" }));
+
+      expect(input).toHaveValue("12/04/2026");
+      expect(screen.getByRole("button", { name: "2026" })).toBeInTheDocument();
+    });
+
+    it("keep the calendar open on the month list", async () => {
+      const { user } = renderWithProviders(<TestDatePicker />);
+
+      await user.click(screen.getByRole("textbox", { name: "Start date" }));
+      await user.click(screen.getByRole("button", { name: "November" }));
+      await user.click(screen.getByRole("button", { name: "Next month" }));
+
+      expect(screen.getByRole("dialog", { name: "Choose a date" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "December" })).toHaveAttribute(
+        "aria-pressed",
+        "true",
+      );
+    });
+
+    it("start from the shown month when the field is empty", async () => {
+      vi.useFakeTimers({ toFake: ["Date"] });
+      vi.setSystemTime(new Date(2026, 10, 5, 12));
+      try {
+        const { user } = renderWithProviders(<TestDatePicker initialValue={null} />);
+        const input = screen.getByRole("textbox", { name: "Start date" });
+
+        await user.click(input);
+        await user.click(screen.getByRole("button", { name: "November" }));
+        await user.click(screen.getByRole("button", { name: "Next month" }));
+
+        expect(input).toHaveValue("12/05/2026");
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it("are disabled when the whole month is outside minDate", async () => {
+      const { user } = renderWithProviders(<TestDatePicker minDate={new Date(2026, 10, 3)} />);
+
+      await user.click(screen.getByRole("textbox", { name: "Start date" }));
+      await user.click(screen.getByRole("button", { name: "November" }));
+
+      expect(screen.getByRole("button", { name: "Previous month" })).toBeDisabled();
+      expect(screen.getByRole("button", { name: "Next month" })).toBeEnabled();
+    });
+  });
+
+  it("moves the saved date through the year list and pages it at the end of the page", async () => {
+    const { user } = renderWithProviders(<TestDatePicker />);
+    const input = screen.getByRole("textbox", { name: "Start date" });
+
+    await user.click(input);
+    await user.click(screen.getByRole("button", { name: "2026" }));
+    // The page of 2026 is 2017 to 2028
+    expect(screen.getByText("2017")).toBeInTheDocument();
+    expect(screen.queryByText("2029")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Next year" }));
+    await user.click(screen.getByRole("button", { name: "Next year" }));
+    expect(input).toHaveValue("11/04/2028");
+    expect(screen.getByText("2017")).toBeInTheDocument();
+
+    // 2028 was the last year of the page: the next click moves on to the next page
+    await user.click(screen.getByRole("button", { name: "Next year" }));
+    expect(input).toHaveValue("11/04/2029");
+    expect(screen.getByText("2040")).toBeInTheDocument();
+    expect(screen.queryByText("2017")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Previous year" }));
+    expect(input).toHaveValue("11/04/2028");
+    expect(screen.getByText("2017")).toBeInTheDocument();
+  });
+
+  describe("picking steps: day, month, year", () => {
+    it("saves every pick and closes after the year, from an empty field", async () => {
+      vi.useFakeTimers({ toFake: ["Date"] });
+      vi.setSystemTime(new Date(2026, 10, 5, 12));
+      try {
+        const { user } = renderWithProviders(<TestDatePicker initialValue={null} />);
+        const input = screen.getByRole("textbox", { name: "Start date" });
+
+        // Day: saved at once, then the month list opens
+        await user.click(input);
+        await user.click(screen.getByRole("gridcell", { name: /20 November 2026/ }));
+        expect(input).toHaveValue("11/20/2026");
+        expect(screen.getByRole("button", { name: "November" })).toHaveAttribute(
+          "aria-pressed",
+          "true",
+        );
+
+        // Month: saved with the same day, then the year list opens
+        await user.click(screen.getByText("March"));
+        expect(input).toHaveValue("03/20/2026");
+        expect(screen.getByRole("button", { name: "2026" })).toHaveAttribute(
+          "aria-pressed",
+          "true",
+        );
+
+        // Year: saved, and the calendar closes
+        await user.click(screen.getByText("2024"));
+        expect(input).toHaveValue("03/20/2024");
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it.each([
+      ["month list", "November"],
+      ["year list", "2026"],
+    ])(
+      "closes on a click in the input while the %s is open, then opens on the days",
+      async (_name, button) => {
+        const onValueChange = vi.fn();
+        const { user } = renderWithProviders(<TestDatePicker onValueChange={onValueChange} />);
+        const input = screen.getByRole("textbox", { name: "Start date" });
+
+        await user.click(input);
+        await user.click(screen.getByRole("button", { name: button }));
+        await user.click(input);
+
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+        expect(onValueChange).not.toHaveBeenCalled();
+
+        await user.click(input);
+
+        expect(screen.getByRole("gridcell", { name: /\b4 November 2026/ })).toBeInTheDocument();
+      },
+    );
+
+    it("stays open on a click in the input while the days are shown", async () => {
+      const { user } = renderWithProviders(<TestDatePicker />);
+      const input = screen.getByRole("textbox", { name: "Start date" });
+
+      await user.click(input);
+      await user.click(input);
+
+      expect(screen.getByRole("dialog", { name: "Choose a date" })).toBeInTheDocument();
+    });
+
+    it("starts on the days again when the calendar is opened the next time", async () => {
+      const { user } = renderWithProviders(<TestDatePicker />);
+      const input = screen.getByRole("textbox", { name: "Start date" });
+
+      await user.click(input);
+      await user.click(screen.getByRole("gridcell", { name: /20 November 2026/ }));
+      await user.click(screen.getByText("March"));
+      await user.click(screen.getByText("2024"));
+      await user.click(input);
+
+      expect(screen.getByRole("gridcell", { name: /\b4 March 2024/ })).toBeInTheDocument();
+    });
+
+    it("lets the month button start at the month step", async () => {
+      const onValueChange = vi.fn();
+      const { user } = renderWithProviders(<TestDatePicker onValueChange={onValueChange} />);
+      const input = screen.getByRole("textbox", { name: "Start date" });
+
+      await user.click(input);
+      await user.click(screen.getByRole("button", { name: "November" }));
+      await user.click(screen.getByText("March"));
+
+      expect(input).toHaveValue("03/04/2026");
+      await user.click(screen.getByText("2025"));
+      expect(input).toHaveValue("03/04/2025");
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+
+    it("lets the year button start at the year step, and closes after it", async () => {
+      const onValueChange = vi.fn();
+      const { user } = renderWithProviders(<TestDatePicker onValueChange={onValueChange} />);
+
+      await user.click(screen.getByRole("textbox", { name: "Start date" }));
+      await user.click(screen.getByRole("button", { name: "2026" }));
+      await user.click(screen.getByText("2020"));
+
+      expect(onValueChange).toHaveBeenCalledOnce();
+      expect(onValueChange).toHaveBeenCalledWith(new Date(2020, 10, 4));
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+
+    it("cuts the saved day when the picked month is shorter", async () => {
+      const { user } = renderWithProviders(<TestDatePicker initialValue={new Date(2026, 0, 31)} />);
+      const input = screen.getByRole("textbox", { name: "Start date" });
+
+      await user.click(input);
+      await user.click(screen.getByRole("button", { name: "January" }));
+      await user.click(screen.getByText("February"));
+
+      expect(input).toHaveValue("02/28/2026");
+    });
   });
 
   it("can be used with the keyboard", async () => {
@@ -95,8 +340,12 @@ describe("DatePicker", () => {
     expect(screen.getByRole("gridcell", { name: /\b4 November 2026/ })).toHaveFocus();
     await user.keyboard("{ArrowDown}{ArrowRight}{Enter}");
 
+    // Enter picks the day, saves it and leads to the month step
     expect(onValueChange).toHaveBeenLastCalledWith(new Date(2026, 10, 12));
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "November" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
   });
 
   it("takes a typed date", async () => {
@@ -105,7 +354,7 @@ describe("DatePicker", () => {
       <TestDatePicker initialValue={null} onValueChange={onValueChange} />,
     );
 
-    await user.type(screen.getByRole("textbox", { name: "Start date" }), "15/01/2027");
+    await user.type(screen.getByRole("textbox", { name: "Start date" }), "01/15/2027");
 
     expect(onValueChange).toHaveBeenLastCalledWith(new Date(2027, 0, 15));
   });
@@ -118,7 +367,7 @@ describe("DatePicker", () => {
     await user.click(input);
     await user.click(screen.getByRole("button", { name: "2026" }));
     await user.clear(input);
-    await user.type(input, "15/01/2027");
+    await user.type(input, "01/15/2027");
 
     expect(onValueChange).toHaveBeenLastCalledWith(new Date(2027, 0, 15));
   });
@@ -135,6 +384,38 @@ describe("DatePicker", () => {
 
     expect(day).toHaveAttribute("aria-disabled", "true");
     expect(onValueChange).not.toHaveBeenCalled();
+  });
+
+  describe("as a start and end date pair", () => {
+    it("does not let the end date be before the start date", async () => {
+      const { user } = renderWithProviders(<TestDateRange />);
+
+      await user.click(screen.getByRole("textbox", { name: "End date" }));
+      const before = screen.getByRole("gridcell", { name: /Not available .*\b9 November 2026/ });
+      await user.click(before);
+
+      expect(before).toHaveAttribute("aria-disabled", "true");
+      expect(screen.getByRole("textbox", { name: "End date" })).toHaveValue("");
+
+      // The start day itself is allowed: a project can start and end on the same day.
+      await user.click(screen.getByRole("gridcell", { name: /\b10 November 2026/ }));
+      expect(screen.getByRole("textbox", { name: "End date" })).toHaveValue("11/10/2026");
+    });
+
+    it("does not let the start date be after the end date", async () => {
+      const { user } = renderWithProviders(<TestDateRange />);
+
+      await user.type(screen.getByRole("textbox", { name: "End date" }), "11/20/2026");
+      await user.click(screen.getByRole("textbox", { name: "Start date" }));
+
+      expect(
+        screen.getByRole("gridcell", { name: /Not available .*\b21 November 2026/ }),
+      ).toHaveAttribute("aria-disabled", "true");
+      expect(screen.getByRole("gridcell", { name: /\b20 November 2026/ })).not.toHaveAttribute(
+        "aria-disabled",
+        "true",
+      );
+    });
   });
 
   // React Hook Form's onTouched mode validates on blur: using the calendar is not leaving the field.

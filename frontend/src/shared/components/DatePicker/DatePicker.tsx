@@ -1,12 +1,17 @@
 import type { Locale } from "next-intl";
-import type { Ref } from "react";
+import { useRef, type Ref } from "react";
 import ReactDatePicker from "react-datepicker";
 import { Field, fieldInputClassName, useFieldIds } from "../Field";
 import { CalendarTodayIcon } from "../icons";
 import { CalendarDialog } from "./CalendarDialog";
 import { CalendarHeader } from "./CalendarHeader";
 import { CalendarLabelContext } from "./CalendarLabelContext";
-import { DATE_FNS_LOCALES, DATE_FORMAT, YEARS_PER_PAGE } from "./datePicker.constants";
+import {
+  DATE_FNS_LOCALES,
+  DATE_FORMATS,
+  WEEK_START_DAY,
+  YEARS_PER_PAGE,
+} from "./datePicker.constants";
 import type { DatePickerLabels } from "./datePicker.types";
 import styles from "./DatePicker.module.css";
 import { useDatePicker } from "./useDatePicker";
@@ -20,7 +25,7 @@ export type DatePickerProps = {
   onBlur?: () => void;
   // On the input, so React Hook Form can focus the field (field.ref).
   ref?: Ref<HTMLInputElement>;
-  // App language: month and weekday names, first day of the week, date format.
+  // App language: month and weekday names and the date format (Sunday is always the first day).
   locale: Locale;
   labels: DatePickerLabels;
   minDate?: Date | undefined;
@@ -55,6 +60,7 @@ export function DatePicker({
   required = false,
   className,
 }: DatePickerProps) {
+  const pickerRef = useRef<ReactDatePicker>(null);
   const { controlId, helperId, errorId, controlProps } = useFieldIds({
     id,
     hasHelperText: Boolean(helperText),
@@ -62,13 +68,25 @@ export function DatePicker({
   });
   const {
     view,
+    isArrowDisabled,
+    onArrowClick,
     showMonthList,
     showYearList,
     onPick,
-    shouldCloseOnSelect,
     onCalendarClose,
+    onInputClick,
     onFocusLeave,
-  } = useDatePicker({ onValueChange, onBlur, ref, controlId });
+  } = useDatePicker({
+    value,
+    minDate,
+    maxDate,
+    onValueChange,
+    onBlur,
+    ref,
+    controlId,
+    // skipSetBlur: the focus stays in the input
+    closeCalendar: () => pickerRef.current?.setOpen(false, true),
+  });
   const dateFnsLocale = DATE_FNS_LOCALES[locale];
 
   return (
@@ -85,17 +103,23 @@ export function DatePicker({
         <CalendarLabelContext value={labels.calendar}>
           <ReactDatePicker
             // One date: picks react-datepicker's single-date props (its types are a union of single / range / multiple)
+            ref={pickerRef}
             selectsRange={false}
             selectsMultiple={false}
             selected={value}
             onChange={onPick}
             onCalendarClose={onCalendarClose}
-            shouldCloseOnSelect={shouldCloseOnSelect}
+            onInputClick={onInputClick}
+            // Closed by the year pick (useDatePicker), not by a day pick
+            shouldCloseOnSelect={false}
             showMonthYearPicker={view === "month"}
             showYearPicker={view === "year"}
             yearItemNumber={YEARS_PER_PAGE}
             locale={dateFnsLocale}
-            dateFormat={DATE_FORMAT}
+            dateFormat={DATE_FORMATS[locale]}
+            calendarStartDay={WEEK_START_DAY}
+            // The design shows full month names ("January"), not the short ones
+            renderMonthContent={(_monthIndex, _shortName, fullName) => fullName}
             // react-datepicker's types take no explicit undefined (exactOptionalPropertyTypes): set only when given
             {...(minDate && { minDate })}
             {...(maxDate && { maxDate })}
@@ -118,6 +142,8 @@ export function DatePicker({
                 view={view}
                 locale={dateFnsLocale}
                 labels={labels}
+                isArrowDisabled={isArrowDisabled}
+                onArrowClick={onArrowClick}
                 onMonthClick={showMonthList}
                 onYearClick={showYearList}
               />

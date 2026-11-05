@@ -115,10 +115,15 @@
   cursor: pointer;
 }
 
-/* Prediction: hover and the open list use the option hover fill */
-.headerButton:hover,
+/* Hover, here and on the days and lists: --color-surface, one step lighter than the options' hover fill (2026-11-05) */
+.headerButton:hover {
+  background: var(--color-surface);
+}
+
+/* The open list: its button is red text, no fill (docs/images/date-picker-layout.png). In dark the red is the
+   lighter error text colour, as the error texts are: #C63031 on #2E2E2E is 2.5:1 */
 .headerButton[aria-pressed="true"] {
-  background: var(--color-option-hover-bg);
+  color: var(--color-error-text);
 }
 
 .arrows {
@@ -194,10 +199,10 @@
   color: var(--color-text-secondary);
 }
 
-/* Prediction: hover and the keyboard cursor use the option hover fill */
+/* Prediction: hover and the keyboard cursor use the surface fill (lighter than the options' hover fill) */
 .calendar :global(.react-datepicker__day):hover,
 .calendar :global(.react-datepicker__day--keyboard-selected) {
-  background: var(--color-option-hover-bg);
+  background: var(--color-surface);
 }
 
 /* Prediction: today is a 1px red ring */
@@ -219,22 +224,37 @@
   cursor: not-allowed;
 }
 
-/* Prediction: month list 3 per row, year list 3 per row; same states as the days */
+/*
+ * Month list (3 × 4) and year list (3 × 4), measured from docs/images/date-picker-layout.png (drawn at 0.757 of the
+ * real size: the 31px day circle there is 41px here): rows 50px apart, the first row about 24px lower than the
+ * weekday row of the day view, the selected item a red rectangle 106 × 34, radius 4, as the selected day is a circle.
+ */
 .calendar :global(.react-datepicker__month-wrapper),
 .calendar :global(.react-datepicker__year-wrapper) {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-2);
+}
+
+.calendar :global(.react-datepicker__month-wrapper):first-child,
+.calendar :global(.react-datepicker__year-wrapper):first-child {
+  margin-top: var(--space-6);
 }
 
 .calendar :global(.react-datepicker__year-wrapper) + :global(.react-datepicker__year-wrapper),
 .calendar :global(.react-datepicker__month-wrapper) + :global(.react-datepicker__month-wrapper) {
-  margin-top: var(--space-2);
+  margin-top: var(--space-4);
 }
 
 .calendar :global(.react-datepicker__month-text),
 .calendar :global(.react-datepicker__year-text) {
-  padding: var(--space-2) 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  box-sizing: border-box;
+  width: 106px;
+  height: 34px;
+  padding: 0;
   border-radius: var(--radius-small);
   outline: 0;
   font: var(--text-calendar-day);
@@ -247,7 +267,7 @@
 .calendar :global(.react-datepicker__year-text):hover,
 .calendar :global(.react-datepicker__month-text--keyboard-selected),
 .calendar :global(.react-datepicker__year-text--keyboard-selected) {
-  background: var(--color-option-hover-bg);
+  background: var(--color-surface);
 }
 
 .calendar :global(.react-datepicker__month-text)[aria-selected="true"],
