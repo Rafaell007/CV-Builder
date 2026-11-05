@@ -1,11 +1,7 @@
 import { useSelect } from "downshift";
-import {
-  useImperativeHandle,
-  type FocusEvent,
-  type KeyboardEvent,
-  type MouseEvent,
-  type Ref,
-} from "react";
+import type { KeyboardEvent, MouseEvent, Ref } from "react";
+import { useElementByIdRef } from "@/shared/hooks";
+import { createFocusLeaveHandler } from "@/shared/utils";
 import type { SelectOption } from "../Select";
 import { getSelectedOptions, toggleValue } from "./utils";
 
@@ -41,7 +37,7 @@ export function useMultiSelect({
   const selectedOptions = getSelectedOptions(options, value);
 
   // Downshift keeps its own ref on the toggle; the caller gets the same element, found by its id after mount.
-  useImperativeHandle(ref, () => document.getElementById(controlId) as HTMLElement, [controlId]);
+  useElementByIdRef(ref, controlId);
 
   const select = useSelect<SelectOption>({
     items: [...options],
@@ -93,8 +89,6 @@ export function useMultiSelect({
       onValueChange(value.filter((item) => item !== optionValue));
     },
     // Focus moving between the toggle and the × buttons stays inside the field: not a blur for the form.
-    onFocusLeave: (event: FocusEvent<HTMLElement>) => {
-      if (!event.currentTarget.contains(event.relatedTarget)) onBlur?.();
-    },
+    onFocusLeave: createFocusLeaveHandler(onBlur),
   };
 }

@@ -7,9 +7,9 @@ export type DatePickerLabels = {
   calendar: string;
   previousMonth: string;
   nextMonth: string;
-  // Arrows of the year list (a page of 12 years)
-  previousYears: string;
-  nextYears: string;
+  // Arrows of the year list (they move the date one year; the month list's arrows use previousMonth and nextMonth)
+  previousYear: string;
+  nextYear: string;
   // Put before a day's full date: "Choose" → "Choose Wednesday, 4 November 2026"
   chooseDayPrefix: string;
   // Put before a day that cannot be chosen: "Not available"

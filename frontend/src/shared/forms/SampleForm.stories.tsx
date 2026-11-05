@@ -6,6 +6,7 @@ import { expect, fn } from "storybook/test";
 import { z } from "zod";
 import {
   Button,
+  DATE_PICKER_EXAMPLE_LABELS,
   DatePicker,
   MultiSelect,
   OtpField,
@@ -33,17 +34,6 @@ const SKILLS = [
   { value: "postgres", label: "PostgreSQL" },
 ];
 
-const DATE_LABELS = {
-  calendar: "Choose a date",
-  previousMonth: "Previous month",
-  nextMonth: "Next month",
-  previousYears: "Previous years",
-  nextYears: "Next years",
-  chooseDayPrefix: "Choose",
-  unavailableDayPrefix: "Not available",
-  monthPrefix: "Month",
-};
-
 const MESSAGES = {
   emailRequired: "Enter an email",
   emailInvalid: "Enter a valid email",
@@ -52,7 +42,8 @@ const MESSAGES = {
   descriptionRequired: "Enter a description",
   departmentRequired: "Choose a department",
   skillsRequired: "Choose at least one skill",
-  startDateRequired: "Choose a start date",
+  // One message for an empty field and for typed text that is not a date: the picker holds null in both cases.
+  startDateRequired: "Enter a valid start date",
   codeInvalid: "Enter the 6-digit code",
 };
 
@@ -70,7 +61,7 @@ const sampleSchema = z.object({
   description: z.string().trim().min(1, MESSAGES.descriptionRequired),
   department: z.string().min(1, MESSAGES.departmentRequired),
   skills: z.array(z.string()).min(1, MESSAGES.skillsRequired),
-  // The picker holds null while empty; the submitted value is always a date.
+  // The picker holds null while empty and when the typed text is not a date; the submitted value is always a date.
   startDate: z
     .date()
     .nullable()
@@ -218,7 +209,7 @@ function SampleForm(props: SampleFormProps) {
           <DatePicker
             label="Start date"
             locale="en"
-            labels={DATE_LABELS}
+            labels={DATE_PICKER_EXAMPLE_LABELS}
             name={field.name}
             value={field.value}
             onValueChange={field.onChange}

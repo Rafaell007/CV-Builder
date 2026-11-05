@@ -1,5 +1,7 @@
 import { unstable_OneTimePasswordField as OneTimePasswordField } from "radix-ui";
-import { useId, useImperativeHandle, type FocusEvent, type Ref } from "react";
+import { useId, type Ref } from "react";
+import { useElementByIdRef } from "@/shared/hooks";
+import { createFocusLeaveHandler } from "@/shared/utils";
 import styles from "./OtpField.module.css";
 
 export type OtpFieldProps = {
@@ -44,14 +46,10 @@ export function OtpField({
   const firstBoxId = useId();
 
   // Radix keeps its own refs on the boxes; the caller gets the first box, found by its id.
-  useImperativeHandle(ref, () => document.getElementById(firstBoxId) as HTMLInputElement, [
-    firstBoxId,
-  ]);
+  useElementByIdRef(ref, firstBoxId);
 
   // Focus moving from box to box stays inside the field: not a blur for the form.
-  const onFocusLeave = (event: FocusEvent<HTMLDivElement>) => {
-    if (!event.currentTarget.contains(event.relatedTarget)) onBlur?.();
-  };
+  const onFocusLeave = createFocusLeaveHandler(onBlur);
 
   return (
     <div className={[styles.field, className].filter(Boolean).join(" ")} onBlur={onFocusLeave}>

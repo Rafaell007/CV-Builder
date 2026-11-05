@@ -8,6 +8,8 @@ export type FieldProps = {
   controlId: string;
   // For a control that is not a labelable element (a div combobox): it points to the label with aria-labelledby.
   labelId?: string | undefined;
+  // For a control that a label cannot focus on its own (a div combobox): runs on a click on the label.
+  onLabelClick?: (() => void) | undefined;
   helperId: string;
   errorId: string;
   helperText?: string | undefined;
@@ -29,6 +31,7 @@ export function Field({
   label,
   controlId,
   labelId,
+  onLabelClick,
   helperId,
   errorId,
   helperText,
@@ -53,7 +56,12 @@ export function Field({
     <div className={[styles.field, className].filter(Boolean).join(" ")}>
       <div className={controlClasses} data-filled={filled || undefined}>
         {children}
-        <Label.Root id={labelId} htmlFor={controlId} className={styles.label}>
+        <Label.Root
+          id={labelId}
+          htmlFor={controlId}
+          onClick={onLabelClick}
+          className={styles.label}
+        >
           {label}
         </Label.Root>
       </div>

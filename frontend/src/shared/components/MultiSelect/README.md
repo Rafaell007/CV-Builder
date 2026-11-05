@@ -9,3 +9,11 @@ Several choices from a list, shown as chips inside the shared `Field` frame. The
 - `onBlur` runs only when focus leaves the whole field (toggle and × buttons). After a × click, focus moves to the field.
 - The list is not in a portal: it is positioned under the field. Inside a clipping container (`overflow: hidden`), give it room.
 - Used by: project and CV forms (environment, skills). Values: [docs/design-tokens.md › Multi-select](../../../../../docs/design-tokens.md#multi-select-ds).
+
+## Known issues (found in the KAN-78 review)
+
+- `SelectOption` is imported from the sibling `../Select` folder. Move the type to the nearest common ancestor if a third component needs it.
+- `Field` knows about MultiSelect (`--field-height`, the combobox selector). Change both together.
+- The CSS repeats the Select CSS on purpose (see the comment in `MultiSelect.module.css`). Keep the two in step.
+- Backspace on the closed field removes the last chip. This is not in the design. Confirm it.
+- No search inside the list. The pages in `docs/pages/` do not ask for it.
