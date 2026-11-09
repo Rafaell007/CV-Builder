@@ -371,5 +371,8 @@ Predictions for KAN-82 (2026-11-06): not drawn, or drawn inconsistently; chosen 
 - Collapsed nav items and avatar keep their text as the accessible name (visually hidden or `aria-label`).
 - Device error: the 591-high box is copied and centred, so the content lands where Figma has it; no separate offset. The message is two sentences on two lines (the line break comes from the text, not from width). Monitor screen corner radius is not shown in Figma: 8px, estimated from `docs/images/09-device-error-page.jpg`. The "Oops" layer name ("С возвращением") is a leftover and ignored.
 - Icons (Material, identified from the screenshots; Figma has no names): Employees "people", Skills "trending_up", Languages "translate", CVs "contact_page" outlined, Departments "domain" outlined, Positions "work_outline", Projects "folder_copy" outlined; profile menu "person_outline", "settings" outlined, "logout"; breadcrumb user "person_outline". The logo is not a Material icon: export it from Figma.
+- Hover states (not drawn): nav link and collapse button text turn text main (#2E2E2E light / #F5F5F7 dark); the profile row gets the surface fill on hover and while its menu is open; a highlighted menu item gets the page background.
+- Collapse button: accessible name "Sidebar" (both states) plus `aria-expanded`, so a screen reader hears "Sidebar, expanded / collapsed".
+- Profile avatar: its own one-letter red circle in the sidebar, not the shared `Avatar` component (no photo in the sidebar).
 
 Avatar initial in dark (2026-11-06): Figma draws #2E2E2E on #C63031, 2.5:1. The initial uses #F5F5F7 in both themes (5.0:1).
