@@ -375,4 +375,6 @@ Predictions for KAN-82 (2026-11-06): not drawn, or drawn inconsistently; chosen 
 - Collapse button: accessible name "Sidebar" (both states) plus `aria-expanded`, so a screen reader hears "Sidebar, expanded / collapsed".
 - Profile avatar: its own one-letter red circle in the sidebar, not the shared `Avatar` component (no photo in the sidebar).
 
+Highlighted breadcrumb in dark (2026-11-09): Figma draws #C63031 on #2E2E2E, 2.5:1. Dark uses #E9B0B0 (`--color-primary-text`), as error text does; light keeps #C63031 (5.0:1).
+
 Avatar initial in dark (2026-11-06): Figma draws #2E2E2E on #C63031, 2.5:1. The initial uses #F5F5F7 in both themes (5.0:1).

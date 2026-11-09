@@ -32,6 +32,32 @@ describe("Breadcrumbs", () => {
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
   });
 
+  it("puts a hidden chevron between items, not before the first", () => {
+    renderWithProviders(<Breadcrumbs items={items} />);
+
+    const listItems = screen.getAllByRole("listitem");
+    expect(listItems[0].querySelector("svg")).toBeNull();
+    expect(listItems[1].querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+    expect(listItems[2].querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("keeps the link name equal to the label when an item has an icon", () => {
+    renderWithProviders(
+      <Breadcrumbs
+        items={[
+          { label: "Employees", href: "/users" },
+          { label: "Jan Kowalski", href: "/users/1", highlighted: true, icon: <svg aria-hidden /> },
+          { label: "Profile" },
+        ]}
+      />,
+    );
+
+    expect(screen.getByRole("link", { name: "Jan Kowalski" })).toHaveAttribute(
+      "href",
+      "/en/users/1",
+    );
+  });
+
   it("uses the given navigation label", () => {
     renderWithProviders(<Breadcrumbs items={items} label="Okruszki" />);
 
