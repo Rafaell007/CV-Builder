@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
-import { DeviceErrorIllustration } from "./components";
+import { SadMonitorIllustration } from "@/shared/components/illustrations";
 import styles from "./DeviceErrorGate.module.css";
 
 type DeviceErrorGateProps = {
@@ -16,7 +16,7 @@ export function DeviceErrorGate({ children }: DeviceErrorGateProps) {
       <div className={styles.page}>{children}</div>
       <div className={styles.gate}>
         <div className={styles.content}>
-          <DeviceErrorIllustration />
+          <SadMonitorIllustration />
           <h1 className={styles.title}>{t("title")}</h1>
           <p className={styles.message}>
             {t("messageLine1")}

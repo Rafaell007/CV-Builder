@@ -9,6 +9,7 @@ export * from "./DatePicker";
 export * from "./FormModal";
 export * from "./IconButton";
 export * from "./icons";
+export * from "./illustrations";
 export * from "./Menu";
 export * from "./Modal";
 export * from "./MultiSelect";

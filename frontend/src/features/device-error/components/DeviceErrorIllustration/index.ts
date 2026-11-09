@@ -1,1 +1,0 @@
-export { DeviceErrorIllustration } from "./DeviceErrorIllustration";

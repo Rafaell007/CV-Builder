@@ -1,6 +1,6 @@
-// A monitor with a sad face, drawn from docs/design-tokens.md › Device error.
+// A monitor with a sad face (device error and no internet screens), drawn from docs/design-tokens.md › Device error.
 // The stand legs are estimated from docs/images/09-device-error-page.jpg.
-export function DeviceErrorIllustration() {
+export function SadMonitorIllustration() {
   return (
     <svg
       width="160"
