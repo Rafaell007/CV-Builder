@@ -12,3 +12,7 @@ query Me {
 mutation Refresh {
   refresh
 }
+
+mutation SignOut {
+  signOut
+}

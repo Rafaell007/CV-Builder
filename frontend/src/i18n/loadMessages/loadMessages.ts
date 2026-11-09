@@ -1,4 +1,5 @@
 import type { Locale } from "next-intl";
+import type appShell from "@/features/app-shell/messages/en.json";
 import type forgotPassword from "@/features/forgot-password/messages/en.json";
 import type health from "@/features/health/messages/en.json";
 import type resetPassword from "@/features/reset-password/messages/en.json";
@@ -10,6 +11,7 @@ import type common from "@/shared/i18n/messages/en.json";
 // One namespace per messages folder. A feature that gets a `messages/` folder is added here (PLAN §4).
 // English is the reference: every other language must have the same keys (checked by typecheck and the test).
 export type Messages = {
+  appShell: typeof appShell;
   common: typeof common;
   forgotPassword: typeof forgotPassword;
   health: typeof health;
@@ -23,6 +25,7 @@ export type Messages = {
 // JSON files are imported directly: an index.ts would load every language together.
 const loaders: Record<Locale, () => Promise<Messages>> = {
   en: async () => ({
+    appShell: (await import("@/features/app-shell/messages/en.json")).default,
     common: (await import("@/shared/i18n/messages/en.json")).default,
     forgotPassword: (await import("@/features/forgot-password/messages/en.json")).default,
     health: (await import("@/features/health/messages/en.json")).default,
@@ -32,6 +35,7 @@ const loaders: Record<Locale, () => Promise<Messages>> = {
     verifyEmail: (await import("@/features/verify-email/messages/en.json")).default,
   }),
   pl: async () => ({
+    appShell: (await import("@/features/app-shell/messages/pl.json")).default,
     common: (await import("@/shared/i18n/messages/pl.json")).default,
     forgotPassword: (await import("@/features/forgot-password/messages/pl.json")).default,
     health: (await import("@/features/health/messages/pl.json")).default,
