@@ -1,1 +1,1 @@
-export { getActiveTabIndex, isTabActive } from "./tabs.utils";
+export { getActiveTabIndex } from "./tabs.utils";
