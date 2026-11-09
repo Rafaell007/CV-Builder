@@ -1,0 +1,89 @@
+/* Values: docs/design-tokens.md › App shell › Profile row and menu. */
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: var(--sidebar-width, 200px);
+  height: var(--space-14);
+  padding: 0 0 0 var(--space-2);
+  overflow: hidden;
+  border: 0;
+  border-radius: 0 200px 200px 0;
+  background: transparent;
+  color: var(--color-text);
+  font: var(--text-body);
+  letter-spacing: var(--text-body-ls);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.trigger:hover,
+.trigger[data-state="open"] {
+  background: var(--color-surface);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+/* Figma: #F5F5F7 on #C63031 in both themes (the dark drawing fails contrast, see design-tokens). */
+.avatar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-10);
+  height: var(--space-10);
+  border-radius: var(--radius-round);
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+  font: 500 20px/20px var(--font-family);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.content {
+  width: var(--radix-dropdown-menu-trigger-width);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-menu);
+  background: var(--color-surface);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  height: var(--space-10);
+  padding-left: var(--space-4);
+  border-radius: 0 200px 200px 0;
+  color: var(--color-text);
+  font: var(--text-body);
+  letter-spacing: var(--text-body-ls);
+  text-decoration: none;
+  white-space: nowrap;
+  outline: none;
+  cursor: pointer;
+}
+
+.item[data-highlighted] {
+  background: var(--color-bg);
+}
+
+.icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+}
+
+.separator {
+  height: 1px;
+  background: var(--color-border);
+}

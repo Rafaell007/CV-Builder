@@ -7,11 +7,11 @@ export default function UsersPage() {
   const t = useTranslations();
 
   return (
-    <main>
+    <>
       <h1>{t("common.employees")}</h1>
       <Suspense fallback={<p>{t("health.checking")}</p>}>
         <HealthCheck />
       </Suspense>
-    </main>
+    </>
   );
 }

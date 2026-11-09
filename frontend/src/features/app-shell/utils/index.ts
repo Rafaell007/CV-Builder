@@ -1,1 +1,1 @@
-export { getNavItems } from "./navigation.utils";
+export { getDisplayName, getNavItems, toSidebarLinks } from "./navigation.utils";
