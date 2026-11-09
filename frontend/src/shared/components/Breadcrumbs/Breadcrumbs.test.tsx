@@ -35,10 +35,10 @@ describe("Breadcrumbs", () => {
   it("puts a hidden chevron between items, not before the first", () => {
     renderWithProviders(<Breadcrumbs items={items} />);
 
-    const listItems = screen.getAllByRole("listitem");
-    expect(listItems[0].querySelector("svg")).toBeNull();
-    expect(listItems[1].querySelector("svg")).toHaveAttribute("aria-hidden", "true");
-    expect(listItems[2].querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+    const [first, second, third] = screen.getAllByRole("listitem");
+    expect(first?.querySelector("svg")).toBeNull();
+    expect(second?.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+    expect(third?.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
   });
 
   it("keeps the link name equal to the label when an item has an icon", () => {

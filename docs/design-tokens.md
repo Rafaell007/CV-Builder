@@ -373,6 +373,7 @@ Predictions for KAN-82 (2026-11-06): not drawn, or drawn inconsistently; chosen 
 - Icons (Material, identified from the screenshots; Figma has no names): Employees "people", Skills "trending_up", Languages "translate", CVs "contact_page" outlined, Departments "domain" outlined, Positions "work_outline", Projects "folder_copy" outlined; profile menu "person_outline", "settings" outlined, "logout"; breadcrumb user "person_outline". The logo is not a Material icon: export it from Figma.
 - Hover states (not drawn): nav link and collapse button text turn text main (#2E2E2E light / #F5F5F7 dark); the profile row gets the surface fill on hover and while its menu is open; a highlighted menu item gets the page background.
 - Collapse button: accessible name "Sidebar" (both states) plus `aria-expanded`, so a screen reader hears "Sidebar, expanded / collapsed".
+- Page title: Figma shows none (the breadcrumbs name the page). Each page still has an `<h1>` for screen readers, visually hidden, in `PageHeader`.
 - Profile avatar: its own one-letter red circle in the sidebar, not the shared `Avatar` component (no photo in the sidebar).
 
 Highlighted breadcrumb in dark (2026-11-09): Figma draws #C63031 on #2E2E2E, 2.5:1. Dark uses #E9B0B0 (`--color-primary-text`), as error text does; light keeps #C63031 (5.0:1).

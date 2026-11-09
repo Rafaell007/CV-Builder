@@ -13,6 +13,7 @@ export * from "./Menu";
 export * from "./Modal";
 export * from "./MultiSelect";
 export * from "./OtpField";
+export * from "./PageHeader";
 export * from "./PageState";
 export * from "./Pagination";
 export * from "./PasswordField";
