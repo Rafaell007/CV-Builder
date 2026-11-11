@@ -13,6 +13,7 @@ export * from "./illustrations";
 export * from "./Menu";
 export * from "./Modal";
 export * from "./MultiSelect";
+export * from "./NoInternetState";
 export * from "./OtpField";
 export * from "./PageHeader";
 export * from "./PageState";
