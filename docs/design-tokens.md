@@ -283,6 +283,14 @@ Header and content:
 - "Oops": Title style, text main, centred, 24 under the illustration.
 - Message: Body style, text main, centred, 24 under "Oops", two lines (break after "devices."). No emphasised phrase.
 
+### No internet (1440 › NO INTERNET ERROR, 768px Tablet › INTERNET ERROR; light / dark)
+
+- Same layout as Device error: full screen, page background, content box 560×591 centred both ways (1440: top 155, left 440; 768: top 217, left 104); no sidebar or header. Light and dark differ only in colours; 768 and 1440 differ only in the frame size.
+- Illustration: identical to Device error (160×120 at box top 127, centred; 2px strokes in text main).
+- "Oops": Title style (400 · 34 · 41.99 · 0.25), text main, centred, top 271 (24 under the illustration).
+- Message: "Something went wrong. We're already working on fixing it. Please try again or go back." Body style, text main, centred, 560 wide, top 335 (24 under "Oops"), two lines with the break after "fixing it.". No emphasised phrase.
+- RETRY: primary button, 220 wide (not the 160 minimum), with the primary button shadow; top 407 (24 under the message), centred. Text "Retry" in the Button style, uppercase.
+
 ### Icons
 
 No icon names in the file, but every glyph matches Google Material Icons by size and position: more-vert (4×16 at 10,4), visibility (22×15 at 1,4.5), search (17.49 at 3,3), chevron-right (7.41×12 at 8.59,6). We use Material Icons paths (Apache 2.0).
@@ -375,6 +383,7 @@ Predictions for KAN-82 (2026-11-06): not drawn, or drawn inconsistently; chosen 
 - Collapse button: accessible name "Sidebar" (both states) plus `aria-expanded`, so a screen reader hears "Sidebar, expanded / collapsed".
 - Page title: Figma shows none (the breadcrumbs name the page). Each page still has an `<h1>` for screen readers, visually hidden, in `PageHeader`.
 - Profile avatar: its own one-letter red circle in the sidebar, not the shared `Avatar` component (no photo in the sidebar).
+- No internet text: we use the Figma message ("…Please try again or go back."), not the shorter one in `docs/pages/07-no-internet-page.md` ("…Please try again."), because Figma is the source of truth. The user goes back with the browser's Back button; the screen has no back button.
 
 Highlighted breadcrumb in dark (2026-11-09): Figma draws #C63031 on #2E2E2E, 2.5:1. Dark uses #E9B0B0 (`--color-primary-text`), as error text does; light keeps #C63031 (5.0:1).
 
