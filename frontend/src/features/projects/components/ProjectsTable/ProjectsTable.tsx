@@ -4,6 +4,7 @@ import { DataTable, type DataTableColumn, type SortState } from "@/shared/compon
 import { PROJECT_SORT_FIELDS } from "../../projects.constants";
 import type { ProjectListItem } from "../../projects.types";
 import { EnvironmentTags } from "./EnvironmentTags";
+import { ProjectDescription } from "./ProjectDescription";
 import { formatProjectDate } from "./utils";
 import styles from "./ProjectsTable.module.css";
 
@@ -32,6 +33,18 @@ export function ProjectsTable({
   const t = useTranslations("projects");
   const locale = useLocale();
 
+  // A date that cannot be read shows a dash, with a text for screen readers, never an empty cell.
+  const renderDate = (value: string): ReactNode => {
+    const text = formatProjectDate(value, locale);
+    return (
+      text ?? (
+        <span role="img" aria-label={t("dateMissing")}>
+          &mdash;
+        </span>
+      )
+    );
+  };
+
   // The table draws one line for each project, so the description and the tags sit under the name.
   const columns: DataTableColumn<ProjectListItem>[] = [
     {
@@ -41,7 +54,7 @@ export function ProjectsTable({
       cell: (project) => (
         <div className={styles.summary}>
           <span className={styles.name}>{project.name}</span>
-          <p className={styles.description}>{project.description}</p>
+          <ProjectDescription text={project.description} />
           <EnvironmentTags items={project.environment} label={t("environment")} />
         </div>
       ),
@@ -51,27 +64,29 @@ export function ProjectsTable({
       id: "startDate",
       header: t("columns.startDate"),
       sortField: PROJECT_SORT_FIELDS.startDate,
-      cell: (project) => formatProjectDate(project.startDate, locale),
+      cell: (project) => renderDate(project.startDate),
     },
     {
       id: "endDate",
       header: t("columns.endDate"),
       sortField: PROJECT_SORT_FIELDS.endDate,
-      cell: (project) => formatProjectDate(project.endDate, locale),
+      cell: (project) => renderDate(project.endDate),
     },
   ];
 
   return (
-    <DataTable
-      label={t("table")}
-      columns={columns}
-      rows={projects}
-      getRowId={(project) => project.id}
-      sort={sort}
-      onSortChange={onSortChange}
-      loading={loading}
-      loadingContent={loadingContent}
-      emptyContent={emptyContent}
-    />
+    <div className={styles.table}>
+      <DataTable
+        label={t("table")}
+        columns={columns}
+        rows={projects}
+        getRowId={(project) => project.id}
+        sort={sort}
+        onSortChange={onSortChange}
+        loading={loading}
+        loadingContent={loadingContent}
+        emptyContent={emptyContent}
+      />
+    </div>
   );
 }

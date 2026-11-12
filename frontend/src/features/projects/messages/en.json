@@ -8,6 +8,7 @@
     "endDate": "End Date"
   },
   "environment": "Environment",
+  "dateMissing": "Date not available",
   "search": {
     "label": "Search projects",
     "placeholder": "Search"

@@ -1,0 +1,26 @@
+.description {
+  margin: 0;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+/* Set by the component only when the text is cut (or expanded), so a plain text keeps the normal cursor. */
+.description[data-toggleable] {
+  cursor: pointer;
+}
+
+.description[data-toggleable]:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Tablet: Figma cuts the description after three lines. A desktop shows all of it. */
+@media (max-width: 1023px) {
+  .description:not([data-expanded]) {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+  }
+}

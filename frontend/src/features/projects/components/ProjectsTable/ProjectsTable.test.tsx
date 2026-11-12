@@ -63,6 +63,20 @@ describe("ProjectsTable", () => {
     expect(screen.getByRole("columnheader", { name: "Data rozpoczęcia" })).toBeInTheDocument();
   });
 
+  it("shows a dash with a text for screen readers when a date cannot be read", () => {
+    render({ projects: [{ ...blog, startDate: "not a date" }] });
+
+    const row = screen.getByRole("row", { name: /Blog/ });
+    expect(within(row).getByRole("img", { name: "Date not available" })).toHaveTextContent("—");
+    expect(within(row).getByText("05/31/2026")).toBeInTheDocument();
+  });
+
+  it("says in Polish that a date is missing", () => {
+    render({ projects: [{ ...blog, endDate: "" }] }, "pl");
+
+    expect(screen.getByRole("img", { name: "Brak daty" })).toBeInTheDocument();
+  });
+
   it("shows every sample project with a description of 100 characters or more", () => {
     sampleProjects.forEach((project) => {
       expect(project.description.length).toBeGreaterThanOrEqual(100);
