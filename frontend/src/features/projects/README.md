@@ -12,12 +12,13 @@ The `/admin/projects` page (PLAN S5.5b, KAN-102): the global list of projects, f
 - Search (KAN-128): the shared `SearchField` (debounced 300 ms, Enter at once, 100 characters at most) sends the text to the backend, which matches name and domain without regard to case. The field sits outside the error state, so an error does not remove the typed text.
 - Sort (KAN-128): Name, Start Date and End Date sort on the backend; the arrow in the header shows the direction. The page starts sorted by Name ascending (`DEFAULT_PROJECTS_SORT`), and the Name header shows it at once. A click cycles ascending, descending, ascending. There is no "no sort" state, so the order is always visible.
 - Pagination (KAN-128): the shared `Pagination`, 10 projects on a page. It shows only for more than 10 projects, and uses the `total` of the backend. While a page loads, it keeps the last `total`.
+- Row menu (KAN-129): each row has the shared `Menu` (three dots) in the `DataTable` `renderRowActions` slot, with `Edit` and `Delete` (Delete in the error colour). The button is named `Actions for {project name}`, so a screen reader tells the rows apart. `ProjectsTable` takes `onEdit(project)` and `onDelete(project)`. `Projects.tsx` passes empty placeholder handlers; the update and delete modal slices fill them in. Only one menu is open at a time; it closes on Escape (the focus returns to the button), on a click outside and after a selection, and the keyboard opens it (Enter or Space), moves (arrows) and selects (Enter). This is Radix `DropdownMenu` behaviour, covered by `ProjectsTable.test.tsx`.
 - States: loading (skeleton inside the table, headers stay), empty (`No projects found`), no results for a search (`No projects found`), error (message and `Retry`). All use the shared `PageState`.
 - Texts: `messages/` (`projects` namespace, `en` and `pl`).
 - Storybook: `Projects.stories.tsx` (`Features/Projects/Projects`) shows the page on a 1440px desktop and a 768px tablet viewport, with a project that has the longest allowed texts (name 100, domain 100, description 2000 characters, `maxLengthProject` in `projects.mocks.ts`), and the ManyPages, SearchAndSort, NoResults, Loading, Empty, LoadFailed and Polish versions.
 - Contract: the backend `Project` has `environment { id name }`. The page document calls the same data `technologies`; the schema wins.
 - Used by: `app/[locale]/(app)/admin/projects/page.tsx`. Backend: `projects` query, Admin only (KAN-101).
-- Done: list, tags, three states (KAN-127); search, sort and pagination (KAN-128). To do: create, update and delete (modals).
+- Done: list, tags, three states (KAN-127); search, sort and pagination (KAN-128); row menu (KAN-129). To do: create, update and delete (modals).
 - Docs: [docs/pages/27-projects-page.md](../../../../docs/pages/27-projects-page.md).
 
 ## Known issues
@@ -30,7 +31,7 @@ The `/admin/projects` page (PLAN S5.5b, KAN-102): the global list of projects, f
   - Text size: the project name is about 12px in Figma and 14px in the table. The tags are about 16px in Figma and 14px in the table.
   - Page title: Figma shows `Projects` as a small grey title in the top bar. The page shows a 24px heading.
   - Search field: Figma shows it at the left, 320px wide, with the CREATE PROJECT button at the right end. The field matches; the button comes with the create ticket. Figma shows an arrow next to Name, Start Date and End Date at all times; the table shows it faint until the column is sorted.
-  - Not built yet: the row menu with three dots and the CREATE PROJECT button (create, update and delete tickets).
+  - Row menu: built (KAN-129). Not built yet: the CREATE PROJECT button (create ticket), and the Edit and Delete handlers (update and delete tickets). Until then, Edit and Delete only close the menu.
 - **The Projects item is not in the sidebar yet.** The app layout (KAN-82, PR #46) was not merged when this was built. The sidebar link, the Admin-only visibility and the active highlight are part of that layout, not of this feature.
 - **No Admin check in the frontend.** A non-admin user who opens the route gets an error state, because the backend rejects the query. The page document (AC-1) asks for access for Admin users only. Add a route guard when the app layout and the role in the session are in place.
 - **Search, sort and page are not in the URL.** They are lost on a refresh and cannot be shared. `SearchField` already takes a `defaultValue`, so the state can move to the URL later (the page document asks for no URL state).
