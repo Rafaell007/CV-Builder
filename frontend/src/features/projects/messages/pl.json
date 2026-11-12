@@ -1,0 +1,17 @@
+{
+  "title": "Projekty",
+  "table": "Lista projektów",
+  "columns": {
+    "name": "Nazwa",
+    "domain": "Domena",
+    "startDate": "Data rozpoczęcia",
+    "endDate": "Data zakończenia"
+  },
+  "environment": "Środowisko",
+  "states": {
+    "loading": "Ładowanie projektów",
+    "empty": "Nie znaleziono projektów",
+    "error": "Coś poszło nie tak. Spróbuj ponownie później",
+    "retry": "Spróbuj ponownie"
+  }
+}
