@@ -1,6 +1,8 @@
 import { act, renderHook } from "@testing-library/react";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { useSidebarCollapsed } from "./useSidebarCollapsed";
+import { NARROW_SCREEN_QUERY, useSidebarCollapsed } from "./useSidebarCollapsed";
 
 // A matchMedia stand-in whose result the test can change, like resizing the window.
 function stubScreen(narrow: boolean) {
@@ -24,6 +26,16 @@ afterEach(() => {
 });
 
 describe("useSidebarCollapsed", () => {
+  it("uses the breakpoint of AppShell.module.css, which cannot read it from here", () => {
+    // Tests run from the frontend folder.
+    const css = readFileSync(
+      resolve("src/features/app-shell/components/AppShell/AppShell.module.css"),
+      "utf8",
+    );
+
+    expect(css).toContain(`@media ${NARROW_SCREEN_QUERY}`);
+  });
+
   it("is expanded on a wide screen and collapsed on a narrow one", () => {
     stubScreen(false);
     expect(renderHook(() => useSidebarCollapsed()).result.current.collapsed).toBe(false);
