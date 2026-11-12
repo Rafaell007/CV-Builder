@@ -9,6 +9,12 @@
   },
   "environment": "Środowisko",
   "dateMissing": "Brak daty",
+  "actions": {
+    "column": "Akcje",
+    "menu": "Akcje dla projektu {name}",
+    "edit": "Edytuj",
+    "delete": "Usuń"
+  },
   "search": {
     "label": "Szukaj projektów",
     "placeholder": "Szukaj"

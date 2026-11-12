@@ -9,6 +9,12 @@
   },
   "environment": "Environment",
   "dateMissing": "Date not available",
+  "actions": {
+    "column": "Actions",
+    "menu": "Actions for {name}",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
   "search": {
     "label": "Search projects",
     "placeholder": "Search"
