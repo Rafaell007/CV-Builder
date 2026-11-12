@@ -1,12 +1,19 @@
 import type { MockLink } from "@apollo/client/testing";
 import { DEFAULT_PAGE_SIZE } from "@/shared/components";
 import {
+  CreateProjectDocument,
+  type CreateProjectInput,
   DeleteProjectDocument,
   ProjectsDocument,
   type ProjectsQuery,
   type ProjectsQueryVariables,
 } from "@/shared/graphql";
-import { DEFAULT_PROJECTS_SORT } from "./projects.constants";
+import {
+  DEFAULT_PROJECTS_SORT,
+  MAX_DESCRIPTION_LENGTH,
+  MAX_DOMAIN_LENGTH,
+  MAX_NAME_LENGTH,
+} from "./projects.constants";
 import type { ProjectListItem } from "./projects.types";
 
 const skill = (id: string, name: string) => ({
@@ -86,10 +93,8 @@ export const sampleProjects: ProjectListItem[] = [blog, sales, analytics, bankin
 const textOfLength = (length: number, words: string): string =>
   `${`${words} `.repeat(Math.ceil(length / words.length)).slice(0, length - 1)}.`;
 
-// The longest values the project form allows (page document: name 100, domain 100, description 2000 characters).
-export const MAX_NAME_LENGTH = 100;
-export const MAX_DOMAIN_LENGTH = 100;
-export const MAX_DESCRIPTION_LENGTH = 2000;
+// The longest values the project form allows; the numbers live in `projects.constants.ts`.
+export { MAX_DESCRIPTION_LENGTH, MAX_DOMAIN_LENGTH, MAX_NAME_LENGTH };
 
 /** A project that uses the longest allowed texts and many tags, one of them with a very long name. */
 export const maxLengthProject: ProjectListItem = {
@@ -222,5 +227,55 @@ export const deleteProjectRefusedMock = (
 /** `deleteProject` that fails before the backend answers (no network). */
 export const deleteProjectNetworkErrorMock = (id: string): MockLink.MockedResponse => ({
   request: { query: DeleteProjectDocument, variables: { id } },
+  error: new Error("Failed to fetch"),
+});
+
+/** MockedProvider response of `createProject`: the backend returns the new project with an id. */
+export const createProjectMock = (
+  input: CreateProjectInput,
+  created: Partial<ProjectListItem> = {},
+): MockLink.MockedResponse => ({
+  request: { query: CreateProjectDocument, variables: { input } },
+  result: {
+    data: {
+      createProject: {
+        __typename: "Project",
+        id: "new-1",
+        name: input.name,
+        domain: input.domain,
+        startDate: input.startDate,
+        endDate: input.endDate,
+        description: input.description,
+        environment: [],
+        ...created,
+      },
+    },
+  },
+});
+
+/** `createProject` refused with `BAD_USER_INPUT` and field errors, as the backend validation answers. */
+export const createProjectInvalidMock = (
+  input: CreateProjectInput,
+  fields: string[],
+): MockLink.MockedResponse => ({
+  request: { query: CreateProjectDocument, variables: { input } },
+  result: {
+    errors: [
+      {
+        message: "Bad Request Exception",
+        extensions: {
+          code: "BAD_USER_INPUT",
+          fieldErrors: fields.map((field) => ({ field, messages: [`${field} is invalid`] })),
+        },
+      },
+    ],
+  },
+});
+
+/** `createProject` that fails before the backend answers (no network). */
+export const createProjectNetworkErrorMock = (
+  input: CreateProjectInput,
+): MockLink.MockedResponse => ({
+  request: { query: CreateProjectDocument, variables: { input } },
   error: new Error("Failed to fetch"),
 });

@@ -3,6 +3,7 @@ import { expect, userEvent, waitFor, within } from "storybook/test";
 import { Projects } from "./Projects";
 import {
   blog,
+  createProjectNetworkErrorMock,
   fakeBackendMock,
   manyProjects,
   maxLengthProject,
@@ -180,5 +181,58 @@ export const Polish: Story = {
     await expect(
       canvas.getByRole("columnheader", { name: "Data rozpoczęcia" }),
     ).toBeInTheDocument();
+  },
+};
+
+const body = within(document.body);
+
+const newProject = {
+  name: "Intranet",
+  domain: "HR",
+  startDate: "2026-01-10T00:00:00.000Z",
+  endDate: "2026-06-30T00:00:00.000Z",
+  description: "A portal for staff",
+};
+
+/** Types all five fields of the Create project modal. */
+const fillCreateForm = async (dialog: HTMLElement) => {
+  const form = within(dialog);
+  await userEvent.type(form.getByRole("textbox", { name: "Name" }), newProject.name);
+  await userEvent.type(form.getByRole("textbox", { name: "Domain" }), newProject.domain);
+  await userEvent.type(form.getByRole("textbox", { name: "Start Date" }), "01/10/2026");
+  await userEvent.type(form.getByRole("textbox", { name: "End Date" }), "06/30/2026");
+  await userEvent.type(form.getByRole("textbox", { name: "Description" }), newProject.description);
+};
+
+/** CREATE PROJECT opens the empty modal; CREATE stays disabled until all five fields are valid. */
+export const CreateProject: Story = {
+  parameters: { apollo: { mocks: [fakeBackendMock([blog, sales])] } },
+  play: async ({ canvas }) => {
+    await userEvent.click(await canvas.findByRole("button", { name: "CREATE PROJECT" }));
+    const dialog = await body.findByRole("dialog", { name: "Create project" });
+    await expect(within(dialog).getByRole("button", { name: "Create" })).toBeDisabled();
+
+    await fillCreateForm(dialog);
+    await expect(within(dialog).getByRole("button", { name: "Create" })).toBeEnabled();
+  },
+};
+
+/** The request fails: the modal stays open, the values stay and the message shows inside the modal. */
+export const CreateProjectFailed: Story = {
+  parameters: {
+    apollo: {
+      mocks: [fakeBackendMock([blog, sales]), createProjectNetworkErrorMock(newProject)],
+    },
+  },
+  play: async ({ canvas }) => {
+    await userEvent.click(await canvas.findByRole("button", { name: "CREATE PROJECT" }));
+    const dialog = await body.findByRole("dialog", { name: "Create project" });
+    await fillCreateForm(dialog);
+    await userEvent.click(within(dialog).getByRole("button", { name: "Create" }));
+
+    await expect(await within(dialog).findByRole("alert")).toHaveTextContent(
+      "Something went wrong. Please try again later",
+    );
+    await expect(within(dialog).getByRole("textbox", { name: "Name" })).toHaveValue("Intranet");
   },
 };
