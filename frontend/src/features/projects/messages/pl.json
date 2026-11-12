@@ -47,6 +47,12 @@
     "close": "Zamknij",
     "submit": "Utwórz",
     "cancel": "Anuluj",
+    "success": {
+      "title": "Projekt utworzony",
+      "text": "Projekt {name} został dodany do listy."
+    }
+  },
+  "form": {
     "fields": {
       "name": "Nazwa",
       "domain": "Domena",
@@ -67,10 +73,6 @@
       "serverInvalid": "Serwer nie przyjął tej wartości",
       "failed": "Coś poszło nie tak. Spróbuj ponownie później"
     },
-    "success": {
-      "title": "Projekt utworzony",
-      "text": "Projekt {name} został dodany do listy."
-    },
     "datePicker": {
       "calendar": "Wybierz datę",
       "previousMonth": "Poprzedni miesiąc",
@@ -80,6 +82,16 @@
       "chooseDayPrefix": "Wybierz",
       "unavailableDayPrefix": "Niedostępne",
       "monthPrefix": "Miesiąc"
+    }
+  },
+  "update": {
+    "title": "Aktualizuj projekt",
+    "close": "Zamknij",
+    "submit": "Aktualizuj",
+    "cancel": "Anuluj",
+    "success": {
+      "title": "Projekt zaktualizowany",
+      "text": "Projekt {name} został zapisany."
     }
   }
 }

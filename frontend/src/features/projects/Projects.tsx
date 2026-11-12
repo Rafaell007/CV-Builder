@@ -11,12 +11,14 @@ import {
 import { CreateProjectModal } from "./components/CreateProjectModal";
 import { DeleteProjectModal } from "./components/DeleteProjectModal";
 import { ProjectsTable } from "./components/ProjectsTable";
+import { UpdateProjectModal } from "./components/UpdateProjectModal";
 import { SEARCH_MAX_LENGTH } from "./projects.constants";
 import { toProjectsVariables } from "./utils";
 import { useCreateProjectForm } from "./useCreateProjectForm";
 import { useDeleteProject } from "./useDeleteProject";
 import { useProjects } from "./useProjects";
 import { useProjectsListState } from "./useProjectsListState";
+import { useUpdateProjectForm } from "./useUpdateProjectForm";
 import styles from "./Projects.module.css";
 
 /**
@@ -30,10 +32,8 @@ export function Projects() {
   const { projects, total, loading, failed, retry } = useProjects(variables);
 
   const creation = useCreateProjectForm();
+  const editing = useUpdateProjectForm();
   const deletion = useDeleteProject();
-
-  // Placeholder: the update modal fills this in the next slice.
-  const handleEdit = () => undefined;
 
   async function handleConfirmDelete() {
     // Read before the request: the project leaves the list while it runs.
@@ -75,7 +75,7 @@ export function Projects() {
             projects={projects}
             sort={list.sort}
             onSortChange={list.setSort}
-            onEdit={handleEdit}
+            onEdit={editing.open}
             onDelete={deletion.askToDelete}
             loading={loading}
             loadingContent={<PageState kind="loading" labels={stateLabels} />}
@@ -97,6 +97,7 @@ export function Projects() {
         </>
       )}
       <CreateProjectModal creation={creation} />
+      <UpdateProjectModal update={editing} />
       <DeleteProjectModal
         project={deletion.project}
         pending={deletion.pending}

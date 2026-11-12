@@ -7,6 +7,8 @@ import {
   ProjectsDocument,
   type ProjectsQuery,
   type ProjectsQueryVariables,
+  UpdateProjectDocument,
+  type UpdateProjectInput,
 } from "@/shared/graphql";
 import {
   DEFAULT_PROJECTS_SORT,
@@ -277,5 +279,54 @@ export const createProjectNetworkErrorMock = (
   input: CreateProjectInput,
 ): MockLink.MockedResponse => ({
   request: { query: CreateProjectDocument, variables: { input } },
+  error: new Error("Failed to fetch"),
+});
+
+/** MockedProvider response of `updateProject`: the backend returns the saved project, with the environment it now has. */
+export const updateProjectMock = (
+  input: UpdateProjectInput,
+  environment: ProjectListItem["environment"] = [],
+): MockLink.MockedResponse => ({
+  request: { query: UpdateProjectDocument, variables: { input } },
+  result: {
+    data: {
+      updateProject: {
+        __typename: "Project",
+        id: input.id,
+        name: input.name,
+        domain: input.domain,
+        startDate: input.startDate,
+        endDate: input.endDate,
+        description: input.description,
+        environment,
+      },
+    },
+  },
+});
+
+/** `updateProject` refused with `BAD_USER_INPUT` and field errors, as the backend validation answers. */
+export const updateProjectInvalidMock = (
+  input: UpdateProjectInput,
+  fields: string[],
+): MockLink.MockedResponse => ({
+  request: { query: UpdateProjectDocument, variables: { input } },
+  result: {
+    errors: [
+      {
+        message: "Bad Request Exception",
+        extensions: {
+          code: "BAD_USER_INPUT",
+          fieldErrors: fields.map((field) => ({ field, messages: [`${field} is invalid`] })),
+        },
+      },
+    ],
+  },
+});
+
+/** `updateProject` that fails before the backend answers (no network). */
+export const updateProjectNetworkErrorMock = (
+  input: UpdateProjectInput,
+): MockLink.MockedResponse => ({
+  request: { query: UpdateProjectDocument, variables: { input } },
   error: new Error("Failed to fetch"),
 });

@@ -47,6 +47,12 @@
     "close": "Close",
     "submit": "Create",
     "cancel": "Cancel",
+    "success": {
+      "title": "Project created",
+      "text": "{name} was added to the projects."
+    }
+  },
+  "form": {
     "fields": {
       "name": "Name",
       "domain": "Domain",
@@ -67,10 +73,6 @@
       "serverInvalid": "The server did not accept this value",
       "failed": "Something went wrong. Please try again later"
     },
-    "success": {
-      "title": "Project created",
-      "text": "{name} was added to the projects."
-    },
     "datePicker": {
       "calendar": "Choose a date",
       "previousMonth": "Previous month",
@@ -80,6 +82,16 @@
       "chooseDayPrefix": "Choose",
       "unavailableDayPrefix": "Not available",
       "monthPrefix": "Month"
+    }
+  },
+  "update": {
+    "title": "Update project",
+    "close": "Close",
+    "submit": "Update",
+    "cancel": "Cancel",
+    "success": {
+      "title": "Project updated",
+      "text": "{name} was saved."
     }
   }
 }

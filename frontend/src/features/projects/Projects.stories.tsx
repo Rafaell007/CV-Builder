@@ -11,6 +11,7 @@ import {
   projectsMock,
   sales,
   sampleProjects,
+  updateProjectNetworkErrorMock,
 } from "./projects.mocks";
 
 const desktop = { viewport: { value: "desktop", isRotated: false } };
@@ -234,5 +235,52 @@ export const CreateProjectFailed: Story = {
       "Something went wrong. Please try again later",
     );
     await expect(within(dialog).getByRole("textbox", { name: "Name" })).toHaveValue("Intranet");
+  },
+};
+
+// What the update modal sends for the Blog project after the name changed to "Blog 2".
+const renamedBlog = {
+  id: blog.id,
+  name: "Blog 2",
+  domain: blog.domain,
+  startDate: blog.startDate,
+  endDate: blog.endDate,
+  description: blog.description,
+  environmentIds: blog.environment.map((skill) => skill.id),
+};
+
+/** Edit opens the modal filled with the row; UPDATE stays disabled until a value changes. */
+export const UpdateProject: Story = {
+  parameters: { apollo: { mocks: [fakeBackendMock([blog, sales])] } },
+  play: async ({ canvas }) => {
+    await userEvent.click(await canvas.findByRole("button", { name: "Actions for Blog" }));
+    await userEvent.click(await body.findByRole("menuitem", { name: "Edit" }));
+    const dialog = await body.findByRole("dialog", { name: "Update project" });
+    const form = within(dialog);
+    await expect(form.getByRole("textbox", { name: "Name" })).toHaveValue("Blog");
+    await expect(form.getByRole("textbox", { name: "Start Date" })).toHaveValue("12/31/2025");
+    await expect(form.getByRole("button", { name: "Update" })).toBeDisabled();
+
+    await userEvent.type(form.getByRole("textbox", { name: "Name" }), " 2");
+    await expect(form.getByRole("button", { name: "Update" })).toBeEnabled();
+  },
+};
+
+/** The request fails: the modal stays open, the values stay and the message shows inside the modal. */
+export const UpdateProjectFailed: Story = {
+  parameters: {
+    apollo: { mocks: [fakeBackendMock([blog, sales]), updateProjectNetworkErrorMock(renamedBlog)] },
+  },
+  play: async ({ canvas }) => {
+    await userEvent.click(await canvas.findByRole("button", { name: "Actions for Blog" }));
+    await userEvent.click(await body.findByRole("menuitem", { name: "Edit" }));
+    const dialog = await body.findByRole("dialog", { name: "Update project" });
+    await userEvent.type(within(dialog).getByRole("textbox", { name: "Name" }), " 2");
+    await userEvent.click(within(dialog).getByRole("button", { name: "Update" }));
+
+    await expect(await within(dialog).findByRole("alert")).toHaveTextContent(
+      "Something went wrong. Please try again later",
+    );
+    await expect(within(dialog).getByRole("textbox", { name: "Name" })).toHaveValue("Blog 2");
   },
 };

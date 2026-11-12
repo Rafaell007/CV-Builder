@@ -1,10 +1,10 @@
 import { z } from "zod";
-import type { CreateProjectInput } from "@/shared/graphql";
+import type { CreateProjectInput, UpdateProjectInput } from "@/shared/graphql";
 import { MAX_DESCRIPTION_LENGTH, MAX_DOMAIN_LENGTH, MAX_NAME_LENGTH } from "../projects.constants";
-import type { CreateProjectSubmit, CreateProjectValues } from "../projects.types";
+import type { ProjectFormSubmit, ProjectFormValues, ProjectListItem } from "../projects.types";
 
 /** The translated texts of the validation messages (page 27, Create Project Validation). */
-export interface CreateProjectMessages {
+export interface ProjectFormMessages {
   nameRequired: string;
   nameTooLong: string;
   domainRequired: string;
@@ -28,13 +28,13 @@ const requiredDate = (message: string) =>
     });
 
 /**
- * The rules of the Create project form: all five fields are required, the lengths are limited, and the end
+ * The rules of the project form (Create and Update): all five fields are required, the lengths are limited, and the end
  * date is not earlier than the start date (the same day is allowed, like the backend). The backend checks
  * everything again. Texts are trimmed, so a name of spaces counts as empty.
  */
-export function createProjectSchema(
-  messages: CreateProjectMessages,
-): z.ZodType<CreateProjectSubmit, CreateProjectValues> {
+export function projectFormSchema(
+  messages: ProjectFormMessages,
+): z.ZodType<ProjectFormSubmit, ProjectFormValues> {
   return z
     .object({
       name: z
@@ -71,12 +71,54 @@ export function toUtcDateIso(date: Date): string {
 }
 
 /** The `createProject` input. `environmentIds` is left out: the form has no Environment field yet (see the README). */
-export function toCreateProjectInput(values: CreateProjectSubmit): CreateProjectInput {
+export function toCreateProjectInput(values: ProjectFormSubmit): CreateProjectInput {
   return {
     name: values.name,
     domain: values.domain,
     startDate: toUtcDateIso(values.startDate),
     endDate: toUtcDateIso(values.endDate),
     description: values.description,
+  };
+}
+
+/**
+ * The reverse of `toUtcDateIso`: the calendar day the backend keeps (midnight UTC) as the local day the date
+ * picker shows. `new Date(iso)` would show the day before in a time zone west of UTC. A value that is not a
+ * date gives `null`, so the field is empty and the form asks for it.
+ */
+export function fromUtcDateIso(iso: string): Date | null {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+}
+
+/** The values the Update project form starts with: the current data of the project (page 27, Edit Project Modal). */
+export function toProjectFormValues(project: ProjectListItem): ProjectFormValues {
+  return {
+    name: project.name,
+    domain: project.domain,
+    startDate: fromUtcDateIso(project.startDate),
+    endDate: fromUtcDateIso(project.endDate),
+    description: project.description,
+  };
+}
+
+/**
+ * The `updateProject` input. The backend replaces the whole environment with `environmentIds` (and an
+ * omitted list means "empty"), so the ids the project already has are sent back: the form has no Environment
+ * field yet, and without them every edit would remove the technologies of the project.
+ */
+export function toUpdateProjectInput(
+  project: ProjectListItem,
+  values: ProjectFormSubmit,
+): UpdateProjectInput {
+  return {
+    id: project.id,
+    name: values.name,
+    domain: values.domain,
+    startDate: toUtcDateIso(values.startDate),
+    endDate: toUtcDateIso(values.endDate),
+    description: values.description,
+    environmentIds: project.environment.map((skill) => skill.id),
   };
 }
