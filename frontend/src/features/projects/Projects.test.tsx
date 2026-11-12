@@ -6,6 +6,7 @@ import {
   analytics,
   banking,
   blog,
+  createProjectMock,
   deleteProjectMock,
   deleteProjectNetworkErrorMock,
   deleteProjectRefusedMock,
@@ -568,6 +569,67 @@ describe("Projects", () => {
       expect(await screen.findByRole("alertdialog")).toHaveTextContent(
         "Czy na pewno chcesz usunąć projekt Blog?",
       );
+    });
+  });
+
+  describe("create", () => {
+    const input = {
+      name: "Intranet",
+      domain: "HR",
+      startDate: "2026-01-10T00:00:00.000Z",
+      endDate: "2026-06-30T00:00:00.000Z",
+      description: "A portal for staff",
+    };
+
+    it("opens the Create project modal with the CREATE PROJECT button", async () => {
+      const { user } = renderWithProviders(<Projects />, { mocks: [projectsMock([blog])] });
+      await screen.findByText("Blog");
+
+      await user.click(screen.getByRole("button", { name: "CREATE PROJECT" }));
+
+      expect(await screen.findByRole("dialog", { name: "Create project" })).toBeInTheDocument();
+    });
+
+    it("shows the button while the list loads and when it failed to load", async () => {
+      renderWithProviders(<Projects />, { mocks: [projectsErrorMock()] });
+
+      expect(screen.getByRole("button", { name: "CREATE PROJECT" })).toBeInTheDocument();
+      await screen.findByRole("alert");
+      expect(screen.getByRole("button", { name: "CREATE PROJECT" })).toBeInTheDocument();
+    });
+
+    it("adds the new project to the list after the list loads again", async () => {
+      const intranet = { ...blog, id: "new-1", ...input, environment: [] };
+      const { user } = renderWithProviders(<Projects />, {
+        mocks: [
+          projectsMock([blog]),
+          createProjectMock(input, { id: "new-1" }),
+          projectsMock([blog, intranet]),
+        ],
+      });
+      await screen.findByText("Blog");
+
+      await user.click(screen.getByRole("button", { name: "CREATE PROJECT" }));
+      await user.type(screen.getByRole("textbox", { name: "Name" }), input.name);
+      await user.type(screen.getByRole("textbox", { name: "Domain" }), input.domain);
+      await user.type(screen.getByRole("textbox", { name: "Start Date" }), "01/10/2026");
+      await user.type(screen.getByRole("textbox", { name: "End Date" }), "06/30/2026");
+      await user.type(screen.getByRole("textbox", { name: "Description" }), input.description);
+      await user.click(screen.getByRole("button", { name: "Create" }));
+
+      expect(await screen.findByText("Intranet")).toBeInTheDocument();
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    });
+
+    it("shows the form in Polish", async () => {
+      const { user } = renderWithProviders(<Projects />, {
+        locale: "pl",
+        mocks: [projectsMock([blog])],
+      });
+      await user.click(await screen.findByRole("button", { name: "UTWÓRZ PROJEKT" }));
+
+      expect(await screen.findByRole("dialog", { name: "Utwórz projekt" })).toBeInTheDocument();
+      expect(screen.getByRole("textbox", { name: "Data rozpoczęcia" })).toBeInTheDocument();
     });
   });
 });

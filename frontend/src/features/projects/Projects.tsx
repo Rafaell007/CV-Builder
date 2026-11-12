@@ -1,11 +1,19 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { PageState, Pagination, SearchField, type PageStateLabels } from "@/shared/components";
+import {
+  Button,
+  PageState,
+  Pagination,
+  SearchField,
+  type PageStateLabels,
+} from "@/shared/components";
+import { CreateProjectModal } from "./components/CreateProjectModal";
 import { DeleteProjectModal } from "./components/DeleteProjectModal";
 import { ProjectsTable } from "./components/ProjectsTable";
 import { SEARCH_MAX_LENGTH } from "./projects.constants";
 import { toProjectsVariables } from "./utils";
+import { useCreateProjectForm } from "./useCreateProjectForm";
 import { useDeleteProject } from "./useDeleteProject";
 import { useProjects } from "./useProjects";
 import { useProjectsListState } from "./useProjectsListState";
@@ -21,6 +29,7 @@ export function Projects() {
   const variables = toProjectsVariables(list);
   const { projects, total, loading, failed, retry } = useProjects(variables);
 
+  const creation = useCreateProjectForm();
   const deletion = useDeleteProject();
 
   // Placeholder: the update modal fills this in the next slice.
@@ -56,6 +65,7 @@ export function Projects() {
           defaultValue={list.search}
           onSearch={list.setSearch}
         />
+        <Button onClick={creation.open}>{t("button")}</Button>
       </div>
       {failed && !loading ? (
         <PageState kind="error" labels={stateLabels} onRetry={retry} />
@@ -86,6 +96,7 @@ export function Projects() {
           </div>
         </>
       )}
+      <CreateProjectModal creation={creation} />
       <DeleteProjectModal
         project={deletion.project}
         pending={deletion.pending}
