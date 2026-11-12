@@ -4,7 +4,7 @@
   top: 0;
   display: flex;
   flex-direction: column;
-  width: var(--sidebar-width, 200px);
+  width: var(--sidebar-width);
   height: 100dvh;
   padding-bottom: var(--space-14);
 }
@@ -28,7 +28,7 @@
 .toggle {
   position: absolute;
   top: 51px;
-  left: calc(var(--sidebar-width, 200px) - 12px);
+  left: calc(var(--sidebar-width) - var(--space-3));
   z-index: 1;
   display: flex;
   width: 24px;
@@ -76,11 +76,11 @@
   display: flex;
   align-items: center;
   gap: var(--space-4);
-  width: var(--sidebar-width, 200px);
+  width: var(--sidebar-width);
   height: var(--space-14);
   padding-left: var(--space-4);
   overflow: hidden;
-  border-radius: 0 200px 200px 0;
+  border-radius: var(--radius-nav);
   color: var(--color-text-secondary);
   font: var(--text-body);
   letter-spacing: var(--text-body-ls);
@@ -108,8 +108,16 @@
   height: 24px;
 }
 
+/* Same size and shape as a link, so nothing moves when the links arrive. */
+.skeletonBar {
+  width: var(--sidebar-width);
+  height: var(--space-14);
+  border-radius: var(--radius-nav);
+  background: var(--color-surface);
+}
+
 .divider {
-  width: var(--sidebar-width, 200px);
+  width: var(--sidebar-width);
   margin: 14px 0;
   border: 0;
   border-top: 1px solid var(--color-border);
