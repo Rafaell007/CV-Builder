@@ -54,7 +54,7 @@ export function Projects() {
   const emptyKind = variables.search === undefined ? "empty" : "no-results";
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <h1 className={styles.title}>{t("title")}</h1>
       {/* Outside the error branch below: an error must not remove the typed search (the field is uncontrolled). */}
       <div className={styles.toolbar}>
@@ -104,6 +104,6 @@ export function Projects() {
         onConfirm={() => void handleConfirmDelete()}
         onCancel={deletion.cancel}
       />
-    </main>
+    </div>
   );
 }
