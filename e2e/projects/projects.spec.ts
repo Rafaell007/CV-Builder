@@ -1,5 +1,10 @@
 import { expect, test, type Page } from "@playwright/test";
-import { createProjects, deleteProjects } from "../support/projects";
+import {
+  createProject,
+  createProjects,
+  deleteProjects,
+  deleteProjectsByName,
+} from "../support/projects";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
 
 // The seed holds 6 projects (backend/prisma/seed/projects.data.ts). The page shows 10 rows (PLAN D19).
@@ -177,5 +182,162 @@ test.describe("projects page, as a user", () => {
     await page.goto("/en/admin/projects");
 
     await expect(page).toHaveURL(/\/users$/);
+  });
+});
+
+// Create, update and delete share this file with the list tests on purpose: the tests of one file run one after
+// another, and these add projects that the "6 seeded projects" checks above must never see.
+// Every project these tests make has this text in its name, so `afterEach` can remove all of them (even after a failure).
+const MANAGE_PREFIX = "E2E Manage";
+
+const row = (page: Page, name: string) => dataRows(page).filter({ hasText: name });
+const dialog = (page: Page) => page.getByRole("dialog");
+// The delete modal is a ConfirmModal, which Radix marks as an alertdialog.
+const confirmDialog = (page: Page) => page.getByRole("alertdialog");
+
+async function find(page: Page, text: string) {
+  await search(page).fill(text);
+  await search(page).press("Enter");
+}
+
+async function fillForm(page: Page, name: string) {
+  await dialog(page).getByRole("textbox", { name: "Name" }).fill(name);
+  await dialog(page).getByRole("textbox", { name: "Domain" }).fill("E2E");
+  await fillDate(page, "Start Date", "01/10/2026");
+  await fillDate(page, "End Date", "06/30/2026");
+  await dialog(page).getByRole("textbox", { name: "Description" }).fill("Made by an E2E test.");
+}
+
+// Tab leaves the field, so the calendar popup closes; an open popup covers the buttons of the modal.
+async function fillDate(page: Page, label: "Start Date" | "End Date", value: string) {
+  const field = dialog(page).getByRole("textbox", { name: label });
+  await field.fill(value);
+  await field.press("Tab");
+}
+
+async function openRowMenu(page: Page, name: string, action: "Edit" | "Delete") {
+  await page.getByRole("button", { name: `Actions for ${name}` }).click();
+  await page.getByRole("menuitem", { name: action }).click();
+}
+
+test.describe("projects page, create, update and delete", () => {
+  test.beforeEach(async ({ context, page }) => {
+    await signIn(context, ADMIN_EMAIL);
+    await page.goto("/en/admin/projects");
+    await expect(page.getByRole("heading", { name: "Projects" })).toBeVisible();
+  });
+
+  test.afterEach(async ({ context }) => {
+    await deleteProjectsByName(context, MANAGE_PREFIX);
+  });
+
+  test("creates a project: the modal closes, a toast shows and the row is in the list", async ({
+    page,
+  }) => {
+    const name = `${MANAGE_PREFIX} Created`;
+
+    await page.getByRole("button", { name: "CREATE PROJECT" }).click();
+    await expect(dialog(page).getByRole("button", { name: "Create" })).toBeDisabled();
+    await fillForm(page, name);
+    await dialog(page).getByRole("button", { name: "Create" }).click();
+
+    await expect(dialog(page)).toBeHidden();
+    await expect(page.getByText("Project created")).toBeVisible();
+    await find(page, name);
+    await expect(row(page, name)).toHaveCount(1);
+    await expect(row(page, name)).toContainText("E2E");
+  });
+
+  test("shows the date message and keeps Create disabled when the end is before the start", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: "CREATE PROJECT" }).click();
+    await fillForm(page, `${MANAGE_PREFIX} Dates`);
+    await fillDate(page, "End Date", "01/01/2026");
+
+    await expect(dialog(page).getByText("End date must be later than start date")).toBeVisible();
+    await expect(dialog(page).getByRole("button", { name: "Create" })).toBeDisabled();
+  });
+
+  test("Cancel closes the create modal and saves nothing", async ({ page }) => {
+    const name = `${MANAGE_PREFIX} Cancelled`;
+
+    await page.getByRole("button", { name: "CREATE PROJECT" }).click();
+    await fillForm(page, name);
+    await dialog(page).getByRole("button", { name: "Cancel" }).click();
+
+    await expect(dialog(page)).toBeHidden();
+    await find(page, name);
+    await expect(page.getByText("No projects found")).toBeVisible();
+  });
+
+  test("updates a project: the form is filled, the new name shows in the list", async ({
+    context,
+    page,
+  }) => {
+    const name = `${MANAGE_PREFIX} Before`;
+    const renamed = `${MANAGE_PREFIX} After`;
+    await createProject(context, name);
+    await page.reload();
+    await find(page, name);
+
+    await openRowMenu(page, name, "Edit");
+    await expect(dialog(page).getByRole("textbox", { name: "Name" })).toHaveValue(name);
+    await expect(dialog(page).getByRole("textbox", { name: "Start Date" })).toHaveValue(
+      "01/01/2024",
+    );
+    await expect(dialog(page).getByRole("button", { name: "Update" })).toBeDisabled();
+    await dialog(page).getByRole("textbox", { name: "Name" }).fill(renamed);
+    await dialog(page).getByRole("button", { name: "Update" }).click();
+
+    await expect(dialog(page)).toBeHidden();
+    await expect(page.getByText("Project updated")).toBeVisible();
+    await find(page, renamed);
+    await expect(row(page, renamed)).toHaveCount(1);
+    await find(page, name);
+    await expect(page.getByText("No projects found")).toBeVisible();
+  });
+
+  test("deletes a project that no CV uses", async ({ context, page }) => {
+    const name = `${MANAGE_PREFIX} Delete me`;
+    await createProject(context, name);
+    await page.reload();
+    await find(page, name);
+
+    await openRowMenu(page, name, "Delete");
+    await expect(confirmDialog(page)).toContainText(
+      `Are you sure you want to delete project ${name}?`,
+    );
+    await confirmDialog(page).getByRole("button", { name: "Confirm" }).click();
+
+    await expect(confirmDialog(page)).toBeHidden();
+    await expect(page.getByText("No projects found")).toBeVisible();
+  });
+
+  test("Cancel keeps the project in the list", async ({ context, page }) => {
+    const name = `${MANAGE_PREFIX} Keep me`;
+    await createProject(context, name);
+    await page.reload();
+    await find(page, name);
+
+    await openRowMenu(page, name, "Delete");
+    await confirmDialog(page).getByRole("button", { name: "Cancel" }).click();
+
+    await expect(confirmDialog(page)).toBeHidden();
+    await expect(row(page, name)).toHaveCount(1);
+  });
+
+  test("shows the backend message and keeps the row when a CV uses the project", async ({
+    page,
+  }) => {
+    // The seed uses Banking Portal in two CVs (backend/prisma/seed/cvs.data.ts).
+    await openRowMenu(page, "Banking Portal", "Delete");
+    await confirmDialog(page).getByRole("button", { name: "Confirm" }).click();
+
+    await expect(confirmDialog(page)).toBeHidden();
+    // Radix adds a second, hidden copy of the toast text for screen readers: match the visible title exactly.
+    await expect(page.getByText("Could not delete the project", { exact: true })).toBeVisible();
+    await expect(page.getByText(/^The project is used in \d+ CVs?$/)).toBeVisible();
+    await expect(row(page, "Banking Portal")).toHaveCount(1);
   });
 });
