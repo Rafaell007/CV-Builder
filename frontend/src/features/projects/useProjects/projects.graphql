@@ -1,0 +1,19 @@
+# One page of the project catalog. Admin only (backend). The backend searches name and domain, sorts and cuts the page,
+# so the frontend never filters or sorts the loaded rows (docs/pages/27-projects-page.md).
+query Projects($page: PageInput!, $search: String, $sort: SortInput) {
+  projects(page: $page, search: $search, sort: $sort) {
+    items {
+      id
+      name
+      domain
+      startDate
+      endDate
+      description
+      environment {
+        id
+        name
+      }
+    }
+    total
+  }
+}

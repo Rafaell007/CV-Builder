@@ -1,0 +1,16 @@
+# Updates one project. Admin only (backend). The backend replaces the WHOLE environment with `environmentIds`
+# (default: empty), so the caller must send the ids the project already has; the form has no Environment field yet.
+mutation UpdateProject($input: UpdateProjectInput!) {
+  updateProject(input: $input) {
+    id
+    name
+    domain
+    startDate
+    endDate
+    description
+    environment {
+      id
+      name
+    }
+  }
+}

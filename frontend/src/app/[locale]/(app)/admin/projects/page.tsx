@@ -1,16 +1,5 @@
-import { useTranslations } from "next-intl";
-import { PageHeader } from "@/shared/components/PageHeader";
+import { Projects } from "@/features/projects";
 
-// Placeholder (PLAN §6); the real page comes with its own step.
 export default function AdminProjectsPage() {
-  const t = useTranslations();
-  const title = t("appShell.nav.projects");
-
-  return (
-    <PageHeader
-      title={title}
-      breadcrumbs={[{ label: title }]}
-      breadcrumbsLabel={t("common.breadcrumbs")}
-    />
-  );
+  return <Projects />;
 }

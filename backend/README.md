@@ -49,7 +49,7 @@ async list({ search, sort, page }: ListArgs): Promise<SkillPage> {
 ```
 
 - `resolveSort` accepts only the fields that you list. It rejects all others with a field error.
-- The page size is 20 by default. The maximum is 100.
+- The page size is 10 by default. The maximum is 100.
 
 ### 2. Validate input
 

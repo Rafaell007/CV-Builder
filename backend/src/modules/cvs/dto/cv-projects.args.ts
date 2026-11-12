@@ -23,5 +23,6 @@ export class CvProjectsArgs {
   @IsOptional()
   @ValidateNested()
   @Type(() => SortInput)
-  sort?: SortInput;
+  // `null` when a client sends `sort: null`; `resolveSort` treats it like no sort.
+  sort?: SortInput | null;
 }

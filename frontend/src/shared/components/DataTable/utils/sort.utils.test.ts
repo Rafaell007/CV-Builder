@@ -13,8 +13,11 @@ describe("getNextSort", () => {
     });
   });
 
-  it("clears the sort after descending", () => {
-    expect(getNextSort({ field: "lastName", direction: "DESC" }, "lastName")).toBeUndefined();
+  it("switches descending back to ascending, never to no sort", () => {
+    expect(getNextSort({ field: "lastName", direction: "DESC" }, "lastName")).toEqual({
+      field: "lastName",
+      direction: "ASC",
+    });
   });
 
   it("starts at ascending when another field is sorted", () => {

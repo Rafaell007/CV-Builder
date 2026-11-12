@@ -6,7 +6,7 @@ interface SortHeaderCellProps {
   header: string;
   field: string;
   sort: SortState | undefined;
-  onSortChange: (sort: SortState | undefined) => void;
+  onSortChange: (sort: SortState) => void;
 }
 
 /** Header cell with a button that cycles the sort of its column; the arrow shows the direction. */
