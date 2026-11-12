@@ -14,6 +14,7 @@ import {
   projectsErrorMock,
   projectsMock,
   sales,
+  updateProjectMock,
   variablesFor,
 } from "./projects.mocks";
 
@@ -630,6 +631,65 @@ describe("Projects", () => {
 
       expect(await screen.findByRole("dialog", { name: "Utwórz projekt" })).toBeInTheDocument();
       expect(screen.getByRole("textbox", { name: "Data rozpoczęcia" })).toBeInTheDocument();
+    });
+  });
+
+  describe("update", () => {
+    // The Blog project with a new name; its dates and technologies stay as they were.
+    const input = {
+      id: "1",
+      name: "Blog 2",
+      domain: "Blogging",
+      startDate: "2025-12-31T00:00:00.000Z",
+      endDate: "2026-05-31T00:00:00.000Z",
+      description: blog.description,
+      environmentIds: ["10", "11", "12", "13", "14", "15"],
+    };
+
+    async function openEdit(user: ReturnType<typeof renderWithProviders>["user"]) {
+      await user.click(await screen.findByRole("button", { name: "Actions for Blog" }));
+      await user.click(screen.getByRole("menuitem", { name: "Edit" }));
+      return screen.findByRole("dialog", { name: "Update project" });
+    }
+
+    it("opens the Update project modal filled with the project of the row", async () => {
+      const { user } = renderWithProviders(<Projects />, { mocks: [projectsMock([blog, sales])] });
+
+      await openEdit(user);
+
+      expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue("Blog");
+      expect(screen.getByRole("textbox", { name: "Domain" })).toHaveValue("Blogging");
+    });
+
+    it("shows the new name in the list after the list loads again", async () => {
+      const renamed = { ...blog, name: "Blog 2" };
+      const { user } = renderWithProviders(<Projects />, {
+        mocks: [
+          projectsMock([blog]),
+          updateProjectMock(input, blog.environment),
+          projectsMock([renamed]),
+        ],
+      });
+      await openEdit(user);
+
+      const field = screen.getByRole("textbox", { name: "Name" });
+      await user.clear(field);
+      await user.type(field, "Blog 2");
+      await user.click(screen.getByRole("button", { name: "Update" }));
+
+      expect(await screen.findByText("Blog 2")).toBeInTheDocument();
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    });
+
+    it("shows the form in Polish", async () => {
+      const { user } = renderWithProviders(<Projects />, {
+        locale: "pl",
+        mocks: [projectsMock([blog])],
+      });
+      await user.click(await screen.findByRole("button", { name: "Akcje dla projektu Blog" }));
+      await user.click(screen.getByRole("menuitem", { name: "Edytuj" }));
+
+      expect(await screen.findByRole("dialog", { name: "Aktualizuj projekt" })).toBeInTheDocument();
     });
   });
 });
