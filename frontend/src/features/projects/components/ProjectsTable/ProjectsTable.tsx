@@ -1,6 +1,6 @@
 import { useLocale, useTranslations } from "next-intl";
 import type { ReactNode } from "react";
-import { DataTable, type DataTableColumn, type SortState } from "@/shared/components";
+import { DataTable, Menu, type DataTableColumn, type SortState } from "@/shared/components";
 import { PROJECT_SORT_FIELDS } from "../../projects.constants";
 import type { ProjectListItem } from "../../projects.types";
 import { EnvironmentTags } from "./EnvironmentTags";
@@ -13,6 +13,10 @@ export interface ProjectsTableProps {
   /** The backend sort. The table only shows it and reports a click on a header. */
   sort: SortState | undefined;
   onSortChange: (sort: SortState) => void;
+  /** Called with the project when the user selects Edit in its row menu. */
+  onEdit: (project: ProjectListItem) => void;
+  /** Called with the project when the user selects Delete in its row menu. */
+  onDelete: (project: ProjectListItem) => void;
   loading: boolean;
   loadingContent: ReactNode;
   emptyContent: ReactNode;
@@ -26,6 +30,8 @@ export function ProjectsTable({
   projects,
   sort,
   onSortChange,
+  onEdit,
+  onDelete,
   loading,
   loadingContent,
   emptyContent,
@@ -83,6 +89,16 @@ export function ProjectsTable({
         getRowId={(project) => project.id}
         sort={sort}
         onSortChange={onSortChange}
+        renderRowActions={(project) => (
+          <Menu
+            label={t("actions.menu", { name: project.name })}
+            items={[
+              { label: t("actions.edit"), onSelect: () => onEdit(project) },
+              { label: t("actions.delete"), onSelect: () => onDelete(project), destructive: true },
+            ]}
+          />
+        )}
+        labels={{ actions: t("actions.column") }}
         loading={loading}
         loadingContent={loadingContent}
         emptyContent={emptyContent}

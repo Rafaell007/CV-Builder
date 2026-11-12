@@ -18,6 +18,8 @@ const render = (props: Partial<Parameters<typeof ProjectsTable>[0]> = {}, locale
       projects={[blog, sales]}
       sort={undefined}
       onSortChange={() => undefined}
+      onEdit={() => undefined}
+      onDelete={() => undefined}
       loading={false}
       loadingContent={<p>Loading content</p>}
       emptyContent={<p>Empty content</p>}
