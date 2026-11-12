@@ -16,3 +16,16 @@ Element.prototype.scrollIntoView ??= () => {};
 afterEach(() => {
   cleanup();
 });
+
+// jsdom has no matchMedia: a stub that never matches (wide screen). Tests that need a width stub their own.
+window.matchMedia ??= (query: string) =>
+  ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => false,
+  }) satisfies MediaQueryList;

@@ -1,7 +1,4 @@
-/** True when `pathname` is the tab route or a route below it (/users/1 is inside /users/1/skills). */
-export function isTabActive(href: string, pathname: string): boolean {
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
+import { isPathActive } from "@/shared/utils";
 
 /**
  * Index of the tab that matches `pathname`, or -1. The longest matching href wins,
@@ -11,7 +8,7 @@ export function getActiveTabIndex(hrefs: ReadonlyArray<string>, pathname: string
   let activeIndex = -1;
   let activeLength = -1;
   hrefs.forEach((href, index) => {
-    if (!isTabActive(href, pathname) || href.length <= activeLength) return;
+    if (!isPathActive(href, pathname) || href.length <= activeLength) return;
     activeIndex = index;
     activeLength = href.length;
   });

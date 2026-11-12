@@ -2,6 +2,7 @@ import { ApolloClient, ApolloLink, InMemoryCache } from "@apollo/client";
 import { of, throwError } from "rxjs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { HealthDocument } from "@/shared/graphql";
+import { getNetworkFailed, resetNetworkStatus } from "@/shared/network/store";
 import { errorLink } from "./errorLink";
 
 function queryHealth(backend: ApolloLink) {
@@ -14,6 +15,7 @@ function queryHealth(backend: ApolloLink) {
 
 afterEach(() => {
   vi.restoreAllMocks();
+  resetNetworkStatus();
 });
 
 describe("errorLink", () => {
@@ -36,6 +38,16 @@ describe("errorLink", () => {
     await queryHealth(backend);
 
     expect(log).toHaveBeenCalledWith("[Network] Health:", failure);
+  });
+
+  it("reports a TypeError from fetch as a lost connection, but not other errors", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await queryHealth(new ApolloLink(() => throwError(() => new Error("Boom"))));
+    expect(getNetworkFailed()).toBe(false);
+
+    await queryHealth(new ApolloLink(() => throwError(() => new TypeError("Failed to fetch"))));
+    expect(getNetworkFailed()).toBe(true);
   });
 
   it("logs nothing when the operation succeeds", async () => {

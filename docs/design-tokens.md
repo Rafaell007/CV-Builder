@@ -245,6 +245,52 @@ Read on 2026-11-04 for KAN-81. Positions from the modal's top-left.
 
 280×80, radius 12, border 1px, no shadow; colours in "Colours (semantic)" → Notification. Text: success #335D35, error #F5F5F7 (warning and info not read). Title in the Notification title style at 8 / 16; text in the Notification text style at top 40; close 24×24 at top 8, 12 from the right, 12×12 cross in the text colour. Title LH is 16 in success, 24 in error. Screen position not drawn.
 
+### App shell (1440 › USERS, USERS (admin), USER PROFILE, SETTINGS; 768px Tablet › USERS (admin), SETTINGS)
+
+Sidebar, expanded (1440):
+
+- 200 wide, no fill and no border: the page background shows through.
+- Logo row 200×56: logo 24×24 at top 16, left 16; "CV Builder" 500 · 16 · 24 · 0.15, text main.
+- Nav item 200×56, radius `0 200px 200px 0`; icon 24×24 at top 16, left 16; text at left 56 in the Body style. Items 14 apart; the first is 14 under the logo row.
+- Default text + icon: text grey (#626262 / #AEAEAE). Active: text main (#2E2E2E / #F5F5F7) on `--color-surface` (#E2E2E4 / #454545).
+- Admin group divider: 1px, #AEAEAE / #626262, 14 under the last user item and 14 above the first admin item.
+- Collapse button: 24×24, radius 20, top 51, its centre on the sidebar's right edge (left 188 of 200, so 12 px over the content). Fill: page background (#F5F5F7 / #2E2E2E, read on Tablet). Chevron 7.41×12 at 8,6, #626262 / #AEAEAE.
+
+Sidebar, collapsed (768px Tablet):
+
+- 56 wide, icons only; logo row 56×56 with the logo only (24×24 at 16,16).
+- Nav item 56×56, radius `0 200px 200px 0`, icon centred at 16,16; active fill and colours, 14px gap and divider (56×1) as expanded.
+- Collapse button at left 44 (centre on the 56 edge), top 51.
+
+Profile row and menu:
+
+- Row 56 high, 56 from the bottom. Avatar 40 circle at left 8, top 8, fill #C63031; initial 500 · 20 · 20 · 0.4, uppercase. Name at left 56, top 16, Body style, text main. Collapsed: avatar only.
+- Menu: as wide as the sidebar (200 or 56) × 121, 5 px above the profile row, radius 8, 1px border #AEAEAE / #626262, fill `--color-surface`, no shadow.
+- Menu items 40 high, radius `0 200px 200px 0`; icon 24 (16 glyph) at left 16, top 8; text at left 56, Body style, text main. A 1px line #AEAEAE / #626262 under Settings (above Logout).
+
+Header and content:
+
+- Header 56 high, sticky at top 0, page background fill; from 24 after the sidebar to 26 before the right edge (1440: 1190 wide).
+- Breadcrumbs at top 16, left 20 inside the header, Body style, title case. Link and current page: text grey (#626262 / #AEAEAE). Separator: chevron-right in a 20×20 box (glyph 6.17×10), #AEAEAE in both themes, 8 px on each side.
+- Highlighted item (the user in `Employees › User › Profile`): #C63031 in both themes, person icon 24 (16 glyph), 8 px before the text.
+- Content: 24 after the sidebar, directly under the header (no gap); right edge 26 (see Spacing).
+
+### Device error (768px Tablet › DEVICE ERROR, 768w light / dark)
+
+- Full screen, page background; nothing else on the screen (no sidebar, header or button).
+- Content box 560×591, centred both ways; the content sits at its top, so it ends up about 40px above the screen's middle.
+- Illustration 160×120 at box top 127, centred: a monitor with a sad face, 2px centred strokes in text main (#2E2E2E / #F5F5F7). Parts (box coordinates): screen 160×100 at 127/200 (outline only); eyes 6×6 filled circles at 159/252 and 159/302; frown 60×10 at 182/250; stand 60×20 at 227/250; base line 80 at 247/240.
+- "Oops": Title style, text main, centred, 24 under the illustration.
+- Message: Body style, text main, centred, 24 under "Oops", two lines (break after "devices."). No emphasised phrase.
+
+### No internet (1440 › NO INTERNET ERROR, 768px Tablet › INTERNET ERROR; light / dark)
+
+- Same layout as Device error: full screen, page background, content box 560×591 centred both ways (1440: top 155, left 440; 768: top 217, left 104); no sidebar or header. Light and dark differ only in colours; 768 and 1440 differ only in the frame size.
+- Illustration: identical to Device error (160×120 at box top 127, centred; 2px strokes in text main).
+- "Oops": Title style (400 · 34 · 41.99 · 0.25), text main, centred, top 271 (24 under the illustration).
+- Message: "Something went wrong. We're already working on fixing it. Please try again or go back." Body style, text main, centred, 560 wide, top 335 (24 under "Oops"), two lines with the break after "fixing it.". No emphasised phrase.
+- RETRY: primary button, 220 wide (not the 160 minimum), with the primary button shadow; top 407 (24 under the message), centred. Text "Retry" in the Button style, uppercase.
+
 ### Icons
 
 No icon names in the file, but every glyph matches Google Material Icons by size and position: more-vert (4×16 at 10,4), visibility (22×15 at 1,4.5), search (17.49 at 3,3), chevron-right (7.41×12 at 8.59,6). We use Material Icons paths (Apache 2.0).
@@ -323,3 +369,22 @@ Predictions for KAN-81 (2026-11-04): not drawn, or drawn inconsistently; chosen 
 - Close button (`CloseButton`): cross in the colour of the text around it; hover a 1px border in that colour; keyboard focus the Button ring. The 12×12 cross is centred (Figma 7,7 in the 24 box is 1px off-centre: read as an artefact).
 
 Toast text contrast (2026-11-04): success #335D35 on #66BB6A is 3.2:1 and fails WCAG AA for 12/16px text (the same pattern gives warning 3.5:1 and info 3.2:1). Success, warning and info text use #2E2E2E (5.7–7.8:1); the borders keep their Figma colours. Error text #F5F5F7 on #C63031 is 5.0:1 and stays.
+
+Predictions for KAN-82 (2026-11-06): not drawn, or drawn inconsistently; chosen by us. Fix here and in the CSS when a better source appears.
+
+- Sidebar state: 1440 draws it expanded, 768 collapsed. Until the user clicks the collapse button, the width decides: collapsed below 1024px, expanded from 1024px (1024 is our choice; Figma has only 768 and 1440). A click overrides it until the page reloads; it is not saved.
+- Collapse chevron: Figma draws `<` in both states; ours points right (`>`) when collapsed, so it shows what a click does. `aria-expanded` gives the state.
+- Header offset: Tablet draws the header 37px after the sidebar but the content at 24; read as an artefact. Header and content both start 24 after the sidebar, as on 1440.
+- Collapse button fill: page background in both sizes (read on Tablet only), so it covers the sidebar edge.
+- Collapsed nav items and avatar keep their text as the accessible name (visually hidden or `aria-label`).
+- Device error: the 591-high box is copied and centred, so the content lands where Figma has it; no separate offset. The message is two sentences on two lines (the line break comes from the text, not from width). Monitor screen corner radius is not shown in Figma: 8px, estimated from `docs/images/09-device-error-page.jpg`. The "Oops" layer name ("С возвращением") is a leftover and ignored. The monitor stand legs (60,100→50,120 and 100,100→110,120 in the 160×120 illustration) are estimated from the same screenshot. Known limitation: the gate is a width media query, so 400 % zoom on a 1280px screen (320 CSS px) shows it too (WCAG 1.4.10 Reflow); accepted because the app does not support widths under 768px.
+- Icons (Material, identified from the screenshots; Figma has no names): Employees "people", Skills "trending_up", Languages "translate", CVs "contact_page" outlined, Departments "domain" outlined, Positions "work_outline", Projects "folder_copy" outlined; profile menu "person_outline", "settings" outlined, "logout"; breadcrumb user "person_outline". The logo is not a Material icon: export it from Figma.
+- Hover states (not drawn): nav link and collapse button text turn text main (#2E2E2E light / #F5F5F7 dark); the profile row gets the surface fill on hover and while its menu is open; a highlighted menu item gets the page background.
+- Collapse button: accessible name "Sidebar" (both states) plus `aria-expanded`, so a screen reader hears "Sidebar, expanded / collapsed".
+- Page title: Figma shows none (the breadcrumbs name the page). Each page still has an `<h1>` for screen readers, visually hidden, in `PageHeader`.
+- Profile avatar: its own one-letter red circle in the sidebar, not the shared `Avatar` component (no photo in the sidebar).
+- No internet text: we use the Figma message ("…Please try again or go back."), not the shorter one in `docs/pages/07-no-internet-page.md` ("…Please try again."), because Figma is the source of truth. The user goes back with the browser's Back button; the screen has no back button.
+
+Highlighted breadcrumb in dark (2026-11-09): Figma draws #C63031 on #2E2E2E, 2.5:1. Dark uses #E9B0B0 (`--color-primary-text`), as error text does; light keeps #C63031 (5.0:1).
+
+Avatar initial in dark (2026-11-06): Figma draws #2E2E2E on #C63031, 2.5:1. The initial uses #F5F5F7 in both themes (5.0:1).

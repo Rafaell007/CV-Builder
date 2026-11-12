@@ -82,6 +82,11 @@
   --radius-notification: 12px;
   --radius-chip: 12px;
   --radius-round: 50%;
+  /* Sidebar links and profile menu items: round on the right only (docs/design-tokens.md › App shell). */
+  --radius-nav: 0 200px 200px 0;
+
+  /* Layout: the expanded sidebar; AppShell narrows it to 56px when collapsed. */
+  --sidebar-width: 200px;
 
   /* Shadows */
   --shadow-button:

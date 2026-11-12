@@ -1,0 +1,12 @@
+/* The page as if the wrapper were not there. */
+.page {
+  display: contents;
+}
+
+/* Over everything, the toasts included: the screen replaces the page. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow-y: auto;
+}

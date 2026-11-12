@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { DeviceErrorGate } from "@/features/device-error";
+import { NoInternetGate } from "@/features/no-internet";
 import { ApolloClientProvider } from "@/shared/apollo";
 // The folder, not the shared/components barrel: a Server Component would pull every component into the server graph.
 import { ToastProvider } from "@/shared/components/Toast";
@@ -43,7 +45,9 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[lo
                 label={t("toast.label")}
                 viewportLabel={t("toast.viewport")}
               >
-                {children}
+                <DeviceErrorGate>
+                  <NoInternetGate>{children}</NoInternetGate>
+                </DeviceErrorGate>
               </ToastProvider>
             </PreferencesProvider>
           </ApolloClientProvider>
