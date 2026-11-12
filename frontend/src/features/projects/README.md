@@ -4,7 +4,7 @@ The `/admin/projects` page (PLAN S5.5b, KAN-102): the global list of projects, f
 
 - Exports: `Projects` (the whole page content; the route only renders it).
 - `Projects/useProjectsListState`: holds the choices of the user: `search`, `sort` and `page`. A new search or sort goes back to page 1. Nothing is filtered or sorted in the frontend.
-- `Projects/utils/toProjectsVariables`: turns that state into the query variables. It always sends `page: { number, size: 10 }` (the backend default is 20), trims the search, and leaves out an empty search and no sort. It must not send `null` for them (see Known issues).
+- `Projects/utils/toProjectsVariables`: turns that state into the query variables. It always sends `page: { number, size: 10 }` (the backend default is 20), trims the search, and leaves out an empty search and no sort. (The backend accepts `null` for them too, since the `resolveSort` fix.)
 - `Projects/useProjects`: sends the `Projects` query (`useProjects/projects.graphql`) with those variables and returns `projects`, `total`, `loading`, `failed` and `retry`. `failed` hides the list, so a failed request never looks like an empty list. `retry` repeats the same request, so search, sort and page stay.
 - `Projects/components/ProjectsTable`: the shared `DataTable` with the columns Name, Domain, Start Date and End Date. `EnvironmentTags` draws the technologies as tags. `utils/formatProjectDate` writes `MM/DD/YYYY` in English and `DD.MM.YYYY` in Polish.
 - Search (KAN-128): the shared `SearchField` (debounced 300 ms, Enter at once, 100 characters at most) sends the text to the backend, which matches name and domain without regard to case. The field sits outside the error state, so an error does not remove the typed text.
@@ -31,7 +31,6 @@ The `/admin/projects` page (PLAN S5.5b, KAN-102): the global list of projects, f
   - Not built yet: the row menu with three dots and the CREATE PROJECT button (create, update and delete tickets).
 - **The Projects item is not in the sidebar yet.** The app layout (KAN-82, PR #46) was not merged when this was built. The sidebar link, the Admin-only visibility and the active highlight are part of that layout, not of this feature.
 - **No Admin check in the frontend.** A non-admin user who opens the route gets an error state, because the backend rejects the query. The page document (AC-1) asks for access for Admin users only. Add a route guard when the app layout and the role in the session are in place.
-- **`sort: null` crashes the backend.** The `projects` query (and every list query) returns `INTERNAL_SERVER_ERROR` when the client sends `sort: null`; leaving `sort` out works. The page leaves it out. Details and the fix: [backend pagination README](../../../../backend/src/common/pagination/README.md).
 - **Search, sort and page are not in the URL.** They are lost on a refresh and cannot be shared. `SearchField` already takes a `defaultValue`, so the state can move to the URL later (the page document asks for no URL state).
 - **The page shows no page buttons with the seed data.** The seed has 6 projects and the page holds 10. Pagination is covered by tests and by the `ManyPages` story; to see it in the app, add more than 10 projects.
 - **No end-to-end test yet** for search, sort and pages of this page (`e2e/`).

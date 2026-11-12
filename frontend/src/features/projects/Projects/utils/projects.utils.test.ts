@@ -9,12 +9,10 @@ describe("toProjectsVariables", () => {
     });
   });
 
-  it("leaves out the search and the sort when there are none, and never sends null", () => {
+  it("leaves out the search and the sort when there are none", () => {
     const variables = toProjectsVariables({ search: "", sort: undefined, page: 1 });
 
-    // The backend fails with an internal error for `sort: null`.
     expect(variables).toEqual({ page: { number: 1, size: 10 } });
-    expect(Object.values(variables)).not.toContain(null);
   });
 
   it("leaves out a search that holds only spaces", () => {
