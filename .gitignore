@@ -39,6 +39,7 @@ frontend/src/shared/graphql/generated
 
 # debug
 npm-debug.log*
+debug-storybook.log
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
