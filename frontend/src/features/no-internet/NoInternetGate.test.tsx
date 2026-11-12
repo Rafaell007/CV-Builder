@@ -43,9 +43,7 @@ describe("NoInternetGate", () => {
 
     goOffline();
 
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "OopsSomething went wrong. We’re already working on fixing it.Please try again or go back.",
-    );
+    // The screen's texts are tested in NoInternetScreen.
     expect(screen.getByRole("heading", { level: 1, name: "Oops" })).toBeInTheDocument();
   });
 
@@ -84,14 +82,5 @@ describe("NoInternetGate", () => {
     });
 
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-  });
-
-  it("shows the Polish texts", () => {
-    renderWithProviders(<NoInternetGate>Page content</NoInternetGate>, { locale: "pl" });
-
-    goOffline();
-
-    expect(screen.getByRole("heading", { level: 1, name: "Ups" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Spróbuj ponownie" })).toBeInTheDocument();
   });
 });
