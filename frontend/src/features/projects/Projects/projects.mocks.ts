@@ -1,5 +1,9 @@
 import type { MockLink } from "@apollo/client/testing";
-import { ProjectsDocument, type ProjectsQuery } from "@/shared/graphql";
+import {
+  ProjectsDocument,
+  type ProjectsQuery,
+  type ProjectsQueryVariables,
+} from "@/shared/graphql";
 import type { ProjectListItem } from "./projects.types";
 
 const skill = (id: string, name: string) => ({
@@ -111,18 +115,39 @@ export const maxLengthProject: ProjectListItem = {
   ].map((name, index) => ({ __typename: "EnvironmentSkill" as const, id: `3${index}`, name })),
 };
 
-export const projectsData = (items: ProjectListItem[]): ProjectsQuery => ({
-  projects: { __typename: "ProjectPage", items, total: items.length },
+/** The variables of the first request of the page: page 1 of 10 rows. No search and no sort: they are left out. */
+export const defaultVariables: ProjectsQueryVariables = {
+  page: { number: 1, size: 10 },
+};
+
+/** Variables for a search, a sort or a page. A MockedProvider answers only a request with the same variables. */
+export const variablesFor = (
+  changes: Partial<ProjectsQueryVariables> = {},
+): ProjectsQueryVariables => ({ ...defaultVariables, ...changes });
+
+export const projectsData = (items: ProjectListItem[], total = items.length): ProjectsQuery => ({
+  projects: { __typename: "ProjectPage", items, total },
 });
 
+interface MockOptions {
+  variables?: ProjectsQueryVariables;
+  /** Number of projects on all pages (default: the number of items). */
+  total?: number;
+}
+
 /** MockedProvider response of the `Projects` query. */
-export const projectsMock = (items: ProjectListItem[]): MockLink.MockedResponse => ({
-  request: { query: ProjectsDocument },
-  result: { data: projectsData(items) },
+export const projectsMock = (
+  items: ProjectListItem[],
+  { variables = defaultVariables, total }: MockOptions = {},
+): MockLink.MockedResponse => ({
+  request: { query: ProjectsDocument, variables },
+  result: { data: projectsData(items, total) },
 });
 
 /** MockedProvider response for a request that fails. */
-export const projectsErrorMock = (): MockLink.MockedResponse => ({
-  request: { query: ProjectsDocument },
+export const projectsErrorMock = (
+  variables: ProjectsQueryVariables = defaultVariables,
+): MockLink.MockedResponse => ({
+  request: { query: ProjectsDocument, variables },
   error: new Error("Failed to fetch"),
 });
