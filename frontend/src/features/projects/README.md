@@ -3,16 +3,16 @@
 The `/admin/projects` page (PLAN S5.5b, KAN-102): the global list of projects, for Admin users.
 
 - Exports: `Projects` (the whole page content; the route only renders it).
-- `Projects/useProjectsListState`: holds the choices of the user: `search`, `sort` and `page`. A new search or sort goes back to page 1. Nothing is filtered or sorted in the frontend.
-- `Projects/utils/toProjectsVariables`: turns that state into the query variables. It always sends `page: { number, size: 10 }` (the backend default is 20), trims the search, and leaves out an empty search and no sort. (The backend accepts `null` for them too, since the `resolveSort` fix.)
-- `Projects/useProjects`: sends the `Projects` query (`useProjects/projects.graphql`) with those variables and returns `projects`, `total`, `loading`, `failed` and `retry`. `failed` hides the list, so a failed request never looks like an empty list. `retry` repeats the same request, so search, sort and page stay.
-- `Projects/components/ProjectsTable`: the shared `DataTable` with the columns Name, Domain, Start Date and End Date. `EnvironmentTags` draws the technologies as tags. `utils/formatProjectDate` writes `MM/DD/YYYY` in English and `DD.MM.YYYY` in Polish.
+- `useProjectsListState`: holds the choices of the user: `search`, `sort` and `page`. A new search or sort goes back to page 1. Nothing is filtered or sorted in the frontend.
+- `utils/toProjectsVariables`: turns that state into the query variables. It always sends `page: { number, size: 10 }` (the backend default is 20), trims the search, and leaves out an empty search and no sort. (The backend accepts `null` for them too, since the `resolveSort` fix.)
+- `useProjects`: sends the `Projects` query (`useProjects/projects.graphql`) with those variables and returns `projects`, `total`, `loading`, `failed` and `retry`. `failed` hides the list, so a failed request never looks like an empty list. `retry` repeats the same request, so search, sort and page stay.
+- `components/ProjectsTable`: the shared `DataTable` with the columns Name, Domain, Start Date and End Date. `EnvironmentTags` draws the technologies as tags. `utils/formatProjectDate` writes `MM/DD/YYYY` in English and `DD.MM.YYYY` in Polish.
 - Search (KAN-128): the shared `SearchField` (debounced 300 ms, Enter at once, 100 characters at most) sends the text to the backend, which matches name and domain without regard to case. The field sits outside the error state, so an error does not remove the typed text.
 - Sort (KAN-128): Name, Start Date and End Date sort on the backend; the arrow in the header shows the direction. A click cycles none, ascending, descending, none. With no sort the backend orders by name.
 - Pagination (KAN-128): the shared `Pagination`, 10 projects on a page. It shows only for more than 10 projects, and uses the `total` of the backend. While a page loads, it keeps the last `total`.
 - States: loading (skeleton inside the table, headers stay), empty (`No projects found`), no results for a search (`No projects found`), error (message and `Retry`). All use the shared `PageState`.
 - Texts: `messages/` (`projects` namespace, `en` and `pl`).
-- Storybook: `Projects/Projects.stories.tsx` (`Features/Projects/Projects`) shows the page on a 1440px desktop and a 768px tablet viewport, with a project that has the longest allowed texts (name 100, domain 100, description 2000 characters, `maxLengthProject` in `projects.mocks.ts`), and the ManyPages, SearchAndSort, NoResults, Loading, Empty, LoadFailed and Polish versions.
+- Storybook: `Projects.stories.tsx` (`Features/Projects/Projects`) shows the page on a 1440px desktop and a 768px tablet viewport, with a project that has the longest allowed texts (name 100, domain 100, description 2000 characters, `maxLengthProject` in `projects.mocks.ts`), and the ManyPages, SearchAndSort, NoResults, Loading, Empty, LoadFailed and Polish versions.
 - Contract: the backend `Project` has `environment { id name }`. The page document calls the same data `technologies`; the schema wins.
 - Used by: `app/[locale]/(app)/admin/projects/page.tsx`. Backend: `projects` query, Admin only (KAN-101).
 - Done: list, tags, three states (KAN-127); search, sort and pagination (KAN-128). To do: create, update and delete (modals).
