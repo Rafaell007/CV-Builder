@@ -49,6 +49,13 @@ describe("ListArgs", () => {
     expect(args.page).toEqual({ number: 1, size: 20 });
   });
 
+  it("accepts null for the search and the sort, as a client may send them", async () => {
+    const args = plainToInstance(ListArgs, { search: null, sort: null });
+
+    expect(await invalidFields(args)).toEqual([]);
+    expect(args.sort).toBeNull();
+  });
+
   it("trims the search term", () => {
     expect(plainToInstance(ListArgs, { search: "  ada  " }).search).toBe("ada");
   });

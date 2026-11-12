@@ -19,7 +19,8 @@ export class ListArgs {
   @IsOptional()
   @ValidateNested()
   @Type(() => SortInput)
-  sort?: SortInput;
+  // `null` when a client sends `sort: null` (the argument is nullable); `resolveSort` treats it like no sort.
+  sort?: SortInput | null;
 
   @Field(() => PageInput, { defaultValue: new PageInput() })
   @ValidateNested()
