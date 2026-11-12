@@ -503,6 +503,60 @@ describe("Projects", () => {
       expect(names()).toEqual(["Blog", "Cloud Sales Management"]);
     });
 
+    it("goes back one page when the last project of page 2 is deleted", async () => {
+      const pageTwo = variablesFor({ page: { number: 2, size: 10 } });
+      const { user } = renderWithProviders(<Projects />, {
+        mocks: [
+          projectsMock([blog], { total: 11 }),
+          projectsMock([sales], { variables: pageTwo, total: 11 }),
+          deleteProjectMock(sales.id),
+          // The reload of page 2 after the delete: the page is empty now.
+          projectsMock([], { variables: pageTwo, total: 10 }),
+          // Page 1 after the page change.
+          projectsMock([blog], { total: 10 }),
+        ],
+      });
+      await screen.findByText("Blog");
+      await user.click(screen.getByRole("button", { name: "Page 2" }));
+      await screen.findByText("Cloud Sales Management");
+      await user.click(screen.getByRole("button", { name: "Actions for Cloud Sales Management" }));
+      await user.click(screen.getByRole("menuitem", { name: "Delete" }));
+
+      await user.click(
+        within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Confirm" }),
+      );
+
+      await waitFor(() => expect(names()).toEqual(["Blog"]));
+      expect(screen.queryByText("No projects found")).not.toBeInTheDocument();
+    });
+
+    it("stays on the page when the deleted project is not the last one of the page", async () => {
+      const pageTwo = variablesFor({ page: { number: 2, size: 10 } });
+      const { user } = renderWithProviders(<Projects />, {
+        mocks: [
+          projectsMock([blog], { total: 12 }),
+          projectsMock([sales, analytics], { variables: pageTwo, total: 12 }),
+          deleteProjectMock(sales.id),
+          projectsMock([analytics], { variables: pageTwo, total: 11 }),
+        ],
+      });
+      await screen.findByText("Blog");
+      await user.click(screen.getByRole("button", { name: "Page 2" }));
+      await screen.findByText("Cloud Sales Management");
+      await user.click(screen.getByRole("button", { name: "Actions for Cloud Sales Management" }));
+      await user.click(screen.getByRole("menuitem", { name: "Delete" }));
+
+      await user.click(
+        within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Confirm" }),
+      );
+
+      await waitFor(() => expect(names()).toEqual([analytics.name]));
+      expect(screen.getByRole("button", { name: "Page 2" })).toHaveAttribute(
+        "aria-current",
+        "page",
+      );
+    });
+
     it("shows the confirmation in Polish", async () => {
       const { user } = renderWithProviders(<Projects />, {
         locale: "pl",
