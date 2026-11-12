@@ -2,9 +2,11 @@
 
 import { useTranslations } from "next-intl";
 import { PageState, Pagination, SearchField, type PageStateLabels } from "@/shared/components";
+import { DeleteProjectModal } from "./components/DeleteProjectModal";
 import { ProjectsTable } from "./components/ProjectsTable";
 import { SEARCH_MAX_LENGTH } from "./projects.constants";
 import { toProjectsVariables } from "./utils";
+import { useDeleteProject } from "./useDeleteProject";
 import { useProjects } from "./useProjects";
 import { useProjectsListState } from "./useProjectsListState";
 import styles from "./Projects.module.css";
@@ -19,9 +21,18 @@ export function Projects() {
   const variables = toProjectsVariables(list);
   const { projects, total, loading, failed, retry } = useProjects(variables);
 
-  // Placeholders: the update modal and the delete modal fill these in the next slices.
+  const deletion = useDeleteProject();
+
+  // Placeholder: the update modal fills this in the next slice.
   const handleEdit = () => undefined;
-  const handleDelete = () => undefined;
+
+  async function handleConfirmDelete() {
+    // Read before the request: the project leaves the list while it runs.
+    const wasLastRowOfPage = projects.length === 1 && list.page > 1;
+    const deleted = await deletion.confirm();
+    // The same page would now be empty, so go back one page.
+    if (deleted && wasLastRowOfPage) list.setPage(list.page - 1);
+  }
 
   const stateLabels: PageStateLabels = {
     loading: t("states.loading"),
@@ -55,7 +66,7 @@ export function Projects() {
             sort={list.sort}
             onSortChange={list.setSort}
             onEdit={handleEdit}
-            onDelete={handleDelete}
+            onDelete={deletion.askToDelete}
             loading={loading}
             loadingContent={<PageState kind="loading" labels={stateLabels} />}
             emptyContent={<PageState kind={emptyKind} labels={stateLabels} />}
@@ -75,6 +86,12 @@ export function Projects() {
           </div>
         </>
       )}
+      <DeleteProjectModal
+        project={deletion.project}
+        pending={deletion.pending}
+        onConfirm={() => void handleConfirmDelete()}
+        onCancel={deletion.cancel}
+      />
     </main>
   );
 }

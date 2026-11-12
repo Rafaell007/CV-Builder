@@ -1,6 +1,7 @@
 import type { MockLink } from "@apollo/client/testing";
 import { DEFAULT_PAGE_SIZE } from "@/shared/components";
 import {
+  DeleteProjectDocument,
   ProjectsDocument,
   type ProjectsQuery,
   type ProjectsQueryVariables,
@@ -200,5 +201,26 @@ export const projectsErrorMock = (
   variables: ProjectsQueryVariables = defaultVariables,
 ): MockLink.MockedResponse => ({
   request: { query: ProjectsDocument, variables },
+  error: new Error("Failed to fetch"),
+});
+
+/** MockedProvider response of `deleteProject` for the project with this id. */
+export const deleteProjectMock = (id: string): MockLink.MockedResponse => ({
+  request: { query: DeleteProjectDocument, variables: { id } },
+  result: { data: { deleteProject: true } },
+});
+
+/** `deleteProject` refused with a GraphQL error, for example `CONFLICT` when a CV uses the project. */
+export const deleteProjectRefusedMock = (
+  id: string,
+  { code = "CONFLICT", message = "The project is used in 1 CV" } = {},
+): MockLink.MockedResponse => ({
+  request: { query: DeleteProjectDocument, variables: { id } },
+  result: { errors: [{ message, extensions: { code } }] },
+});
+
+/** `deleteProject` that fails before the backend answers (no network). */
+export const deleteProjectNetworkErrorMock = (id: string): MockLink.MockedResponse => ({
+  request: { query: DeleteProjectDocument, variables: { id } },
   error: new Error("Failed to fetch"),
 });

@@ -6,6 +6,9 @@ import {
   analytics,
   banking,
   blog,
+  deleteProjectMock,
+  deleteProjectNetworkErrorMock,
+  deleteProjectRefusedMock,
   fakeBackendMock,
   projectsErrorMock,
   projectsMock,
@@ -400,6 +403,171 @@ describe("Projects", () => {
 
       expect(screen.getByRole("navigation", { name: "Paginacja projektów" })).toBeInTheDocument();
       expect(screen.getByRole("button", { name: "Strona 2" })).toBeInTheDocument();
+    });
+  });
+
+  describe("delete", () => {
+    async function openDelete(
+      user: ReturnType<typeof renderWithProviders>["user"],
+      projectName: string,
+    ) {
+      await user.click(await screen.findByRole("button", { name: `Actions for ${projectName}` }));
+      await user.click(screen.getByRole("menuitem", { name: "Delete" }));
+      return screen.findByRole("alertdialog");
+    }
+
+    it("opens the confirmation with the name of the selected project (AC-30, AC-31)", async () => {
+      const { user } = renderWithProviders(<Projects />, { mocks: [projectsMock([blog, sales])] });
+
+      const dialog = await openDelete(user, "Cloud Sales Management");
+
+      expect(within(dialog).getByRole("heading", { name: "Delete project" })).toBeInTheDocument();
+      expect(dialog).toHaveTextContent(
+        "Are you sure you want to delete project Cloud Sales Management?",
+      );
+      expect(within(dialog).getByRole("button", { name: "Confirm" })).toBeInTheDocument();
+      expect(within(dialog).getByRole("button", { name: "Cancel" })).toBeInTheDocument();
+    });
+
+    it("closes on Cancel and keeps the project", async () => {
+      // No delete mock: a request would fail the test.
+      const { user } = renderWithProviders(<Projects />, { mocks: [projectsMock([blog, sales])] });
+      const dialog = await openDelete(user, "Blog");
+
+      await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
+
+      await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+      expect(names()).toEqual(["Blog", "Cloud Sales Management"]);
+    });
+
+    it("sends the mutation on Confirm, then the row leaves the list and the modal closes (AC-32)", async () => {
+      const { user } = renderWithProviders(<Projects />, {
+        // The second list answer is the reload after the delete: the backend no longer returns Blog.
+        mocks: [projectsMock([blog, sales]), deleteProjectMock(blog.id), projectsMock([sales])],
+      });
+      const dialog = await openDelete(user, "Blog");
+
+      await user.click(within(dialog).getByRole("button", { name: "Confirm" }));
+
+      await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+      await waitFor(() => expect(names()).toEqual(["Cloud Sales Management"]));
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    });
+
+    it("shows a loading state and sends one request when Confirm is pressed twice", async () => {
+      const slowDelete = { ...deleteProjectMock(blog.id), delay: 50 };
+      // One delete mock: a second request would find no mock and fail with an error toast.
+      const { user } = renderWithProviders(<Projects />, {
+        mocks: [projectsMock([blog, sales]), slowDelete, projectsMock([sales])],
+      });
+      const dialog = await openDelete(user, "Blog");
+      const confirm = within(dialog).getByRole("button", { name: "Confirm" });
+
+      await user.dblClick(confirm);
+
+      expect(confirm).toHaveAttribute("aria-busy", "true");
+      await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+      await waitFor(() => expect(names()).toEqual(["Cloud Sales Management"]));
+      expect(screen.queryByText("Could not delete the project")).not.toBeInTheDocument();
+    });
+
+    it("shows the business-rule error of the backend and keeps the row (AC-33, AC-35, AC-37)", async () => {
+      const { user } = renderWithProviders(<Projects />, {
+        mocks: [
+          projectsMock([blog, sales]),
+          deleteProjectRefusedMock(blog.id, { message: "The project is used in 2 CVs" }),
+        ],
+      });
+      const dialog = await openDelete(user, "Blog");
+
+      await user.click(within(dialog).getByRole("button", { name: "Confirm" }));
+
+      // The modal closes, so a keyboard user can reach the error toast (see the Toast README).
+      await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+      expect(await screen.findByText("Could not delete the project")).toBeInTheDocument();
+      expect(screen.getByText("The project is used in 2 CVs")).toBeInTheDocument();
+      expect(names()).toEqual(["Blog", "Cloud Sales Management"]);
+    });
+
+    it("shows a friendly message when the request fails for another reason (AC-37)", async () => {
+      const { user } = renderWithProviders(<Projects />, {
+        mocks: [projectsMock([blog, sales]), deleteProjectNetworkErrorMock(blog.id)],
+      });
+      const dialog = await openDelete(user, "Blog");
+
+      await user.click(within(dialog).getByRole("button", { name: "Confirm" }));
+
+      expect(await screen.findByText("Could not delete the project")).toBeInTheDocument();
+      expect(screen.getByText("Something went wrong. Please try again.")).toBeInTheDocument();
+      expect(screen.queryByText(/Failed to fetch/)).not.toBeInTheDocument();
+      expect(names()).toEqual(["Blog", "Cloud Sales Management"]);
+    });
+
+    it("goes back one page when the last project of page 2 is deleted", async () => {
+      const pageTwo = variablesFor({ page: { number: 2, size: 10 } });
+      const { user } = renderWithProviders(<Projects />, {
+        mocks: [
+          projectsMock([blog], { total: 11 }),
+          projectsMock([sales], { variables: pageTwo, total: 11 }),
+          deleteProjectMock(sales.id),
+          // The reload of page 2 after the delete: the page is empty now.
+          projectsMock([], { variables: pageTwo, total: 10 }),
+          // Page 1 after the page change.
+          projectsMock([blog], { total: 10 }),
+        ],
+      });
+      await screen.findByText("Blog");
+      await user.click(screen.getByRole("button", { name: "Page 2" }));
+      await screen.findByText("Cloud Sales Management");
+      await user.click(screen.getByRole("button", { name: "Actions for Cloud Sales Management" }));
+      await user.click(screen.getByRole("menuitem", { name: "Delete" }));
+
+      await user.click(
+        within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Confirm" }),
+      );
+
+      await waitFor(() => expect(names()).toEqual(["Blog"]));
+      expect(screen.queryByText("No projects found")).not.toBeInTheDocument();
+    });
+
+    it("stays on the page when the deleted project is not the last one of the page", async () => {
+      const pageTwo = variablesFor({ page: { number: 2, size: 10 } });
+      const { user } = renderWithProviders(<Projects />, {
+        mocks: [
+          projectsMock([blog], { total: 12 }),
+          projectsMock([sales, analytics], { variables: pageTwo, total: 12 }),
+          deleteProjectMock(sales.id),
+          projectsMock([analytics], { variables: pageTwo, total: 11 }),
+        ],
+      });
+      await screen.findByText("Blog");
+      await user.click(screen.getByRole("button", { name: "Page 2" }));
+      await screen.findByText("Cloud Sales Management");
+      await user.click(screen.getByRole("button", { name: "Actions for Cloud Sales Management" }));
+      await user.click(screen.getByRole("menuitem", { name: "Delete" }));
+
+      await user.click(
+        within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Confirm" }),
+      );
+
+      await waitFor(() => expect(names()).toEqual([analytics.name]));
+      expect(screen.getByRole("button", { name: "Page 2" })).toHaveAttribute(
+        "aria-current",
+        "page",
+      );
+    });
+
+    it("shows the confirmation in Polish", async () => {
+      const { user } = renderWithProviders(<Projects />, {
+        locale: "pl",
+        mocks: [projectsMock([blog])],
+      });
+      await user.click(await screen.findByRole("button", { name: "Akcje dla projektu Blog" }));
+      await user.click(screen.getByRole("menuitem", { name: "Usuń" }));
+
+      expect(await screen.findByRole("alertdialog")).toHaveTextContent(
+        "Czy na pewno chcesz usunąć projekt Blog?",
+      );
     });
   });
 });
