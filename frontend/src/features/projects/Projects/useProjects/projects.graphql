@@ -1,0 +1,18 @@
+# First page of the project catalog. Admin only (backend). Search, sort and page variables come with KAN-128.
+query Projects {
+  projects {
+    items {
+      id
+      name
+      domain
+      startDate
+      endDate
+      description
+      environment {
+        id
+        name
+      }
+    }
+    total
+  }
+}
