@@ -1,4 +1,4 @@
-/* Values: docs/design-tokens.md › Device error. */
+/* Values: docs/design-tokens.md › Device error. The content box is the shared ErrorScreen. */
 
 /* From 768px up: the page as if the wrapper were not there; the gate hidden (also from screen readers). */
 .page {
@@ -24,29 +24,4 @@
     background: var(--color-bg);
     color: var(--color-text);
   }
-}
-
-/* The Figma box 560×591, centred; the content sits at its top. */
-.content {
-  box-sizing: border-box;
-  display: flex;
-  width: 100%;
-  max-width: 560px;
-  min-height: 591px;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 127px;
-  text-align: center;
-}
-
-.title {
-  margin: var(--space-6) 0 0;
-  font: var(--text-title);
-  letter-spacing: var(--text-title-ls);
-}
-
-.message {
-  margin: var(--space-6) 0 0;
-  font: var(--text-body);
-  letter-spacing: var(--text-body-ls);
 }

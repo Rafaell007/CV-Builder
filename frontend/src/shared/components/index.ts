@@ -6,6 +6,7 @@ export * from "./CloseButton";
 export * from "./ConfirmModal";
 export * from "./DataTable";
 export * from "./DatePicker";
+export * from "./ErrorScreen";
 export * from "./FormModal";
 export * from "./IconButton";
 export * from "./icons";

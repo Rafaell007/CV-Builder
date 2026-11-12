@@ -1,6 +1,6 @@
 # NoInternetState
 
-Full-screen error for when the app cannot reach the server: the sad monitor, "Oops", a message and a RETRY button.
+Full-screen error for when the app cannot reach the server: an [ErrorScreen](../ErrorScreen/README.md) with a RETRY button.
 
 - **Props:** `title`, `message` (a node, so the caller can add Figma's line break), `retryLabel`, `onRetry` (repeats the failed request). All texts come from the caller.
 - The heading and message are in a `role="alert"` region, so screen readers announce them when the screen appears.

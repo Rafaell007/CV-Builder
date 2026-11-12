@@ -1,0 +1,26 @@
+/* Values: docs/design-tokens.md › Device error and › No internet (the same layout). */
+
+/* The Figma box 560×591, centred by the caller; the content sits at its top. */
+.content {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  max-width: 560px;
+  min-height: 591px;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 127px;
+  text-align: center;
+}
+
+.title {
+  margin: var(--space-6) 0 0;
+  font: var(--text-title);
+  letter-spacing: var(--text-title-ls);
+}
+
+.message {
+  margin: var(--space-6) 0 0;
+  font: var(--text-body);
+  letter-spacing: var(--text-body-ls);
+}
