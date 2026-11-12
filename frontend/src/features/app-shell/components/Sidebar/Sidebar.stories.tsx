@@ -36,10 +36,9 @@ const meta = {
   component: Sidebar,
   parameters: { layout: "fullscreen" },
   args: {
-    appName: "CV Builder",
-    navigationLabel: "Main navigation",
-    toggleLabel: "Sidebar",
+    labels: { appName: "CV Builder", navigation: "Main navigation", toggle: "Sidebar" },
     collapsed: false,
+    loading: false,
     onToggle: fn(),
     ...linksFor("USER", "/users"),
     footer: (

@@ -16,11 +16,11 @@ export interface BreadcrumbItem {
 export interface BreadcrumbsProps {
   items: ReadonlyArray<BreadcrumbItem>;
   /** Accessible name of the navigation landmark. Callers pass a translated text. */
-  label?: string;
+  label: string;
 }
 
 /** Trail of links to the current page, for example Users › Jan Kowalski. */
-export function Breadcrumbs({ items, label = "Breadcrumbs" }: BreadcrumbsProps) {
+export function Breadcrumbs({ items, label }: BreadcrumbsProps) {
   return (
     <nav aria-label={label}>
       <ol className={styles.list}>

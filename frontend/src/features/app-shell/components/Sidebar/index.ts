@@ -1,2 +1,2 @@
 export { Sidebar } from "./Sidebar";
-export type { SidebarLink, SidebarProps } from "./Sidebar";
+export type { SidebarLabels, SidebarLink, SidebarProps } from "./Sidebar";

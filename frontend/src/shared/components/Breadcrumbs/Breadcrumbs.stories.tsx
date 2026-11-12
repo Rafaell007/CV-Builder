@@ -7,6 +7,7 @@ const meta = {
   title: "Shared/Breadcrumbs",
   component: Breadcrumbs,
   args: {
+    label: "Breadcrumbs",
     items: [
       { label: "Users", href: "/users" },
       { label: "Jan Kowalski", href: "/users/1" },

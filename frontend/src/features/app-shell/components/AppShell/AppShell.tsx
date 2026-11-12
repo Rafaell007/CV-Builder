@@ -12,7 +12,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     // No attribute until the user clicks: CSS picks the width from the screen, also before hydration.
     <div className={styles.shell} data-collapsed={userChoice ?? undefined}>
-      {/* The current path is known only per request on dynamic routes, so the sidebar streams in. */}
+      {/* The current path is known only per request on dynamic routes, so the sidebar streams in. The empty
+          fallback holds the sidebar column of the grid, so the page does not move when the sidebar arrives. */}
       <Suspense fallback={<div />}>
         <AppSidebar collapsed={collapsed} onToggle={toggle} />
       </Suspense>

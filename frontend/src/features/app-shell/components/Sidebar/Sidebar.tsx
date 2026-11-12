@@ -10,19 +10,25 @@ export type SidebarLink = {
   active: boolean;
 };
 
-export interface SidebarProps {
+export interface SidebarLabels {
   appName: string;
   /** Accessible name of the navigation landmark. */
-  navigationLabel: string;
+  navigation: string;
+  /** Accessible name of the collapse button; `aria-expanded` gives its state. */
+  toggle: string;
+}
+
+export interface SidebarProps {
+  labels: SidebarLabels;
   mainLinks: ReadonlyArray<SidebarLink>;
   /** Admin pages, drawn below a divider. Empty for a user. */
   extraLinks: ReadonlyArray<SidebarLink>;
   collapsed: boolean;
-  /** Accessible name of the collapse button; `aria-expanded` gives its state. */
-  toggleLabel: string;
+  /** The links are not known yet (the user is loading): grey bars take their place. */
+  loading: boolean;
   onToggle: () => void;
-  /** The profile row at the bottom. */
-  footer?: ReactNode;
+  /** The profile row at the bottom; nothing while the user loads. */
+  footer: ReactNode;
 }
 
 const NAVIGATION_ID = "app-sidebar-navigation";
@@ -32,41 +38,64 @@ const NAVIGATION_ID = "app-sidebar-navigation";
  * `--sidebar-width` (AppShell); when collapsed, the labels are clipped but stay the links' accessible names.
  */
 export function Sidebar({
-  appName,
-  navigationLabel,
+  labels,
   mainLinks,
   extraLinks,
   collapsed,
-  toggleLabel,
+  loading,
   onToggle,
   footer,
 }: SidebarProps) {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.logoRow}>
-        <span className={styles.appName}>{appName}</span>
+        <span className={styles.appName}>{labels.appName}</span>
       </div>
       <button
         type="button"
         className={styles.toggle}
-        aria-label={toggleLabel}
+        aria-label={labels.toggle}
         aria-expanded={!collapsed}
         aria-controls={NAVIGATION_ID}
         onClick={onToggle}
       >
         <ChevronLeftIcon className={styles.chevron} aria-hidden="true" />
       </button>
-      <nav id={NAVIGATION_ID} className={styles.navigation} aria-label={navigationLabel}>
-        <SidebarLinkList links={mainLinks} />
-        {extraLinks.length > 0 && (
+      <nav
+        id={NAVIGATION_ID}
+        className={styles.navigation}
+        aria-label={labels.navigation}
+        aria-busy={loading}
+      >
+        {loading ? (
+          <SidebarSkeleton />
+        ) : (
           <>
-            <hr className={styles.divider} />
-            <SidebarLinkList links={extraLinks} />
+            <SidebarLinkList links={mainLinks} />
+            {extraLinks.length > 0 && (
+              <>
+                <hr className={styles.divider} />
+                <SidebarLinkList links={extraLinks} />
+              </>
+            )}
           </>
         )}
       </nav>
       {footer && <div className={styles.footer}>{footer}</div>}
     </aside>
+  );
+}
+
+// A user has 4 links, so 4 bars: the admin links appear below them once the role is known.
+const SKELETON_BARS = [0, 1, 2, 3];
+
+function SidebarSkeleton() {
+  return (
+    <ul className={styles.list} aria-hidden="true">
+      {SKELETON_BARS.map((bar) => (
+        <li key={bar} className={styles.skeletonBar} />
+      ))}
+    </ul>
   );
 }
 
