@@ -36,3 +36,7 @@ The `/admin/projects` page (PLAN S5.5b, KAN-102): the global list of projects, f
 - **Search, sort and page are not in the URL.** They are lost on a refresh and cannot be shared. `SearchField` already takes a `defaultValue`, so the state can move to the URL later (the page document asks for no URL state).
 - **The page shows no page buttons with the seed data.** The seed has 6 projects and the page holds 10. Pagination is covered by tests and by the `ManyPages` story; to see it in the app, add more than 10 projects.
 - **No end-to-end test yet** for search, sort and pages of this page (`e2e/`).
+- **Pagination is not in the page document.** `docs/pages/27-projects-page.md` has no page size and no pagination section. The size 10 comes from PLAN D19 and the backend default (both 10). Ask for a line in the page document.
+- **Two utils files with almost the same name.** `utils/projects.utils.ts` (query variables) and `components/ProjectsTable/utils/project.utils.ts` (date and tag helpers) differ by one letter. Rename one of them when one of the two is touched next.
+- **`ProjectDescription` uses `role="button"` on a `<p>`.** It has `tabIndex`, `aria-expanded` and Enter and Space handling, so it works. A real `<button>` would be cleaner, and the missing date dash could use hidden text instead of `role="img"` (`ProjectsTable.tsx`).
+- **The tablet limit 1023px is written in two CSS files** (`ProjectsTable.module.css`, `ProjectDescription.module.css`). Move it to one place when the repo gets a breakpoint token.
