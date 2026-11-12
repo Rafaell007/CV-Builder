@@ -1,0 +1,17 @@
+{
+  "navigation": "Nawigacja główna",
+  "nav": {
+    "employees": "Pracownicy",
+    "skills": "Umiejętności",
+    "languages": "Języki",
+    "cvs": "CV",
+    "departments": "Działy",
+    "positions": "Stanowiska",
+    "projects": "Projekty"
+  },
+  "sidebar": "Panel boczny",
+  "profile": "Profil",
+  "settings": "Ustawienia",
+  "logout": "Wyloguj",
+  "logoutFailed": "Nie udało się wylogować. Spróbuj ponownie."
+}

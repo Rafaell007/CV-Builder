@@ -1,0 +1,30 @@
+/*
+ * The sidebar is 200px wide, or 56px collapsed (docs/design-tokens.md › App shell).
+ * Without data-collapsed the screen width decides (keep 1023.98px in sync with useSidebarCollapsed);
+ * after a click, data-collapsed="true" or "false" wins.
+ */
+.shell {
+  --sidebar-width: 200px;
+  --chevron-flip: 1;
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  min-height: 100dvh;
+}
+
+.shell[data-collapsed="true"] {
+  --sidebar-width: 56px;
+  --chevron-flip: -1;
+}
+
+@media (max-width: 1023.98px) {
+  .shell:not([data-collapsed]) {
+    --sidebar-width: 56px;
+    --chevron-flip: -1;
+  }
+}
+
+/* Header and content start 24 after the sidebar and end 26 before the right edge. */
+.main {
+  min-width: 0;
+  padding: 0 26px 0 var(--space-6);
+}

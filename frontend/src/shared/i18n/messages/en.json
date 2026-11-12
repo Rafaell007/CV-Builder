@@ -2,6 +2,9 @@
   "appName": "CV Builder",
   "appDescription": "Create, edit and preview CVs.",
   "employees": "Employees",
+  "breadcrumbs": "Breadcrumbs",
+  "details": "Details",
+  "preview": "Preview",
   "pageNotFound": "Page not found",
   "toast": {
     "label": "Notification",
