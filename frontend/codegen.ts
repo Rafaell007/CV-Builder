@@ -14,6 +14,8 @@ const config: CodegenConfig = {
         nonOptionalTypename: true,
         skipTypeNameForRoot: true,
         useTypeImports: true,
+        // The backend sends a DateTime as an ISO 8601 string (for example 2025-12-31T00:00:00.000Z).
+        scalars: { DateTime: "string" },
       },
     },
   },
