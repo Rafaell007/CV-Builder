@@ -26,6 +26,14 @@ export function Projects() {
   // Placeholder: the update modal fills this in the next slice.
   const handleEdit = () => undefined;
 
+  async function handleConfirmDelete() {
+    // Read before the request: the project leaves the list while it runs.
+    const wasLastRowOfPage = projects.length === 1 && list.page > 1;
+    const deleted = await deletion.confirm();
+    // The same page would now be empty, so go back one page.
+    if (deleted && wasLastRowOfPage) list.setPage(list.page - 1);
+  }
+
   const stateLabels: PageStateLabels = {
     loading: t("states.loading"),
     empty: t("states.empty"),
@@ -58,7 +66,7 @@ export function Projects() {
             sort={list.sort}
             onSortChange={list.setSort}
             onEdit={handleEdit}
-            onDelete={deletion.request}
+            onDelete={deletion.askToDelete}
             loading={loading}
             loadingContent={<PageState kind="loading" labels={stateLabels} />}
             emptyContent={<PageState kind={emptyKind} labels={stateLabels} />}
@@ -81,7 +89,7 @@ export function Projects() {
       <DeleteProjectModal
         project={deletion.project}
         pending={deletion.pending}
-        onConfirm={() => void deletion.confirm()}
+        onConfirm={() => void handleConfirmDelete()}
         onCancel={deletion.cancel}
       />
     </main>

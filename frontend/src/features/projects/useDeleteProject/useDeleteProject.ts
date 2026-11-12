@@ -2,7 +2,7 @@
 
 import { useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useToast } from "@/shared/components";
 import { DeleteProjectDocument, ProjectsDocument } from "@/shared/graphql";
 import type { ProjectListItem } from "../projects.types";
@@ -14,11 +14,11 @@ export type UseDeleteProjectResult = {
   /** True while the request runs. */
   pending: boolean;
   /** Opens the confirmation for this project. */
-  request: (project: ProjectListItem) => void;
+  askToDelete: (project: ProjectListItem) => void;
   /** Closes the confirmation without a request. */
   cancel: () => void;
-  /** Sends `deleteProject` for the chosen project. A second call while one runs does nothing. */
-  confirm: () => Promise<void>;
+  /** Sends `deleteProject` for the chosen project. Resolves `true` when the project was deleted. A second call while one runs does nothing and resolves `false`. */
+  confirm: () => Promise<boolean>;
 };
 
 /**
@@ -33,9 +33,13 @@ export function useDeleteProject(): UseDeleteProjectResult {
   const [project, setProject] = useState<ProjectListItem | null>(null);
   const [deleteProject, { loading }] = useMutation(DeleteProjectDocument);
 
-  async function confirm() {
-    // `loading` blocks a second request (AC "no double send"), also when Enter is pressed twice.
-    if (project === null || loading) return;
+  // A ref changes at once, `loading` only after the next render: two calls in the same tick cannot both pass.
+  const sending = useRef(false);
+
+  async function confirm(): Promise<boolean> {
+    // The same mutation must not be sent twice while it runs (page 27, Loading State).
+    if (project === null || sending.current) return false;
+    sending.current = true;
     try {
       await deleteProject({
         variables: { id: project.id },
@@ -49,19 +53,23 @@ export function useDeleteProject(): UseDeleteProjectResult {
         refetchQueries: [ProjectsDocument],
       });
       setProject(null);
+      return true;
     } catch (error) {
       setProject(null);
       toast.error({
         title: t("failedTitle"),
         description: toDeleteProjectFailure(error) ?? t("failedText"),
       });
+      return false;
+    } finally {
+      sending.current = false;
     }
   }
 
   return {
     project,
     pending: loading,
-    request: setProject,
+    askToDelete: setProject,
     cancel: () => setProject(null),
     confirm,
   };
