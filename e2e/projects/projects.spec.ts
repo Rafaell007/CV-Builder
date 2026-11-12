@@ -187,7 +187,7 @@ test.describe("projects page, as a user", () => {
 
 // Create, update and delete share this file with the list tests on purpose: the tests of one file run one after
 // another, and these add projects that the "6 seeded projects" checks above must never see.
-// Every project these tests make has this text in its name, so `afterEach` can remove all of them (even after a failure).
+// Every project these tests make has this text in its name, so `afterEach` can remove all of them (also after a test failed halfway).
 const MANAGE_PREFIX = "E2E Manage";
 
 const row = (page: Page, name: string) => dataRows(page).filter({ hasText: name });
