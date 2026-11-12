@@ -7,6 +7,13 @@ import { ADMIN_EMAIL, signIn } from "../support/signIn";
 
 const TABLET = { width: 768, height: 1024 };
 const WCAG_AA_TEXT = 4.5;
+// Tab presses: enough to pass the header, the search field, the sort buttons and one page of 10 row menus.
+const TAB_STOPS_ON_PAGE = 40;
+// Tab presses inside a modal: more than the number of its controls, so the focus must go round at least once.
+const TAB_STOPS_IN_CREATE_MODAL = 12;
+const TAB_STOPS_IN_DELETE_MODAL = 6;
+// Tolerance, in pixels, for two boxes that are on the same row.
+const SAME_ROW_TOLERANCE = 2;
 
 const dialog = (page: Page) => page.getByRole("dialog");
 const confirmDialog = (page: Page) => page.getByRole("alertdialog");
@@ -36,7 +43,7 @@ test.describe("projects page, keyboard and focus", () => {
   }) => {
     const reached = new Set<string>();
     // Tab through the page and write down the accessible name of each element that gets the focus.
-    for (let step = 0; step < 40; step += 1) {
+    for (let step = 0; step < TAB_STOPS_ON_PAGE; step += 1) {
       await page.keyboard.press("Tab");
       const name = await page.evaluate(() => {
         const element = document.activeElement;
@@ -55,7 +62,7 @@ test.describe("projects page, keyboard and focus", () => {
 
   test("a sort button works with Enter and with Space", async ({ page }) => {
     const nameHeader = page.getByRole("columnheader", { name: "Name" });
-    const nameButton = page.getByRole("button", { name: "Name" });
+    const nameButton = page.getByRole("button", { name: "Name", exact: true });
 
     await nameButton.focus();
     await page.keyboard.press("Enter");
@@ -75,7 +82,7 @@ test.describe("projects page, keyboard and focus", () => {
     await expect(dialog(page)).toBeVisible();
     await expect(focusedIn(dialog(page))).toHaveCount(1);
     // The focus must stay in the modal however many times Tab is pressed (the page behind is not reachable).
-    for (let step = 0; step < 12; step += 1) {
+    for (let step = 0; step < TAB_STOPS_IN_CREATE_MODAL; step += 1) {
       await page.keyboard.press("Tab");
       await expect(focusedIn(dialog(page))).toHaveCount(1);
     }
@@ -163,7 +170,7 @@ test.describe("projects page, keyboard and focus", () => {
 
     await expect(confirmDialog(page)).toBeVisible();
     await expect(focusedIn(confirmDialog(page))).toHaveCount(1);
-    for (let step = 0; step < 6; step += 1) {
+    for (let step = 0; step < TAB_STOPS_IN_DELETE_MODAL; step += 1) {
       await page.keyboard.press("Tab");
       await expect(focusedIn(confirmDialog(page))).toHaveCount(1);
     }
@@ -258,10 +265,10 @@ async function contrastOf(page: Page, selector: string): Promise<number> {
 
 for (const theme of ["light", "dark"] as const) {
   test.describe(`projects page, ${theme} theme`, () => {
-    test.beforeEach(async ({ context, page }) => {
+    test.beforeEach(async ({ baseURL, context, page }) => {
       await signIn(context, ADMIN_EMAIL);
       // The saved choice of the user (PreferencesScript reads this cookie before the first paint).
-      await context.addCookies([{ name: "theme", value: theme, url: "http://localhost:3100" }]);
+      await context.addCookies([{ name: "theme", value: theme, url: baseURL ?? "" }]);
       await openProjectsPage(page);
     });
 
@@ -339,7 +346,7 @@ test.describe("projects page, tablet width", () => {
     expect(modal.x + modal.width).toBeLessThanOrEqual(TABLET.width);
     expect(modal.y + modal.height).toBeLessThanOrEqual(TABLET.height);
     // Same row: the tops are equal and the end field is to the right of the start field.
-    expect(Math.abs(start.y - end.y)).toBeLessThan(2);
+    expect(Math.abs(start.y - end.y)).toBeLessThan(SAME_ROW_TOLERANCE);
     expect(end.x).toBeGreaterThan(start.x + start.width - 1);
   });
 
