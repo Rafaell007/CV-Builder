@@ -457,7 +457,7 @@ describe("Projects", () => {
     });
 
     it("shows a loading state and sends one request when Confirm is pressed twice", async () => {
-      const slowDelete = { ...deleteProjectMock(blog.id), delay: 50 };
+      const slowDelete = { ...deleteProjectMock(blog.id), delay: 300 };
       // One delete mock: a second request would find no mock and fail with an error toast.
       const { user } = renderWithProviders(<Projects />, {
         mocks: [projectsMock([blog, sales]), slowDelete, projectsMock([sales])],
@@ -467,7 +467,8 @@ describe("Projects", () => {
 
       await user.dblClick(confirm);
 
-      expect(confirm).toHaveAttribute("aria-busy", "true");
+      // The mock answers after 300 ms, long enough to see the busy state even on a slow machine.
+      await waitFor(() => expect(confirm).toHaveAttribute("aria-busy", "true"));
       await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
       await waitFor(() => expect(names()).toEqual(["Cloud Sales Management"]));
       expect(screen.queryByText("Could not delete the project")).not.toBeInTheDocument();
