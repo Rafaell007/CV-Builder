@@ -19,6 +19,10 @@ export function Projects() {
   const variables = toProjectsVariables(list);
   const { projects, total, loading, failed, retry } = useProjects(variables);
 
+  // Placeholders: the update modal and the delete modal fill these in the next slices.
+  const handleEdit = () => undefined;
+  const handleDelete = () => undefined;
+
   const stateLabels: PageStateLabels = {
     loading: t("states.loading"),
     empty: t("states.empty"),
@@ -50,6 +54,8 @@ export function Projects() {
             projects={projects}
             sort={list.sort}
             onSortChange={list.setSort}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
             loading={loading}
             loadingContent={<PageState kind="loading" labels={stateLabels} />}
             emptyContent={<PageState kind={emptyKind} labels={stateLabels} />}
