@@ -16,6 +16,9 @@ async function graphql<Data>(
   return body.data;
 }
 
+// The largest page the backend allows (backend/src/common/pagination/page.input.ts).
+const MAX_PAGE_SIZE = 100;
+
 const CREATE_PROJECT =
   "mutation CreateProject($input: CreateProjectInput!) { createProject(input: $input) { id } }";
 
@@ -37,10 +40,7 @@ export async function createProjects(
 ): Promise<string[]> {
   const ids: string[] = [];
   for (let number = 1; number <= count; number += 1) {
-    const data = await graphql<{ createProject: { id: string } }>(context, CREATE_PROJECT, {
-      input: projectInput(`${prefix} ${number}`),
-    });
-    ids.push(data.createProject.id);
+    ids.push(await createProject(context, `${prefix} ${number}`));
   }
   return ids;
 }
@@ -54,14 +54,14 @@ export async function createProject(context: BrowserContext, name: string): Prom
 }
 
 /**
- * Deletes every project whose name contains `text`, whatever way it was created (also through the page).
- * Use it in `afterEach`, so a test that failed half way leaves no project behind.
+ * Deletes every project whose name contains `text` (up to one page of 100), also a project that a test made through the page.
+ * Use it in `afterEach`, so a test that failed halfway leaves no project behind.
  */
 export async function deleteProjectsByName(context: BrowserContext, text: string): Promise<void> {
   const data = await graphql<{ projects: { items: { id: string }[] } }>(
     context,
-    "query Find($search: String) { projects(search: $search) { items { id } } }",
-    { search: text },
+    "query Find($search: String, $page: PageInput!) { projects(search: $search, page: $page) { items { id } } }",
+    { search: text, page: { number: 1, size: MAX_PAGE_SIZE } },
   );
   await deleteProjects(
     context,
