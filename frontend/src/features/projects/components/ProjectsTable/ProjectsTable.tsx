@@ -12,7 +12,7 @@ export interface ProjectsTableProps {
   projects: readonly ProjectListItem[];
   /** The backend sort. The table only shows it and reports a click on a header. */
   sort: SortState | undefined;
-  onSortChange: (sort: SortState | undefined) => void;
+  onSortChange: (sort: SortState) => void;
   loading: boolean;
   loadingContent: ReactNode;
   emptyContent: ReactNode;

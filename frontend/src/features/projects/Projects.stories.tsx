@@ -93,6 +93,11 @@ export const SearchAndSort: Story = {
     const search = canvas.getByRole("searchbox", { name: "Search projects" });
     const firstRow = () => canvas.getAllByRole("row")[1]!;
     await expect(await canvas.findByText("Blog")).toBeInTheDocument();
+    // The list starts sorted by name ascending, and the Name header shows it.
+    await expect(canvas.getByRole("columnheader", { name: "Name" })).toHaveAttribute(
+      "aria-sort",
+      "ascending",
+    );
 
     // Search: the backend returns only the matching project.
     await userEvent.type(search, "bank{Enter}");

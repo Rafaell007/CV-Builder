@@ -1,9 +1,11 @@
 import type { MockLink } from "@apollo/client/testing";
+import { DEFAULT_PAGE_SIZE } from "@/shared/components";
 import {
   ProjectsDocument,
   type ProjectsQuery,
   type ProjectsQueryVariables,
 } from "@/shared/graphql";
+import { DEFAULT_PROJECTS_SORT } from "./projects.constants";
 import type { ProjectListItem } from "./projects.types";
 
 const skill = (id: string, name: string) => ({
@@ -115,9 +117,10 @@ export const maxLengthProject: ProjectListItem = {
   ].map((name, index) => ({ __typename: "EnvironmentSkill" as const, id: `3${index}`, name })),
 };
 
-/** The variables of the first request of the page: page 1 of 10 rows. No search and no sort: they are left out. */
+/** The variables of the first request of the page: page 1 of 10 rows, sorted by name ascending. No search: it is left out. */
 export const defaultVariables: ProjectsQueryVariables = {
   page: { number: 1, size: 10 },
+  sort: DEFAULT_PROJECTS_SORT,
 };
 
 /** Variables for a search, a sort or a page. A MockedProvider answers only a request with the same variables. */
@@ -158,11 +161,16 @@ export const manyProjects = (count: number): ProjectListItem[] =>
  * date or end date, name ascending by default, 10 rows on a page). It lives here, in the mocks, so a story
  * works when the user types or clicks. The page itself never filters, sorts or cuts pages.
  */
-export const fakeBackendMock = (all: ProjectListItem[]): MockLink.MockedResponse => ({
+export const fakeBackendMock = (
+  all: ProjectListItem[],
+  /** Called with the variables of every request, so a test can count the requests. */
+  onRequest?: (variables: ProjectsQueryVariables) => void,
+): MockLink.MockedResponse => ({
   // A function for `variables` matches every request (Apollo Client 4); the mock is reused without a limit.
   request: { query: ProjectsDocument, variables: () => true },
   maxUsageCount: Number.POSITIVE_INFINITY,
   result: (variables: ProjectsQueryVariables) => {
+    onRequest?.(variables);
     const search = variables.search?.trim().toLowerCase();
     const matching = search
       ? all.filter(
@@ -179,9 +187,9 @@ export const fakeBackendMock = (all: ProjectListItem[]): MockLink.MockedResponse
       (a, b) => key(a).localeCompare(key(b)) * (direction === "DESC" ? -1 : 1),
     );
 
-    // Same defaults as the backend PageInput: page 1, 20 rows.
+    // Same default as the backend PageInput: page 1, 10 rows.
     const number = variables.page.number ?? 1;
-    const size = variables.page.size ?? 20;
+    const size = variables.page.size ?? DEFAULT_PAGE_SIZE;
     const items = sorted.slice((number - 1) * size, number * size);
     return { data: projectsData(items, matching.length) };
   },

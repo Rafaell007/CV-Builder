@@ -6,6 +6,7 @@ import {
   analytics,
   banking,
   blog,
+  fakeBackendMock,
   projectsErrorMock,
   projectsMock,
   sales,
@@ -85,6 +86,46 @@ describe("Projects", () => {
 
       expect(await screen.findByText("Mobile Banking Platform")).toBeInTheDocument();
       expect(screen.queryByText("Blog")).not.toBeInTheDocument();
+    });
+
+    it("sends one request for a search typed without Enter, after the debounce", async () => {
+      const requests: (string | null | undefined)[] = [];
+      const { user } = renderWithProviders(<Projects />, {
+        mocks: [fakeBackendMock([blog, sales], (variables) => requests.push(variables.search))],
+      });
+      await screen.findByText("Blog");
+
+      await user.type(screen.getByRole("searchbox", { name: "Search projects" }), "crm");
+
+      // The first request has no search. Three keystrokes send one request after the debounce, not three.
+      await waitFor(() => expect(requests.length).toBeGreaterThanOrEqual(2));
+      await waitFor(() => expect(screen.queryByText("Blog")).not.toBeInTheDocument());
+      expect(requests).toEqual([undefined, "crm"]);
+    });
+
+    it("stays on the same page when only the spaces around the search change", async () => {
+      const searchedPageTwo = variablesFor({ search: "crm", page: { number: 2, size: 10 } });
+      const { user } = renderWithProviders(<Projects />, {
+        mocks: [
+          projectsMock([blog], { total: 25 }),
+          projectsMock([blog], { variables: variablesFor({ search: "crm" }), total: 25 }),
+          projectsMock([sales], { variables: searchedPageTwo, total: 25 }),
+        ],
+      });
+      await screen.findByText("Blog");
+      const search = screen.getByRole("searchbox", { name: "Search projects" });
+      await user.type(search, "crm{Enter}");
+      await waitFor(() => expect(screen.getByRole("button", { name: "Page 2" })).toBeEnabled());
+      await user.click(screen.getByRole("button", { name: "Page 2" }));
+      await screen.findByText("Cloud Sales Management");
+
+      await user.type(search, " {Enter}");
+
+      expect(screen.getByRole("button", { name: "Page 2" })).toHaveAttribute(
+        "aria-current",
+        "page",
+      );
+      expect(screen.getByText("Cloud Sales Management")).toBeInTheDocument();
     });
 
     it("shows what the backend returns even when it does not match the typed text", async () => {
@@ -167,23 +208,85 @@ describe("Projects", () => {
   });
 
   describe("sort", () => {
+    it("starts sorted by name ascending, and the Name header shows it", async () => {
+      renderWithProviders(<Projects />, { mocks: [projectsMock([analytics, banking])] });
+
+      await screen.findByText("Mobile Banking Platform");
+
+      expect(screen.getByRole("columnheader", { name: "Name" })).toHaveAttribute(
+        "aria-sort",
+        "ascending",
+      );
+      expect(screen.getByRole("columnheader", { name: "Start Date" })).toHaveAttribute(
+        "aria-sort",
+        "none",
+      );
+    });
+
     it("sends the sort to the backend and shows the rows in the order the backend returns", async () => {
       const { user } = renderWithProviders(<Projects />, {
         mocks: [
-          projectsMock([banking, analytics]),
-          projectsMock([analytics, banking], {
-            variables: variablesFor({ sort: { field: "name", direction: "ASC" } }),
+          projectsMock([analytics, banking]),
+          projectsMock([banking, analytics], {
+            variables: variablesFor({ sort: { field: "name", direction: "DESC" } }),
           }),
         ],
       });
       await screen.findByText("Mobile Banking Platform");
-      expect(names()).toEqual(["Mobile Banking Platform", "Logistics Analytics Dashboard"]);
+      expect(names()).toEqual(["Logistics Analytics Dashboard", "Mobile Banking Platform"]);
 
       await user.click(screen.getByRole("button", { name: "Name" }));
 
+      await waitForHeaderSort("Name", "descending");
+      // Only a backend request could change the order: the mock for the sorted request answers with Mobile first.
+      expect(names()).toEqual(["Mobile Banking Platform", "Logistics Analytics Dashboard"]);
+    });
+
+    it("switches between ascending and descending and never back to no sort", async () => {
+      const descending = variablesFor({ sort: { field: "name", direction: "DESC" } });
+      const { user } = renderWithProviders(<Projects />, {
+        mocks: [
+          projectsMock([analytics, banking]),
+          projectsMock([banking, analytics], { variables: descending }),
+          // The third click asks for the default again: a second answer for the first variables.
+          projectsMock([analytics, banking]),
+        ],
+      });
+      await screen.findByText("Mobile Banking Platform");
+
+      await user.click(screen.getByRole("button", { name: "Name" }));
+      await waitForHeaderSort("Name", "descending");
+      await user.click(screen.getByRole("button", { name: "Name" }));
       await waitForHeaderSort("Name", "ascending");
-      // Only a backend request could change the order: the mock for the sorted request answers with Logistics first.
+
       expect(names()).toEqual(["Logistics Analytics Dashboard", "Mobile Banking Platform"]);
+    });
+
+    it("goes back to page 1 when the sort changes", async () => {
+      const sorted = variablesFor({ sort: { field: "name", direction: "DESC" } });
+      const { user } = renderWithProviders(<Projects />, {
+        mocks: [
+          projectsMock([blog], { total: 25 }),
+          projectsMock([sales], {
+            variables: variablesFor({ page: { number: 2, size: 10 } }),
+            total: 25,
+          }),
+          projectsMock([analytics], { variables: sorted, total: 25 }),
+        ],
+      });
+      await screen.findByText("Blog");
+      await user.click(screen.getByRole("button", { name: "Page 2" }));
+      await screen.findByText("Cloud Sales Management");
+
+      await user.click(screen.getByRole("button", { name: "Name" }));
+
+      // The mock for the sorted request has page 1 only, so a wrong page would show an error.
+      await screen.findByText("Logistics Analytics Dashboard");
+      expect(screen.getByRole("button", { name: "Page 1" })).toHaveAttribute(
+        "aria-current",
+        "page",
+      );
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     });
 
     it("sorts by the dates with the direction of each click", async () => {

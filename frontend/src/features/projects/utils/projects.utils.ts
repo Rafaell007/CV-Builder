@@ -4,8 +4,9 @@ import type { ProjectsListState } from "../projects.types";
 
 /**
  * Turns the choices of the user into the variables of the `Projects` query.
- * The page size is always sent: the backend default is 20 and the table pages hold 10 rows.
- * An empty search and no sort are left out of the variables. Without them the backend returns every project, sorted by name.
+ * The page size is always sent (10, the same as the backend default), so the page buttons never depend on the backend default.
+ * The sort is always sent: the list starts sorted by name ascending and a click only switches direction or column.
+ * An empty search is left out. Without it the backend returns every project.
  */
 export function toProjectsVariables({
   search,
@@ -15,7 +16,7 @@ export function toProjectsVariables({
   const text = search.trim();
   return {
     page: { number: page, size: DEFAULT_PAGE_SIZE },
+    sort,
     ...(text === "" ? {} : { search: text }),
-    ...(sort === undefined ? {} : { sort }),
   };
 }

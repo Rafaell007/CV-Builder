@@ -3,10 +3,14 @@ import { describe, expect, it } from "vitest";
 import { useProjectsListState } from "./useProjectsListState";
 
 describe("useProjectsListState", () => {
-  it("starts with no search, no sort and page 1", () => {
+  it("starts with no search, the sort by name ascending and page 1", () => {
     const { result } = renderHook(() => useProjectsListState());
 
-    expect(result.current).toMatchObject({ search: "", sort: undefined, page: 1 });
+    expect(result.current).toMatchObject({
+      search: "",
+      sort: { field: "name", direction: "ASC" },
+      page: 1,
+    });
   });
 
   it("changes the page", () => {
@@ -55,12 +59,24 @@ describe("useProjectsListState", () => {
     expect(result.current.page).toBe(2);
   });
 
-  it("removes the sort when the sort is cleared", () => {
+  it("stays on the same page when only the spaces around the search change", () => {
     const { result } = renderHook(() => useProjectsListState());
-    act(() => result.current.setSort({ field: "name", direction: "ASC" }));
+    act(() => result.current.setSearch("bank"));
+    act(() => result.current.setPage(2));
 
-    act(() => result.current.setSort(undefined));
+    act(() => result.current.setSearch("bank "));
+    act(() => result.current.setSearch("  bank"));
 
-    expect(result.current.sort).toBeUndefined();
+    expect(result.current).toMatchObject({ search: "bank", page: 2 });
+  });
+
+  it("goes back to page 1 when the search is cleared", () => {
+    const { result } = renderHook(() => useProjectsListState());
+    act(() => result.current.setSearch("bank"));
+    act(() => result.current.setPage(2));
+
+    act(() => result.current.setSearch(""));
+
+    expect(result.current).toMatchObject({ search: "", page: 1 });
   });
 });
