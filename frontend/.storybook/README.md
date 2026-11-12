@@ -20,6 +20,7 @@ Storybook 10 shows components one at a time, outside the app, in light, dark and
 
 Put `X.stories.tsx` next to the component in `src/`. Name stories after the state they show. See `ThemeSample/ThemeSample.stories.tsx`.
 
+- Viewport: `globals: { viewport: { value: "tablet", isRotated: false } }` forces one. `preview.tsx` defines the two screen sizes the project supports: `tablet` (768px) and `desktop` (1440px); the toolbar lists the same two. The story tests (Vitest) do not resize the browser, so check the layout of a viewport story in the Storybook UI.
 - Theme: `globals: { theme: "dark" }` forces one (`"light" | "dark" | "system"`).
 - Language: `globals: { locale: "pl" }` forces one; texts come from the real `messages/` files.
 - Checks: a `play` function with `expect` from `storybook/test`.

@@ -8,9 +8,21 @@
     "endDate": "End Date"
   },
   "environment": "Environment",
+  "dateMissing": "Date not available",
+  "search": {
+    "label": "Search projects",
+    "placeholder": "Search"
+  },
+  "pagination": {
+    "navigation": "Projects pagination",
+    "previous": "Previous page",
+    "next": "Next page",
+    "page": "Page {number}"
+  },
   "states": {
     "loading": "Loading projects",
     "empty": "No projects found",
+    "noResults": "No projects found",
     "error": "Something went wrong. Please try again later",
     "retry": "Retry"
   }

@@ -18,6 +18,23 @@ const preview: Preview = {
     // Accessibility violations fail the story test (pnpm test, CI). A story can opt out with
     // `parameters: { a11y: { test: "todo" } }` (warning only). https://storybook.js.org/docs/writing-tests/accessibility-testing
     a11y: { test: "error" },
+    // The two screen sizes the project supports (the page documents: desktop and tablet). A story picks one with
+    // `globals: { viewport: { value: "tablet" | "desktop", isRotated: false } }`; the toolbar lists the same two.
+    // https://storybook.js.org/docs/essentials/viewport
+    viewport: {
+      options: {
+        tablet: {
+          name: "Tablet 768px",
+          styles: { width: "768px", height: "1024px" },
+          type: "tablet",
+        },
+        desktop: {
+          name: "Desktop 1440px",
+          styles: { width: "1440px", height: "900px" },
+          type: "desktop",
+        },
+      },
+    },
   },
   // Toolbar theme and language switchers (core Storybook, no addon). withAppProviders applies the theme through
   // the preferences store and the language through next-intl. https://storybook.js.org/docs/essentials/toolbars-and-globals

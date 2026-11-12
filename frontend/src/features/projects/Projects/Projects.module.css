@@ -1,9 +1,0 @@
-.page {
-  padding: var(--space-6) var(--space-4);
-}
-
-.title {
-  margin: 0 0 var(--space-6);
-  font: var(--text-heading);
-  letter-spacing: var(--text-heading-ls);
-}

@@ -1,10 +1,9 @@
 import type { SortState } from "../DataTable.types";
 
-/** Click order of a sortable header: no sort → ASC → DESC → no sort. A new field starts at ASC. */
-export function getNextSort(current: SortState | undefined, field: string): SortState | undefined {
-  if (current?.field !== field) return { field, direction: "ASC" };
-  if (current.direction === "ASC") return { field, direction: "DESC" };
-  return undefined;
+/** Click order of a sortable header: ASC → DESC → ASC. A new field starts at ASC. There is no "no sort" state. */
+export function getNextSort(current: SortState | undefined, field: string): SortState {
+  if (current?.field === field && current.direction === "ASC") return { field, direction: "DESC" };
+  return { field, direction: "ASC" };
 }
 
 export type AriaSort = "ascending" | "descending" | "none";

@@ -59,7 +59,7 @@ describe("DataTable", () => {
       expect(onSortChange).toHaveBeenCalledWith({ field: "firstName", direction: "ASC" });
     });
 
-    it("asks for descending order, then for no sort", async () => {
+    it("asks for descending order, then for ascending order again", async () => {
       const onSortChange = vi.fn();
       const { user, rerender } = renderTable({
         onSortChange,
@@ -79,7 +79,7 @@ describe("DataTable", () => {
         />,
       );
       await user.click(screen.getByRole("button", { name: "First name" }));
-      expect(onSortChange).toHaveBeenLastCalledWith(undefined);
+      expect(onSortChange).toHaveBeenLastCalledWith({ field: "firstName", direction: "ASC" });
     });
 
     it("marks the sorted column for assistive technology", () => {

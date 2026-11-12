@@ -15,14 +15,16 @@ export function toSkipTake(page: PageInput): { skip: number; take: number } {
 /**
  * Checks the requested sort field against the ones a module allows, so a client cannot sort by
  * (or probe) any column. Falls back to `defaultSort` when no sort is requested.
+ * `sort` is a nullable GraphQL argument: a client that leaves it out gives `undefined`, and a client that sends
+ * `sort: null` gives `null`. Both mean "no sort".
  * Build Prisma's orderBy from the result: `{ [sort.field]: sort.direction }`.
  */
 export function resolveSort<Field extends string>(
-  sort: SortInput | undefined,
+  sort: SortInput | null | undefined,
   allowedFields: readonly Field[],
   defaultSort: ResolvedSort<Field>,
 ): ResolvedSort<Field> {
-  if (sort === undefined) return defaultSort;
+  if (sort === undefined || sort === null) return defaultSort;
 
   const field = allowedFields.find((allowed) => allowed === sort.field);
   if (field === undefined) {

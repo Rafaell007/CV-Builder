@@ -2,14 +2,21 @@ import { act, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import { renderWithProviders, type RenderWithProvidersOptions } from "@/shared/testing";
-import { blog, projectsErrorMock, projectsMock, sales } from "../projects.mocks";
+import {
+  blog,
+  defaultVariables,
+  projectsErrorMock,
+  projectsMock,
+  sales,
+  variablesFor,
+} from "../projects.mocks";
 import { useProjects } from "./useProjects";
 
 // renderWithProviders renders elements; this small component lets the hook run inside the same providers.
-function setup(options: RenderWithProvidersOptions) {
+function setup(options: RenderWithProvidersOptions, variables = defaultVariables) {
   let current!: ReturnType<typeof useProjects>;
   function Probe(): ReactNode {
-    current = useProjects();
+    current = useProjects(variables);
     return null;
   }
   renderWithProviders(<Probe />, options);
@@ -28,6 +35,24 @@ describe("useProjects", () => {
       "Cloud Sales Management",
     ]);
     expect(result().failed).toBe(false);
+  });
+
+  it("sends the search, the sort and the page to the backend and returns its total", async () => {
+    const variables = variablesFor({
+      page: { number: 2, size: 10 },
+      search: "bank",
+      sort: { field: "endDate", direction: "DESC" },
+    });
+    // The mock answers only a request with exactly these variables.
+    const { result } = setup(
+      { mocks: [projectsMock([sales], { variables, total: 11 })] },
+      variables,
+    );
+
+    await waitFor(() => expect(result().loading).toBe(false));
+
+    expect(result().projects).toEqual([sales]);
+    expect(result().total).toBe(11);
   });
 
   it("reports a failed request and returns no projects", async () => {

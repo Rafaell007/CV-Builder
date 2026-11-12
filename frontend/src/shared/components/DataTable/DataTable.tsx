@@ -13,7 +13,7 @@ export interface DataTableProps<Row> {
   rows: readonly Row[];
   getRowId: (row: Row) => string;
   sort?: SortState | undefined;
-  onSortChange?: (sort: SortState | undefined) => void;
+  onSortChange?: (sort: SortState) => void;
   onRowClick?: (row: Row) => void;
   /** Slot at the end of each row, for example a button or a menu. Clicks in it do not click the row. */
   renderRowActions?: (row: Row) => ReactNode;

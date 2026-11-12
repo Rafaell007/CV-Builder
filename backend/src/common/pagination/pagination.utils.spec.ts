@@ -29,6 +29,11 @@ describe("resolveSort", () => {
     expect(resolveSort(undefined, allowed, fallback)).toBe(fallback);
   });
 
+  // A client that sends `sort: null` gives null, not undefined. This used to throw a TypeError (INTERNAL_SERVER_ERROR).
+  it("returns the default when the client sends sort null", () => {
+    expect(resolveSort(null, allowed, fallback)).toBe(fallback);
+  });
+
   it.each([
     [SortDirection.ASC, "asc"],
     [SortDirection.DESC, "desc"],
