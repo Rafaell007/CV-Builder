@@ -15,3 +15,8 @@ export const DEFAULT_PROJECTS_SORT: SortState = {
   field: PROJECT_SORT_FIELDS.name,
   direction: "ASC",
 };
+
+// The longest values the project form allows (page document: name 100, domain 100, description 2000 characters).
+export const MAX_NAME_LENGTH = 100;
+export const MAX_DOMAIN_LENGTH = 100;
+export const MAX_DESCRIPTION_LENGTH = 2000;
