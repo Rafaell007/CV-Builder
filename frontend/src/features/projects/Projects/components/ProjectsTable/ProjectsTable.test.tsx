@@ -1,5 +1,5 @@
 import { screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "@/shared/testing";
 import {
   blog,
@@ -16,6 +16,8 @@ const render = (props: Partial<Parameters<typeof ProjectsTable>[0]> = {}, locale
   renderWithProviders(
     <ProjectsTable
       projects={[blog, sales]}
+      sort={undefined}
+      onSortChange={() => undefined}
       loading={false}
       loadingContent={<p>Loading content</p>}
       emptyContent={<p>Empty content</p>}
@@ -83,6 +85,45 @@ describe("ProjectsTable", () => {
     expect(screen.getByText(maxLengthProject.description)).toBeInTheDocument();
     expect(screen.getByText(maxLengthProject.domain)).toBeInTheDocument();
     expect(screen.getAllByRole("listitem")).toHaveLength(maxLengthProject.environment.length);
+  });
+
+  it("lets the user sort by Name, Start Date and End Date, but not by Domain", () => {
+    render();
+
+    expect(screen.getByRole("button", { name: "Name" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Start Date" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "End Date" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Domain" })).not.toBeInTheDocument();
+  });
+
+  it("reports the backend field and the direction of a click on a header", async () => {
+    const onSortChange = vi.fn();
+    const { user } = render({ onSortChange });
+
+    await user.click(screen.getByRole("button", { name: "Start Date" }));
+
+    expect(onSortChange).toHaveBeenCalledWith({ field: "startDate", direction: "ASC" });
+  });
+
+  it("shows the active sort in the header of that column only", () => {
+    render({ sort: { field: "endDate", direction: "DESC" } });
+
+    expect(screen.getByRole("columnheader", { name: "End Date" })).toHaveAttribute(
+      "aria-sort",
+      "descending",
+    );
+    expect(screen.getByRole("columnheader", { name: "Name" })).toHaveAttribute("aria-sort", "none");
+  });
+
+  it("keeps the order of the rows it gets, because the backend does the sorting", () => {
+    // Blog (name B) is given before Cloud Sales (name C) although the sort is by name, descending.
+    render({ projects: [blog, sales], sort: { field: "name", direction: "DESC" } });
+
+    const names = screen
+      .getAllByRole("row")
+      .slice(1)
+      .map((row) => within(row).getByText(/^(Blog|Cloud Sales Management)$/).textContent);
+    expect(names).toEqual(["Blog", "Cloud Sales Management"]);
   });
 
   it("shows the loading content instead of the rows, and keeps the headers", () => {

@@ -8,9 +8,20 @@
     "endDate": "Data zakończenia"
   },
   "environment": "Środowisko",
+  "search": {
+    "label": "Szukaj projektów",
+    "placeholder": "Szukaj"
+  },
+  "pagination": {
+    "navigation": "Paginacja projektów",
+    "previous": "Poprzednia strona",
+    "next": "Następna strona",
+    "page": "Strona {number}"
+  },
   "states": {
     "loading": "Ładowanie projektów",
     "empty": "Nie znaleziono projektów",
+    "noResults": "Nie znaleziono projektów",
     "error": "Coś poszło nie tak. Spróbuj ponownie później",
     "retry": "Spróbuj ponownie"
   }

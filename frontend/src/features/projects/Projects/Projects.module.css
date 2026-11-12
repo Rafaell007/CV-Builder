@@ -7,3 +7,19 @@
   font: var(--text-heading);
   letter-spacing: var(--text-heading-ls);
 }
+
+/* The search field is 320px wide in Figma (the CREATE PROJECT button comes at the right end). */
+.toolbar {
+  display: flex;
+  margin-bottom: var(--space-4);
+}
+
+.toolbar > * {
+  max-width: 320px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-6);
+}
