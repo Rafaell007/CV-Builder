@@ -1,4 +1,4 @@
-/* Values: docs/design-tokens.md › Device error. */
+/* Values: docs/design-tokens.md › Device error (the screen itself is ErrorScreen). */
 
 /* From 768px up: the page as if the wrapper were not there; the gate hidden (also from screen readers). */
 .page {
@@ -15,38 +15,6 @@
   }
 
   .gate {
-    display: flex;
-    box-sizing: border-box;
-    min-height: 100dvh;
-    align-items: center;
-    justify-content: center;
-    padding: 0 var(--space-4);
-    background: var(--color-bg);
-    color: var(--color-text);
+    display: block;
   }
-}
-
-/* The Figma box 560×591, centred; the content sits at its top. */
-.content {
-  box-sizing: border-box;
-  display: flex;
-  width: 100%;
-  max-width: 560px;
-  min-height: 591px;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 127px;
-  text-align: center;
-}
-
-.title {
-  margin: var(--space-6) 0 0;
-  font: var(--text-title);
-  letter-spacing: var(--text-title-ls);
-}
-
-.message {
-  margin: var(--space-6) 0 0;
-  font: var(--text-body);
-  letter-spacing: var(--text-body-ls);
 }

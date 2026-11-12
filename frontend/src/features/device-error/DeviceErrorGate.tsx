@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
-import { SadMonitorIllustration } from "@/shared/components/illustrations";
+import { ErrorScreen } from "@/shared/components/ErrorScreen";
 import styles from "./DeviceErrorGate.module.css";
 
 type DeviceErrorGateProps = {
@@ -15,15 +15,16 @@ export function DeviceErrorGate({ children }: DeviceErrorGateProps) {
     <>
       <div className={styles.page}>{children}</div>
       <div className={styles.gate}>
-        <div className={styles.content}>
-          <SadMonitorIllustration />
-          <h1 className={styles.title}>{t("title")}</h1>
-          <p className={styles.message}>
-            {t("messageLine1")}
-            <br />
-            {t("messageLine2")}
-          </p>
-        </div>
+        <ErrorScreen
+          title={t("title")}
+          message={
+            <>
+              {t("messageLine1")}
+              <br />
+              {t("messageLine2")}
+            </>
+          }
+        />
       </div>
     </>
   );

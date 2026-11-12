@@ -1,4 +1,4 @@
-/* Values: docs/design-tokens.md › No internet. */
+/* Values: docs/design-tokens.md › No internet, Not found, Device error (same layout). */
 
 .screen {
   display: flex;
@@ -35,7 +35,7 @@
 }
 
 /* Figma draws this button 220 wide, wider than the 160 minimum. */
-.retry {
+.action {
   width: 220px;
   margin-top: var(--space-6);
 }
