@@ -1,14 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { MAX_DESCRIPTION_LENGTH, MAX_DOMAIN_LENGTH, MAX_NAME_LENGTH } from "../projects.constants";
-import type { CreateProjectValues } from "../projects.types";
+import { blog } from "../projects.mocks";
+import type { ProjectFormValues } from "../projects.types";
 import {
-  createProjectSchema,
+  projectFormSchema,
+  fromUtcDateIso,
   toCreateProjectInput,
+  toProjectFormValues,
+  toUpdateProjectInput,
   toUtcDateIso,
-  type CreateProjectMessages,
-} from "./createProject.utils";
+  type ProjectFormMessages,
+} from "./projectForm.utils";
 
-const messages: CreateProjectMessages = {
+const messages: ProjectFormMessages = {
   nameRequired: "name required",
   nameTooLong: "name long",
   domainRequired: "domain required",
@@ -20,7 +24,7 @@ const messages: CreateProjectMessages = {
   descriptionTooLong: "description long",
 };
 
-const valid: CreateProjectValues = {
+const valid: ProjectFormValues = {
   name: "Blog",
   domain: "Blogging",
   startDate: new Date(2026, 0, 10),
@@ -28,10 +32,10 @@ const valid: CreateProjectValues = {
   description: "A blogging site",
 };
 
-const schema = createProjectSchema(messages);
+const schema = projectFormSchema(messages);
 
 /** The messages of every issue, by field. */
-function issues(values: CreateProjectValues): Record<string, string> {
+function issues(values: ProjectFormValues): Record<string, string> {
   const result = schema.safeParse(values);
   if (result.success) return {};
   return Object.fromEntries(
@@ -39,7 +43,7 @@ function issues(values: CreateProjectValues): Record<string, string> {
   );
 }
 
-describe("createProjectSchema", () => {
+describe("projectFormSchema", () => {
   it("accepts valid values and trims the texts", () => {
     const result = schema.safeParse({
       ...valid,
@@ -123,5 +127,68 @@ describe("toCreateProjectInput", () => {
       endDate: "2026-06-30T00:00:00.000Z",
       description: "A blogging site",
     });
+  });
+});
+
+describe("fromUtcDateIso", () => {
+  it("gives the local day that has the same calendar date as the UTC day", () => {
+    // `new Date(iso)` would be the 9th (local time) in a time zone west of UTC.
+    const date = fromUtcDateIso("2026-01-10T00:00:00.000Z");
+
+    expect([date?.getFullYear(), date?.getMonth(), date?.getDate()]).toEqual([2026, 0, 10]);
+  });
+
+  it("round-trips with toUtcDateIso", () => {
+    const iso = "2026-03-29T00:00:00.000Z";
+
+    expect(toUtcDateIso(fromUtcDateIso(iso) as Date)).toBe(iso);
+  });
+
+  it("gives null for a text that is not a date", () => {
+    expect(fromUtcDateIso("not a date")).toBeNull();
+  });
+});
+
+describe("toProjectFormValues", () => {
+  it("prefills the form with the data of the project", () => {
+    const values = toProjectFormValues(blog);
+
+    expect(values).toMatchObject({
+      name: "Blog",
+      domain: "Blogging",
+      description: blog.description,
+    });
+    expect(values.startDate).toEqual(new Date(2025, 11, 31));
+    expect(values.endDate).toEqual(new Date(2026, 4, 31));
+  });
+});
+
+describe("toUpdateProjectInput", () => {
+  it("sends the id and the ids of the current environment, so an edit keeps the technologies", () => {
+    expect(
+      toUpdateProjectInput(blog, {
+        ...valid,
+        name: "Blog 2",
+        startDate: new Date(2026, 0, 10),
+        endDate: new Date(2026, 5, 30),
+      }),
+    ).toEqual({
+      id: "1",
+      name: "Blog 2",
+      domain: "Blogging",
+      startDate: "2026-01-10T00:00:00.000Z",
+      endDate: "2026-06-30T00:00:00.000Z",
+      description: "A blogging site",
+      environmentIds: ["10", "11", "12", "13", "14", "15"],
+    });
+  });
+
+  it("sends an empty list for a project without technologies", () => {
+    const input = toUpdateProjectInput(
+      { ...blog, environment: [] },
+      { ...valid, startDate: new Date(2026, 0, 10), endDate: new Date(2026, 5, 30) },
+    );
+
+    expect(input.environmentIds).toEqual([]);
   });
 });
