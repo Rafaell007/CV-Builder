@@ -3,7 +3,7 @@
 Table for a backend list page. It only renders; the page owns the query state (`search`, `sort`, `page`) and passes the `items` of the response as `rows`.
 
 - **Columns:** `DataTableColumn<Row>` = `{ id, header, cell(row), sortField? }`. A column with `sortField` gets a sort button; the field name is the one the backend accepts.
-- **Sorting:** `sort` and `onSortChange` use the backend `SortInput` shape (`{ field, direction: "ASC" | "DESC" }`). Clicks cycle: none → ASC → DESC → none. The page resets to page 1 in `onSortChange`.
+- **Sorting:** `sort` and `onSortChange` use the backend `SortInput` shape (`{ field, direction: "ASC" | "DESC" }`). Clicks cycle: ASC → DESC → ASC (a new column starts at ASC; there is no "no sort" state, so the page passes the order it starts with, for example name ASC). The page resets to page 1 in `onSortChange`.
 - **Row click:** `onRowClick`; rows are keyboard focusable (Enter or Space).
 - **Row actions:** `renderRowActions(row)` renders a slot at the row end (button, menu). Clicks in it do not click the row.
 - **Selection:** `selectable`, `selectedIds`, `onSelectionChange`. The header checkbox works on the rows of the current page; the selection of other pages stays.
