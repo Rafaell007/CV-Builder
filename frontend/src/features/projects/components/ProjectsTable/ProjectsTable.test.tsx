@@ -252,7 +252,9 @@ describe("ProjectsTable", () => {
       expect(screen.queryByRole("menu")).not.toBeInTheDocument();
     });
 
-    it("hides the Actions header from sight but keeps it for screen readers", () => {
+    it("gives the actions column a header that screen readers can read", () => {
+      // jsdom does not load the CSS module, so this test cannot check that the header is hidden from sight.
+      // The hiding is done by the DataTable class visuallyHidden; check it in Storybook.
       render();
 
       expect(screen.getByRole("columnheader", { name: "Actions" })).toBeInTheDocument();
