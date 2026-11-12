@@ -1,5 +1,6 @@
 {
   "title": "Projekty",
+  "button": "UTWÓRZ PROJEKT",
   "table": "Lista projektów",
   "columns": {
     "name": "Nazwa",
@@ -40,5 +41,45 @@
     "noResults": "Nie znaleziono projektów",
     "error": "Coś poszło nie tak. Spróbuj ponownie później",
     "retry": "Spróbuj ponownie"
+  },
+  "create": {
+    "title": "Utwórz projekt",
+    "close": "Zamknij",
+    "submit": "Utwórz",
+    "cancel": "Anuluj",
+    "fields": {
+      "name": "Nazwa",
+      "domain": "Domena",
+      "startDate": "Data rozpoczęcia",
+      "endDate": "Data zakończenia",
+      "description": "Opis"
+    },
+    "errors": {
+      "nameRequired": "Nazwa projektu jest wymagana",
+      "nameTooLong": "Nazwa projektu nie może przekraczać 100 znaków",
+      "domainRequired": "Domena jest wymagana",
+      "domainTooLong": "Domena nie może przekraczać 100 znaków",
+      "startDateRequired": "Data rozpoczęcia jest wymagana",
+      "endDateRequired": "Data zakończenia jest wymagana",
+      "endDateBeforeStart": "Data zakończenia nie może być wcześniejsza niż data rozpoczęcia",
+      "descriptionRequired": "Opis jest wymagany",
+      "descriptionTooLong": "Opis nie może przekraczać 2000 znaków",
+      "serverInvalid": "Serwer nie przyjął tej wartości",
+      "failed": "Coś poszło nie tak. Spróbuj ponownie później"
+    },
+    "success": {
+      "title": "Projekt utworzony",
+      "text": "Projekt {name} został dodany do listy."
+    },
+    "datePicker": {
+      "calendar": "Wybierz datę",
+      "previousMonth": "Poprzedni miesiąc",
+      "nextMonth": "Następny miesiąc",
+      "previousYear": "Poprzedni rok",
+      "nextYear": "Następny rok",
+      "chooseDayPrefix": "Wybierz",
+      "unavailableDayPrefix": "Niedostępne",
+      "monthPrefix": "Miesiąc"
+    }
   }
 }
