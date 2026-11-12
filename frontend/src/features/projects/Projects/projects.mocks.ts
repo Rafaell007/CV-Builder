@@ -144,6 +144,49 @@ export const projectsMock = (
   result: { data: projectsData(items, total) },
 });
 
+/** `count` generated projects with unique names, so the pages of a list can be shown. */
+export const manyProjects = (count: number): ProjectListItem[] =>
+  Array.from({ length: count }, (_, index) => {
+    const base = sampleProjects[index % sampleProjects.length]!;
+    const number = String(index + 1).padStart(2, "0");
+    return { ...base, id: `gen-${number}`, name: `${base.name} ${number}` };
+  });
+
+/**
+ * A stand-in for the backend, for stories: it answers every request, whatever the search, the sort or the page,
+ * with the rules of the real backend (search in name and domain without regard to case, sort by name, start
+ * date or end date, name ascending by default, 10 rows on a page). It lives here, in the mocks, so a story
+ * works when the user types or clicks. The page itself never filters, sorts or cuts pages.
+ */
+export const fakeBackendMock = (all: ProjectListItem[]): MockLink.MockedResponse => ({
+  // A function for `variables` matches every request (Apollo Client 4); the mock is reused without a limit.
+  request: { query: ProjectsDocument, variables: () => true },
+  maxUsageCount: Number.POSITIVE_INFINITY,
+  result: (variables: ProjectsQueryVariables) => {
+    const search = variables.search?.trim().toLowerCase();
+    const matching = search
+      ? all.filter(
+          (project) =>
+            project.name.toLowerCase().includes(search) ||
+            project.domain.toLowerCase().includes(search),
+        )
+      : all;
+
+    const { field, direction } = variables.sort ?? { field: "name", direction: "ASC" };
+    const key = (project: ProjectListItem): string =>
+      project[field === "startDate" || field === "endDate" ? field : "name"];
+    const sorted = [...matching].sort(
+      (a, b) => key(a).localeCompare(key(b)) * (direction === "DESC" ? -1 : 1),
+    );
+
+    // Same defaults as the backend PageInput: page 1, 20 rows.
+    const number = variables.page.number ?? 1;
+    const size = variables.page.size ?? 20;
+    const items = sorted.slice((number - 1) * size, number * size);
+    return { data: projectsData(items, matching.length) };
+  },
+});
+
 /** MockedProvider response for a request that fails. */
 export const projectsErrorMock = (
   variables: ProjectsQueryVariables = defaultVariables,

@@ -1,16 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect, userEvent } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import { Projects } from "./Projects";
 import {
-  analytics,
-  banking,
   blog,
+  fakeBackendMock,
+  manyProjects,
   maxLengthProject,
   projectsErrorMock,
   projectsMock,
   sales,
   sampleProjects,
-  variablesFor,
 } from "./projects.mocks";
 
 const desktop = { viewport: { value: "desktop", isRotated: false } };
@@ -46,81 +45,82 @@ type Story = StoryObj<typeof meta>;
 
 /** The list on a 1440px desktop screen. */
 export const Desktop: Story = {
-  parameters: { apollo: { mocks: [projectsMock([blog, sales])] } },
+  parameters: { apollo: { mocks: [fakeBackendMock([blog, sales])] } },
   play: expectListShown,
 };
 
 /** The same list on a 768px tablet screen. */
 export const Tablet: Story = {
   globals: tablet,
-  parameters: { apollo: { mocks: [projectsMock([blog, sales])] } },
+  parameters: { apollo: { mocks: [fakeBackendMock([blog, sales])] } },
   play: expectListShown,
 };
 
 /** Four projects with descriptions of different lengths (from about 160 to 560 characters). */
 export const ManyProjects: Story = {
-  parameters: { apollo: { mocks: [projectsMock(sampleProjects)] } },
+  parameters: { apollo: { mocks: [fakeBackendMock(sampleProjects)] } },
   play: async ({ canvas }) => {
     await expect(await canvas.findByText("Mobile Banking Platform")).toBeInTheDocument();
     await expect(canvas.getAllByRole("row")).toHaveLength(sampleProjects.length + 1);
   },
 };
 
-/** 35 projects make 4 pages of 10 rows: the page buttons show, and the first page is the current one. */
+/** 35 projects make 4 pages of 10 rows: the page buttons show, and a click on a page asks the backend for it. */
 export const ManyPages: Story = {
-  parameters: { apollo: { mocks: [projectsMock(sampleProjects, { total: 35 })] } },
+  parameters: { apollo: { mocks: [fakeBackendMock(manyProjects(35))] } },
   play: async ({ canvas }) => {
-    await expect(await canvas.findByText("Mobile Banking Platform")).toBeInTheDocument();
+    await expect(await canvas.findByText("Blog 01")).toBeInTheDocument();
     await expect(canvas.getByRole("button", { name: "Page 1" })).toHaveAttribute(
       "aria-current",
       "page",
     );
     await expect(canvas.getByRole("button", { name: "Page 4" })).toBeInTheDocument();
+
+    await userEvent.click(canvas.getByRole("button", { name: "Page 4" }));
+    // The last page holds the 5 projects that remain (35 - 3 x 10).
+    await waitFor(() => expect(canvas.getAllByRole("row")).toHaveLength(6));
+    await expect(canvas.getByRole("button", { name: "Page 4" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
   },
 };
 
-/** Search and sort go to the backend (each answer below is a mocked backend response). Typing and a click change the list. */
+/** Search and sort work: every request is answered by the stand-in backend (`fakeBackendMock`), as the real backend would. */
 export const SearchAndSort: Story = {
-  parameters: {
-    apollo: {
-      mocks: [
-        projectsMock([blog, sales, analytics, banking]),
-        projectsMock([banking], { variables: variablesFor({ search: "bank" }) }),
-        projectsMock([banking], {
-          variables: variablesFor({
-            search: "bank",
-            sort: { field: "startDate", direction: "ASC" },
-          }),
-        }),
-      ],
-    },
-  },
+  parameters: { apollo: { mocks: [fakeBackendMock(sampleProjects)] } },
   play: async ({ canvas }) => {
+    const search = canvas.getByRole("searchbox", { name: "Search projects" });
+    const firstRow = () => canvas.getAllByRole("row")[1]!;
     await expect(await canvas.findByText("Blog")).toBeInTheDocument();
 
-    await userEvent.type(canvas.getByRole("searchbox", { name: "Search projects" }), "bank{Enter}");
+    // Search: the backend returns only the matching project.
+    await userEvent.type(search, "bank{Enter}");
     await expect(await canvas.findByText("Mobile Banking Platform")).toBeInTheDocument();
-    await expect(canvas.queryByText("Blog")).not.toBeInTheDocument();
+    await waitFor(() => expect(canvas.queryByText("Blog")).not.toBeInTheDocument());
 
+    // An empty search returns every project again.
+    await userEvent.clear(search);
+    await userEvent.type(search, "{Enter}");
+    await expect(await canvas.findByText("Blog")).toBeInTheDocument();
+
+    // Sort: the first click sorts ascending (oldest start first), the second descending.
     await userEvent.click(canvas.getByRole("button", { name: "Start Date" }));
+    await waitFor(() =>
+      expect(within(firstRow()).getByText("Mobile Banking Platform")).toBeInTheDocument(),
+    );
     await expect(canvas.getByRole("columnheader", { name: "Start Date" })).toHaveAttribute(
       "aria-sort",
       "ascending",
     );
-    await expect(await canvas.findByText("Mobile Banking Platform")).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole("button", { name: "Start Date" }));
+    await waitFor(() => expect(within(firstRow()).getByText("Blog")).toBeInTheDocument());
   },
 };
 
 /** A search that matches nothing: No projects found, and the search field keeps the text. */
 export const NoResults: Story = {
-  parameters: {
-    apollo: {
-      mocks: [
-        projectsMock([blog, sales]),
-        projectsMock([], { variables: variablesFor({ search: "zzz" }) }),
-      ],
-    },
-  },
+  parameters: { apollo: { mocks: [fakeBackendMock([blog, sales])] } },
   play: async ({ canvas }) => {
     await expect(await canvas.findByText("Blog")).toBeInTheDocument();
     await userEvent.type(canvas.getByRole("searchbox", { name: "Search projects" }), "zzz{Enter}");
@@ -131,14 +131,14 @@ export const NoResults: Story = {
 
 /** A project with the longest texts the form allows: name 100, domain 100 and description 2000 characters. */
 export const LongestTextsDesktop: Story = {
-  parameters: { apollo: { mocks: [projectsMock([maxLengthProject, blog])] } },
+  parameters: { apollo: { mocks: [fakeBackendMock([maxLengthProject, blog])] } },
   play: expectLongestTextsShown,
 };
 
 /** The same project on a 768px tablet screen: the text and the many tags must wrap inside the table. */
 export const LongestTextsTablet: Story = {
   globals: tablet,
-  parameters: { apollo: { mocks: [projectsMock([maxLengthProject, blog])] } },
+  parameters: { apollo: { mocks: [fakeBackendMock([maxLengthProject, blog])] } },
   play: expectLongestTextsShown,
 };
 
@@ -169,7 +169,7 @@ export const LoadFailed: Story = {
 /** The same list with Polish texts and dates (DD.MM.YYYY). */
 export const Polish: Story = {
   globals: { ...desktop, locale: "pl" },
-  parameters: { apollo: { mocks: [projectsMock([blog, sales])] } },
+  parameters: { apollo: { mocks: [fakeBackendMock([blog, sales])] } },
   play: async ({ canvas }) => {
     await expect(await canvas.findByText("31.05.2026")).toBeInTheDocument();
     await expect(
