@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "@/shared/testing";
 import {
@@ -33,7 +33,7 @@ describe("ProjectsTable", () => {
     render();
 
     const headers = screen.getAllByRole("columnheader").map((header) => header.textContent);
-    expect(headers).toEqual(["Name", "Domain", "Start Date", "End Date"]);
+    expect(headers).toEqual(["Name", "Domain", "Start Date", "End Date", "Actions"]);
   });
 
   it("shows name, description, domain and environment tags of a project", () => {
@@ -147,12 +147,124 @@ describe("ProjectsTable", () => {
 
     expect(screen.getByText("Loading content")).toBeInTheDocument();
     expect(screen.queryByText("Blog")).not.toBeInTheDocument();
-    expect(screen.getAllByRole("columnheader")).toHaveLength(4);
+    expect(screen.getAllByRole("columnheader")).toHaveLength(5);
   });
 
   it("shows the empty content when there are no projects", () => {
     render({ projects: [] });
 
     expect(screen.getByText("Empty content")).toBeInTheDocument();
+  });
+
+  describe("row action menu", () => {
+    it("gives each row its own menu button, named with the project name", () => {
+      render();
+
+      expect(screen.getByRole("button", { name: "Actions for Blog" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Actions for Cloud Sales Management" }),
+      ).toBeInTheDocument();
+    });
+
+    it("keeps the menu closed until the button is clicked, then shows Edit and Delete", async () => {
+      const { user } = render();
+      expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole("button", { name: "Actions for Blog" }));
+
+      const items = screen.getAllByRole("menuitem").map((item) => item.textContent);
+      expect(items).toEqual(["Edit", "Delete"]);
+    });
+
+    it("calls onEdit with the project of the row and closes the menu", async () => {
+      const onEdit = vi.fn();
+      const onDelete = vi.fn();
+      const { user } = render({ onEdit, onDelete });
+      await user.click(screen.getByRole("button", { name: "Actions for Cloud Sales Management" }));
+
+      await user.click(screen.getByRole("menuitem", { name: "Edit" }));
+
+      expect(onEdit).toHaveBeenCalledOnce();
+      expect(onEdit).toHaveBeenCalledWith(sales);
+      expect(onDelete).not.toHaveBeenCalled();
+      expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    });
+
+    it("calls onDelete with the project of the row and closes the menu", async () => {
+      const onEdit = vi.fn();
+      const onDelete = vi.fn();
+      const { user } = render({ onEdit, onDelete });
+      await user.click(screen.getByRole("button", { name: "Actions for Blog" }));
+
+      await user.click(screen.getByRole("menuitem", { name: "Delete" }));
+
+      expect(onDelete).toHaveBeenCalledOnce();
+      expect(onDelete).toHaveBeenCalledWith(blog);
+      expect(onEdit).not.toHaveBeenCalled();
+      expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    });
+
+    it("closes on Escape and gives the focus back to the button", async () => {
+      const { user } = render();
+      const button = screen.getByRole("button", { name: "Actions for Blog" });
+      await user.click(button);
+
+      await user.keyboard("{Escape}");
+
+      expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+      expect(button).toHaveFocus();
+    });
+
+    it("closes on a click outside", async () => {
+      const { user } = render();
+      await user.click(screen.getByRole("button", { name: "Actions for Blog" }));
+
+      // Radix blocks pointer events on the page while the menu is open and listens for pointerdown.
+      fireEvent.pointerDown(document.body);
+
+      await waitFor(() => expect(screen.queryByRole("menu")).not.toBeInTheDocument());
+    });
+
+    it("keeps only one menu open at a time", async () => {
+      const { user } = render();
+      await user.click(screen.getByRole("button", { name: "Actions for Blog" }));
+
+      // The open menu hides the rest of the page, so the second button is found with hidden: true.
+      fireEvent.pointerDown(
+        screen.getByRole("button", { name: "Actions for Cloud Sales Management", hidden: true }),
+      );
+
+      await waitFor(() => expect(screen.getAllByRole("menu")).toHaveLength(1));
+      expect(screen.getAllByRole("menuitem")).toHaveLength(2);
+    });
+
+    it("works with the keyboard: open, move, select", async () => {
+      const onDelete = vi.fn();
+      const { user } = render({ onDelete });
+      screen.getByRole("button", { name: "Actions for Blog" }).focus();
+
+      await user.keyboard("{Enter}");
+      expect(screen.getByRole("menu")).toBeInTheDocument();
+      await user.keyboard("{ArrowDown}");
+      await user.keyboard("{Enter}");
+
+      expect(onDelete).toHaveBeenCalledWith(blog);
+      expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    });
+
+    it("hides the Actions header from sight but keeps it for screen readers", () => {
+      render();
+
+      expect(screen.getByRole("columnheader", { name: "Actions" })).toBeInTheDocument();
+    });
+
+    it("uses the Polish texts on the Polish page", async () => {
+      const { user } = render({}, "pl");
+
+      await user.click(screen.getByRole("button", { name: "Akcje dla projektu Blog" }));
+
+      const items = screen.getAllByRole("menuitem").map((item) => item.textContent);
+      expect(items).toEqual(["Edytuj", "Usuń"]);
+    });
   });
 });
