@@ -15,6 +15,15 @@
     "edit": "Edit",
     "delete": "Delete"
   },
+  "delete": {
+    "title": "Delete project",
+    "message": "Are you sure you want to delete project <strong>{name}</strong>?",
+    "close": "Close",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "failedTitle": "Could not delete the project",
+    "failedText": "Something went wrong. Please try again."
+  },
   "search": {
     "label": "Search projects",
     "placeholder": "Search"

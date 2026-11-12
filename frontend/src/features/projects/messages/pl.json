@@ -15,6 +15,15 @@
     "edit": "Edytuj",
     "delete": "Usuń"
   },
+  "delete": {
+    "title": "Usuń projekt",
+    "message": "Czy na pewno chcesz usunąć projekt <strong>{name}</strong>?",
+    "close": "Zamknij",
+    "confirm": "Potwierdź",
+    "cancel": "Anuluj",
+    "failedTitle": "Nie udało się usunąć projektu",
+    "failedText": "Coś poszło nie tak. Spróbuj ponownie."
+  },
   "search": {
     "label": "Szukaj projektów",
     "placeholder": "Szukaj"
