@@ -242,7 +242,7 @@ test.describe("projects page, create, update and delete", () => {
     await dialog(page).getByRole("button", { name: "Create" }).click();
 
     await expect(dialog(page)).toBeHidden();
-    await expect(page.getByText("Project created")).toBeVisible();
+    await expect(page.getByText("Project created", { exact: true })).toBeVisible();
     await find(page, name);
     await expect(row(page, name)).toHaveCount(1);
     await expect(row(page, name)).toContainText("E2E");
@@ -291,7 +291,7 @@ test.describe("projects page, create, update and delete", () => {
     await dialog(page).getByRole("button", { name: "Update" }).click();
 
     await expect(dialog(page)).toBeHidden();
-    await expect(page.getByText("Project updated")).toBeVisible();
+    await expect(page.getByText("Project updated", { exact: true })).toBeVisible();
     await find(page, renamed);
     await expect(row(page, renamed)).toHaveCount(1);
     await find(page, name);

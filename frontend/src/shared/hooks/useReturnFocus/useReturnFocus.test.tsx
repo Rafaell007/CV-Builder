@@ -43,6 +43,32 @@ describe("useReturnFocus", () => {
     expect(preventDefault).not.toHaveBeenCalled();
   });
 
+  // The menu item that opened the dialog is removed when the menu closes: the button that opened the menu is the opener.
+  it("focuses the button that opened the menu when the dialog was opened from a menu item", () => {
+    const trigger = addButton();
+    trigger.id = "menu-trigger";
+    const menu = document.createElement("div");
+    menu.setAttribute("role", "menu");
+    menu.setAttribute("aria-labelledby", "menu-trigger");
+    const item = document.createElement("div");
+    item.setAttribute("role", "menuitem");
+    item.tabIndex = -1;
+    menu.append(item);
+    document.body.append(menu);
+    const inside = addButton();
+    const { result } = renderHook(() => useReturnFocus());
+    const preventDefault = vi.fn();
+
+    item.focus();
+    result.current.onOpenAutoFocus();
+    menu.remove();
+    inside.focus();
+    result.current.onCloseAutoFocus({ preventDefault });
+
+    expect(trigger).toHaveFocus();
+    expect(preventDefault).toHaveBeenCalledOnce();
+  });
+
   it("keeps the default when the opener was removed", () => {
     const opener = addButton();
     const { result } = renderHook(() => useReturnFocus());
