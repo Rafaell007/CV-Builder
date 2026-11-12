@@ -1,0 +1,11 @@
+/* Values: docs/design-tokens.md › No internet (the screen itself is ErrorScreen). */
+
+/* The page as if the wrapper were not there. */
+.page {
+  display: contents;
+}
+
+/* Hidden while the No Internet screen shows; also hidden from screen readers. */
+.hiddenPage {
+  display: none;
+}
