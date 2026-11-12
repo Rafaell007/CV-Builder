@@ -1,13 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect } from "storybook/test";
+import { expect, userEvent } from "storybook/test";
 import { Projects } from "./Projects";
 import {
+  analytics,
+  banking,
   blog,
   maxLengthProject,
   projectsErrorMock,
   projectsMock,
   sales,
   sampleProjects,
+  variablesFor,
 } from "./projects.mocks";
 
 const desktop = { viewport: { value: "desktop", isRotated: false } };
@@ -60,6 +63,69 @@ export const ManyProjects: Story = {
   play: async ({ canvas }) => {
     await expect(await canvas.findByText("Mobile Banking Platform")).toBeInTheDocument();
     await expect(canvas.getAllByRole("row")).toHaveLength(sampleProjects.length + 1);
+  },
+};
+
+/** 35 projects make 4 pages of 10 rows: the page buttons show, and the first page is the current one. */
+export const ManyPages: Story = {
+  parameters: { apollo: { mocks: [projectsMock(sampleProjects, { total: 35 })] } },
+  play: async ({ canvas }) => {
+    await expect(await canvas.findByText("Mobile Banking Platform")).toBeInTheDocument();
+    await expect(canvas.getByRole("button", { name: "Page 1" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await expect(canvas.getByRole("button", { name: "Page 4" })).toBeInTheDocument();
+  },
+};
+
+/** Search and sort go to the backend (each answer below is a mocked backend response). Typing and a click change the list. */
+export const SearchAndSort: Story = {
+  parameters: {
+    apollo: {
+      mocks: [
+        projectsMock([blog, sales, analytics, banking]),
+        projectsMock([banking], { variables: variablesFor({ search: "bank" }) }),
+        projectsMock([banking], {
+          variables: variablesFor({
+            search: "bank",
+            sort: { field: "startDate", direction: "ASC" },
+          }),
+        }),
+      ],
+    },
+  },
+  play: async ({ canvas }) => {
+    await expect(await canvas.findByText("Blog")).toBeInTheDocument();
+
+    await userEvent.type(canvas.getByRole("searchbox", { name: "Search projects" }), "bank{Enter}");
+    await expect(await canvas.findByText("Mobile Banking Platform")).toBeInTheDocument();
+    await expect(canvas.queryByText("Blog")).not.toBeInTheDocument();
+
+    await userEvent.click(canvas.getByRole("button", { name: "Start Date" }));
+    await expect(canvas.getByRole("columnheader", { name: "Start Date" })).toHaveAttribute(
+      "aria-sort",
+      "ascending",
+    );
+    await expect(await canvas.findByText("Mobile Banking Platform")).toBeInTheDocument();
+  },
+};
+
+/** A search that matches nothing: No projects found, and the search field keeps the text. */
+export const NoResults: Story = {
+  parameters: {
+    apollo: {
+      mocks: [
+        projectsMock([blog, sales]),
+        projectsMock([], { variables: variablesFor({ search: "zzz" }) }),
+      ],
+    },
+  },
+  play: async ({ canvas }) => {
+    await expect(await canvas.findByText("Blog")).toBeInTheDocument();
+    await userEvent.type(canvas.getByRole("searchbox", { name: "Search projects" }), "zzz{Enter}");
+    await expect(await canvas.findByText("No projects found")).toBeInTheDocument();
+    await expect(canvas.getByRole("searchbox", { name: "Search projects" })).toHaveValue("zzz");
   },
 };
 
