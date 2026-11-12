@@ -1,7 +1,15 @@
 import { screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { renderWithProviders } from "@/shared/testing";
-import { blog, sales } from "../../projects.mocks";
+import {
+  blog,
+  MAX_DESCRIPTION_LENGTH,
+  MAX_DOMAIN_LENGTH,
+  MAX_NAME_LENGTH,
+  maxLengthProject,
+  sales,
+  sampleProjects,
+} from "../../projects.mocks";
 import { ProjectsTable } from "./ProjectsTable";
 
 const render = (props: Partial<Parameters<typeof ProjectsTable>[0]> = {}, locale?: "en" | "pl") =>
@@ -29,11 +37,11 @@ describe("ProjectsTable", () => {
 
     const row = screen.getByRole("row", { name: /Blog/ });
     expect(within(row).getByText("Blogging")).toBeInTheDocument();
-    expect(within(row).getByText("A dynamic blogging website.")).toBeInTheDocument();
+    expect(within(row).getByText(blog.description)).toBeInTheDocument();
     const tags = within(row)
       .getAllByRole("listitem")
       .map((tag) => tag.textContent);
-    expect(tags).toEqual(["HTML5", "TypeScript"]);
+    expect(tags).toEqual(["HTML5", "CSS3", "TypeScript", "React", "Zustand", "Firebase"]);
   });
 
   it("writes the dates as MM/DD/YYYY in English", () => {
@@ -51,6 +59,30 @@ describe("ProjectsTable", () => {
     expect(within(row).getByText("31.12.2025")).toBeInTheDocument();
     expect(within(row).getByText("31.05.2026")).toBeInTheDocument();
     expect(screen.getByRole("columnheader", { name: "Data rozpoczęcia" })).toBeInTheDocument();
+  });
+
+  it("shows every sample project with a description of 100 characters or more", () => {
+    sampleProjects.forEach((project) => {
+      expect(project.description.length).toBeGreaterThanOrEqual(100);
+    });
+
+    render({ projects: sampleProjects });
+
+    sampleProjects.forEach((project) => {
+      expect(screen.getByText(project.description)).toBeInTheDocument();
+    });
+  });
+
+  it("shows a project with the longest texts the form allows, in full", () => {
+    expect(maxLengthProject.name).toHaveLength(MAX_NAME_LENGTH);
+    expect(maxLengthProject.domain).toHaveLength(MAX_DOMAIN_LENGTH);
+    expect(maxLengthProject.description).toHaveLength(MAX_DESCRIPTION_LENGTH);
+
+    render({ projects: [maxLengthProject] });
+
+    expect(screen.getByText(maxLengthProject.description)).toBeInTheDocument();
+    expect(screen.getByText(maxLengthProject.domain)).toBeInTheDocument();
+    expect(screen.getAllByRole("listitem")).toHaveLength(maxLengthProject.environment.length);
   });
 
   it("shows the loading content instead of the rows, and keeps the headers", () => {
