@@ -1,0 +1,17 @@
+{
+  "title": "Projects",
+  "table": "Projects list",
+  "columns": {
+    "name": "Name",
+    "domain": "Domain",
+    "startDate": "Start Date",
+    "endDate": "End Date"
+  },
+  "environment": "Environment",
+  "states": {
+    "loading": "Loading projects",
+    "empty": "No projects found",
+    "error": "Something went wrong. Please try again later",
+    "retry": "Retry"
+  }
+}
