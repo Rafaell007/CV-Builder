@@ -28,7 +28,7 @@ const requiredDate = (message: string) =>
     });
 
 /**
- * The rules of the Create project form: all five fields are required, the lengths are limited, and the end
+ * The rules of the project form (Create and Update): all five fields are required, the lengths are limited, and the end
  * date is not earlier than the start date (the same day is allowed, like the backend). The backend checks
  * everything again. Texts are trimmed, so a name of spaces counts as empty.
  */

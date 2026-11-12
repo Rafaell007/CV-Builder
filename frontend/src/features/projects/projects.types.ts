@@ -11,7 +11,7 @@ export interface ProjectsListState {
   page: number;
 }
 
-/** What the Create project form holds while the user types. A date is `null` while the field is empty or holds text that is not a date. */
+/** What the project form (Create and Update) holds while the user types. A date is `null` while the field is empty or holds text that is not a date. */
 export interface ProjectFormValues {
   name: string;
   domain: string;
