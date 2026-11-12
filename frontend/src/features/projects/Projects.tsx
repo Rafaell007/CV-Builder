@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { PageState, Pagination, SearchField } from "@/shared/components";
+import { PageState, Pagination, SearchField, type PageStateLabels } from "@/shared/components";
 import { ProjectsTable } from "./components/ProjectsTable";
 import { SEARCH_MAX_LENGTH } from "./projects.constants";
 import { toProjectsVariables } from "./utils";
@@ -19,7 +19,7 @@ export function Projects() {
   const variables = toProjectsVariables(list);
   const { projects, total, loading, failed, retry } = useProjects(variables);
 
-  const stateLabels = {
+  const stateLabels: PageStateLabels = {
     loading: t("states.loading"),
     empty: t("states.empty"),
     noResults: t("states.noResults"),
