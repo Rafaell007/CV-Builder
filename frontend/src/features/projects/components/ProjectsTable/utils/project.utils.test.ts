@@ -19,7 +19,8 @@ describe("formatProjectDate", () => {
     expect(formatProjectDate("2026-01-01T00:00:00.000Z", "en")).toBe("01/01/2026");
   });
 
-  it("returns an empty string for a value that is not a date", () => {
-    expect(formatProjectDate("not a date", "en")).toBe("");
+  it("returns null for a value that is not a date", () => {
+    expect(formatProjectDate("not a date", "en")).toBeNull();
+    expect(formatProjectDate("", "pl")).toBeNull();
   });
 });

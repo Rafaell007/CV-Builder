@@ -1,20 +1,20 @@
 import type { Locale } from "next-intl";
 
-const pad = (value: number): string => String(value).padStart(2, "0");
-
 /**
- * Formats a project date for the table: `MM/DD/YYYY` in English, `DD.MM.YYYY` in Polish.
+ * Formats a project date for the table with the rules of the language: `04/15/2025` in English,
+ * `15.04.2025` in Polish. A new language needs no change here.
  * The backend stores a calendar date (a DATE column) and sends it as midnight UTC, so the UTC parts are
  * read. The local time zone would show the day before in time zones west of UTC.
- * Returns an empty string for a value that is not a date.
+ * Returns `null` for a value that is not a date, so the caller can show that the date is missing.
  */
-export function formatProjectDate(value: string, locale: Locale): string {
+export function formatProjectDate(value: string, locale: Locale): string | null {
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
+  if (Number.isNaN(date.getTime())) return null;
 
-  const day = pad(date.getUTCDate());
-  const month = pad(date.getUTCMonth() + 1);
-  const year = date.getUTCFullYear();
-
-  return locale === "pl" ? `${day}.${month}.${year}` : `${month}/${day}/${year}`;
+  return new Intl.DateTimeFormat(locale, {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
 }
