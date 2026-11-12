@@ -270,6 +270,7 @@ Rules for all code in this repository.
 
 - Components receive data and callbacks through props and render markup. No data fetching, business logic, side effects, context access or `process.env` in a component body.
 - Allowed: props, JSX, purely visual local state (e.g. open/closed), UI-only hooks.
+- Exception, translations: a **feature** component may call `useTranslations` and `useLocale` in its body, because it belongs to one feature and one `messages/` namespace. A **shared** component (`shared/components`) must not: it takes translated texts as props (for example `labels`), so it works in any feature and any language.
 
 ### 5.2 Hook composition (frontend)
 
