@@ -1,1 +1,1 @@
-export { toProjectsVariables } from "./projects.utils";
+export { toDeleteProjectFailure, toProjectsVariables } from "./projects.utils";
