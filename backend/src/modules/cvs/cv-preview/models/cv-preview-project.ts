@@ -23,7 +23,7 @@ export class CvPreviewProject {
   @Field(() => [String])
   roles!: string[];
 
-  /** The period as text for display, for example Jan 2023 - Present. */
+  /** The period as text for display, for example 01.2023 - Present. */
   @Field()
   period!: string;
 
