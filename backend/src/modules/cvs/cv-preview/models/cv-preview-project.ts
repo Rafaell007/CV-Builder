@@ -23,14 +23,14 @@ export class CvPreviewProject {
   @Field(() => [String])
   roles!: string[];
 
-  /** The period as text for display, for example 01.2023 - Present. */
+  /** The period as text for display, for example 01.2023 – Till now. */
   @Field()
   period!: string;
 
   @Field(() => Date)
   startDate!: Date;
 
-  /** Null means the person still works on the project (Present). */
+  /** Null means the person still works on the project (Till now). */
   @Field(() => Date, { nullable: true })
   endDate!: Date | null;
 
