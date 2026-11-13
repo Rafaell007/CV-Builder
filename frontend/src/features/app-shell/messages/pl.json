@@ -13,5 +13,10 @@
   "profile": "Profil",
   "settings": "Ustawienia",
   "logout": "Wyloguj",
-  "logoutFailed": "Nie udało się wylogować. Spróbuj ponownie."
+  "logoutFailed": "Nie udało się wylogować. Spróbuj ponownie.",
+  "forbidden": {
+    "title": "Brak dostępu",
+    "message": "Tę stronę mogą otworzyć tylko administratorzy.",
+    "back": "Wróć do pracowników"
+  }
 }
