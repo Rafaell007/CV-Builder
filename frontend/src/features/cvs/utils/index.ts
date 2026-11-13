@@ -6,3 +6,4 @@ export {
   toUpdateCvInput,
   type CvFormMessages,
 } from "./cvForm.utils";
+export { toDeleteCvFailure, type DeleteCvFailure } from "./toDeleteCvFailure";

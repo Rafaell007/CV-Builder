@@ -67,5 +67,16 @@
       "title": "CV updated",
       "text": "{name} was saved."
     }
+  },
+  "delete": {
+    "title": "Delete CV",
+    "message": "Are you sure you want to delete CV <strong>{name}</strong>?",
+    "close": "Close",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "failedTitle": "Could not delete the CV",
+    "failedText": "Something went wrong. Please try again.",
+    "notFound": "This CV does not exist any more. The list was updated.",
+    "forbidden": "You are not allowed to delete this CV."
   }
 }
