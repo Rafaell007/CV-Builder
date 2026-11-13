@@ -143,3 +143,21 @@ export const Loading: Story = {
 export const Empty: Story = {
   args: { emptyContent: "No users found" },
 };
+
+export const HiddenColumnAndDetailLine: Story = {
+  args: {
+    rows: firstPage,
+    columns: columns.map((column) =>
+      column.id === "email" ? { ...column, hideBelow: 100000 } : column,
+    ),
+    renderRowDetail: (user) => <p>{`${user.firstName} works as ${user.position}.`}</p>,
+  },
+  play: async ({ canvas }) => {
+    // hideBelow 100000 is above any window width, so the Email column is always hidden.
+    await expect(canvas.queryByRole("columnheader", { name: "Email" })).not.toBeInTheDocument();
+    await expect(canvas.getByRole("columnheader", { name: "Position" })).toBeInTheDocument();
+    await expect(
+      canvas.getByText(`${firstPage[0]!.firstName} works as ${firstPage[0]!.position}.`),
+    ).toBeInTheDocument();
+  },
+};

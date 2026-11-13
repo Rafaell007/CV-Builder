@@ -4,6 +4,8 @@ Table for a backend list page. It only renders; the page owns the query state (`
 
 - **Columns:** `DataTableColumn<Row>` = `{ id, header, cell(row), sortField? }`. A column with `sortField` gets a sort button; the field name is the one the backend accepts.
 - **Sorting:** `sort` and `onSortChange` use the backend `SortInput` shape (`{ field, direction: "ASC" | "DESC" }`). Clicks cycle: ASC → DESC → ASC (a new column starts at ASC; there is no "no sort" state, so the page passes the order it starts with, for example name ASC). The page resets to page 1 in `onSortChange`.
+- **Hide a column:** `hideBelow` on a column (pixels). The column (header and cells) is left out when the window is narrower than that: `hideBelow: 1024` shows it from 1024px. CSS media queries cannot read a variable, so the table reads `window.innerWidth` and listens to `resize` (`useVisibleColumns`). The server renders every column, so a narrow screen shows the column for a moment until React takes over. Hidden columns do not count for the width of the detail line.
+- **Detail line:** `renderRowDetail(row)` draws a second row under each row, as wide as the table (`colSpan`). Return `null` for a row without it. The detail row is a separate `tr`, so a page that finds a row by its text finds the main row without the detail text. The row click and the row hover apply to the main row only.
 - **Row click:** `onRowClick`; rows are keyboard focusable (Enter or Space).
 - **Row actions:** `renderRowActions(row)` renders a slot at the row end (button, menu). Clicks in it do not click the row.
 - **Selection:** `selectable`, `selectedIds`, `onSelectionChange`. The header checkbox works on the rows of the current page; the selection of other pages stays.
