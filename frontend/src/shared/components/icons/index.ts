@@ -1,11 +1,13 @@
 // Paths from Google Material Icons ("materialicons" or "materialiconsoutlined", 24px), Apache License 2.0:
 // https://github.com/google/material-design-icons. Figma's glyphs match them (docs/design-tokens.md › Icons).
 export type { IconProps } from "./icons.types";
+export { AddIcon } from "./AddIcon";
 export { CalendarTodayIcon } from "./CalendarTodayIcon";
 export { ChevronLeftIcon } from "./ChevronLeftIcon";
 export { ChevronRightIcon } from "./ChevronRightIcon";
 export { CloseIcon } from "./CloseIcon";
 export { ContactPageIcon } from "./ContactPageIcon";
+export { DeleteForeverIcon } from "./DeleteForeverIcon";
 export { DomainIcon } from "./DomainIcon";
 export { ExpandMoreIcon } from "./ExpandMoreIcon";
 export { FolderCopyIcon } from "./FolderCopyIcon";
