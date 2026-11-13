@@ -1,6 +1,5 @@
 import type { Locale } from "next-intl";
 import { useRef, type Ref } from "react";
-import { createPortal } from "react-dom";
 import ReactDatePicker from "react-datepicker";
 import { Field, fieldInputClassName, useFieldIds } from "../Field";
 import { CalendarTodayIcon } from "../icons";
@@ -162,11 +161,12 @@ export function DatePicker({
             disabledDayAriaLabelPrefix={labels.unavailableDayPrefix}
             monthAriaLabelPrefix={labels.monthPrefix}
             showPopperArrow={false}
-            // KAN-136: the calendar opens centred on the screen and stays there (calendarCentre). It sits under
-            // <body>: the modal's content box scrolls (overflow-y: auto) and would clip it, and the Modal's
-            // transform would make a fixed-position child follow the modal instead of the screen.
+            // KAN-136: the calendar opens centred on the screen and stays there (centreCalendar). It is placed
+            // with position: fixed, so the scrolling Modal cannot clip it (the Modal has no transform, which would
+            // make a fixed child follow the modal). It must stay inside the Modal in the DOM: a portal under <body>
+            // is outside the Radix focus trap, which pulls the focus back to the input (keyboard picking breaks).
             popperModifiers={[centreCalendar]}
-            popperContainer={({ children }) => createPortal(children, document.body)}
+            popperProps={{ strategy: "fixed" }}
             // CSS Module names are typed string | undefined; react-datepicker wants a string
             wrapperClassName={styles.wrapper ?? ""}
             popperClassName={styles.popper ?? ""}
