@@ -20,3 +20,12 @@ export const DEFAULT_PROJECTS_SORT: SortState = {
 export const MAX_NAME_LENGTH = 100;
 export const MAX_DOMAIN_LENGTH = 100;
 export const MAX_DESCRIPTION_LENGTH = 2000;
+/** The backend accepts at most 50 technologies on a project (`environmentIds`). */
+export const MAX_ENVIRONMENT_SKILLS = 50;
+
+/**
+ * Tablet screens are narrower than this many pixels. The Domain column is hidden below it (`DataTable`
+ * `hideBelow`). CSS media queries cannot read a constant, so the two CSS files of the table repeat it
+ * as `max-width: 1023px` (one pixel less). Own choice: the repo has no breakpoint token yet.
+ */
+export const PROJECTS_DESKTOP_MIN_WIDTH = 1024;

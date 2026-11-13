@@ -1,22 +1,12 @@
-.summary {
+.name {
+  overflow-wrap: anywhere;
+}
+
+/* The detail line under a row: the description, then the environment tags. */
+.detail {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-2);
   min-width: 0;
-}
-
-.name {
-  overflow-wrap: anywhere;
-}
-
-/*
- * Tablet: Figma hides the Domain column. DataTable cannot hide a column yet, so this hides the second
- * column (header and cells) by its position. It breaks if a column is added before Domain. Replace it
- * with the DataTable column option when that ticket is done (see the README, Known issues).
- */
-@media (max-width: 1023px) {
-  .table :is(th, td):nth-child(2) {
-    display: none;
-  }
 }

@@ -14,6 +14,7 @@ import {
 } from "./datePicker.constants";
 import type { DatePickerLabels } from "./datePicker.types";
 import styles from "./DatePicker.module.css";
+import { centreCalendar } from "./centreCalendar";
 import { useDatePicker } from "./useDatePicker";
 
 export type DatePickerProps = {
@@ -68,6 +69,8 @@ export function DatePicker({
   });
   const {
     view,
+    isCalendarOpen,
+    onCalendarOpen,
     isArrowDisabled,
     onArrowClick,
     showMonthList,
@@ -99,7 +102,12 @@ export function DatePicker({
       error={error}
       className={className}
     >
-      <div className={styles.box} onBlur={onFocusLeave}>
+      {/* data-calendar-open: a Modal around the field skips its own Escape while the calendar is open (see Modal) */}
+      <div
+        className={styles.box}
+        onBlur={onFocusLeave}
+        {...(isCalendarOpen && { "data-calendar-open": "true" })}
+      >
         <CalendarLabelContext value={labels.calendar}>
           <ReactDatePicker
             // One date: picks react-datepicker's single-date props (its types are a union of single / range / multiple)
@@ -108,6 +116,7 @@ export function DatePicker({
             selectsMultiple={false}
             selected={value}
             onChange={onPick}
+            onCalendarOpen={onCalendarOpen}
             onCalendarClose={onCalendarClose}
             onInputClick={onInputClick}
             // Closed by the year pick (useDatePicker), not by a day pick
@@ -152,7 +161,12 @@ export function DatePicker({
             disabledDayAriaLabelPrefix={labels.unavailableDayPrefix}
             monthAriaLabelPrefix={labels.monthPrefix}
             showPopperArrow={false}
-            popperPlacement="bottom-start"
+            // KAN-136: the calendar opens centred on the screen and stays there (centreCalendar). It is placed
+            // with position: fixed, so the scrolling Modal cannot clip it (the Modal has no transform, which would
+            // make a fixed child follow the modal). It must stay inside the Modal in the DOM: a portal under <body>
+            // is outside the Radix focus trap, which pulls the focus back to the input (keyboard picking breaks).
+            popperModifiers={[centreCalendar]}
+            popperProps={{ strategy: "fixed" }}
             // CSS Module names are typed string | undefined; react-datepicker wants a string
             wrapperClassName={styles.wrapper ?? ""}
             popperClassName={styles.popper ?? ""}

@@ -99,7 +99,7 @@
   --color-surface: var(--palette-grey-600);
   --color-modal-bg: var(--palette-grey-600);
   --color-text: var(--palette-grey-100);
-  --color-text-secondary: var(--palette-grey-400);
+  --color-text-secondary: var(--palette-grey-300);
   --color-text-placeholder: var(--palette-grey-500);
   --color-border: var(--palette-grey-500);
   --color-input-border: var(--palette-grey-400);
@@ -164,7 +164,7 @@
     --color-surface: var(--palette-grey-600);
     --color-modal-bg: var(--palette-grey-600);
     --color-text: var(--palette-grey-100);
-    --color-text-secondary: var(--palette-grey-400);
+    --color-text-secondary: var(--palette-grey-300);
     --color-text-placeholder: var(--palette-grey-500);
     --color-border: var(--palette-grey-500);
     --color-input-border: var(--palette-grey-400);

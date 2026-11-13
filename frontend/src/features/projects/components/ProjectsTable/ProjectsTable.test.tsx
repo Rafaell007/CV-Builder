@@ -41,11 +41,29 @@ describe("ProjectsTable", () => {
 
     const row = screen.getByRole("row", { name: /Blog/ });
     expect(within(row).getByText("Blogging")).toBeInTheDocument();
-    expect(within(row).getByText(blog.description)).toBeInTheDocument();
-    const tags = within(row)
+    // The description and the tags sit in the detail line under the row, not in the Name cell.
+    expect(within(row).queryByText(blog.description)).not.toBeInTheDocument();
+    const detail = row.nextElementSibling as HTMLElement;
+    expect(detail).toHaveAttribute("data-row-detail");
+    expect(within(detail).getByText(blog.description)).toBeInTheDocument();
+    const tags = within(detail)
       .getAllByRole("listitem")
       .map((tag) => tag.textContent);
     expect(tags).toEqual(["HTML5", "CSS3", "TypeScript", "React", "Zustand", "Firebase"]);
+  });
+
+  it("hides the Domain column below the desktop width", () => {
+    const original = window.innerWidth;
+    window.innerWidth = 768;
+    try {
+      render();
+
+      const headers = screen.getAllByRole("columnheader").map((header) => header.textContent);
+      expect(headers).toEqual(["Name", "Start Date", "End Date", "Actions"]);
+      expect(screen.queryByText("Blogging")).not.toBeInTheDocument();
+    } finally {
+      window.innerWidth = original;
+    }
   });
 
   it("writes the dates as MM/DD/YYYY in English", () => {
@@ -138,6 +156,7 @@ describe("ProjectsTable", () => {
     const names = screen
       .getAllByRole("row")
       .slice(1)
+      .filter((row) => !row.hasAttribute("data-row-detail"))
       .map((row) => within(row).getByText(/^(Blog|Cloud Sales Management)$/).textContent);
     expect(names).toEqual(["Blog", "Cloud Sales Management"]);
   });

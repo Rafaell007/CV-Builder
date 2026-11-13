@@ -179,7 +179,9 @@ test.describe("projects page, keyboard and focus", () => {
 
     await expect(confirmDialog(page)).toBeHidden();
     // Nothing was deleted: Escape is a Cancel.
-    await expect(page.getByRole("row", { name: /Banking Portal/ })).toHaveCount(1);
+    await expect(
+      page.locator("tbody tr:not([data-row-detail])", { hasText: "Banking Portal" }),
+    ).toHaveCount(1);
     await expect(button).toBeFocused();
   });
 
@@ -200,10 +202,8 @@ test.describe("projects page, keyboard and focus", () => {
     await expect(startDate).not.toHaveValue("01/10/2026");
   });
 
-  // Known issue (projects README, "Escape in the calendar"): one Escape closes the calendar AND the Create modal,
-  // so the user loses the form. WAI-ARIA wants the popup closed first. Remove `fixme` when the shared Modal and
-  // DatePicker agree on who handles the key.
-  test.fixme("Escape closes only the calendar, not the Create modal", async ({ page }) => {
+  // WAI-ARIA: Escape closes the popup first. The shared Modal skips its own Escape while a calendar is open.
+  test("Escape closes only the calendar, not the Create modal", async ({ page }) => {
     await createButton(page).click();
     const startDate = dialog(page).getByRole("textbox", { name: "Start Date" });
     await startDate.focus();
@@ -275,10 +275,7 @@ for (const theme of ["light", "dark"] as const) {
     test("applies the theme and keeps the project rows readable", async ({ page }) => {
       await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
 
-      const firstRow = page
-        .getByRole("row")
-        .filter({ has: page.getByRole("cell") })
-        .first();
+      const firstRow = page.locator("tbody tr:not([data-row-detail])").first();
       await expect(firstRow).toContainText("Banking Portal");
       // The name cell, the domain cell and the heading are the three kinds of text on the list.
       expect(await contrastOf(page, "tbody tr:first-child td:first-child")).toBeGreaterThanOrEqual(
@@ -295,13 +292,8 @@ for (const theme of ["light", "dark"] as const) {
 
       await expect(dialog(page)).toBeVisible();
       expect(await contrastOf(page, '[role="dialog"] h2')).toBeGreaterThanOrEqual(WCAG_AA_TEXT);
-      // Known issue (projects README): in the dark theme the field label (grey-400 on the grey-600 modal) has
-      // 4.32:1. The fix is a shared token change, so only the light theme is checked until that is done.
-      if (theme === "light") {
-        expect(await contrastOf(page, '[role="dialog"] label')).toBeGreaterThanOrEqual(
-          WCAG_AA_TEXT,
-        );
-      }
+      // The field label uses --color-text-secondary. In the dark theme it was 4.32:1 (KAN-139 fixed it).
+      expect(await contrastOf(page, '[role="dialog"] label')).toBeGreaterThanOrEqual(WCAG_AA_TEXT);
     });
   });
 }
@@ -363,10 +355,9 @@ test.describe("projects page, tablet width", () => {
     expect(box.x + box.width).toBeLessThanOrEqual(TABLET.width);
   });
 
-  // Known issue (projects README, "Calendar cut by the modal"): at 768 x 1024 the calendar opens above the field and
-  // the top edge of the modal cuts its header, so the month and year buttons and the arrows cannot be used.
-  // Remove `fixme` when the shared DatePicker or Modal lets the popup show whole.
-  test.fixme("the calendar header is not cut by the modal", async ({ page }) => {
+  // At 768 x 1024 the calendar opens above the field. It is placed against the screen (fixed), so the modal
+  // cannot cut it.
+  test("the calendar header is not cut by the modal", async ({ page }) => {
     await createButton(page).click();
     await dialog(page).getByRole("textbox", { name: "End Date" }).click();
 

@@ -51,17 +51,17 @@
 }
 
 /*
- * Attached under the field's bottom border, aligned with its outer left edge.
- * react-datepicker keeps a 10px gap above its popup even without the arrow: -10px + the 1px border.
- * The Open story checks the position, so a change of that gap in a library update fails the test.
+ * The calendar sits under <body> (KAN-136), outside the modal, so it needs its own layer over the modal (z-index 20)
+ * and its own pointer events: an open Radix modal sets pointer-events: none on <body>, which the calendar would
+ * inherit, so a click on anything but a day would pass through it and close it as a click outside.
  */
 .popper {
-  z-index: 1;
-  margin: -9px 0 0 -1px;
+  z-index: 21;
+  pointer-events: auto;
 }
 
 /*
- * Popup: 449px wide (wider than the 400 field), radius 0 0 8 8, 1px border, page fill, shadow in light only.
+ * Popup: 449px wide, radius 8, 1px border, page fill, shadow in light only.
  * Inner spacing: the header row at 24px from the top, 32px from the sides (Figma). Below it: prediction.
  */
 .calendar {
@@ -71,7 +71,7 @@
   max-width: calc(100vw - 2 * var(--space-4));
   padding: var(--space-6) var(--space-8);
   border: 1px solid var(--color-input-border);
-  border-radius: 0 0 var(--radius-menu) var(--radius-menu);
+  border-radius: var(--radius-menu);
   background: var(--color-bg);
   box-shadow: var(--shadow-calendar);
   color: var(--color-text);

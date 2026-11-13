@@ -2,6 +2,8 @@ import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders, screen } from "@/shared/testing";
 import { Button } from "../Button";
+import { DatePicker } from "../DatePicker";
+import { DATE_PICKER_EXAMPLE_LABELS } from "../DatePicker/datePicker.fixtures";
 import { Modal, type ModalProps } from "./Modal";
 
 // Opened by a page button, as on the real pages (no Radix Trigger).
@@ -104,5 +106,44 @@ describe("Modal", () => {
 
     expect(onOpenChange).toHaveBeenCalledWith(false);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  describe("with a DatePicker inside", () => {
+    function ModalWithDate({ onOpenChange }: { onOpenChange: (open: boolean) => void }) {
+      return (
+        <Modal open onOpenChange={onOpenChange} title="Add project" closeLabel="Close">
+          <DatePicker
+            label="Start Date"
+            locale="en"
+            labels={DATE_PICKER_EXAMPLE_LABELS}
+            value={null}
+            onValueChange={() => undefined}
+          />
+        </Modal>
+      );
+    }
+
+    it("closes only the calendar on the first Escape and the modal on the second", async () => {
+      const onOpenChange = vi.fn();
+      const { user } = renderWithProviders(<ModalWithDate onOpenChange={onOpenChange} />);
+      const input = screen.getByRole("textbox", { name: "Start Date" });
+      await user.click(input);
+      expect(
+        screen.getByRole("dialog", { name: DATE_PICKER_EXAMPLE_LABELS.calendar }),
+      ).toBeInTheDocument();
+
+      await user.keyboard("{Escape}");
+
+      expect(
+        screen.queryByRole("dialog", { name: DATE_PICKER_EXAMPLE_LABELS.calendar }),
+      ).not.toBeInTheDocument();
+      expect(onOpenChange).not.toHaveBeenCalled();
+      expect(screen.getByRole("dialog", { name: "Add project" })).toBeInTheDocument();
+      expect(input).toHaveFocus();
+
+      await user.keyboard("{Escape}");
+
+      expect(onOpenChange).toHaveBeenCalledWith(false);
+    });
   });
 });
