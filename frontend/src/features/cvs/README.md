@@ -70,8 +70,9 @@ Rules (the same in the backend):
 - **The Employee column shows the owner email for both roles.** The page document says the same, so there is no role check in the frontend.
 - **Search, sort and page are not in the URL.** They are lost on a refresh and cannot be shared (same as the projects page).
 - **Not checked in a browser.** Vitest and Storybook (Chromium) pass; nobody has compared the page with the Figma frame pixel by pixel, or used it with a screen reader or on a touch screen.
-- **E2E is not written.** No Playwright spec covers the CVs list yet.
+- **E2E:** `e2e/cvs/cvs.spec.ts` covers the list (admin and user), sort, search, row click, the menu, create, update, delete and the go-back-one-page rule. It does not cover the Polish texts, the tablet layout or the keyboard (no `cvs.a11y.spec.ts` yet).
 - **Dark and light theme of the description line.** It uses `--color-text-secondary`; check the contrast against the Figma frame.
 - **The Create form sends no `userId`.** The backend uses the signed-in user, so an admin cannot choose another owner in this form. The User CVs tab (S7.7) needs this: create assigns to that user.
 - **The `NOT_FOUND` reload of a delete has no test** (`useDeleteCv.test.tsx` holds an `it.todo` with the steps; the hook needs an active `Cvs` query).
 - **The fade-out of the delete modal and the real backend were not checked by hand.**
+- **Stale total after a delete (fixed here, check the projects page).** `useDeleteCv` drops every cached `cvs` page when a CV is deleted. Before this, going back one page showed page 1 from the cache with the old total, so a second page button stayed for 10 CVs (found by the E2E test). `useDeleteProject` uses the same refetch of the open query only; it was not checked for the same problem.
