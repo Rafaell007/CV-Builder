@@ -25,4 +25,8 @@ describe("uniqueDomains", () => {
       ]),
     ).toEqual(["IoT", "FinTech", "Healthcare"]);
   });
+
+  it("compares domains case-sensitive: IoT and iot are two different domains", () => {
+    expect(uniqueDomains([projectIn("IoT"), projectIn("iot")])).toEqual(["IoT", "iot"]);
+  });
 });
