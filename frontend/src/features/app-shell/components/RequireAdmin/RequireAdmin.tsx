@@ -9,15 +9,22 @@ import styles from "./RequireAdmin.module.css";
 
 /**
  * Route guard for the Admin pages. While the user loads it shows a loading state, so the page (and its
- * requests) do not start. A user who is not an Admin sees a Forbidden screen with a link back.
+ * requests) do not start. If the user cannot be loaded, it shows an error with Retry. A loaded user who
+ * is not an Admin sees a Forbidden screen with a link back.
  * This is only a clear message: the backend still rejects every Admin request of other users (PLAN D10).
  */
 export function RequireAdmin({ children }: { children: ReactNode }) {
   const t = useTranslations("appShell.forbidden");
-  const { loading, isAdmin } = useCurrentUser();
+  const { loading, failed, retry, isAdmin } = useCurrentUser();
 
   if (loading) {
     return <PageState kind="loading" />;
+  }
+
+  if (failed) {
+    return (
+      <PageState kind="error" onRetry={retry} labels={{ error: t("error"), retry: t("retry") }} />
+    );
   }
 
   if (!isAdmin) {

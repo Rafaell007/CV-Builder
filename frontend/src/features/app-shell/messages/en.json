@@ -17,6 +17,8 @@
   "forbidden": {
     "title": "No access",
     "message": "Only Admin users can open this page.",
-    "back": "Back to Employees"
+    "back": "Back to Employees",
+    "error": "Could not check your access. Please try again.",
+    "retry": "Retry"
   }
 }

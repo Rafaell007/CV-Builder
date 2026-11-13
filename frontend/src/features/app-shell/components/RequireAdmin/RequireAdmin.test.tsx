@@ -31,6 +31,31 @@ describe("RequireAdmin", () => {
     expect(await screen.findByText("Secret page")).toBeInTheDocument();
   });
 
+  it("shows an error with Retry, not Forbidden, when the user cannot be loaded", async () => {
+    renderWithProviders(<RequireAdmin>Secret page</RequireAdmin>, {
+      mocks: [{ request: { query: MeDocument }, error: new Error("Network down") }],
+    });
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Could not check your access");
+    expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
+    expect(screen.queryByText("No access")).not.toBeInTheDocument();
+    expect(screen.queryByText("Secret page")).not.toBeInTheDocument();
+  });
+
+  it("sends the request again on Retry and then shows the page to an Admin", async () => {
+    const { user } = renderWithProviders(<RequireAdmin>Secret page</RequireAdmin>, {
+      mocks: [
+        { request: { query: MeDocument }, error: new Error("Network down") },
+        meMock("ADMIN"),
+      ],
+    });
+
+    await user.click(await screen.findByRole("button", { name: "Retry" }));
+
+    expect(await screen.findByText("Secret page")).toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
   it("shows Forbidden with a link back to a user who is not an Admin", async () => {
     renderWithProviders(<RequireAdmin>Secret page</RequireAdmin>, { mocks: [meMock("USER")] });
 

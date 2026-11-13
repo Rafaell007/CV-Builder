@@ -17,6 +17,8 @@
   "forbidden": {
     "title": "Brak dostępu",
     "message": "Tę stronę mogą otworzyć tylko administratorzy.",
-    "back": "Wróć do pracowników"
+    "back": "Wróć do pracowników",
+    "error": "Nie udało się sprawdzić uprawnień. Spróbuj ponownie.",
+    "retry": "Ponów"
   }
 }
