@@ -30,5 +30,42 @@
     "noResults": "No CVs found",
     "error": "Failed to load CVs",
     "retry": "Retry"
+  },
+  "form": {
+    "fields": {
+      "name": "Name",
+      "education": "Education",
+      "description": "Description"
+    },
+    "errors": {
+      "nameRequired": "Name is required",
+      "nameTooLong": "Name must not exceed 255 characters",
+      "educationRequired": "Education is required",
+      "educationTooLong": "Education must not exceed 255 characters",
+      "descriptionRequired": "Description is required",
+      "descriptionTooLong": "Description must not exceed 2000 characters",
+      "serverInvalid": "The server did not accept this value",
+      "failed": "Something went wrong. Please try again later"
+    }
+  },
+  "create": {
+    "title": "Create CV",
+    "close": "Close",
+    "submit": "Create",
+    "cancel": "Cancel",
+    "success": {
+      "title": "CV created",
+      "text": "{name} was added to the CVs."
+    }
+  },
+  "update": {
+    "title": "Update CV",
+    "close": "Close",
+    "submit": "Save",
+    "cancel": "Cancel",
+    "success": {
+      "title": "CV updated",
+      "text": "{name} was saved."
+    }
   }
 }

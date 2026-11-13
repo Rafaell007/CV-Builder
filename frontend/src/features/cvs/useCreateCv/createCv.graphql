@@ -1,0 +1,11 @@
+# Creates one CV. The backend makes the signed-in user the owner. An admin may send `userId`; the form does not.
+mutation CreateCv($input: CreateCvInput!) {
+  createCv(input: $input) {
+    id
+    name
+    education
+    description
+    ownerEmail
+    userId
+  }
+}

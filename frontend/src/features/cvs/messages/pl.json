@@ -30,5 +30,42 @@
     "noResults": "Nie znaleziono CV",
     "error": "Nie udało się wczytać CV",
     "retry": "Spróbuj ponownie"
+  },
+  "form": {
+    "fields": {
+      "name": "Nazwa",
+      "education": "Wykształcenie",
+      "description": "Opis"
+    },
+    "errors": {
+      "nameRequired": "Nazwa jest wymagana",
+      "nameTooLong": "Nazwa może mieć co najwyżej 255 znaków",
+      "educationRequired": "Wykształcenie jest wymagane",
+      "educationTooLong": "Wykształcenie może mieć co najwyżej 255 znaków",
+      "descriptionRequired": "Opis jest wymagany",
+      "descriptionTooLong": "Opis może mieć co najwyżej 2000 znaków",
+      "serverInvalid": "Serwer nie przyjął tej wartości",
+      "failed": "Coś poszło nie tak. Spróbuj ponownie później"
+    }
+  },
+  "create": {
+    "title": "Utwórz CV",
+    "close": "Zamknij",
+    "submit": "Utwórz",
+    "cancel": "Anuluj",
+    "success": {
+      "title": "CV zostało utworzone",
+      "text": "{name} zostało dodane do listy CV."
+    }
+  },
+  "update": {
+    "title": "Edytuj CV",
+    "close": "Zamknij",
+    "submit": "Zapisz",
+    "cancel": "Anuluj",
+    "success": {
+      "title": "CV zostało zaktualizowane",
+      "text": "{name} zostało zapisane."
+    }
   }
 }
