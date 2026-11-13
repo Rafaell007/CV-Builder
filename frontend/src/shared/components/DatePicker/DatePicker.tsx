@@ -70,6 +70,8 @@ export function DatePicker({
   });
   const {
     view,
+    isCalendarOpen,
+    onCalendarOpen,
     isArrowDisabled,
     onArrowClick,
     showMonthList,
@@ -101,7 +103,12 @@ export function DatePicker({
       error={error}
       className={className}
     >
-      <div className={styles.box} onBlur={onFocusLeave}>
+      {/* data-calendar-open: a Modal around the field skips its own Escape while the calendar is open (see Modal) */}
+      <div
+        className={styles.box}
+        onBlur={onFocusLeave}
+        {...(isCalendarOpen && { "data-calendar-open": "true" })}
+      >
         <CalendarLabelContext value={labels.calendar}>
           <ReactDatePicker
             // One date: picks react-datepicker's single-date props (its types are a union of single / range / multiple)
@@ -110,6 +117,7 @@ export function DatePicker({
             selectsMultiple={false}
             selected={value}
             onChange={onPick}
+            onCalendarOpen={onCalendarOpen}
             onCalendarClose={onCalendarClose}
             onInputClick={onInputClick}
             // Closed by the year pick (useDatePicker), not by a day pick
