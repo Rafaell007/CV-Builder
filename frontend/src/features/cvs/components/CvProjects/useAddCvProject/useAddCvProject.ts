@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useCallback, useMemo, useState, type BaseSyntheticEvent } from "react";
 import { useWatch } from "react-hook-form";
 import { useToast } from "@/shared/components";
-import { AddCvProjectDocument, CvProjectsDocument } from "@/shared/graphql";
+import { AddCvProjectDocument, CvProjectsDocument, HeldCvProjectsDocument } from "@/shared/graphql";
 import type { CvProjectFormSubmit } from "../cvProjects.types";
 import { useCvProjectForm } from "../useCvProjectForm";
 import { useProjectCatalog } from "../useProjectCatalog";
@@ -32,7 +32,8 @@ export function useAddCvProject(cvId: string) {
   const catalog = useProjectCatalog(isOpen);
   const roles = useProjectRoles(isOpen);
   // The projects that the CV holds, with no search: the list on the page can show fewer rows than the CV has.
-  const held = useQuery(CvProjectsDocument, {
+  // Its own document: a refetch of the list after a change must not run this request too.
+  const held = useQuery(HeldCvProjectsDocument, {
     variables: { cvId },
     skip: !isOpen,
     fetchPolicy: "network-only",

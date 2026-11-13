@@ -3,6 +3,7 @@ import {
   AddCvProjectDocument,
   type AddCvProjectInput,
   CvProjectsDocument,
+  HeldCvProjectsDocument,
   ProjectCatalogDocument,
   ProjectRolesDocument,
   RemoveCvProjectsDocument,
@@ -112,6 +113,23 @@ export const cvProjectsNetworkErrorMock = (
 ): MockLink.MockedResponse => ({
   request: { query: CvProjectsDocument, variables },
   error: new Error("Failed to fetch"),
+});
+
+/** MockedProvider response of the `HeldCvProjects` query: the ids of the projects that the CV holds. */
+export const heldCvProjectsMock = (
+  projects: CvProjectItem[] = [],
+  cvId = CV_ID,
+): MockLink.MockedResponse => ({
+  request: { query: HeldCvProjectsDocument, variables: { cvId } },
+  result: {
+    data: {
+      cvProjects: projects.map((item) => ({
+        __typename: "CvProject",
+        id: item.id,
+        project: { __typename: "Project", id: item.project.id },
+      })),
+    },
+  },
 });
 
 /** MockedProvider response of the `ProjectCatalog` query. */

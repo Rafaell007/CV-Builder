@@ -9,7 +9,7 @@ import {
   bank,
   cvProject,
   CV_ID,
-  cvProjectsMock,
+  heldCvProjectsMock,
   projectCatalogMock,
   projectRolesMock,
   sampleRoles,
@@ -32,7 +32,7 @@ function setup(options: RenderWithProvidersOptions) {
 }
 
 // The projects that the CV holds, asked without a search (blog is in the CV, bank is not).
-const heldMock = () => cvProjectsMock([blogEntry], { cvId: CV_ID });
+const heldMock = () => heldCvProjectsMock([blogEntry]);
 const openMocks = () => [projectCatalogMock(), projectRolesMock(), heldMock()];
 
 // What the form sends for the bank project with the dates of the project and one role.
@@ -116,10 +116,7 @@ describe("useAddCvProject", () => {
 
   it("adds the project, closes the modal and says so (AC-7, AC-41)", async () => {
     const added = cvProject({ id: "link-new", project: bank, roles: [sampleRoles[0]!] });
-    // The second held mock answers the list that loads again after the request.
-    const { result } = setup({
-      mocks: [...openMocks(), addCvProjectMock(bankInput, added), heldMock()],
-    });
+    const { result } = setup({ mocks: [...openMocks(), addCvProjectMock(bankInput, added)] });
     await openAndChooseBank(result);
 
     await act(() => result().submit(submitEvent));
@@ -139,7 +136,6 @@ describe("useAddCvProject", () => {
       mocks: [
         ...openMocks(),
         addCvProjectMock(input, cvProject({ id: "link-new", project: bank })),
-        heldMock(),
       ],
     });
     await openAndChooseBank(result);
@@ -204,7 +200,7 @@ describe("useAddCvProject", () => {
     const added = cvProject({ id: "link-new", project: bank });
     // One add mock: a second request would find no mock and the modal would show the general message.
     const slow = { ...addCvProjectMock(bankInput, added), delay: 20 };
-    const { result } = setup({ mocks: [...openMocks(), slow, heldMock()] });
+    const { result } = setup({ mocks: [...openMocks(), slow] });
     await openAndChooseBank(result);
 
     await act(async () => {

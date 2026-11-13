@@ -1,0 +1,13 @@
+/* The search field is 320px wide in Figma (as on the CVs page); ADD PROJECT sits at the right end. */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.toolbar > :first-child {
+  flex: 1;
+  max-width: 320px;
+}
