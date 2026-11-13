@@ -8,6 +8,7 @@ import {
   SearchField,
   type PageStateLabels,
 } from "@/shared/components";
+import { useCurrentUser } from "@/shared/currentUser";
 import { useRouter } from "@/shared/i18n";
 import { CvsTable } from "./components/CvsTable";
 import { SEARCH_MAX_LENGTH } from "./cvs.constants";
@@ -41,6 +42,7 @@ export function Cvs({ userId, onView, onEdit, onDelete, onCreate }: CvsProps) {
   const list = useCvsListState();
   const variables = toCvsVariables(list, userId);
   const { cvs, total, loading, failed, retry } = useCvs(variables);
+  const { user, isAdmin } = useCurrentUser();
 
   const stateLabels: PageStateLabels = {
     loading: t("states.loading"),
@@ -49,8 +51,11 @@ export function Cvs({ userId, onView, onEdit, onDelete, onCreate }: CvsProps) {
     error: t("states.error"),
     retry: t("states.retry"),
   };
-  // A search that matched nothing is not the same as a user without CVs.
-  const emptyKind = variables.search === undefined ? "empty" : "no-results";
+  // "You have no CVs yet" is for a signed-in non-admin who has no CVs and did not search. An admin, a list of one
+  // user (userId) and a search that matched nothing all show "No CVs found".
+  const hasNoCvsYet =
+    user !== null && !isAdmin && userId === undefined && variables.search === undefined;
+  const emptyKind = hasNoCvsYet ? "empty" : "no-results";
 
   return (
     <div className={styles.page}>

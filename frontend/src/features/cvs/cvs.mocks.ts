@@ -1,6 +1,6 @@
 import type { MockLink } from "@apollo/client/testing";
 import { DEFAULT_PAGE_SIZE } from "@/shared/components";
-import { CvsDocument, type CvsQuery, type CvsQueryVariables } from "@/shared/graphql";
+import { CvsDocument, MeDocument, type CvsQuery, type CvsQueryVariables } from "@/shared/graphql";
 import { DEFAULT_CVS_SORT } from "./cvs.constants";
 import type { CvListItem } from "./cvs.types";
 
@@ -123,4 +123,22 @@ export const cvsErrorMock = (
 ): MockLink.MockedResponse => ({
   request: { query: CvsDocument, variables },
   error: new Error("Failed to fetch"),
+});
+
+/** MockedProvider response of the `me` query: the signed-in user with this role. The empty text of the list depends on it. */
+export const meMock = (role: "ADMIN" | "USER" = "USER"): MockLink.MockedResponse => ({
+  request: { query: MeDocument },
+  result: {
+    data: {
+      me: {
+        __typename: "SessionUser",
+        id: "10",
+        email: "anna.kowalska@example.com",
+        firstName: "Anna",
+        lastName: "Kowalska",
+        role,
+        isVerified: true,
+      },
+    },
+  },
 });

@@ -9,6 +9,7 @@ import {
   fakeBackendMock,
   frontendCv,
   manyCvs,
+  meMock,
   sampleCvs,
 } from "./cvs.mocks";
 
@@ -130,10 +131,19 @@ export const Loading: Story = {
   },
 };
 
+/** A signed-in user without CVs. */
 export const Empty: Story = {
-  parameters: { apollo: { mocks: [cvsMock([])] } },
+  parameters: { apollo: { mocks: [meMock("USER"), cvsMock([])] } },
   play: async ({ canvas }) => {
     await expect(await canvas.findByText("You have no CVs yet")).toBeInTheDocument();
+  },
+};
+
+/** An admin sees No CVs found for an empty list, not the text for a user without CVs. */
+export const EmptyAdmin: Story = {
+  parameters: { apollo: { mocks: [meMock("ADMIN"), cvsMock([])] } },
+  play: async ({ canvas }) => {
+    await expect(await canvas.findByText("No CVs found")).toBeInTheDocument();
   },
 };
 

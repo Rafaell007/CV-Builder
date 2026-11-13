@@ -9,6 +9,7 @@ import {
   dataCv,
   fakeBackendMock,
   frontendCv,
+  meMock,
   variablesFor,
 } from "./cvs.mocks";
 
@@ -66,10 +67,28 @@ describe("Cvs", () => {
     expect(screen.queryByRole("status", { name: "Loading CVs" })).not.toBeInTheDocument();
   });
 
-  it("shows You have no CVs yet when the list is empty", async () => {
-    renderWithProviders(<Cvs />, { mocks: [cvsMock([])] });
+  describe("empty list", () => {
+    it("shows You have no CVs yet to a signed-in user without CVs", async () => {
+      renderWithProviders(<Cvs />, { mocks: [meMock("USER"), cvsMock([])] });
 
-    expect(await screen.findByText("You have no CVs yet")).toBeInTheDocument();
+      expect(await screen.findByText("You have no CVs yet")).toBeInTheDocument();
+    });
+
+    it("shows No CVs found to an admin", async () => {
+      renderWithProviders(<Cvs />, { mocks: [meMock("ADMIN"), cvsMock([])] });
+
+      expect(await screen.findByText("No CVs found")).toBeInTheDocument();
+      expect(screen.queryByText("You have no CVs yet")).not.toBeInTheDocument();
+    });
+
+    it("shows No CVs found for the list of one user, also for a non-admin", async () => {
+      renderWithProviders(<Cvs userId="10" />, {
+        mocks: [meMock("USER"), cvsMock([], { variables: variablesFor({ userId: "10" }) })],
+      });
+
+      expect(await screen.findByText("No CVs found")).toBeInTheDocument();
+      expect(screen.queryByText("You have no CVs yet")).not.toBeInTheDocument();
+    });
   });
 
   it("shows an error with a retry button, not an empty list, when the request fails", async () => {
@@ -92,7 +111,7 @@ describe("Cvs", () => {
   });
 
   it("shows the texts in Polish", async () => {
-    renderWithProviders(<Cvs />, { locale: "pl", mocks: [cvsMock([])] });
+    renderWithProviders(<Cvs />, { locale: "pl", mocks: [meMock("USER"), cvsMock([])] });
 
     expect(screen.getByRole("heading", { name: "CV" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "UTWÓRZ CV" })).toBeInTheDocument();
@@ -308,6 +327,34 @@ describe("Cvs", () => {
   });
 
   describe("actions", () => {
+    it("does not open the CV when the description is clicked", async () => {
+      const onView = vi.fn();
+      const { user } = renderWithProviders(<Cvs onView={onView} />, {
+        mocks: [cvsMock([frontendCv])],
+      });
+
+      await user.click(await screen.findByText(frontendCv.description));
+
+      expect(onView).not.toHaveBeenCalled();
+    });
+
+    it("does not open the CV when the menu button is clicked or Edit is selected", async () => {
+      const onView = vi.fn();
+      const onEdit = vi.fn();
+      const { user } = renderWithProviders(<Cvs onView={onView} onEdit={onEdit} />, {
+        mocks: [cvsMock([frontendCv])],
+      });
+
+      await user.click(
+        await screen.findByRole("button", { name: "Actions for Frontend Developer" }),
+      );
+      expect(onView).not.toHaveBeenCalled();
+      await user.click(screen.getByRole("menuitem", { name: "Edit" }));
+
+      expect(onEdit).toHaveBeenCalledOnce();
+      expect(onView).not.toHaveBeenCalled();
+    });
+
     it("opens the CV Details page on a row click when no onView is given", async () => {
       const { user } = renderWithProviders(<Cvs />, { mocks: [cvsMock([frontendCv])] });
 
