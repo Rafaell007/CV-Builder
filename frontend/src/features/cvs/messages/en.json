@@ -103,5 +103,80 @@
     "failedText": "Something went wrong. Please try again.",
     "notFound": "This CV does not exist any more. The list was updated.",
     "forbidden": "You are not allowed to delete this CV."
+  },
+  "skills": {
+    "actions": {
+      "add": "ADD SKILL",
+      "remove": "REMOVE SKILLS"
+    },
+    "masteryLevel": "Mastery: {level}",
+    "mastery": {
+      "BEGINNER": "Beginner",
+      "ELEMENTARY": "Elementary",
+      "INTERMEDIATE": "Intermediate",
+      "ADVANCED": "Advanced",
+      "EXPERT": "Expert"
+    },
+    "states": {
+      "loading": "Loading skills",
+      "empty": "No skills added yet",
+      "error": "Failed to load skills",
+      "retry": "Retry"
+    },
+    "selection": {
+      "remove": "Remove",
+      "cancel": "Cancel"
+    },
+    "add": {
+      "title": "Add skill",
+      "close": "Close",
+      "skill": "Skill",
+      "submit": "Add",
+      "cancel": "Cancel",
+      "loading": "Loading skills",
+      "loadFailed": "Failed to load the skills you can add.",
+      "retry": "Retry",
+      "none": "The owner of this CV has no more skills to add.",
+      "errors": {
+        "required": "Skill is required",
+        "conflict": "This skill is already in the CV",
+        "invalid": "This skill is not available for the owner of the CV",
+        "notFound": "This CV does not exist any more.",
+        "forbidden": "You are not allowed to add skills to this CV.",
+        "failed": "Something went wrong. Please try again later"
+      },
+      "success": {
+        "title": "Skill added",
+        "text": "{name} was added to the CV."
+      }
+    },
+    "update": {
+      "title": "Update skill",
+      "close": "Close",
+      "skill": "Skill",
+      "mastery": "Mastery",
+      "submit": "Save",
+      "cancel": "Cancel",
+      "errors": {
+        "notFound": "This skill is not in the CV any more.",
+        "forbidden": "You are not allowed to change this CV.",
+        "failed": "Something went wrong. Please try again later"
+      },
+      "success": {
+        "title": "Skill updated",
+        "text": "{name} was saved."
+      }
+    },
+    "remove": {
+      "title": "Remove skills",
+      "message": "{count, plural, one {Are you sure you want to remove # skill?} other {Are you sure you want to remove # skills?}}",
+      "close": "Close",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "failedTitle": "Could not remove the skills",
+      "failedText": "Something went wrong. Please try again.",
+      "notFound": "Some of these skills are not in the CV any more. The list was updated.",
+      "forbidden": "You are not allowed to change this CV."
+    }
   }
 }

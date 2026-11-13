@@ -1,0 +1,16 @@
+# The skills of one CV for the Skills tab. The backend checks access: a user reads only the skills of their own CVs,
+# an admin of any CV. Someone else's CV answers NOT_FOUND, the same as a missing one (docs/pages/22-cv-skills-page.md).
+# The list is ordered by category name, then skill name, so the page only groups it.
+query CvSkills($cvId: ID!) {
+  cvSkills(cvId: $cvId) {
+    id
+    cvId
+    skillId
+    name
+    mastery
+    category {
+      id
+      name
+    }
+  }
+}

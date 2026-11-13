@@ -103,5 +103,80 @@
     "failedText": "Coś poszło nie tak. Spróbuj ponownie.",
     "notFound": "To CV już nie istnieje. Lista została odświeżona.",
     "forbidden": "Nie masz uprawnień do usunięcia tego CV."
+  },
+  "skills": {
+    "actions": {
+      "add": "DODAJ UMIEJĘTNOŚĆ",
+      "remove": "USUŃ UMIEJĘTNOŚCI"
+    },
+    "masteryLevel": "Poziom: {level}",
+    "mastery": {
+      "BEGINNER": "Początkujący",
+      "ELEMENTARY": "Podstawowy",
+      "INTERMEDIATE": "Średnio zaawansowany",
+      "ADVANCED": "Zaawansowany",
+      "EXPERT": "Ekspert"
+    },
+    "states": {
+      "loading": "Ładowanie umiejętności",
+      "empty": "Nie dodano jeszcze umiejętności",
+      "error": "Nie udało się wczytać umiejętności",
+      "retry": "Spróbuj ponownie"
+    },
+    "selection": {
+      "remove": "Usuń",
+      "cancel": "Anuluj"
+    },
+    "add": {
+      "title": "Dodaj umiejętność",
+      "close": "Zamknij",
+      "skill": "Umiejętność",
+      "submit": "Dodaj",
+      "cancel": "Anuluj",
+      "loading": "Ładowanie umiejętności",
+      "loadFailed": "Nie udało się wczytać umiejętności do dodania.",
+      "retry": "Spróbuj ponownie",
+      "none": "Właściciel tego CV nie ma więcej umiejętności do dodania.",
+      "errors": {
+        "required": "Umiejętność jest wymagana",
+        "conflict": "Ta umiejętność jest już w CV",
+        "invalid": "Ta umiejętność nie jest dostępna dla właściciela CV",
+        "notFound": "To CV już nie istnieje.",
+        "forbidden": "Nie masz uprawnień do dodawania umiejętności do tego CV.",
+        "failed": "Coś poszło nie tak. Spróbuj ponownie później"
+      },
+      "success": {
+        "title": "Dodano umiejętność",
+        "text": "Umiejętność {name} została dodana do CV."
+      }
+    },
+    "update": {
+      "title": "Zmień umiejętność",
+      "close": "Zamknij",
+      "skill": "Umiejętność",
+      "mastery": "Poziom",
+      "submit": "Zapisz",
+      "cancel": "Anuluj",
+      "errors": {
+        "notFound": "Tej umiejętności nie ma już w CV.",
+        "forbidden": "Nie masz uprawnień do zmiany tego CV.",
+        "failed": "Coś poszło nie tak. Spróbuj ponownie później"
+      },
+      "success": {
+        "title": "Zmieniono umiejętność",
+        "text": "Umiejętność {name} została zapisana."
+      }
+    },
+    "remove": {
+      "title": "Usuń umiejętności",
+      "message": "{count, plural, one {Czy na pewno chcesz usunąć # umiejętność?} few {Czy na pewno chcesz usunąć # umiejętności?} many {Czy na pewno chcesz usunąć # umiejętności?} other {Czy na pewno chcesz usunąć # umiejętności?}}",
+      "close": "Zamknij",
+      "confirm": "Potwierdź",
+      "cancel": "Anuluj",
+      "failedTitle": "Nie udało się usunąć umiejętności",
+      "failedText": "Coś poszło nie tak. Spróbuj ponownie.",
+      "notFound": "Część tych umiejętności nie jest już w CV. Lista została odświeżona.",
+      "forbidden": "Nie masz uprawnień do zmiany tego CV."
+    }
   }
 }

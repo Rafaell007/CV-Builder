@@ -90,10 +90,12 @@ export class CvsService {
 
   /**
    * Throws NOT_FOUND unless the user may use the CV. Code that works on the data of a CV (for
-   * example its projects) calls this first, so the ownership rule lives in one place.
+   * example its projects) calls this first, so the ownership rule lives in one place. It returns
+   * the id of the owner, for rules that depend on the owner (the skills the owner has).
    */
-  async assertAccessible(user: AuthUser, id: string): Promise<void> {
-    await this.findAccessible(user, id);
+  async assertAccessible(user: AuthUser, id: string): Promise<{ ownerId: string }> {
+    const { userId } = await this.findAccessible(user, id);
+    return { ownerId: userId };
   }
 
   /**

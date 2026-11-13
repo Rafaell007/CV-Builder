@@ -11,6 +11,19 @@ input AddCvProjectInput {
   startDate: DateTime!
 }
 
+input AddCvSkillInput {
+  cvId: ID!
+  mastery: Mastery
+  skillId: ID!
+}
+
+type AvailableCvSkill {
+  category: SkillCategory!
+  id: ID!
+  mastery: Mastery!
+  name: String!
+}
+
 input CreateCvInput {
   description: String!
   education: String!
@@ -55,6 +68,17 @@ type CvProject {
   updatedAt: DateTime!
 }
 
+type CvSkill {
+  category: SkillCategory!
+  createdAt: DateTime!
+  cvId: ID!
+  id: ID!
+  mastery: Mastery!
+  name: String!
+  skillId: ID!
+  updatedAt: DateTime!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -73,8 +97,17 @@ type Health {
   status: String!
 }
 
+enum Mastery {
+  ADVANCED
+  BEGINNER
+  ELEMENTARY
+  EXPERT
+  INTERMEDIATE
+}
+
 type Mutation {
   addCvProject(input: AddCvProjectInput!): CvProject!
+  addCvSkill(input: AddCvSkillInput!): CvSkill!
   createCv(input: CreateCvInput!): Cv!
   createProject(input: CreateProjectInput!): Project!
   deleteCv(id: ID!): Cv!
@@ -82,6 +115,7 @@ type Mutation {
   forgotPassword(input: ForgotPasswordInput!): Boolean!
   refresh: Boolean!
   removeCvProjects(input: RemoveCvProjectsInput!): Boolean!
+  removeCvSkills(input: RemoveCvSkillsInput!): Boolean!
   resendVerificationCode: Boolean!
   resetPassword(input: ResetPasswordInput!): Boolean!
   signIn(input: SignInInput!): SessionUser!
@@ -89,6 +123,7 @@ type Mutation {
   signUp(input: SignUpInput!): SessionUser!
   updateCv(input: UpdateCvInput!): Cv!
   updateCvProject(input: UpdateCvProjectInput!): CvProject!
+  updateCvSkill(input: UpdateCvSkillInput!): CvSkill!
   updateProject(input: UpdateProjectInput!): Project!
   verifyEmail(input: VerifyEmailInput!): SessionUser!
 }
@@ -121,8 +156,10 @@ type ProjectRole {
 }
 
 type Query {
+  availableCvSkills(cvId: ID!): [AvailableCvSkill!]!
   cv(id: ID!): Cv!
   cvProjects(cvId: ID!, search: String, sort: SortInput): [CvProject!]!
+  cvSkills(cvId: ID!): [CvSkill!]!
   cvs(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput, userId: ID): CvPage!
   health: Health!
   me: SessionUser
@@ -132,6 +169,11 @@ type Query {
 }
 
 input RemoveCvProjectsInput {
+  cvId: ID!
+  ids: [ID!]!
+}
+
+input RemoveCvSkillsInput {
   cvId: ID!
   ids: [ID!]!
 }
@@ -165,6 +207,11 @@ input SignUpInput {
   password: String!
 }
 
+type SkillCategory {
+  id: ID!
+  name: String!
+}
+
 enum SortDirection {
   ASC
   DESC
@@ -188,6 +235,11 @@ input UpdateCvProjectInput {
   responsibilities: String
   roleIds: [ID!]!
   startDate: DateTime!
+}
+
+input UpdateCvSkillInput {
+  id: ID!
+  mastery: Mastery!
 }
 
 input UpdateProjectInput {

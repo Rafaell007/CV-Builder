@@ -1,0 +1,36 @@
+/* Values: Figma CV Skills (1440 frame): an 80 × 3 bar left of the name. The fill grows with the level and its colour
+   changes with it: grey, blue, green, yellow, red. The track is the same colour, lighter. */
+.bar {
+  --mastery-color: var(--color-text-secondary);
+  flex: none;
+  box-sizing: border-box;
+  width: 80px;
+  height: 3px;
+  background: color-mix(in srgb, var(--mastery-color) 30%, transparent);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  background: var(--mastery-color);
+}
+
+.neutral {
+  --mastery-color: var(--color-text-secondary);
+}
+
+.info {
+  --mastery-color: var(--color-info);
+}
+
+.success {
+  --mastery-color: var(--color-success);
+}
+
+.warning {
+  --mastery-color: var(--color-warning);
+}
+
+.error {
+  --mastery-color: var(--color-error);
+}

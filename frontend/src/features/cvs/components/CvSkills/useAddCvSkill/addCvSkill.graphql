@@ -1,0 +1,15 @@
+# Adds a skill of the CV owner to the CV. Without a mastery the backend copies the owner's level.
+# Errors: BAD_USER_INPUT (the owner does not have the skill), CONFLICT (already in the CV), NOT_FOUND, FORBIDDEN.
+mutation AddCvSkill($input: AddCvSkillInput!) {
+  addCvSkill(input: $input) {
+    id
+    cvId
+    skillId
+    name
+    mastery
+    category {
+      id
+      name
+    }
+  }
+}

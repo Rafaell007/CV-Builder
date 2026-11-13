@@ -7,6 +7,7 @@ Single choice from a list, built on Radix [`Select`](https://www.radix-ui.com/pr
 - `onBlur` runs when focus leaves the field, not when the list opens (`useTriggerBlur`), so `onTouched` validation waits until the user moves on.
 - No placeholder: the label rests inside until a value is chosen, as in the text input.
 - The list is in a portal at the field's width, shows 5 options and then scrolls. Radix makes it modal: the rest of the page is hidden from screen readers while it is open.
+- The list has `z-index: 21`, above the modal (20). Without it the modal overlay covers the list and options cannot be clicked in a modal (found in KAN-114: the first modal with a Select). Unit tests and jsdom cannot see this; the E2E spec `e2e/cvs/cv-skills.spec.ts` chooses options inside a modal.
 - Used by: user profile (department, position), CV and project forms. Values: [docs/design-tokens.md › Select](../../../../../docs/design-tokens.md#select-ds).
 
 ## Known issues (found in the KAN-78 review)

@@ -1,0 +1,5 @@
+# Removes links between the CV and its skills. All or nothing: one id that is not in the CV gives NOT_FOUND.
+# `ids` are the ids of the CV-skill links, not of the skills of the catalog.
+mutation RemoveCvSkills($input: RemoveCvSkillsInput!) {
+  removeCvSkills(input: $input)
+}
