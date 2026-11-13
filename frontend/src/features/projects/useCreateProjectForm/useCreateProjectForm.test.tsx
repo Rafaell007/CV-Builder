@@ -11,6 +11,7 @@ const input = {
   startDate: "2026-01-10T00:00:00.000Z",
   endDate: "2026-06-30T00:00:00.000Z",
   description: "A blogging site",
+  environmentIds: [],
 };
 
 // The submit handler only needs these two methods of the form event.

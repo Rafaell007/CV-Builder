@@ -1,6 +1,11 @@
 import { z } from "zod";
 import type { CreateProjectInput, UpdateProjectInput } from "@/shared/graphql";
-import { MAX_DESCRIPTION_LENGTH, MAX_DOMAIN_LENGTH, MAX_NAME_LENGTH } from "../projects.constants";
+import {
+  MAX_DESCRIPTION_LENGTH,
+  MAX_DOMAIN_LENGTH,
+  MAX_ENVIRONMENT_SKILLS,
+  MAX_NAME_LENGTH,
+} from "../projects.constants";
 import type { ProjectFormSubmit, ProjectFormValues, ProjectListItem } from "../projects.types";
 
 /** The translated texts of the validation messages (page 27, Create Project Validation). */
@@ -14,6 +19,8 @@ export interface ProjectFormMessages {
   endDateBeforeStart: string;
   descriptionRequired: string;
   descriptionTooLong: string;
+  environmentTooMany: string;
+  environmentDuplicate: string;
 }
 
 // The date picker holds `null` while empty and when the typed text is not a date, so one message covers both.
@@ -28,8 +35,9 @@ const requiredDate = (message: string) =>
     });
 
 /**
- * The rules of the project form (Create and Update): all five fields are required, the lengths are limited, and the end
- * date is not earlier than the start date (the same day is allowed, like the backend). The backend checks
+ * The rules of the project form (Create and Update): name, domain, dates and description are required, the lengths are limited, and the end
+ * date is not earlier than the start date (the same day is allowed, like the backend). The technologies are
+ * optional: at most 50, each one once. The backend checks
  * everything again. Texts are trimmed, so a name of spaces counts as empty.
  */
 export function projectFormSchema(
@@ -54,6 +62,10 @@ export function projectFormSchema(
         .trim()
         .min(1, messages.descriptionRequired)
         .max(MAX_DESCRIPTION_LENGTH, messages.descriptionTooLong),
+      environmentIds: z
+        .array(z.string())
+        .max(MAX_ENVIRONMENT_SKILLS, messages.environmentTooMany)
+        .refine((ids) => new Set(ids).size === ids.length, messages.environmentDuplicate),
     })
     .refine(({ startDate, endDate }) => endDate >= startDate, {
       message: messages.endDateBeforeStart,
@@ -70,7 +82,7 @@ export function toUtcDateIso(date: Date): string {
   return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())).toISOString();
 }
 
-/** The `createProject` input. `environmentIds` is left out: the form has no Environment field yet (see the README). */
+/** The `createProject` input. `environmentIds` holds the technologies the user chose (an empty list for none). */
 export function toCreateProjectInput(values: ProjectFormSubmit): CreateProjectInput {
   return {
     name: values.name,
@@ -78,6 +90,7 @@ export function toCreateProjectInput(values: ProjectFormSubmit): CreateProjectIn
     startDate: toUtcDateIso(values.startDate),
     endDate: toUtcDateIso(values.endDate),
     description: values.description,
+    environmentIds: values.environmentIds,
   };
 }
 
@@ -100,13 +113,13 @@ export function toProjectFormValues(project: ProjectListItem): ProjectFormValues
     startDate: fromUtcDateIso(project.startDate),
     endDate: fromUtcDateIso(project.endDate),
     description: project.description,
+    environmentIds: project.environment.map((skill) => skill.id),
   };
 }
 
 /**
- * The `updateProject` input. The backend replaces the whole environment with `environmentIds` (and an
- * omitted list means "empty"), so the ids the project already has are sent back: the form has no Environment
- * field yet, and without them every edit would remove the technologies of the project.
+ * The `updateProject` input. The backend replaces the whole environment with `environmentIds`, so the form
+ * value is sent, not the ids the project had when the list loaded: the user can change the technologies.
  */
 export function toUpdateProjectInput(
   project: ProjectListItem,
@@ -119,6 +132,6 @@ export function toUpdateProjectInput(
     startDate: toUtcDateIso(values.startDate),
     endDate: toUtcDateIso(values.endDate),
     description: values.description,
-    environmentIds: project.environment.map((skill) => skill.id),
+    environmentIds: values.environmentIds,
   };
 }

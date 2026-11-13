@@ -1,6 +1,14 @@
 import { useLocale, useTranslations } from "next-intl";
 import { Controller } from "react-hook-form";
-import { DatePicker, Textarea, TextField, type DatePickerLabels } from "@/shared/components";
+import {
+  Button,
+  DatePicker,
+  MultiSelect,
+  Textarea,
+  TextField,
+  type DatePickerLabels,
+} from "@/shared/components";
+import { useEnvironmentOptions } from "../../useEnvironmentOptions";
 import type { UseProjectFormResult } from "../../useProjectForm";
 import styles from "./ProjectFormFields.module.css";
 
@@ -10,8 +18,10 @@ export interface ProjectFormFieldsProps {
 }
 
 /**
- * The five fields of a project form and its general error message (page 27, Create Project and Update
- * Project). It renders only the fields: the modal around it owns the title, the buttons and the submit.
+ * The fields of a project form (name, domain, two dates, description and the Environment multi-select) and its
+ * general error message (page 27, Create Project and Update Project). It renders only the fields: the modal
+ * around it owns the title, the buttons and the submit. The technologies come from the skills catalog
+ * (`useEnvironmentOptions`): while they load the field is disabled, and when they fail it shows an error and a retry.
  */
 export function ProjectFormFields({ projectForm }: ProjectFormFieldsProps) {
   const t = useTranslations("projects.form");
@@ -19,6 +29,7 @@ export function ProjectFormFields({ projectForm }: ProjectFormFieldsProps) {
   const { form, failed } = projectForm;
   const { register, control, getValues, trigger } = form;
   const { errors } = form.formState;
+  const environment = useEnvironmentOptions();
 
   const dateLabels: DatePickerLabels = {
     calendar: t("datePicker.calendar"),
@@ -92,6 +103,31 @@ export function ProjectFormFields({ projectForm }: ProjectFormFieldsProps) {
         label={t("fields.description")}
         required
         error={errors.description?.message}
+      />
+      <Controller
+        control={control}
+        name="environmentIds"
+        render={({ field }) => (
+          <div className={styles.environment}>
+            <MultiSelect
+              ref={field.ref}
+              label={t("fields.environment")}
+              options={environment.options}
+              value={field.value}
+              onValueChange={field.onChange}
+              onBlur={field.onBlur}
+              getRemoveLabel={(option) => t("environment.remove", { option })}
+              disabled={environment.loading}
+              helperText={environment.loading ? t("environment.loading") : undefined}
+              error={environment.failed ? t("environment.failed") : errors.environmentIds?.message}
+            />
+            {environment.failed && (
+              <Button variant="secondary" onClick={environment.retry}>
+                {t("environment.retry")}
+              </Button>
+            )}
+          </div>
+        )}
       />
       {failed && (
         <p role="alert" className={styles.error}>

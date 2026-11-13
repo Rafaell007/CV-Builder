@@ -14,6 +14,7 @@ const EMPTY_VALUES: ProjectFormValues = {
   startDate: null,
   endDate: null,
   description: "",
+  environmentIds: [],
 };
 
 /**
