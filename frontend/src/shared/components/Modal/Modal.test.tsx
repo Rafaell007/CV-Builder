@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { renderWithProviders, screen } from "@/shared/testing";
+import { renderWithProviders, screen, waitFor } from "@/shared/testing";
 import { Button } from "../Button";
 import { DatePicker } from "../DatePicker";
 import { DATE_PICKER_EXAMPLE_LABELS } from "../DatePicker/datePicker.fixtures";
@@ -131,6 +131,8 @@ describe("Modal", () => {
       expect(
         screen.getByRole("dialog", { name: DATE_PICKER_EXAMPLE_LABELS.calendar }),
       ).toBeInTheDocument();
+      // The marker is set one render after the calendar shows; on a slow machine Escape could come first.
+      await waitFor(() => expect(input.closest("[data-calendar-open]")).not.toBeNull());
 
       await user.keyboard("{Escape}");
 
@@ -139,7 +141,8 @@ describe("Modal", () => {
       ).not.toBeInTheDocument();
       expect(onOpenChange).not.toHaveBeenCalled();
       expect(screen.getByRole("dialog", { name: "Add project" })).toBeInTheDocument();
-      expect(input).toHaveFocus();
+      // Focus comes back to the field a moment after the calendar closes (CI saw it on <body> at first).
+      await waitFor(() => expect(input).toHaveFocus());
 
       await user.keyboard("{Escape}");
 
