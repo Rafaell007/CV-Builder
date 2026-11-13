@@ -1,0 +1,4 @@
+/* A long name, education or email wraps inside its cell instead of widening the table. */
+.text {
+  overflow-wrap: anywhere;
+}
