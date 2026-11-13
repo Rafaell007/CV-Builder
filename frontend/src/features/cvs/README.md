@@ -62,8 +62,20 @@ Rules (the same in the backend):
   - The backend message is never shown. `utils/toDeleteCvFailure` returns `notFound`, `forbidden` or `undefined`, and the hook picks the translated text.
 - Who may delete (AC-32, AC-33, AC-34): the backend decides. A user deletes only their own CVs, an admin any CV. The frontend shows `Delete` for every row it receives, because the list already holds only rows the user may see.
 
+## CV Details: loading one CV
+
+Spec: [docs/pages/21-cv-details-page.md](../../../../docs/pages/21-cv-details-page.md) (PLAN S7.2, KAN-113). The page is built in steps; this is the data part.
+
+- `useCv(id)` sends the `Cv` query (`useCv/cv.graphql`) and returns `cv`, `loading`, `failure` and `retry`. `failure` is `undefined` when the request worked. `retry` repeats the request for the same id.
+- `utils/toCvLoadFailure(error)` turns a failed request into `notFound`, `forbidden` or `failed`:
+  - `notFound`: the backend code `NOT_FOUND`. It also means the CV belongs to another user (the backend gives the same answer, so a user cannot learn which ids exist). The page must not try to tell the two cases apart.
+  - `forbidden`: the backend code `FORBIDDEN`. The `cv` query does not send it today; the page is ready for it.
+  - `failed`: any other code, or a network error. Only this kind shows Retry, because a repeat cannot change the answer of the other two.
+- `useCv/cv.mocks.ts`: `cvMock`, `cvCodeErrorMock` and `cvNetworkErrorMock`. For tests and stories only.
+
 ## Notes
 
+- **Signed-out users on the CV Details page.** The spec lists authentication errors as a separate case. `toCvLoadFailure` has no kind for it: a code like `UNAUTHENTICATED` becomes `failed`. This is decided: the page relies on the global handler in `shared/apollo/errorLink` (session refresh and redirect to sign-in, planned in PLAN D9 and S3), which is not built yet. Until it is, a signed-out user sees `failed` with Retry. When the handler exists, check that the redirect happens before this page shows an error.
 - **The description is a `role="button"` on a `<p>`**, like in projects (the same known issue). A real `<button>` would be cleaner.
 - **Two copies of `useClampedText`.** `CvDescription` and `ProjectDescription` have the same hook and nearly the same CSS. Move both to one shared place when a third list needs it. The 1023px limit is written in CSS only (no breakpoint token yet).
 - **A click on the description line does nothing for a CV that is not cut.** The row above opens the CV. This is the decided behaviour.
