@@ -197,6 +197,10 @@ const dialog = (page: Page) => page.getByRole("dialog");
 // The delete modal is a ConfirmModal, which Radix marks as an alertdialog.
 const confirmDialog = (page: Page) => page.getByRole("alertdialog");
 
+// The tags are in the detail line under the project row. After `find` only one project is listed, so there is one list.
+const detailTags = (page: Page) =>
+  page.locator("tr[data-row-detail]").getByRole("list", { name: "Environment" });
+
 async function find(page: Page, text: string) {
   await search(page).fill(text);
   await search(page).press("Enter");
@@ -271,7 +275,7 @@ test.describe("projects page, create, update and delete", () => {
 
     await expect(dialog(page)).toBeHidden();
     await find(page, name);
-    const tags = row(page, name).getByRole("list", { name: "Environment" });
+    const tags = detailTags(page);
     await expect(tags.getByRole("listitem")).toHaveText(["Docker", "React"]);
 
     await openRowMenu(page, name, "Edit");
@@ -286,7 +290,7 @@ test.describe("projects page, create, update and delete", () => {
   test("Update opens with the technologies of the project as chips", async ({ page }) => {
     // The seed project Banking Portal has six technologies; the form must start with all of them.
     await find(page, "Banking Portal");
-    const tags = row(page, "Banking Portal").getByRole("list", { name: "Environment" });
+    const tags = detailTags(page);
     await expect(tags.getByRole("listitem")).toHaveCount(6);
 
     await openRowMenu(page, "Banking Portal", "Edit");
