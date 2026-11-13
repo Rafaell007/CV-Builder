@@ -1,4 +1,4 @@
-// Runs every test suite in turn and prints a summary table at the end.
+// Starts the Docker services, runs every test suite in turn and prints a summary table at the end.
 // Stops at the first failing suite, like the former `&&` chain did.
 import { spawn } from "node:child_process";
 
@@ -20,7 +20,10 @@ const parsePlaywright = (out) => {
   return counts.length ? counts.reduce((sum, match) => sum + Number(match[1]), 0) : null;
 };
 
+// A step without `parse` is not a test suite: the table shows "-" instead of a test count.
+// `--wait` returns only when the services pass their health checks (PostgreSQL, Mailpit).
 const suites = [
+  { name: "Docker services", command: "docker compose up -d --wait" },
   {
     name: "Frontend unit + stories",
     command: "pnpm --filter @cv-builder/frontend test",
@@ -70,7 +73,7 @@ function printSummary(rows) {
   const lines = [...rows, total].map((row) => [
     row.name,
     row.status,
-    row.tests === null ? "?" : String(row.tests),
+    row.tests === undefined ? "-" : row.tests === null ? "?" : String(row.tests),
     formatTime(row.ms),
   ]);
   const header = ["Suite", "Result", "Tests", "Time"];
@@ -101,7 +104,7 @@ for (const suite of suites) {
   rows.push({
     name: suite.name,
     status: code === 0 ? "passed" : "FAILED",
-    tests: suite.parse(output),
+    tests: suite.parse?.(output),
     ms: performance.now() - start,
   });
   if (code !== 0) {
