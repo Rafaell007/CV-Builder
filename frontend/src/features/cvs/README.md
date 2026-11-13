@@ -75,6 +75,15 @@ Spec: [docs/pages/21-cv-details-page.md](../../../../docs/pages/21-cv-details-pa
 - `useCvDetailsForm(cv)`: the form of the Details tab. It reuses `useCvForm` (rules, double-submit guard, server errors) and `useUpdateCv`. Returns `{ form, failed, submit, canUpdate, isSubmitting }`. `canUpdate` is true only when the form is valid, differs from the saved CV and no request runs. After a successful save the values of the backend become the new unchanged state (UPDATE is disabled, the values stay). A failed save resets nothing. The success toast reuses the `cvs.update.success` texts.
 - `components/CvDetailsForm({ details })`: the Name, Education and Description fields (`CvFormFields`) with the UPDATE button below. The button shows its spinner while the request runs and stays focusable. Text: `cvs.details.update` (`en`, `pl`). The form uses `noValidate`: the messages come from the form hook. A field shows its error after the user leaves it (`useZodForm` validates on touch).
 
+- `components/CvLayout({ cvId, children })`: the shell of all four tabs, used by `app/[locale]/(app)/cvs/[cvId]/layout.tsx`. `useCvLayout` (next to it) loads the CV with `useCv`, reads the route (`usePathname` of `@/shared/i18n`) and builds the tabs and the breadcrumbs `CVs › {CV name} › {tab}` (the name in red, as in Figma). The `view` is one of:
+  - `ready`: the tab page (`children`) shows. This is the only view that shows it, so a direct link to `/cvs/{id}/skills` of another user's CV cannot get around the access check.
+  - `loading`: the skeleton, with the tabs. Data wins over `loading`: a refresh in the background does not replace a page that is shown.
+  - `failed`: `Failed to load CV details` with Retry. `notFound` and `forbidden`: the shared `ErrorScreen` (`CV not found` or `No access`) with a link back to `/cvs`, without Retry, the tabs and the CV name.
+- `components/CvDetails({ cvId })`: the Details tab. It reads the CV with `useCv` (the cache has it, so no second request) and shows `CvDetailsForm`. It shows nothing when there is no CV.
+- Routes: `cvs/[cvId]/layout.tsx` (the shell), `details/page.tsx` (`CvDetails`). `skills`, `projects` and `preview` are placeholders that return `null` until S7.3, S7.4 and S7.5; the shell already gives them the breadcrumbs and the tabs.
+- Texts: `cvs.tabs` (the four tab names and the navigation label) and `cvs.details` (`update`, `states`, `notFound`, `forbidden`), `en` and `pl`.
+- Route and tab helpers: `CV_TABS` (`cvs.constants.ts`), `CvTab` (`cvs.types.ts`) and `utils/toCvTabPath(cvId, tab)`.
+
 ## Notes
 
 - **Signed-out users on the CV Details page.** The spec lists authentication errors as a separate case. `toCvLoadFailure` has no kind for it: a code like `UNAUTHENTICATED` becomes `failed`. This is decided: the page relies on the global handler in `shared/apollo/errorLink` (session refresh and redirect to sign-in, planned in PLAN D9 and S3), which is not built yet. Until it is, a signed-out user sees `failed` with Retry. When the handler exists, check that the redirect happens before this page shows an error.
@@ -90,3 +99,8 @@ Spec: [docs/pages/21-cv-details-page.md](../../../../docs/pages/21-cv-details-pa
 - **The `NOT_FOUND` reload of a delete has no test** (`useDeleteCv.test.tsx` holds an `it.todo` with the steps; the hook needs an active `Cvs` query).
 - **The fade-out of the delete modal and the real backend were not checked by hand.**
 - **Stale total after a delete (fixed here, check the projects page).** `useDeleteCv` drops every cached `cvs` page when a CV is deleted. Before this, going back one page showed page 1 from the cache with the old total, so a second page button stayed for 10 CVs (found by the E2E test). `useDeleteProject` uses the same refetch of the open query only; it was not checked for the same problem.
+- **The shared `Tabs` differ from Figma on the CV Details page.** Figma shows four tabs of the same width (about 150px) with the line under the first one; the shared `Tabs` size each tab by its text with a 24px gap. Not changed here, because the other pages use `Tabs` too (check with the design).
+- **The tab pages after Details are placeholders** (`null`). The Skills, Projects and Preview tabs show the shell and an empty area until S7.3 to S7.5.
+- **CV Details is not checked in a browser.** Vitest passes; nobody has compared the page with the Figma frame, tried a tablet width, a screen reader or the dark theme. The form is 852px wide and centred, as measured on the 1440px frame.
+- **The shell has no E2E spec yet.** The form, the states and the access rules are covered by component tests only.
+- **A CV name that is very long** is not cut in the breadcrumbs (no ellipsis rule in Figma). Check how it wraps.
