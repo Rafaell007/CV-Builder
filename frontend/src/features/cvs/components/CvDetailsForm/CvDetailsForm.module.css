@@ -1,0 +1,10 @@
+/* Fields are 36 apart, as in the modals; the floated label sits in that space (docs/design-tokens.md › Components › Modal). */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.actions {
+  display: flex;
+}
