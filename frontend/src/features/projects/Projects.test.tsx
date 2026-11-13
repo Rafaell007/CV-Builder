@@ -22,6 +22,8 @@ const names = () =>
   screen
     .getAllByRole("row")
     .slice(1)
+    // The detail line under a project (description and tags) is a row with one wide cell.
+    .filter((row) => !row.hasAttribute("data-row-detail"))
     .map((row) => within(row).getAllByRole("cell")[0]!.querySelector("span")?.textContent);
 
 describe("Projects", () => {
