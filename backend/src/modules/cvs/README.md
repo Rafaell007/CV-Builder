@@ -2,7 +2,7 @@
 
 List, read, create, change and delete CVs. A user works with their own CVs. An admin works with all CVs (D10).
 
-- **Folders:** CV projects live in `cv-projects/` and CV skills in `cv-skills/` (each has resolver, service, `dto/`, `models/`, specs). `require-user.ts` stays in the module root, because both topics use it.
+- **Folders:** CV projects live in `cv-projects/`, CV skills in `cv-skills/` and the CV preview in `cv-preview/` (each has resolver, service, `dto/`, `models/`, specs). `require-user.ts` stays in the module root, because both topics use it.
 - **GraphQL:**
   - `cvs(search, sort, page, userId)` returns `{ items, total }`. `cv(id)` returns one CV.
   - `createCv(input)`, `updateCv(input)` and `deleteCv(id)` return the CV. `deleteCv` returns the CV that it removed.
@@ -57,6 +57,26 @@ The skills of one CV, in `cv-skills/`: `cv-skills.service.ts`, `cv-skills.resolv
 - **Remove:** all or nothing. If one id is not in the CV, the answer is `NOT_FOUND` and nothing is removed. The skills of the catalog and of the owner stay (AC-36). Deleting a CV removes its links with it.
 - **Tests:** `cv-skills.service.spec.ts` and `cv-skills.resolver.spec.ts` next to the code. `backend/test/cvs/cv-skills.int-spec.ts` runs over HTTP against the test database.
 - **Docs:** [CV skills page](../../../../docs/pages/22-cv-skills-page.md) · [PLAN.md S7.3](../../../../PLAN.md)
+
+## CV preview (S7.5a)
+
+The read model of the CV preview page, in `cv-preview/`: `cv-preview.service.ts`, `cv-preview.resolver.ts`, `calculations/` (one small function per file, each with a spec), `dto/cv-preview.args.ts`, `models/` and specs. There is a short extra README in the folder.
+
+- **GraphQL:** `cvPreview(cvId)` returns one `CvPreview`. There is no paging. It has `cvId`, `name`, `education`, `description`, `fullName` (`null` without a profile name), `position` (`null` without a position), `languages { name proficiency }`, `domains`, `skillGroups { category skills { name mastery experienceYears lastUsedYear } }` and `projects { name description domain environment roles period startDate endDate responsibilities }`.
+- **Access:** the service first calls `CvsService.assertAccessible`, the same rule as for the CV: owner or admin, else `NOT_FOUND`. Nothing is loaded before this check passes. A missing CV, a CV of another user and an unknown id give the same answer. An id that is not a UUID gives `BAD_USER_INPUT`.
+- **Read only:** the query has no `@Verified()`. It needs a session only, like the other CV reads. Without a session the answer is `UNAUTHENTICATED`.
+- **Data of the CV only:** skills and projects come from this CV (`cvId` is in every filter). Other CVs of the same owner and skills that the owner has but did not add to the CV never appear. Name and position come from the owner of the CV, not from the person who asks (an admin sees the data of the owner).
+- **Ordering:** skill groups by category name, skills in a group by name. Projects by start date, newest first, then by id. Languages by name. Roles and environment by name.
+- **Calculations (`calculations/`):** the environment of the CV projects is the only source, and a skill is matched by its id.
+  - Experience: whole years, rounded down, from the earliest start date of the CV projects that use the skill, up to now. Never negative.
+  - Last used: the end year of the most recent matching project. A project without an end date counts as the most recent and gives the current year.
+  - A skill that is in no project environment of the CV gets `null` for both values.
+  - Domains: the domains of the CV projects, each once.
+- **Period:** `MM.YYYY – MM.YYYY`, or `MM.YYYY – Till now` when the project has no end date. The separator is an en dash. `startDate` and `endDate` are also returned for the client.
+- **Empty values:** a project without roles gives `[]`. A project without responsibilities gives `null`.
+- **Proficiency enum:** the Prisma enum is registered for GraphQL in `cv-preview/models/proficiency.enum.ts`, because the CV preview is the first type that uses it. If a languages module registers it later, merge the two registrations. Registering the same name twice breaks the schema.
+- **Tests:** specs next to the code (`cv-preview.service.spec.ts`, `cv-preview.resolver.spec.ts` and one spec per calculation). `backend/test/cvs/cv-preview.int-spec.ts` runs over HTTP against the test database. It takes the years from the real current date, because the test app uses the system clock.
+- **Docs:** [CV preview page](../../../../docs/pages/24-cv-preview-page.md) · [PLAN.md](../../../../PLAN.md)
 
 ## Things to note
 
