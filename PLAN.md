@@ -229,7 +229,7 @@ CV-Builder/
       common/                            guards, decorators, filters, pagination, GraphQL building blocks
       prisma/                            PrismaService
       modules/<module>/                  one folder per module (shape below)
-    test/                                integration tests (Supertest), test DB setup
+    test/                                integration tests (Supertest), one folder per module (test/<module>/); support/ = test DB setup
 ```
 
 Feature (frontend):
@@ -255,7 +255,7 @@ modules/<module>/
   dto/                     @InputType classes with class-validator
   models/                  @ObjectType classes
   <module>.service.spec.ts · <module>.resolver.spec.ts
-  <child>/                 same shape (e.g. cvs/skills, cvs/projects, users/skills)
+  <topic>/                 same shape, one per extra topic with its own resolver/service (e.g. cvs/cv-projects, auth/sessions, projects/project-roles)
 ```
 
 Placement rules (§5.9): code used by one unit stays in it; shared by siblings → their parent; shared by unrelated features → `frontend/src/shared/` or `backend/src/common/`. The **skills list UI** is used by `/skills`, the user Skills tab and CV Skills → lives in `features/skills/`. Same for languages. The frontend never imports backend code; they share only `schema.gql`.
@@ -309,6 +309,7 @@ Rules for all code in this repository.
 - Every unit is a folder that owns its files, tests and children; the same shape repeats at every level.
 - A file and its test are one unit: `X.ts(x)` and `X.test.ts(x)` live in folder `X/` with an `index.ts`. A file without a test stays a plain file. Role files are named by their role: `x.utils.ts` → `utils/`, `x.store.ts` → `store/`. A feature's main component stays at the feature root, since the feature folder is already its folder. The same holds for the feature-level files that belong to the feature as a whole and have no sub-parts: `<feature>.mocks.ts` with its test, `<feature>.constants.ts` and `<feature>.types.ts`.
 - Shared code moves to the **nearest common ancestor**; only code used by unrelated features goes to `shared/` (frontend) or `common/` (backend).
+- Backend: a module with more than one topic (each with its own resolver or service) gets one sub-folder per topic, with its own `dto/`, `models/` and specs; the module root keeps the module file, the main resolver/service and the README. Integration tests mirror the modules: `backend/test/<module>/`.
 - Frontend folders expose one public `index.ts`; other code imports only from it. Exception: `messages/*.json` files are imported directly (by `src/i18n/loadMessages`), so a request loads only its own language. Backend modules are imported through their Nest module.
 - Every feature folder and every non-obvious shared component has a short `README.md` (about 5–10 lines): what it does, what it exports, where it is used, link to its `docs/` page. Simple components (e.g. a button) get none. Update it in the same PR when the public API changes.
 
