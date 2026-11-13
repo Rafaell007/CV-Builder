@@ -62,18 +62,18 @@ export const Empty: Story = {
   },
 };
 
-// The calendar: 449px wide, under the field's bottom border, aligned with its outer left edge.
+// The calendar: 449px wide, centred on the screen (KAN-136).
 export const Open: Story = {
   play: async ({ canvas, userEvent }) => {
     const input = canvas.getByRole("textbox", { name: "Start date" });
     await userEvent.click(input);
 
     const calendar = screen.getByRole("dialog", { name: "Choose a date" });
-    const field = input.closest("div[class*='control']")!.getBoundingClientRect();
     const box = calendar.getBoundingClientRect();
     await expect(box.width).toBe(449);
-    await expect(Math.round(box.top)).toBe(Math.round(field.bottom));
-    await expect(Math.round(box.left)).toBe(Math.round(field.left));
+    const middle = { x: document.documentElement.clientWidth / 2, y: window.innerHeight / 2 };
+    await expect(Math.abs(box.left + box.width / 2 - middle.x)).toBeLessThanOrEqual(1);
+    await expect(Math.abs(box.top + box.height / 2 - middle.y)).toBeLessThanOrEqual(1);
 
     const selected = screen.getByRole("gridcell", { name: /\b4 November 2026/ });
     await expect(selected).toHaveStyle({
