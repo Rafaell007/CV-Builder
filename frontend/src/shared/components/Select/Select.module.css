@@ -91,8 +91,12 @@
 /*
  * Open list: the field's width (trigger + its two 1px borders), attached under it, page fill, no radius or shadow.
  * Border on the sides and bottom (Figma draws it per option: same look). Prediction: max 5 options, then it scrolls.
+ *
+ * The list sits under <body> (portal), outside a modal, so it needs its own layer over the modal (z-index 20), like the
+ * calendar of the DatePicker. Without it the modal overlay covers the list and a click on an option never arrives.
  */
 .list {
+  z-index: 21;
   box-sizing: border-box;
   width: calc(var(--radix-select-trigger-width) + 2px);
   max-height: min(calc(5 * 47px + 1px), var(--radix-select-content-available-height));
