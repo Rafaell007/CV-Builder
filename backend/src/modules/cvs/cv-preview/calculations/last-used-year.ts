@@ -14,6 +14,9 @@ export function lastUsedYear(
   if (matching.length === 0) return null;
   if (matching.some((project) => project.endDate === null)) return now.getUTCFullYear();
 
-  const ends = matching.map((project) => (project.endDate as Date).getTime());
+  const ends: number[] = [];
+  for (const project of matching) {
+    if (project.endDate !== null) ends.push(project.endDate.getTime());
+  }
   return new Date(Math.max(...ends)).getUTCFullYear();
 }
