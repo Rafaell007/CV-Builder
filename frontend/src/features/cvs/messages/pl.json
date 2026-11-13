@@ -1,0 +1,34 @@
+{
+  "title": "CV",
+  "button": "UTWÓRZ CV",
+  "table": "Lista CV",
+  "columns": {
+    "name": "Nazwa",
+    "education": "Wykształcenie",
+    "employee": "Pracownik"
+  },
+  "actions": {
+    "column": "Akcje",
+    "menu": "Akcje dla CV {name}",
+    "view": "Zobacz",
+    "edit": "Edytuj",
+    "delete": "Usuń"
+  },
+  "search": {
+    "label": "Szukaj CV",
+    "placeholder": "Szukaj"
+  },
+  "pagination": {
+    "navigation": "Paginacja CV",
+    "previous": "Poprzednia strona",
+    "next": "Następna strona",
+    "page": "Strona {number}"
+  },
+  "states": {
+    "loading": "Ładowanie CV",
+    "empty": "Nie masz jeszcze żadnych CV",
+    "noResults": "Nie znaleziono CV",
+    "error": "Nie udało się wczytać CV",
+    "retry": "Spróbuj ponownie"
+  }
+}

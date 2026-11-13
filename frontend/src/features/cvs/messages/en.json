@@ -1,0 +1,34 @@
+{
+  "title": "CVs",
+  "button": "CREATE CV",
+  "table": "CVs list",
+  "columns": {
+    "name": "Name",
+    "education": "Education",
+    "employee": "Employee"
+  },
+  "actions": {
+    "column": "Actions",
+    "menu": "Actions for {name}",
+    "view": "View",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "search": {
+    "label": "Search CVs",
+    "placeholder": "Search"
+  },
+  "pagination": {
+    "navigation": "CVs pagination",
+    "previous": "Previous page",
+    "next": "Next page",
+    "page": "Page {number}"
+  },
+  "states": {
+    "loading": "Loading CVs",
+    "empty": "You have no CVs yet",
+    "noResults": "No CVs found",
+    "error": "Failed to load CVs",
+    "retry": "Retry"
+  }
+}
