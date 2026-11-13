@@ -40,7 +40,28 @@ The projects of one CV: `cv-projects.service.ts`, `cv-projects.resolver.ts`, `cv
 - **Tests:** `cv-projects.service.spec.ts`, `cv-projects.resolver.spec.ts` and `cv-project-dates.spec.ts` next to the code. `backend/test/cv-projects.int-spec.ts` runs over HTTP against the test database.
 - **Docs:** [CV projects page](../../../../docs/pages/23-cv-projects-page.md) · [PLAN.md S7.4, D16, D18, D25](../../../../PLAN.md)
 
+## CV skills (S7.3a)
+
+The skills of one CV: `cv-skills.service.ts`, `cv-skills.resolver.ts`, `dto/*cv-skill*`, `models/cv-skill.ts`, `models/available-cv-skill.ts`. The shared `Mastery` enum and `SkillCategory` type are in `modules/skills/models/`.
+
+- **GraphQL:**
+  - `cvSkills(cvId)` returns `[CvSkill!]!`. `availableCvSkills(cvId)` returns the skills that the owner of the CV has and that are not yet in the CV. There is no paging.
+  - `addCvSkill(input: { cvId, skillId, mastery? })` and `updateCvSkill(input: { id, mastery })` return the `CvSkill`. `removeCvSkills(input: { cvId, ids })` returns `true`.
+  - `CvSkill` has `id` (the CV-skill link), `cvId`, `skillId` (the catalog skill), `name`, `category { id name }`, `mastery`, `createdAt`, `updatedAt`. The list is ordered by category name, then skill name, then id.
+- **Access:** every operation first calls `CvsService.assertAccessible`, the same rule as for the CV: owner or admin, else `NOT_FOUND`. `updateCvSkill` finds the CV through the link, so a user cannot change a link of another CV by sending its id. `removeCvSkills` deletes only links of the named CV.
+- **Verified only (D16):** the three mutations use `@Verified()`. Reading needs only a session.
+- **Available skills:** the source is the `UserSkill` rows of the **owner of the CV**, not of the person who asks. An admin who adds a skill to the CV of another user sees and can use only the skills of that user. `addCvSkill` checks the same rule again. A skill that the owner does not have gives `BAD_USER_INPUT` with a field error on `skillId`. A skill that does not exist gives the same answer.
+- **Mastery:** it belongs to the CV and can differ from the owner's level. `addCvSkill` without `mastery` copies the owner's level. `updateCvSkill` changes only the mastery of the link, never the owner's skill. The skill of a link cannot change (page doc: the Skill field is disabled in the Update modal).
+- **Duplicates:** the unique index `(cvId, skillId)` is the guard. The service turns the error into `CONFLICT` ("The skill is already in this CV"). Two parallel requests for the same skill give one link and one `CONFLICT`.
+- **Remove:** all or nothing. If one id is not in the CV, the answer is `NOT_FOUND` and nothing is removed. The skills of the catalog and of the owner stay (AC-36). Deleting a CV removes its links with it.
+- **Tests:** `cv-skills.service.spec.ts` and `cv-skills.resolver.spec.ts` next to the code. `backend/test/cv-skills.int-spec.ts` runs over HTTP against the test database.
+- **Docs:** [CV skills page](../../../../docs/pages/22-cv-skills-page.md) · [PLAN.md S7.3](../../../../PLAN.md)
+
 ## Things to note
+
+- **Contract (for the frontend, KAN-114):** `schema.gql` gained `CvSkill`, `AvailableCvSkill`, `SkillCategory`, `Mastery`, `AddCvSkillInput`, `UpdateCvSkillInput`, `RemoveCvSkillsInput`, `cvSkills`, `availableCvSkills`, `addCvSkill`, `updateCvSkill` and `removeCvSkills`. Nothing was removed. The frontend must run `codegen`.
+- **Open (KAN-107):** the skills of a user (`UserSkill`) have no API yet. `availableCvSkills` reads the table directly, so it works now. When KAN-107 adds a user skills service, `CvSkillsService` can call it instead.
+- **Open (mastery in the Add modal):** the page doc shows only the Skill field in the Add modal. The mutation takes an optional `mastery` and copies the owner's level when it is missing. If the team wants the Add modal to show a level, the contract already supports it.
 
 - **Open (catalog for employees):** the Add project modal needs the list of catalog projects. `projects` is admin only (`@Roles(Role.ADMIN)`), so a normal user cannot call it. The ticket KAN-115 does not cover this. Before the frontend of S7.4 can work for a user, the team must decide: a read-only catalog query for every signed-in user (like `projectRoles`), or a query that returns only the projects not yet in the CV. Not done here.
 - **Open (list shape):** `cvProjects` returns a plain list, not `{ items, total }` with paging like `cvs`. If the team wants the shared list shape, change the return type and add `ListArgs`. The frontend must then run `codegen`.
