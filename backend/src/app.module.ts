@@ -9,6 +9,7 @@ import { AuthModule } from "./modules/auth/auth.module";
 import { CvsModule } from "./modules/cvs/cvs.module";
 import { HealthModule } from "./modules/health/health.module";
 import { ProjectsModule } from "./modules/projects/projects.module";
+import { SkillsModule } from "./modules/skills/skills.module";
 import { PrismaModule } from "./prisma/prisma.module";
 
 @Module({
@@ -30,6 +31,7 @@ import { PrismaModule } from "./prisma/prisma.module";
     }),
     HealthModule,
     ProjectsModule,
+    SkillsModule,
     CvsModule,
   ],
 })
