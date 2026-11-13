@@ -10,12 +10,18 @@ import {
 } from "@/shared/components";
 import { useCurrentUser } from "@/shared/currentUser";
 import { useRouter } from "@/shared/i18n";
+import { CreateCvModal } from "./components/CreateCvModal";
 import { CvsTable } from "./components/CvsTable";
+import { DeleteCvModal } from "./components/DeleteCvModal";
+import { UpdateCvModal } from "./components/UpdateCvModal";
 import { SEARCH_MAX_LENGTH } from "./cvs.constants";
 import type { CvListItem } from "./cvs.types";
 import { toCvDetailsPath, toCvsVariables } from "./utils";
+import { useCreateCvForm } from "./useCreateCvForm";
 import { useCvs } from "./useCvs";
 import { useCvsListState } from "./useCvsListState";
+import { useDeleteCv } from "./useDeleteCv";
+import { useUpdateCvForm } from "./useUpdateCvForm";
 import styles from "./Cvs.module.css";
 
 export interface CvsProps {
@@ -23,12 +29,6 @@ export interface CvsProps {
   userId?: string;
   /** Called with the CV on View and on a row click. Without it, the page opens the CV Details page. */
   onView?: (cv: CvListItem) => void;
-  /** Called with the CV when the user selects Edit in its row menu. */
-  onEdit?: (cv: CvListItem) => void;
-  /** Called with the CV when the user selects Delete in its row menu. */
-  onDelete?: (cv: CvListItem) => void;
-  /** Called when the user presses CREATE CV. */
-  onCreate?: () => void;
 }
 
 /**
@@ -36,13 +36,21 @@ export interface CvsProps {
  * with the loading, empty, no results and error states. The backend searches, sorts, cuts the pages
  * and decides which CVs the user may see.
  */
-export function Cvs({ userId, onView, onEdit, onDelete, onCreate }: CvsProps) {
+export function Cvs({ userId, onView }: CvsProps) {
   const t = useTranslations("cvs");
   const router = useRouter();
   const list = useCvsListState();
   const variables = toCvsVariables(list, userId);
   const { cvs, total, loading, failed, retry } = useCvs(variables);
-  const { user, isAdmin } = useCurrentUser();
+  const { user, isAdmin, loading: userLoading } = useCurrentUser();
+
+  const creation = useCreateCvForm();
+  const editing = useUpdateCvForm();
+  const deletion = useDeleteCv({
+    page: list.page,
+    rowsOnPage: cvs.length,
+    onPageChange: list.setPage,
+  });
 
   const stateLabels: PageStateLabels = {
     loading: t("states.loading"),
@@ -69,7 +77,7 @@ export function Cvs({ userId, onView, onEdit, onDelete, onCreate }: CvsProps) {
           defaultValue={list.search}
           onSearch={list.setSearch}
         />
-        <Button onClick={onCreate}>{t("button")}</Button>
+        <Button onClick={creation.open}>{t("button")}</Button>
       </div>
       {failed && !loading ? (
         <PageState kind="error" labels={stateLabels} onRetry={retry} />
@@ -80,11 +88,14 @@ export function Cvs({ userId, onView, onEdit, onDelete, onCreate }: CvsProps) {
             sort={list.sort}
             onSortChange={list.setSort}
             onView={onView ?? ((cv) => router.push(toCvDetailsPath(cv.id)))}
-            onEdit={(cv) => onEdit?.(cv)}
-            onDelete={(cv) => onDelete?.(cv)}
+            onEdit={editing.open}
+            onDelete={deletion.askToDelete}
             loading={loading}
             loadingContent={<PageState kind="loading" labels={stateLabels} />}
-            emptyContent={<PageState kind={emptyKind} labels={stateLabels} />}
+            // The role decides the text, so wait for the user: no flash of the wrong text.
+            emptyContent={
+              <PageState kind={userLoading ? "loading" : emptyKind} labels={stateLabels} />
+            }
           />
           <div className={styles.pagination}>
             <Pagination
@@ -101,6 +112,14 @@ export function Cvs({ userId, onView, onEdit, onDelete, onCreate }: CvsProps) {
           </div>
         </>
       )}
+      <CreateCvModal creation={creation} />
+      <UpdateCvModal update={editing} />
+      <DeleteCvModal
+        cv={deletion.cv}
+        pending={deletion.pending}
+        onConfirm={() => void deletion.confirm()}
+        onCancel={deletion.cancel}
+      />
     </div>
   );
 }
