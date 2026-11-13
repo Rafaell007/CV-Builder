@@ -1,0 +1,13 @@
+{
+  "delete": {
+    "title": "Usuń CV",
+    "message": "Czy na pewno chcesz usunąć CV <strong>{name}</strong>?",
+    "close": "Zamknij",
+    "confirm": "Potwierdź",
+    "cancel": "Anuluj",
+    "failedTitle": "Nie udało się usunąć CV",
+    "failedText": "Coś poszło nie tak. Spróbuj ponownie.",
+    "notFound": "To CV już nie istnieje. Lista została odświeżona.",
+    "forbidden": "Nie masz uprawnień do usunięcia tego CV."
+  }
+}
