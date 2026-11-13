@@ -157,14 +157,22 @@ export const addCvProjectMock = (
   result: { data: { addCvProject: added } },
 });
 
-/** `addCvProject` refused with a GraphQL error code, for example `CONFLICT` or `BAD_USER_INPUT`. */
+/** The extensions of a refused request: the code and, for `BAD_USER_INPUT`, the fields the backend rejected. */
+const refusal = (code: string, fields: string[] = []) => ({
+  code,
+  ...(fields.length > 0
+    ? { fieldErrors: fields.map((field) => ({ field, messages: [`${field} is invalid`] })) }
+    : {}),
+});
+
+/** `addCvProject` refused with a GraphQL error code, for example `CONFLICT` or `BAD_USER_INPUT` with `fields`. */
 export const addCvProjectRefusedMock = (
   input: AddCvProjectInput,
   code: string,
-  fields?: Record<string, string[]>,
+  fields?: string[],
 ): MockLink.MockedResponse => ({
   request: { query: AddCvProjectDocument, variables: { input } },
-  result: { errors: [{ message: code, extensions: { code, ...(fields ? { fields } : {}) } }] },
+  result: { errors: [{ message: code, extensions: refusal(code, fields) }] },
 });
 
 /** `addCvProject` that fails before the backend answers. */
@@ -184,13 +192,14 @@ export const updateCvProjectMock = (
   result: { data: { updateCvProject: updated } },
 });
 
-/** `updateCvProject` refused with a GraphQL error code. */
+/** `updateCvProject` refused with a GraphQL error code, with the rejected `fields` for `BAD_USER_INPUT`. */
 export const updateCvProjectRefusedMock = (
   input: UpdateCvProjectInput,
   code: string,
+  fields?: string[],
 ): MockLink.MockedResponse => ({
   request: { query: UpdateCvProjectDocument, variables: { input } },
-  result: { errors: [{ message: code, extensions: { code } }] },
+  result: { errors: [{ message: code, extensions: refusal(code, fields) }] },
 });
 
 /** `updateCvProject` that fails before the backend answers. */
