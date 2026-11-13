@@ -65,6 +65,8 @@ export function useDeleteCv({
           const id = cache.identify(cv);
           if (id === undefined) return;
           cache.evict({ id });
+          // Every cached page holds the old total. The page that opens after "go back one page" would show it.
+          cache.evict({ id: "ROOT_QUERY", fieldName: "cvs" });
           cache.gc();
         },
         // The total and the pages change: the open list loads again with the same search, sort and page.
