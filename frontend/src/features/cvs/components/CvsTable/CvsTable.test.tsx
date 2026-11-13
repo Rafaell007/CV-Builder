@@ -109,7 +109,47 @@ describe("CvsTable", () => {
     expect(onView).toHaveBeenCalledWith(backendCv);
   });
 
+  it("does not call onView when the description is clicked", async () => {
+    const onView = vi.fn();
+    const { user } = render({ onView });
+
+    await user.click(screen.getByText(backendCv.description));
+
+    expect(onView).not.toHaveBeenCalled();
+  });
+
+  it("opens the CV with Enter on the focused row", async () => {
+    const onView = vi.fn();
+    const { user } = render({ onView });
+    screen.getByRole("row", { name: /Backend Engineer/ }).focus();
+
+    await user.keyboard("{Enter}");
+
+    expect(onView).toHaveBeenCalledExactlyOnceWith(backendCv);
+  });
+
   describe("row action menu", () => {
+    it("does not call onView when the menu button is clicked", async () => {
+      const onView = vi.fn();
+      const { user } = render({ onView });
+
+      await user.click(screen.getByRole("button", { name: "Actions for Backend Engineer" }));
+
+      expect(onView).not.toHaveBeenCalled();
+    });
+
+    it("does not call onView a second time when Edit or Delete is selected", async () => {
+      const onView = vi.fn();
+      const { user } = render({ onView });
+
+      await user.click(screen.getByRole("button", { name: "Actions for Backend Engineer" }));
+      await user.click(screen.getByRole("menuitem", { name: "Edit" }));
+      await user.click(screen.getByRole("button", { name: "Actions for Backend Engineer" }));
+      await user.click(screen.getByRole("menuitem", { name: "Delete" }));
+
+      expect(onView).not.toHaveBeenCalled();
+    });
+
     it("gives each row its own menu button, named with the CV name", () => {
       render();
 

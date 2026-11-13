@@ -1,0 +1,1 @@
+export { CvDescription } from "./CvDescription";
