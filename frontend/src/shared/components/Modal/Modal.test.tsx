@@ -142,7 +142,8 @@ describe("Modal", () => {
       expect(onOpenChange).not.toHaveBeenCalled();
       expect(screen.getByRole("dialog", { name: "Add project" })).toBeInTheDocument();
       // Focus comes back to the field a moment after the calendar closes (CI saw it on <body> at first).
-      await waitFor(() => expect(input).toHaveFocus());
+      // The default 1 s limit was too short on a busy CI worker (KAN-116 run), so the limit is longer.
+      await waitFor(() => expect(input).toHaveFocus(), { timeout: 5000 });
 
       await user.keyboard("{Escape}");
 
