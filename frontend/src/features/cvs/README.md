@@ -82,6 +82,7 @@ Spec: [docs/pages/21-cv-details-page.md](../../../../docs/pages/21-cv-details-pa
 - `components/CvDetails({ cvId })`: the Details tab. It reads the CV with `useCv` (the cache has it, so no second request) and shows `CvDetailsForm`. It shows nothing when there is no CV.
 - Routes: `cvs/[cvId]/layout.tsx` (the shell), `details/page.tsx` (`CvDetails`). `skills`, `projects` and `preview` are placeholders that return `null` until S7.3, S7.4 and S7.5; the shell already gives them the breadcrumbs and the tabs.
 - Texts: `cvs.tabs` (the four tab names and the navigation label) and `cvs.details` (`update`, `states`, `notFound`, `forbidden`), `en` and `pl`.
+- Storybook: `components/CvLayout/CvLayout.stories.tsx` (`Features/Cvs/CvLayout`): Ready, Loading, NotFound, Forbidden, LoadFailed and Polish. `components/CvDetailsForm/CvDetailsForm.stories.tsx` (`Features/Cvs/CvDetailsForm`): Default, Changed, Invalid and Polish. The active tab in the shell stories depends on the mocked route (`nextjs.navigation.pathname`); not compared with Figma.
 - Route and tab helpers: `CV_TABS` (`cvs.constants.ts`), `CvTab` (`cvs.types.ts`) and `utils/toCvTabPath(cvId, tab)`.
 
 ## Notes
