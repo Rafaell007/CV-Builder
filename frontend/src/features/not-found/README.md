@@ -7,3 +7,8 @@ The 404 screen: "Hmm...", a two-line message and GO BACK (S4.1, KAN-93). GO BACK
 - Texts: `messages/` (`notFound` namespace), used by `app/[locale]/not-found.tsx`; `app/global-not-found.tsx` has the English texts inline.
 - Used by: `app/[locale]/not-found.tsx` (unknown paths inside a language, via `[...rest]`) and `app/global-not-found.tsx` (paths without a language).
 - Docs: [docs/pages/08-not-found-page.md](../../../../docs/pages/08-not-found-page.md); values in `docs/design-tokens.md` › Not found.
+
+## Known limits
+
+- `useGoBack` decides with `history.length > 1`. A tab whose history already holds a page from another site goes back to that site, out of the app.
+- `app/global-not-found.tsx` has English texts inline, because there is no language. A second language for that page needs a decision first.

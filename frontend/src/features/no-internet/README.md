@@ -9,3 +9,7 @@ The "Oops" screen with RETRY when the app cannot reach the server (S4.2, KAN-93)
 - `useNetworkStatus` (inside the feature): `useSyncExternalStore` over the store in [network](../../shared/network/README.md). Failed queries are reported by `networkErrorLink` in [apollo](../../shared/apollo/README.md).
 - Used by: `app/[locale]/layout.tsx` (`NoInternetGate`, inside `DeviceErrorGate`, so below 768px the device error shows instead) and `app/[locale]/error.tsx` (`NoInternetScreen`, a page that failed to render; RETRY = Next.js `retry`).
 - Docs: [docs/pages/07-no-internet-page.md](../../../../docs/pages/07-no-internet-page.md); values in `docs/design-tokens.md` › No internet.
+
+## Known limits
+
+- When the browser goes from offline to online, the screen hides but the queries do not run again. Only RETRY runs them again. This is acceptable, because a failed query normally also sets the failed flag and keeps the screen until RETRY succeeds.
