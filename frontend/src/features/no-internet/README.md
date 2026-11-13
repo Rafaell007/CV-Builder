@@ -2,7 +2,8 @@
 
 The "Oops" screen with RETRY when the app cannot reach the server (S4.2, KAN-93). It shows when the browser is offline or a query fails with a network error. Mutations keep their error toast, so a failed save never removes a form.
 
-- Exports: `NoInternetGate` (wraps `children`) and `NoInternetScreen` (`onRetry` prop).
+- Exports: `NoInternetGate` (wraps `children`), `NoInternetScreen` (`onRetry` prop) and `useClearQueryFailed`.
+- `useClearQueryFailed`: clears the failed flag on mount. `error.tsx` calls it: a `useSuspenseQuery` that fails throws to that error page, so without it the gate's screen would cover the error page's screen and RETRY would need two clicks.
 - `NoInternetGate`: reads `useNetworkStatus`. When the status is not `"online"`, the page stays mounted but hidden (typed text survives) and the screen shows. RETRY = `useRetryQueries`: runs the active queries again and clears the failed flag only when they succeed.
 - `useNetworkStatus` (inside the feature): `useSyncExternalStore` over the store in [network](../../shared/network/README.md). Failed queries are reported by `networkErrorLink` in [apollo](../../shared/apollo/README.md).
 - Texts: `messages/` (`noInternet` namespace).
