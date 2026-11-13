@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
-import { expect, fn } from "storybook/test";
+import { expect, fn, screen } from "storybook/test";
 import { DatePicker, type DatePickerProps } from "./DatePicker";
 import { DATE_PICKER_EXAMPLE_LABELS as LABELS } from "./datePicker.fixtures";
 
@@ -68,21 +68,21 @@ export const Open: Story = {
     const input = canvas.getByRole("textbox", { name: "Start date" });
     await userEvent.click(input);
 
-    const calendar = canvas.getByRole("dialog", { name: "Choose a date" });
+    const calendar = screen.getByRole("dialog", { name: "Choose a date" });
     const field = input.closest("div[class*='control']")!.getBoundingClientRect();
     const box = calendar.getBoundingClientRect();
     await expect(box.width).toBe(449);
     await expect(Math.round(box.top)).toBe(Math.round(field.bottom));
     await expect(Math.round(box.left)).toBe(Math.round(field.left));
 
-    const selected = canvas.getByRole("gridcell", { name: /\b4 November 2026/ });
+    const selected = screen.getByRole("gridcell", { name: /\b4 November 2026/ });
     await expect(selected).toHaveStyle({
       width: "41px",
       height: "41px",
       backgroundColor: RED,
       color: GREY_100,
     });
-    await expect(canvas.getByRole("button", { name: "Next month" })).toHaveStyle({
+    await expect(screen.getByRole("button", { name: "Next month" })).toHaveStyle({
       width: "40px",
       borderTopColor: GREY_500,
     });
@@ -93,10 +93,10 @@ export const OpenDark: Story = {
   globals: { theme: "dark" },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("textbox", { name: "Start date" }));
-    await expect(canvas.getByRole("dialog", { name: "Choose a date" })).toHaveStyle({
+    await expect(screen.getByRole("dialog", { name: "Choose a date" })).toHaveStyle({
       boxShadow: "none",
     });
-    await expect(canvas.getByRole("button", { name: "Next month" })).toHaveStyle({
+    await expect(screen.getByRole("button", { name: "Next month" })).toHaveStyle({
       borderTopColor: GREY_100,
     });
   },
@@ -106,21 +106,21 @@ export const OpenDark: Story = {
 export const MonthList: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("textbox", { name: "Start date" }));
-    await userEvent.click(canvas.getByRole("button", { name: "November" }));
-    await expect(canvas.getByRole("button", { name: "November" })).toHaveAttribute(
+    await userEvent.click(screen.getByRole("button", { name: "November" }));
+    await expect(screen.getByRole("button", { name: "November" })).toHaveAttribute(
       "aria-pressed",
       "true",
     );
-    await userEvent.click(canvas.getByText("March"));
-    await expect(canvas.getByRole("button", { name: "March" })).toBeInTheDocument();
+    await userEvent.click(screen.getByText("March"));
+    await expect(screen.getByRole("button", { name: "March" })).toBeInTheDocument();
   },
 };
 
 export const YearList: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("textbox", { name: "Start date" }));
-    await userEvent.click(canvas.getByRole("button", { name: "2026" }));
-    await expect(canvas.getByRole("button", { name: "Next year" })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "2026" }));
+    await expect(screen.getByRole("button", { name: "Next year" })).toBeInTheDocument();
   },
 };
 
@@ -130,7 +130,7 @@ export const Polish: Story = {
     const input = canvas.getByRole("textbox", { name: "Data rozpoczęcia" });
     await expect(input).toHaveValue("04.11.2026");
     await userEvent.click(input);
-    await expect(canvas.getByRole("button", { name: "listopad" })).toBeInTheDocument();
+    await expect(screen.getByRole("button", { name: "listopad" })).toBeInTheDocument();
   },
 };
 
@@ -139,7 +139,7 @@ export const WithMinDate: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("textbox", { name: "Start date" }));
     await expect(
-      canvas.getByRole("gridcell", { name: /Not available .*\b2 November 2026/ }),
+      screen.getByRole("gridcell", { name: /Not available .*\b2 November 2026/ }),
     ).toHaveStyle({ textDecorationLine: "line-through" });
   },
 };
@@ -176,14 +176,14 @@ export const StartAndEndDate: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("textbox", { name: "End date" }));
     await expect(
-      canvas.getByRole("gridcell", { name: /Not available .*\b9 November 2026/ }),
+      screen.getByRole("gridcell", { name: /Not available .*\b9 November 2026/ }),
     ).toHaveStyle({ textDecorationLine: "line-through" });
-    await userEvent.click(canvas.getByRole("gridcell", { name: /\b20 November 2026/ }));
+    await userEvent.click(screen.getByRole("gridcell", { name: /\b20 November 2026/ }));
 
     // With an end date, the start date's calendar crosses out the days after it.
     await userEvent.click(canvas.getByRole("textbox", { name: "Start date" }));
     await expect(
-      canvas.getByRole("gridcell", { name: /Not available .*\b21 November 2026/ }),
+      screen.getByRole("gridcell", { name: /Not available .*\b21 November 2026/ }),
     ).toHaveStyle({ textDecorationLine: "line-through" });
   },
 };
@@ -206,7 +206,7 @@ export const InvalidOpen: Story = {
     const input = canvas.getByRole("textbox", { name: "Start date" });
     await userEvent.click(input);
 
-    await expect(canvas.getByRole("dialog", { name: "Choose a date" })).toBeInTheDocument();
+    await expect(screen.getByRole("dialog", { name: "Choose a date" })).toBeInTheDocument();
     await expect(input).toBeInvalid();
     await expect(input).toHaveAccessibleDescription("Enter a start date");
     await expect(input.closest("div[class*='control']")).toHaveStyle({ borderTopColor: RED });
@@ -230,7 +230,7 @@ export const InvalidOpenDark: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("textbox", { name: "Start date" }));
 
-    await expect(canvas.getByRole("dialog", { name: "Choose a date" })).toBeInTheDocument();
+    await expect(screen.getByRole("dialog", { name: "Choose a date" })).toBeInTheDocument();
     await expect(canvas.getByRole("textbox", { name: "Start date" })).toBeInvalid();
   },
 };
@@ -249,13 +249,13 @@ export const MonthListDark: Story = {
   globals: { theme: "dark" },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("textbox", { name: "Start date" }));
-    await userEvent.click(canvas.getByRole("button", { name: "November" }));
+    await userEvent.click(screen.getByRole("button", { name: "November" }));
 
-    await expect(canvas.getByRole("button", { name: "November" })).toHaveStyle({
+    await expect(screen.getByRole("button", { name: "November" })).toHaveStyle({
       color: ERROR_TEXT_DARK,
     });
-    await expect(canvas.getByText("January")).toBeInTheDocument();
-    const selected = canvas.getAllByText("November").at(-1)!.closest("[aria-selected='true']");
+    await expect(screen.getByText("January")).toBeInTheDocument();
+    const selected = screen.getAllByText("November").at(-1)!.closest("[aria-selected='true']");
     await expect(selected).toHaveStyle({ backgroundColor: RED, color: GREY_100 });
   },
 };
@@ -264,13 +264,13 @@ export const YearListDark: Story = {
   globals: { theme: "dark" },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("textbox", { name: "Start date" }));
-    await userEvent.click(canvas.getByRole("button", { name: "2026" }));
+    await userEvent.click(screen.getByRole("button", { name: "2026" }));
 
-    await expect(canvas.getByRole("button", { name: "2026" })).toHaveStyle({
+    await expect(screen.getByRole("button", { name: "2026" })).toHaveStyle({
       color: ERROR_TEXT_DARK,
     });
-    await expect(canvas.getByRole("button", { name: "Next year" })).toBeInTheDocument();
-    const selected = canvas.getAllByText("2026").at(-1)!.closest("[class*='year-text--selected']");
+    await expect(screen.getByRole("button", { name: "Next year" })).toBeInTheDocument();
+    const selected = screen.getAllByText("2026").at(-1)!.closest("[class*='year-text--selected']");
     await expect(selected).toHaveStyle({ backgroundColor: RED, color: GREY_100 });
   },
 };
