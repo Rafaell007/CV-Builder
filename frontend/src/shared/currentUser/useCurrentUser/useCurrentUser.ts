@@ -9,6 +9,10 @@ export type UseCurrentUserResult = {
   // The signed-in user, or `null` while loading and when nobody is signed in.
   user: CurrentUser | null;
   loading: boolean;
+  // The `me` request failed (network or server). Not the same as "nobody is signed in".
+  failed: boolean;
+  // Sends the `me` request again.
+  retry: () => void;
   isAdmin: boolean;
 };
 
@@ -17,7 +21,13 @@ export type UseCurrentUserResult = {
  * only hides what the user may not do; the backend decides (PLAN D10).
  */
 export function useCurrentUser(): UseCurrentUserResult {
-  const { data, loading } = useQuery(MeDocument);
+  const { data, loading, error, refetch } = useQuery(MeDocument);
   const user = data?.me ?? null;
-  return { user, loading, isAdmin: user?.role === "ADMIN" };
+  return {
+    user,
+    loading,
+    failed: Boolean(error) && !data,
+    retry: () => void refetch().catch(() => undefined),
+    isAdmin: user?.role === "ADMIN",
+  };
 }

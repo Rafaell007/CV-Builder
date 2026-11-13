@@ -4,6 +4,7 @@ import {
   CreateProjectDocument,
   type CreateProjectInput,
   DeleteProjectDocument,
+  EnvironmentOptionsDocument,
   ProjectsDocument,
   type ProjectsQuery,
   type ProjectsQueryVariables,
@@ -328,5 +329,31 @@ export const updateProjectNetworkErrorMock = (
   input: UpdateProjectInput,
 ): MockLink.MockedResponse => ({
   request: { query: UpdateProjectDocument, variables: { input } },
+  error: new Error("Failed to fetch"),
+});
+
+/** The skills catalog as the backend returns it (sorted by name): the choices of the Environment field. */
+export const catalogSkills = [
+  skill("11", "CSS3"),
+  skill("15", "Firebase"),
+  skill("10", "HTML5"),
+  skill("16", "MobX"),
+  skill("13", "React"),
+  skill("12", "TypeScript"),
+  skill("14", "Zustand"),
+];
+
+/** MockedProvider response of the `EnvironmentOptions` query. It answers every request, so each form can ask. */
+export const environmentOptionsMock = (
+  skills: typeof catalogSkills = catalogSkills,
+): MockLink.MockedResponse => ({
+  request: { query: EnvironmentOptionsDocument },
+  result: { data: { skills } },
+  maxUsageCount: Number.POSITIVE_INFINITY,
+});
+
+/** `EnvironmentOptions` that fails before the backend answers (no network). */
+export const environmentOptionsErrorMock = (): MockLink.MockedResponse => ({
+  request: { query: EnvironmentOptionsDocument },
   error: new Error("Failed to fetch"),
 });

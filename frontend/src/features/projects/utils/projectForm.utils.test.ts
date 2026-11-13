@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { MAX_DESCRIPTION_LENGTH, MAX_DOMAIN_LENGTH, MAX_NAME_LENGTH } from "../projects.constants";
+import {
+  MAX_DESCRIPTION_LENGTH,
+  MAX_DOMAIN_LENGTH,
+  MAX_ENVIRONMENT_SKILLS,
+  MAX_NAME_LENGTH,
+} from "../projects.constants";
 import { blog } from "../projects.mocks";
 import type { ProjectFormValues } from "../projects.types";
 import {
@@ -22,6 +27,8 @@ const messages: ProjectFormMessages = {
   endDateBeforeStart: "end before start",
   descriptionRequired: "description required",
   descriptionTooLong: "description long",
+  environmentTooMany: "too many technologies",
+  environmentDuplicate: "duplicate technology",
 };
 
 const valid: ProjectFormValues = {
@@ -30,6 +37,7 @@ const valid: ProjectFormValues = {
   startDate: new Date(2026, 0, 10),
   endDate: new Date(2026, 5, 30),
   description: "A blogging site",
+  environmentIds: [],
 };
 
 const schema = projectFormSchema(messages);
@@ -61,13 +69,37 @@ describe("projectFormSchema", () => {
 
   it("requires every field", () => {
     expect(
-      issues({ name: "  ", domain: "", startDate: null, endDate: null, description: "" }),
+      issues({
+        name: "  ",
+        domain: "",
+        startDate: null,
+        endDate: null,
+        description: "",
+        environmentIds: [],
+      }),
     ).toEqual({
       name: "name required",
       domain: "domain required",
       startDate: "start required",
       endDate: "end required",
       description: "description required",
+    });
+  });
+
+  it("accepts no technologies, a few and the most allowed, and refuses more than 50", () => {
+    const ids = (count: number) => Array.from({ length: count }, (_, index) => `skill-${index}`);
+
+    expect(issues({ ...valid, environmentIds: [] })).toEqual({});
+    expect(issues({ ...valid, environmentIds: ids(3) })).toEqual({});
+    expect(issues({ ...valid, environmentIds: ids(MAX_ENVIRONMENT_SKILLS) })).toEqual({});
+    expect(issues({ ...valid, environmentIds: ids(MAX_ENVIRONMENT_SKILLS + 1) })).toEqual({
+      environmentIds: "too many technologies",
+    });
+  });
+
+  it("refuses the same technology twice", () => {
+    expect(issues({ ...valid, environmentIds: ["a", "b", "a"] })).toEqual({
+      environmentIds: "duplicate technology",
     });
   });
 
@@ -113,12 +145,13 @@ describe("toUtcDateIso", () => {
 });
 
 describe("toCreateProjectInput", () => {
-  it("turns the form values into the mutation input without an environment", () => {
+  it("turns the form values into the mutation input, with the chosen technologies", () => {
     expect(
       toCreateProjectInput({
         ...valid,
         startDate: new Date(2026, 0, 10),
         endDate: new Date(2026, 5, 30),
+        environmentIds: ["12", "13"],
       }),
     ).toEqual({
       name: "Blog",
@@ -126,6 +159,7 @@ describe("toCreateProjectInput", () => {
       startDate: "2026-01-10T00:00:00.000Z",
       endDate: "2026-06-30T00:00:00.000Z",
       description: "A blogging site",
+      environmentIds: ["12", "13"],
     });
   });
 });
@@ -160,17 +194,19 @@ describe("toProjectFormValues", () => {
     });
     expect(values.startDate).toEqual(new Date(2025, 11, 31));
     expect(values.endDate).toEqual(new Date(2026, 4, 31));
+    expect(values.environmentIds).toEqual(["10", "11", "12", "13", "14", "15"]);
   });
 });
 
 describe("toUpdateProjectInput", () => {
-  it("sends the id and the ids of the current environment, so an edit keeps the technologies", () => {
+  it("sends the technologies of the form, not the ones the project had", () => {
     expect(
       toUpdateProjectInput(blog, {
         ...valid,
         name: "Blog 2",
         startDate: new Date(2026, 0, 10),
         endDate: new Date(2026, 5, 30),
+        environmentIds: ["13", "99"],
       }),
     ).toEqual({
       id: "1",
@@ -179,15 +215,16 @@ describe("toUpdateProjectInput", () => {
       startDate: "2026-01-10T00:00:00.000Z",
       endDate: "2026-06-30T00:00:00.000Z",
       description: "A blogging site",
-      environmentIds: ["10", "11", "12", "13", "14", "15"],
+      environmentIds: ["13", "99"],
     });
   });
 
-  it("sends an empty list for a project without technologies", () => {
-    const input = toUpdateProjectInput(
-      { ...blog, environment: [] },
-      { ...valid, startDate: new Date(2026, 0, 10), endDate: new Date(2026, 5, 30) },
-    );
+  it("sends an empty list when the user removed every technology", () => {
+    const input = toUpdateProjectInput(blog, {
+      ...valid,
+      startDate: new Date(2026, 0, 10),
+      endDate: new Date(2026, 5, 30),
+    });
 
     expect(input.environmentIds).toEqual([]);
   });

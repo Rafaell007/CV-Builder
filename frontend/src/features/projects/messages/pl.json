@@ -58,7 +58,14 @@
       "domain": "Domena",
       "startDate": "Data rozpoczęcia",
       "endDate": "Data zakończenia",
-      "description": "Opis"
+      "description": "Opis",
+      "environment": "Środowisko"
+    },
+    "environment": {
+      "remove": "Usuń {option}",
+      "loading": "Wczytywanie technologii",
+      "failed": "Nie udało się wczytać technologii.",
+      "retry": "Spróbuj ponownie"
     },
     "errors": {
       "nameRequired": "Nazwa projektu jest wymagana",
@@ -70,6 +77,8 @@
       "endDateBeforeStart": "Data zakończenia nie może być wcześniejsza niż data rozpoczęcia",
       "descriptionRequired": "Opis jest wymagany",
       "descriptionTooLong": "Opis nie może przekraczać 2000 znaków",
+      "environmentTooMany": "Projekt może mieć najwyżej 50 technologii",
+      "environmentDuplicate": "Każdą technologię można wybrać raz",
       "serverInvalid": "Serwer nie przyjął tej wartości",
       "failed": "Coś poszło nie tak. Spróbuj ponownie później"
     },

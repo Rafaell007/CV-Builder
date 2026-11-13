@@ -179,7 +179,9 @@ test.describe("projects page, keyboard and focus", () => {
 
     await expect(confirmDialog(page)).toBeHidden();
     // Nothing was deleted: Escape is a Cancel.
-    await expect(page.getByRole("row", { name: /Banking Portal/ })).toHaveCount(1);
+    await expect(
+      page.locator("tbody tr:not([data-row-detail])", { hasText: "Banking Portal" }),
+    ).toHaveCount(1);
     await expect(button).toBeFocused();
   });
 
@@ -275,10 +277,7 @@ for (const theme of ["light", "dark"] as const) {
     test("applies the theme and keeps the project rows readable", async ({ page }) => {
       await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
 
-      const firstRow = page
-        .getByRole("row")
-        .filter({ has: page.getByRole("cell") })
-        .first();
+      const firstRow = page.locator("tbody tr:not([data-row-detail])").first();
       await expect(firstRow).toContainText("Banking Portal");
       // The name cell, the domain cell and the heading are the three kinds of text on the list.
       expect(await contrastOf(page, "tbody tr:first-child td:first-child")).toBeGreaterThanOrEqual(
@@ -295,13 +294,8 @@ for (const theme of ["light", "dark"] as const) {
 
       await expect(dialog(page)).toBeVisible();
       expect(await contrastOf(page, '[role="dialog"] h2')).toBeGreaterThanOrEqual(WCAG_AA_TEXT);
-      // Known issue (projects README): in the dark theme the field label (grey-400 on the grey-600 modal) has
-      // 4.32:1. The fix is a shared token change, so only the light theme is checked until that is done.
-      if (theme === "light") {
-        expect(await contrastOf(page, '[role="dialog"] label')).toBeGreaterThanOrEqual(
-          WCAG_AA_TEXT,
-        );
-      }
+      // The field label uses --color-text-secondary. In the dark theme it was 4.32:1 (KAN-139 fixed it).
+      expect(await contrastOf(page, '[role="dialog"] label')).toBeGreaterThanOrEqual(WCAG_AA_TEXT);
     });
   });
 }
