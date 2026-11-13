@@ -94,4 +94,17 @@ describe("experienceYears", () => {
   it("gives 0 when the project starts later in the current year", () => {
     expect(experienceYears("react", [projectUsing(["react"], "2026-09-01")], NOW)).toBe(0);
   });
+
+  it("handles a 29 February start date in a non-leap year", () => {
+    const projects = [projectUsing(["react"], "2024-02-29")];
+
+    expect(experienceYears("react", projects, new Date("2025-02-28T00:00:00Z"))).toBe(0);
+    expect(experienceYears("react", projects, new Date("2025-03-01T00:00:00Z"))).toBe(1);
+  });
+
+  it("counts the year on 29 February of a later leap year", () => {
+    const projects = [projectUsing(["react"], "2024-02-29")];
+
+    expect(experienceYears("react", projects, new Date("2028-02-29T00:00:00Z"))).toBe(4);
+  });
 });
