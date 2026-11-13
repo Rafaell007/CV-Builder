@@ -22,7 +22,7 @@ export interface CvsTableProps {
 }
 
 /**
- * The CVs as a table: name, education and employee (the owner email).
+ * The CVs as a table: name, education and employee (the owner email), and the description in a line under each row.
  * Only Name sorts, on the backend; the table never sorts the rows it holds.
  * A click on a row opens the CV, like View in the row menu.
  */
@@ -67,6 +67,7 @@ export function CvsTable({
       sort={sort}
       onSortChange={onSortChange}
       onRowClick={onView}
+      renderRowDetail={(cv) => <p className={styles.description}>{cv.description}</p>}
       renderRowActions={(cv) => (
         <Menu
           label={t("actions.menu", { name: cv.name })}

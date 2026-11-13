@@ -37,6 +37,16 @@ describe("CvsTable", () => {
     expect(within(row).getByText("anna.kowalska@example.com")).toBeInTheDocument();
   });
 
+  it("shows the description in the detail line under the row, not in a column", () => {
+    render();
+
+    const row = screen.getByRole("row", { name: /Frontend Developer/ });
+    expect(within(row).queryByText(frontendCv.description)).not.toBeInTheDocument();
+    const detail = row.nextElementSibling as HTMLElement;
+    expect(detail).toHaveAttribute("data-row-detail");
+    expect(within(detail).getByText(frontendCv.description)).toBeInTheDocument();
+  });
+
   it("lets the user sort by Name only", () => {
     render();
 
@@ -70,6 +80,7 @@ describe("CvsTable", () => {
     const names = screen
       .getAllByRole("row")
       .slice(1)
+      .filter((row) => !row.hasAttribute("data-row-detail"))
       .map((row) => within(row).getByText(/^(Frontend Developer|Backend Engineer)$/).textContent);
     expect(names).toEqual(["Frontend Developer", "Backend Engineer"]);
   });

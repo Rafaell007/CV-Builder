@@ -2,3 +2,10 @@
 .text {
   overflow-wrap: anywhere;
 }
+
+/* The description sits in the detail line under a row, in the secondary colour (Figma). */
+.description {
+  margin: 0;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
