@@ -1,0 +1,6 @@
+.link {
+  margin-top: var(--space-6);
+  color: inherit;
+  font: var(--text-body);
+  text-decoration: underline;
+}

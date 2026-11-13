@@ -57,7 +57,13 @@ export const Desktop: Story = {
 export const Tablet: Story = {
   globals: tablet,
   parameters: { apollo: { mocks: [fakeBackendMock([blog, sales])] } },
-  play: expectListShown,
+  play: async (context) => {
+    await expectListShown(context);
+    // Tablet: the Domain column is hidden.
+    await expect(
+      context.canvas.queryByRole("columnheader", { name: "Domain" }),
+    ).not.toBeInTheDocument();
+  },
 };
 
 /** Four projects with descriptions of different lengths (from about 160 to 560 characters). */
@@ -65,7 +71,7 @@ export const ManyProjects: Story = {
   parameters: { apollo: { mocks: [fakeBackendMock(sampleProjects)] } },
   play: async ({ canvas }) => {
     await expect(await canvas.findByText("Mobile Banking Platform")).toBeInTheDocument();
-    await expect(canvas.getAllByRole("row")).toHaveLength(sampleProjects.length + 1);
+    await expect(canvas.getAllByRole("row")).toHaveLength(sampleProjects.length * 2 + 1);
   },
 };
 
@@ -82,7 +88,7 @@ export const ManyPages: Story = {
 
     await userEvent.click(canvas.getByRole("button", { name: "Page 4" }));
     // The last page holds the 5 projects that remain (35 - 3 x 10).
-    await waitFor(() => expect(canvas.getAllByRole("row")).toHaveLength(6));
+    await waitFor(() => expect(canvas.getAllByRole("row")).toHaveLength(11));
     await expect(canvas.getByRole("button", { name: "Page 4" })).toHaveAttribute(
       "aria-current",
       "page",

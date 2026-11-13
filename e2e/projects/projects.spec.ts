@@ -14,8 +14,10 @@ const PAGE_SIZE = 10;
 const search = (page: Page) => page.getByRole("searchbox", { name: "Search projects" });
 const header = (page: Page, name: string) => page.getByRole("columnheader", { name });
 const pagination = (page: Page) => page.getByRole("navigation", { name: "Projects pagination" });
-// Rows with data cells: the header row has none.
-const dataRows = (page: Page) => page.getByRole("row").filter({ has: page.getByRole("cell") });
+// Rows with data cells: the header row has none. The detail line under a project (description and
+// tags) is a row too; the table marks it with data-row-detail, so it is left out here.
+const dataRows = (page: Page) =>
+  page.locator("tbody tr:not([data-row-detail])").filter({ has: page.getByRole("cell") });
 
 test.describe("projects page, as an admin", () => {
   test.beforeEach(async ({ context, page }) => {
