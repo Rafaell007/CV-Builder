@@ -15,6 +15,8 @@ const DATABASE_URL =
 // Building both apps takes a while, most of all on a cold CI runner.
 const SERVER_START_TIMEOUT_MS = 5 * 60 * 1000;
 
+const CV_LIST_SPEC = "cvs/cvs.spec.ts";
+
 export default defineConfig({
   // One folder per area (PLAN §4), e.g. smoke/, auth/, cvs/.
   testDir: ".",
@@ -30,7 +32,21 @@ export default defineConfig({
     baseURL: FRONTEND_URL,
     trace: "on-first-retry",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    // cvs.spec.ts counts the rows of the CV list, so no other spec may create a CV while it runs. It runs alone and
+    // first; every other spec waits for it (a project runs after its dependencies finish).
+    {
+      name: "cvs-list",
+      testMatch: CV_LIST_SPEC,
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "chromium",
+      testIgnore: CV_LIST_SPEC,
+      dependencies: ["cvs-list"],
+      use: { ...devices["Desktop Chrome"] },
+    },
+  ],
   // Production builds against a freshly seeded database, so every run starts from the same data.
   webServer: [
     {
