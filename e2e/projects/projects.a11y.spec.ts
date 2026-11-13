@@ -200,10 +200,8 @@ test.describe("projects page, keyboard and focus", () => {
     await expect(startDate).not.toHaveValue("01/10/2026");
   });
 
-  // Known issue (projects README, "Escape in the calendar"): one Escape closes the calendar AND the Create modal,
-  // so the user loses the form. WAI-ARIA wants the popup closed first. Remove `fixme` when the shared Modal and
-  // DatePicker agree on who handles the key.
-  test.fixme("Escape closes only the calendar, not the Create modal", async ({ page }) => {
+  // WAI-ARIA: Escape closes the popup first. The shared Modal skips its own Escape while a calendar is open.
+  test("Escape closes only the calendar, not the Create modal", async ({ page }) => {
     await createButton(page).click();
     const startDate = dialog(page).getByRole("textbox", { name: "Start Date" });
     await startDate.focus();
@@ -363,10 +361,9 @@ test.describe("projects page, tablet width", () => {
     expect(box.x + box.width).toBeLessThanOrEqual(TABLET.width);
   });
 
-  // Known issue (projects README, "Calendar cut by the modal"): at 768 x 1024 the calendar opens above the field and
-  // the top edge of the modal cuts its header, so the month and year buttons and the arrows cannot be used.
-  // Remove `fixme` when the shared DatePicker or Modal lets the popup show whole.
-  test.fixme("the calendar header is not cut by the modal", async ({ page }) => {
+  // At 768 x 1024 the calendar opens above the field. It is placed against the screen (fixed), so the modal
+  // cannot cut it.
+  test("the calendar header is not cut by the modal", async ({ page }) => {
     await createButton(page).click();
     await dialog(page).getByRole("textbox", { name: "End Date" }).click();
 
