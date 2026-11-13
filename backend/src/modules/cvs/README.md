@@ -2,6 +2,7 @@
 
 List, read, create, change and delete CVs. A user works with their own CVs. An admin works with all CVs (D10).
 
+- **Folders:** CV projects live in `cv-projects/` (resolver, service, `dto/`, `models/`, specs). `require-user.ts` stays in the module root, because both topics use it.
 - **GraphQL:**
   - `cvs(search, sort, page, userId)` returns `{ items, total }`. `cv(id)` returns one CV.
   - `createCv(input)`, `updateCv(input)` and `deleteCv(id)` return the CV. `deleteCv` returns the CV that it removed.
@@ -16,7 +17,7 @@ List, read, create, change and delete CVs. A user works with their own CVs. An a
 - **Validation:** name and education are required and have at most 255 characters. Description is required and has at most 2000 characters (the database column has no limit, the API sets one). Text is trimmed first, with the shared `Trim` decorator. The messages are the ones of the page docs (`Name is required`).
 - **Parallel deletes:** if another request deletes a CV between the access check and `updateCv` or `deleteCv`, the answer is `NOT_FOUND` (Prisma error P2025), not a server error.
 - **Delete:** a CV removes its skills and projects with it. Deleting a user removes their CVs (D13).
-- **Tests:** `cvs.service.spec.ts` and `cvs.resolver.spec.ts` next to the code. `backend/test/cvs.int-spec.ts` runs over HTTP against the test database.
+- **Tests:** `cvs.service.spec.ts` and `cvs.resolver.spec.ts` next to the code. `backend/test/cvs/cvs.int-spec.ts` runs over HTTP against the test database.
 - **Docs:** [CVs page](../../../../docs/pages/20-cvs-page.md) · [CV details page](../../../../docs/pages/21-cv-details-page.md) · [PLAN.md S7.1, D10, D16](../../../../PLAN.md)
 
 ## CV projects (S7.4a)
@@ -37,7 +38,7 @@ The projects of one CV: `cv-projects.service.ts`, `cv-projects.resolver.ts`, `cv
 - **Duplicates:** the unique index `(cvId, projectId)` is the guard. The service turns the error into `CONFLICT` ("The project is already in this CV"). Two parallel requests for the same project give one entry and one `CONFLICT`.
 - **Parallel changes (D25):** `addCvProject` and `updateCvProject` run in a serializable transaction, like `ProjectsService.update`. If a project date changes at the same moment, one of the two fails with `CONFLICT` ("Try again"), so an entry cannot end up outside the project dates.
 - **Remove:** all or nothing. If one id is not in the CV, the answer is `NOT_FOUND` and nothing is removed. The roles of the entry go with it (cascade). The project and the roles of the catalogs stay (AC-23, AC-39).
-- **Tests:** `cv-projects.service.spec.ts`, `cv-projects.resolver.spec.ts` and `cv-project-dates.spec.ts` next to the code. `backend/test/cv-projects.int-spec.ts` runs over HTTP against the test database.
+- **Tests:** `cv-projects.service.spec.ts`, `cv-projects.resolver.spec.ts` and `cv-project-dates.spec.ts` in `cv-projects/`. `backend/test/cvs/cv-projects.int-spec.ts` runs over HTTP against the test database.
 - **Docs:** [CV projects page](../../../../docs/pages/23-cv-projects-page.md) · [PLAN.md S7.4, D16, D18, D25](../../../../PLAN.md)
 
 ## Things to note

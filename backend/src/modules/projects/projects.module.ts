@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
-import { ProjectRolesResolver } from "./project-roles.resolver";
-import { ProjectRolesService } from "./project-roles.service";
+import { ProjectRolesResolver } from "./project-roles/project-roles.resolver";
+import { ProjectRolesService } from "./project-roles/project-roles.service";
 import { ProjectsResolver } from "./projects.resolver";
 import { ProjectsService } from "./projects.service";
 

@@ -8,7 +8,7 @@ import { AuthService } from "./auth.service";
 import { SignInInput } from "./dto/sign-in.input";
 import { SignUpInput } from "./dto/sign-up.input";
 import { SessionUser } from "./models/session-user";
-import { SessionCookiesService } from "./session-cookies.service";
+import { SessionCookiesService } from "./sessions/session-cookies.service";
 
 @Resolver(() => SessionUser)
 export class AuthResolver {
