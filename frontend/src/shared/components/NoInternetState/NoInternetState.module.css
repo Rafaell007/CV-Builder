@@ -1,0 +1,17 @@
+/* Values: docs/design-tokens.md › No internet. The content box is the shared ErrorScreen. */
+
+.screen {
+  display: flex;
+  min-height: 100dvh;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-4);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* Figma draws this button 220 wide, wider than the 160 minimum. */
+.retry {
+  width: 220px;
+  margin-top: var(--space-6);
+}

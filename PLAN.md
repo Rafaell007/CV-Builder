@@ -270,6 +270,7 @@ Rules for all code in this repository.
 
 - Components receive data and callbacks through props and render markup. No data fetching, business logic, side effects, context access or `process.env` in a component body.
 - Allowed: props, JSX, purely visual local state (e.g. open/closed), UI-only hooks.
+- Exception, translations: a **feature** component may call `useTranslations` and `useLocale` in its body, because it belongs to one feature and one `messages/` namespace. A **shared** component (`shared/components`) must not: it takes translated texts as props (for example `labels`), so it works in any feature and any language.
 
 ### 5.2 Hook composition (frontend)
 
@@ -306,7 +307,7 @@ Rules for all code in this repository.
 ### 5.9 Fractal structure
 
 - Every unit is a folder that owns its files, tests and children; the same shape repeats at every level.
-- A file and its test are one unit: `X.ts(x)` and `X.test.ts(x)` live in folder `X/` with an `index.ts`. A file without a test stays a plain file. Role files are named by their role: `x.utils.ts` → `utils/`, `x.store.ts` → `store/`. A feature's main component stays at the feature root, since the feature folder is already its folder.
+- A file and its test are one unit: `X.ts(x)` and `X.test.ts(x)` live in folder `X/` with an `index.ts`. A file without a test stays a plain file. Role files are named by their role: `x.utils.ts` → `utils/`, `x.store.ts` → `store/`. A feature's main component stays at the feature root, since the feature folder is already its folder. The same holds for the feature-level files that belong to the feature as a whole and have no sub-parts: `<feature>.mocks.ts` with its test, `<feature>.constants.ts` and `<feature>.types.ts`.
 - Shared code moves to the **nearest common ancestor**; only code used by unrelated features goes to `shared/` (frontend) or `common/` (backend).
 - Frontend folders expose one public `index.ts`; other code imports only from it. Exception: `messages/*.json` files are imported directly (by `src/i18n/loadMessages`), so a request loads only its own language. Backend modules are imported through their Nest module.
 - Every feature folder and every non-obvious shared component has a short `README.md` (about 5–10 lines): what it does, what it exports, where it is used, link to its `docs/` page. Simple components (e.g. a button) get none. Update it in the same PR when the public API changes.
@@ -457,7 +458,7 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
 - [ ] **S1.1 Form controls** — Button, IconButton, TextField, PasswordField (toggle), Textarea, Select, MultiSelect, DatePicker, OtpField, SearchField (debounced); RHF + Zod helpers and server field-error mapping. Stories + tests.
 - [ ] **S1.2 Data display** — DataTable (columns, sort indicator, row actions slot), Pagination, Menu (one open, Escape/outside close), Tabs, Breadcrumbs, Avatar, PageState (loading skeleton, empty, no results, error + retry). Stories + tests.
   - **Done (S1.2a, KAN-79):** `DataTable` and `Pagination` in `frontend/src/shared/components/` (README in each folder). Both are controlled, so the page owns `search`, `sort` and `page`; sort uses the backend `SortInput` shape and `Pagination` uses page size 10 (D19). Story `Shared/DataTable → Sample` shows mocked data that sorts, searches, pages and shows row actions. Menu, Tabs, Breadcrumbs, Avatar and PageState are still open (S1.2b).
-  - **Open items (S1.2a):** (1) both components use English default texts; the first list page must pass translated `labels` (S0.6). (2) A list query must send `page: { number, size: DEFAULT_PAGE_SIZE }` (10), because the backend default is 20; add a test on the Users page. (3) The page clears `selectedIds` and resets `page` when search or sort changes. More in the READMEs of both components ("Known issues").
+  - **Open items (S1.2a):** (1) both components use English default texts; the first list page must pass translated `labels` (S0.6). (2) A list query sends `page: { number, size: DEFAULT_PAGE_SIZE }` (10). The backend default is also 10 since 2026-11-12; add a test on the Users page that checks the size. (3) The page clears `selectedIds` and resets `page` when search or sort changes. More in the READMEs of both components ("Known issues").
   - **Local gotcha:** `pnpm --filter @cv-builder/frontend typecheck` can fail on `.next/dev/types/validator.ts` (old routes such as `admin/departments`) after routes change. Delete `frontend/.next` and run it again; CI is not affected.
   - **Done (S1.2b, KAN-80):** `Menu`, `Tabs`, `Breadcrumbs`, `Avatar` and `PageState` in `frontend/src/shared/components/` (README for `Menu` and `PageState`). `Menu` is Radix `DropdownMenu`. `Tabs` takes the current `pathname` from the layout and marks the longest matching route; `Avatar` falls back to initials when the image is missing or fails. `PageState` keeps `empty` and `no-results` apart from `error`. Texts are props with English defaults until S0.6.
 - [ ] **S1.3 Overlays and feedback** — Modal / FormModal (focus trap, Escape, primary disabled until valid and dirty), ConfirmModal, Toast notifications, SelectionToolbar ("REMOVE (n)"). Stories + tests.
@@ -496,7 +497,7 @@ Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE 
 
 - [ ] **S5.1 Departments** — AC per departments.
 - [ ] **S5.2 Positions** — AC per positions.
-- [ ] **S5.3 Skills catalog** — with `skillCategories`; type from category. AC per skills-admin.
+- [ ] **S5.3 Skills catalog** — with `skillCategories`; type from category. AC per skills-admin. Started: the `skills` query (id, name, Admin only) exists in `backend/src/modules/skills` for the Projects Environment field (KAN-136); create, update, delete and categories are still open.
 - [ ] **S5.4 Languages catalog** — ISO unique. AC per languages-admin.
 - [ ] **S5.5 Projects** — with `projectRoles`; date rules; environment as skill tags; search name/domain; delete blocked when used in a CV; date change blocked when CV projects would fall outside (D25). AC per projects. BE done (KAN-101, S5.5a), FE pending.
 

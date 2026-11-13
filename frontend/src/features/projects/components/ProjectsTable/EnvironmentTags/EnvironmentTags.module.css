@@ -1,0 +1,21 @@
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Outlined pill as in the Figma list. min-width: 0 and overflow-wrap let a long name shrink instead of widening the table. */
+.tag {
+  min-width: 0;
+  max-width: 100%;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-chip-border);
+  border-radius: var(--radius-pill);
+  color: var(--color-text);
+  font: var(--text-table-cell);
+  letter-spacing: var(--text-table-cell-ls);
+  overflow-wrap: anywhere;
+}

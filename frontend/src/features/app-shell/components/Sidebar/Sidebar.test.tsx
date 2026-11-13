@@ -5,16 +5,16 @@ import { renderWithProviders } from "@/shared/testing";
 import { Sidebar, type SidebarProps } from "./Sidebar";
 
 const props: SidebarProps = {
-  appName: "CV Builder",
-  navigationLabel: "Main navigation",
+  labels: { appName: "CV Builder", navigation: "Main navigation", toggle: "Sidebar" },
   mainLinks: [
     { href: "/users", label: "Employees", icon: PeopleIcon, active: true },
     { href: "/skills", label: "Skills", icon: TrendingUpIcon, active: false },
   ],
   extraLinks: [],
   collapsed: false,
-  toggleLabel: "Sidebar",
+  loading: false,
   onToggle: () => {},
+  footer: null,
 };
 
 describe("Sidebar", () => {
@@ -40,6 +40,23 @@ describe("Sidebar", () => {
 
     expect(screen.getByRole("separator")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Departments" })).toBeInTheDocument();
+  });
+
+  it("keeps the link names when collapsed, so a screen reader still hears them", () => {
+    renderWithProviders(<Sidebar {...props} collapsed />);
+
+    expect(screen.getByRole("link", { name: "Employees" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Skills" })).toBeInTheDocument();
+  });
+
+  it("draws bars instead of links while loading", () => {
+    renderWithProviders(<Sidebar {...props} loading />);
+
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: "Main navigation" })).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
   });
 
   it("tells whether it is expanded and reports a click on the collapse button", async () => {

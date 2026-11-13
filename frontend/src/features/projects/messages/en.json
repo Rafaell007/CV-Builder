@@ -1,0 +1,106 @@
+{
+  "title": "Projects",
+  "button": "CREATE PROJECT",
+  "table": "Projects list",
+  "columns": {
+    "name": "Name",
+    "domain": "Domain",
+    "startDate": "Start Date",
+    "endDate": "End Date"
+  },
+  "environment": "Environment",
+  "dateMissing": "Date not available",
+  "actions": {
+    "column": "Actions",
+    "menu": "Actions for {name}",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "delete": {
+    "title": "Delete project",
+    "message": "Are you sure you want to delete project <strong>{name}</strong>?",
+    "close": "Close",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "failedTitle": "Could not delete the project",
+    "failedText": "Something went wrong. Please try again."
+  },
+  "search": {
+    "label": "Search projects",
+    "placeholder": "Search"
+  },
+  "pagination": {
+    "navigation": "Projects pagination",
+    "previous": "Previous page",
+    "next": "Next page",
+    "page": "Page {number}"
+  },
+  "states": {
+    "loading": "Loading projects",
+    "empty": "No projects found",
+    "noResults": "No projects found",
+    "error": "Something went wrong. Please try again later",
+    "retry": "Retry"
+  },
+  "create": {
+    "title": "Create project",
+    "close": "Close",
+    "submit": "Create",
+    "cancel": "Cancel",
+    "success": {
+      "title": "Project created",
+      "text": "{name} was added to the projects."
+    }
+  },
+  "form": {
+    "fields": {
+      "name": "Name",
+      "domain": "Domain",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "description": "Description",
+      "environment": "Environment"
+    },
+    "environment": {
+      "remove": "Remove {option}",
+      "loading": "Loading technologies",
+      "failed": "The technologies could not be loaded.",
+      "retry": "Retry"
+    },
+    "errors": {
+      "nameRequired": "Project name is required",
+      "nameTooLong": "Project name must not exceed 100 characters",
+      "domainRequired": "Domain is required",
+      "domainTooLong": "Domain must not exceed 100 characters",
+      "startDateRequired": "Start date is required",
+      "endDateRequired": "End date is required",
+      "endDateBeforeStart": "End date must be later than start date",
+      "descriptionRequired": "Description is required",
+      "descriptionTooLong": "Description must not exceed 2000 characters",
+      "environmentTooMany": "A project can have at most 50 technologies",
+      "environmentDuplicate": "Each technology can be chosen once",
+      "serverInvalid": "The server did not accept this value",
+      "failed": "Something went wrong. Please try again later"
+    },
+    "datePicker": {
+      "calendar": "Choose a date",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "previousYear": "Previous year",
+      "nextYear": "Next year",
+      "chooseDayPrefix": "Choose",
+      "unavailableDayPrefix": "Not available",
+      "monthPrefix": "Month"
+    }
+  },
+  "update": {
+    "title": "Update project",
+    "close": "Close",
+    "submit": "Update",
+    "cancel": "Cancel",
+    "success": {
+      "title": "Project updated",
+      "text": "{name} was saved."
+    }
+  }
+}

@@ -9,7 +9,7 @@ List, read, create, change and delete CVs. A user works with their own CVs. An a
 - **Own or all:** the service decides, not the client. A user always gets only their own CVs. An admin gets all CVs, and can narrow the list with `userId`. A user who sends the `userId` of another user gets `FORBIDDEN`.
 - **Search:** case-insensitive, by CV name. For an admin, also by the email of the owner. A user cannot search by email.
 - **Sort:** only `name` (`resolveSort` rejects all other fields). Equal names are ordered by `id`, so pages do not overlap. The default is `name` ascending.
-- **Page size:** `cvs` has its own default of 10 (D19, `CVS_PAGE_SIZE` in `cvs.args.ts`). The shared default of 20 stays for the other lists. A client can still send another `size` (maximum 100).
+- **Page size:** the shared default of 10 (D19, `DEFAULT_PAGE_SIZE` in `common/pagination`). `cvs` has no own value since 2026-11-12. A client can still send another `size` (maximum 100).
 - **Owner:** `createCv` makes the signed-in user the owner. An admin can set `userId` to create a CV for another user. If that user does not exist, the answer is `BAD_USER_INPUT` with a field error on `userId`. `updateCv` cannot change the owner.
 - **Access errors:** a CV of another user gives `NOT_FOUND`, the same as a missing CV. A user cannot find out which ids exist. An id that is not a UUID gives `BAD_USER_INPUT`.
 - **Verified only (D16):** `createCv`, `updateCv` and `deleteCv` use `@Verified()`. Reading needs only a session.

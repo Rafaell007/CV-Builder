@@ -95,7 +95,7 @@ type Mutation {
 
 input PageInput {
   number: Int! = 1
-  size: Int! = 20
+  size: Int! = 10
 }
 
 type Project {
@@ -127,7 +127,8 @@ type Query {
   health: Health!
   me: SessionUser
   projectRoles: [ProjectRole!]!
-  projects(page: PageInput! = {number: 1, size: 20}, search: String, sort: SortInput): ProjectPage!
+  projects(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): ProjectPage!
+  skills: [EnvironmentSkill!]!
 }
 
 input RemoveCvProjectsInput {

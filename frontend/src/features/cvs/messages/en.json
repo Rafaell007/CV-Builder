@@ -1,0 +1,82 @@
+{
+  "title": "CVs",
+  "button": "CREATE CV",
+  "table": "CVs list",
+  "columns": {
+    "name": "Name",
+    "education": "Education",
+    "employee": "Employee"
+  },
+  "actions": {
+    "column": "Actions",
+    "menu": "Actions for {name}",
+    "view": "View",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "search": {
+    "label": "Search CVs",
+    "placeholder": "Search"
+  },
+  "pagination": {
+    "navigation": "CVs pagination",
+    "previous": "Previous page",
+    "next": "Next page",
+    "page": "Page {number}"
+  },
+  "states": {
+    "loading": "Loading CVs",
+    "empty": "You have no CVs yet",
+    "noResults": "No CVs found",
+    "error": "Failed to load CVs",
+    "retry": "Retry"
+  },
+  "form": {
+    "fields": {
+      "name": "Name",
+      "education": "Education",
+      "description": "Description"
+    },
+    "errors": {
+      "nameRequired": "Name is required",
+      "nameTooLong": "Name must not exceed 255 characters",
+      "educationRequired": "Education is required",
+      "educationTooLong": "Education must not exceed 255 characters",
+      "descriptionRequired": "Description is required",
+      "descriptionTooLong": "Description must not exceed 2000 characters",
+      "serverInvalid": "The server did not accept this value",
+      "failed": "Something went wrong. Please try again later"
+    }
+  },
+  "create": {
+    "title": "Create CV",
+    "close": "Close",
+    "submit": "Create",
+    "cancel": "Cancel",
+    "success": {
+      "title": "CV created",
+      "text": "{name} was added to the CVs."
+    }
+  },
+  "update": {
+    "title": "Update CV",
+    "close": "Close",
+    "submit": "Save",
+    "cancel": "Cancel",
+    "success": {
+      "title": "CV updated",
+      "text": "{name} was saved."
+    }
+  },
+  "delete": {
+    "title": "Delete CV",
+    "message": "Are you sure you want to delete CV <strong>{name}</strong>?",
+    "close": "Close",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "failedTitle": "Could not delete the CV",
+    "failedText": "Something went wrong. Please try again.",
+    "notFound": "This CV does not exist any more. The list was updated.",
+    "forbidden": "You are not allowed to delete this CV."
+  }
+}

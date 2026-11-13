@@ -10,13 +10,13 @@ async function invalidFields(instance: object): Promise<string[]> {
 }
 
 describe("PageInput", () => {
-  it("defaults to the first page of 20", () => {
-    expect(new PageInput()).toEqual({ number: 1, size: 20 });
+  it("defaults to the first page of 10", () => {
+    expect(new PageInput()).toEqual({ number: 1, size: 10 });
   });
 
   it.each([
-    [{ number: 0, size: 20 }, "number"],
-    [{ number: 1.5, size: 20 }, "number"],
+    [{ number: 0, size: 10 }, "number"],
+    [{ number: 1.5, size: 10 }, "number"],
     [{ number: 1, size: 0 }, "size"],
     [{ number: 1, size: 101 }, "size"],
   ])("rejects %j", async (plain, field) => {
@@ -46,7 +46,14 @@ describe("ListArgs", () => {
     const args = plainToInstance(ListArgs, {});
 
     expect(await invalidFields(args)).toEqual([]);
-    expect(args.page).toEqual({ number: 1, size: 20 });
+    expect(args.page).toEqual({ number: 1, size: 10 });
+  });
+
+  it("accepts null for the search and the sort, as a client may send them", async () => {
+    const args = plainToInstance(ListArgs, { search: null, sort: null });
+
+    expect(await invalidFields(args)).toEqual([]);
+    expect(args.sort).toBeNull();
   });
 
   it("trims the search term", () => {

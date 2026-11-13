@@ -1,4 +1,5 @@
-import { describe, expect, it, vi } from "vitest";
+import { act } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderWithProviders, screen, within } from "@/shared/testing";
 import { DataTable, type DataTableProps } from "./DataTable";
 import type { DataTableColumn } from "./DataTable.types";
@@ -59,7 +60,7 @@ describe("DataTable", () => {
       expect(onSortChange).toHaveBeenCalledWith({ field: "firstName", direction: "ASC" });
     });
 
-    it("asks for descending order, then for no sort", async () => {
+    it("asks for descending order, then for ascending order again", async () => {
       const onSortChange = vi.fn();
       const { user, rerender } = renderTable({
         onSortChange,
@@ -79,7 +80,7 @@ describe("DataTable", () => {
         />,
       );
       await user.click(screen.getByRole("button", { name: "First name" }));
-      expect(onSortChange).toHaveBeenLastCalledWith(undefined);
+      expect(onSortChange).toHaveBeenLastCalledWith({ field: "firstName", direction: "ASC" });
     });
 
     it("marks the sorted column for assistive technology", () => {
@@ -187,6 +188,74 @@ describe("DataTable", () => {
         "mixed",
       );
       expect(screen.getByRole("checkbox", { name: "Select row 1" })).toBeChecked();
+    });
+  });
+
+  describe("hiding a column below a width", () => {
+    const originalWidth = window.innerWidth;
+    const setWidth = (width: number) => {
+      window.innerWidth = width;
+      window.dispatchEvent(new Event("resize"));
+    };
+    const hidingColumns: DataTableColumn<Person>[] = [
+      columns[0]!,
+      { ...columns[1]!, hideBelow: 1024 },
+    ];
+
+    afterEach(() => {
+      window.innerWidth = originalWidth;
+    });
+
+    it("shows the column at its limit and hides it below the limit", () => {
+      window.innerWidth = 1024;
+      renderTable({ columns: hidingColumns });
+      expect(screen.getByRole("columnheader", { name: "Position" })).toBeInTheDocument();
+
+      act(() => setWidth(1023));
+
+      expect(screen.queryByRole("columnheader", { name: "Position" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("cell", { name: "Admiral" })).not.toBeInTheDocument();
+      expect(screen.getByRole("cell", { name: "Ada" })).toBeInTheDocument();
+    });
+
+    it("shows the column again when the window grows", () => {
+      window.innerWidth = 800;
+      renderTable({ columns: hidingColumns });
+      expect(screen.queryByRole("columnheader", { name: "Position" })).not.toBeInTheDocument();
+
+      act(() => setWidth(1200));
+
+      expect(screen.getByRole("columnheader", { name: "Position" })).toBeInTheDocument();
+    });
+  });
+
+  describe("row detail", () => {
+    it("draws a detail line under each row across the full width", () => {
+      renderTable({
+        selectable: true,
+        renderRowActions: () => <button type="button">Edit</button>,
+        renderRowDetail: (row) => <p>About {row.firstName}</p>,
+      });
+
+      const detail = screen.getByText("About Ada").closest("td");
+      expect(detail).toHaveAttribute("colspan", "4");
+      expect(detail?.closest("tr")?.previousElementSibling).toBe(
+        screen.getByRole("cell", { name: "Ada" }).closest("tr"),
+      );
+      expect(screen.getByText("About Grace")).toBeInTheDocument();
+    });
+
+    it("draws no line for a row whose detail is null", () => {
+      renderTable({ renderRowDetail: (row) => (row.id === "1" ? <p>About Ada</p> : null) });
+
+      expect(screen.getByText("About Ada")).toBeInTheDocument();
+      expect(screen.getAllByRole("row")).toHaveLength(4);
+    });
+
+    it("draws no extra row without renderRowDetail", () => {
+      renderTable();
+
+      expect(screen.getAllByRole("row")).toHaveLength(3);
     });
   });
 

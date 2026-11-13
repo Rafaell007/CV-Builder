@@ -9,7 +9,7 @@ import { getDisplayName, getNavItems, toSidebarLinks } from "../../utils";
 import { ProfileMenu } from "../ProfileMenu";
 import { Sidebar } from "../Sidebar";
 
-// While the user loads, no links: the role decides where Skills and Languages point.
+// Signed out: no links. While the user loads the Sidebar draws bars: the role decides where Skills and Languages point.
 const NO_NAV_ITEMS: NavItems = { mainItems: [], extraItems: [] };
 
 export interface AppSidebarProps {
@@ -22,7 +22,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
   const t = useTranslations("appShell");
   const tCommon = useTranslations("common");
   const pathname = usePathname();
-  const { user } = useCurrentUser();
+  const { user, loading } = useCurrentUser();
   const { signOut } = useSignOut();
 
   const { mainItems, extraItems } = user ? getNavItems(user.role) : NO_NAV_ITEMS;
@@ -30,12 +30,11 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
 
   return (
     <Sidebar
-      appName={tCommon("appName")}
-      navigationLabel={t("navigation")}
+      labels={{ appName: tCommon("appName"), navigation: t("navigation"), toggle: t("sidebar") }}
       mainLinks={toSidebarLinks(mainItems, pathname, translate)}
       extraLinks={toSidebarLinks(extraItems, pathname, translate)}
       collapsed={collapsed}
-      toggleLabel={t("sidebar")}
+      loading={loading}
       onToggle={onToggle}
       footer={
         user && (

@@ -4,6 +4,8 @@ import { useReturnFocus } from "@/shared/hooks";
 import { CloseButton } from "../CloseButton";
 import styles from "./Modal.module.css";
 
+const CALENDAR_OPEN_SELECTOR = "[data-calendar-open]";
+
 export interface ModalProps {
   open: boolean;
   /** Called with `false` on Escape, a click on the overlay and the close button. */
@@ -39,6 +41,14 @@ export function Modal({
   // `false` and `null` come from conditional JSX (`hasHint && hint`); they mean "no description" too.
   const hasDescription = description !== undefined && description !== null && description !== false;
 
+  // One Escape closes one layer. Radix hears Escape on the document before the focused field, so it cannot tell
+  // that a popup inside the modal (the DatePicker calendar, marked data-calendar-open) is open. The popup closes
+  // itself; the modal stays open.
+  function handleEscapeKeyDown(event: KeyboardEvent) {
+    const target = event.target;
+    if (target instanceof Element && target.closest(CALENDAR_OPEN_SELECTOR)) event.preventDefault();
+  }
+
   function handleOpenAutoFocus(event: Event) {
     returnFocus.onOpenAutoFocus();
     onOpenAutoFocus?.(event);
@@ -50,6 +60,7 @@ export function Modal({
         <Dialog.Overlay className={styles.overlay} />
         <Dialog.Content
           onOpenAutoFocus={handleOpenAutoFocus}
+          onEscapeKeyDown={handleEscapeKeyDown}
           onCloseAutoFocus={returnFocus.onCloseAutoFocus}
           className={styles.content}
           // Without a Description part Radix asks for an explicit "no description".

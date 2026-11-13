@@ -1,38 +1,31 @@
 import type { ReactNode } from "react";
-import { Button } from "../Button";
 import { SadMonitorIllustration } from "../illustrations";
 import styles from "./ErrorScreen.module.css";
 
-export interface ErrorScreenAction {
-  label: string;
-  onClick: () => void;
-}
-
 export interface ErrorScreenProps {
   title: string;
+  /** A node, so the caller can add Figma's line break. */
   message: ReactNode;
-  action?: ErrorScreenAction;
-  // true = screen readers read the title and message as soon as the screen appears.
+  /** Puts the heading and the message in a `role="alert"` region: read out as soon as the screen appears. */
   announce?: boolean;
+  /** The action under the message, for example a RETRY button. */
+  children?: ReactNode;
 }
 
-/** Full-screen error: sad monitor, title, message and an optional button. */
-export function ErrorScreen({ title, message, action, announce = false }: ErrorScreenProps) {
+/** The content of a full-screen error: the sad monitor, "Oops", a message and an optional action. */
+export function ErrorScreen({ title, message, announce = false, children }: ErrorScreenProps) {
+  const text = (
+    <>
+      <h1 className={styles.title}>{title}</h1>
+      <p className={styles.message}>{message}</p>
+    </>
+  );
+
   return (
-    <div className={styles.screen}>
-      <div className={styles.content}>
-        <SadMonitorIllustration />
-        {/* undefined = React leaves the role attribute out */}
-        <div role={announce ? "alert" : undefined}>
-          <h1 className={styles.title}>{title}</h1>
-          <p className={styles.message}>{message}</p>
-        </div>
-        {action && (
-          <Button className={styles.action} onClick={action.onClick}>
-            {action.label}
-          </Button>
-        )}
-      </div>
+    <div className={styles.content}>
+      <SadMonitorIllustration />
+      {announce ? <div role="alert">{text}</div> : text}
+      {children}
     </div>
   );
 }

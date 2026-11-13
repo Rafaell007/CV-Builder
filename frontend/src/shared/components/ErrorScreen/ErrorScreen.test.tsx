@@ -1,41 +1,28 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { renderWithProviders, screen } from "@/shared/testing";
 import { ErrorScreen } from "./ErrorScreen";
 
-const props = {
-  title: "Oops",
-  message: "Something went wrong. Please try again or go back.",
-};
+const props = { title: "Oops", message: "Something went wrong." };
 
 describe("ErrorScreen", () => {
-  it("shows the heading and the message", () => {
-    renderWithProviders(<ErrorScreen {...props} />);
-
-    expect(screen.getByRole("heading", { level: 1, name: "Oops" })).toBeInTheDocument();
-    expect(screen.getByText(props.message)).toBeInTheDocument();
-  });
-
-  it("has no alert and no button by default", () => {
-    renderWithProviders(<ErrorScreen {...props} />);
-
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button")).not.toBeInTheDocument();
-  });
-
-  it("announces the heading and the message as an alert when asked", () => {
-    renderWithProviders(<ErrorScreen {...props} announce />);
-
-    expect(screen.getByRole("alert")).toHaveTextContent(`Oops${props.message}`);
-  });
-
-  it("calls the action when its button is clicked", async () => {
-    const onClick = vi.fn();
-    const { user } = renderWithProviders(
-      <ErrorScreen {...props} action={{ label: "Retry", onClick }} />,
+  it("shows the heading, the message and the action", () => {
+    renderWithProviders(
+      <ErrorScreen {...props}>
+        <button type="button">Retry</button>
+      </ErrorScreen>,
     );
 
-    await user.click(screen.getByRole("button", { name: "Retry" }));
+    expect(screen.getByRole("heading", { level: 1, name: "Oops" })).toBeInTheDocument();
+    expect(screen.getByText("Something went wrong.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
+  });
 
-    expect(onClick).toHaveBeenCalledTimes(1);
+  it("is not an alert unless asked to announce", () => {
+    const { rerender } = renderWithProviders(<ErrorScreen {...props} />);
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+
+    rerender(<ErrorScreen {...props} announce />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent("OopsSomething went wrong.");
   });
 });

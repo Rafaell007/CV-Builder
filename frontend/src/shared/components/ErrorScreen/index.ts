@@ -1,2 +1,2 @@
 export { ErrorScreen } from "./ErrorScreen";
-export type { ErrorScreenAction, ErrorScreenProps } from "./ErrorScreen";
+export type { ErrorScreenProps } from "./ErrorScreen";
