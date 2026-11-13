@@ -27,7 +27,7 @@ export class CvPreviewProject {
   @Field()
   period!: string;
 
-  @Field()
+  @Field(() => Date)
   startDate!: Date;
 
   /** Null means the person still works on the project (Present). */
