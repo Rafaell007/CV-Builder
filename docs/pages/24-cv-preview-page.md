@@ -350,11 +350,13 @@ Requirements:
 - Must use CV-specific Start Date and End Date rather than the global Project dates
 Format:
 
-`MM.YYYY - MM.YYYY`
+`MM.YYYY – MM.YYYY` (with an en dash)
 
 If End Date is not specified:
 
-`MM.YYYY - Present`
+`MM.YYYY – Till now`
+
+The wording `Till now` follows the Figma design. The backend builds this text (`period`), so the preview and the PDF show the same value.
 
 
 ---

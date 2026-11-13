@@ -56,6 +56,48 @@ type CvPage {
   total: Int!
 }
 
+type CvPreview {
+  cvId: ID!
+  description: String!
+  domains: [String!]!
+  education: String!
+  fullName: String
+  languages: [CvPreviewLanguage!]!
+  name: String!
+  position: String
+  projects: [CvPreviewProject!]!
+  skillGroups: [CvPreviewSkillGroup!]!
+}
+
+type CvPreviewLanguage {
+  name: String!
+  proficiency: Proficiency!
+}
+
+type CvPreviewProject {
+  description: String!
+  domain: String!
+  endDate: DateTime
+  environment: [String!]!
+  name: String!
+  period: String!
+  responsibilities: String
+  roles: [String!]!
+  startDate: DateTime!
+}
+
+type CvPreviewSkill {
+  experienceYears: Int
+  lastUsedYear: Int
+  mastery: Mastery!
+  name: String!
+}
+
+type CvPreviewSkillGroup {
+  category: String!
+  skills: [CvPreviewSkill!]!
+}
+
 type CvProject {
   createdAt: DateTime!
   cvId: ID!
@@ -133,6 +175,16 @@ input PageInput {
   size: Int! = 10
 }
 
+enum Proficiency {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+  NATIVE
+}
+
 type Project {
   createdAt: DateTime!
   description: String!
@@ -158,6 +210,7 @@ type ProjectRole {
 type Query {
   availableCvSkills(cvId: ID!): [AvailableCvSkill!]!
   cv(id: ID!): Cv!
+  cvPreview(cvId: ID!): CvPreview!
   cvProjects(cvId: ID!, search: String, sort: SortInput): [CvProject!]!
   cvSkills(cvId: ID!): [CvSkill!]!
   cvs(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput, userId: ID): CvPage!
