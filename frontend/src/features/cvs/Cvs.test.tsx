@@ -340,8 +340,7 @@ describe("Cvs", () => {
 
     it("does not open the CV when the menu button is clicked or Edit is selected", async () => {
       const onView = vi.fn();
-      const onEdit = vi.fn();
-      const { user } = renderWithProviders(<Cvs onView={onView} onEdit={onEdit} />, {
+      const { user } = renderWithProviders(<Cvs onView={onView} />, {
         mocks: [cvsMock([frontendCv])],
       });
 
@@ -351,7 +350,7 @@ describe("Cvs", () => {
       expect(onView).not.toHaveBeenCalled();
       await user.click(screen.getByRole("menuitem", { name: "Edit" }));
 
-      expect(onEdit).toHaveBeenCalledOnce();
+      expect(await screen.findByRole("dialog", { name: "Update CV" })).toBeInTheDocument();
       expect(onView).not.toHaveBeenCalled();
     });
 
@@ -372,14 +371,11 @@ describe("Cvs", () => {
       expect(push).toHaveBeenCalledExactlyOnceWith("/cvs/2/details");
     });
 
-    it("calls the callbacks of the props with the CV of the row", async () => {
+    it("opens the right dialog for each row menu item", async () => {
       const onView = vi.fn();
-      const onEdit = vi.fn();
-      const onDelete = vi.fn();
-      const { user } = renderWithProviders(
-        <Cvs onView={onView} onEdit={onEdit} onDelete={onDelete} />,
-        { mocks: [cvsMock([frontendCv])] },
-      );
+      const { user } = renderWithProviders(<Cvs onView={onView} />, {
+        mocks: [cvsMock([frontendCv])],
+      });
       const open = async (item: string) => {
         await user.click(
           await screen.findByRole("button", { name: "Actions for Frontend Developer" }),
@@ -388,24 +384,27 @@ describe("Cvs", () => {
       };
 
       await open("View");
-      await open("Edit");
-      await open("Delete");
-
       expect(onView).toHaveBeenCalledExactlyOnceWith(frontendCv);
-      expect(onEdit).toHaveBeenCalledExactlyOnceWith(frontendCv);
-      expect(onDelete).toHaveBeenCalledExactlyOnceWith(frontendCv);
       expect(push).not.toHaveBeenCalled();
+
+      await open("Edit");
+      expect(await screen.findByRole("dialog", { name: "Update CV" })).toBeInTheDocument();
+      expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue(frontendCv.name);
+      await user.click(screen.getByRole("button", { name: "Cancel" }));
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+
+      await open("Delete");
+      const confirmation = await screen.findByRole("alertdialog", { name: "Delete CV" });
+      expect(within(confirmation).getByText(frontendCv.name)).toBeInTheDocument();
     });
 
-    it("calls onCreate when CREATE CV is pressed, also while the list loads", async () => {
-      const onCreate = vi.fn();
-      const { user } = renderWithProviders(<Cvs onCreate={onCreate} />, {
-        mocks: [cvsMock([frontendCv])],
-      });
+    it("opens the Create CV dialog when CREATE CV is pressed, also while the list loads", async () => {
+      const { user } = renderWithProviders(<Cvs />, { mocks: [cvsMock([frontendCv])] });
 
       await user.click(screen.getByRole("button", { name: "CREATE CV" }));
 
-      expect(onCreate).toHaveBeenCalledOnce();
+      expect(await screen.findByRole("dialog", { name: "Create CV" })).toBeInTheDocument();
+      expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue("");
     });
   });
 });
