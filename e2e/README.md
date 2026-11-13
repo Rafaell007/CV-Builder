@@ -13,7 +13,7 @@ pnpm test:e2e
 Each run:
 
 1. `e2e:db` (backend) empties `cv_builder_test` and seeds it, so every run starts from the same data. Accounts: see "Seed data and test users" in the root README.
-2. Builds and starts the backend on port 4100 and the frontend on port 3100. A running `pnpm dev` (3000 / 4000, development database) is never used. The backend runs with `THROTTLE_LIMIT=1000`: all specs share one IP and most sign in first, so the default of 10 calls per minute would fail them. The throttle is tested in `backend/test/throttling.int-spec.ts`.
+2. Builds and starts the backend on port 4100 and the frontend on port 3100. A running `pnpm dev` (3000 / 4000, development database) is never used. The backend runs with `THROTTLE_LIMIT=1000`: all specs share one IP and most sign in first, so the default of 10 calls per minute would fail them. The throttle is tested in `backend/test/auth/throttling.int-spec.ts`.
 3. Runs the specs in Chromium.
 
 The HTML report is written to `e2e/playwright-report/` (`pnpm --filter @cv-builder/e2e exec playwright show-report`).

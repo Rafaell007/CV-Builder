@@ -4,7 +4,7 @@ import type { AuthContext } from "./auth-context";
 import { AuthResolver } from "./auth.resolver";
 import type { AuthService } from "./auth.service";
 import type { SessionUser } from "./models/session-user";
-import type { SessionCookiesService } from "./session-cookies.service";
+import type { SessionCookiesService } from "./sessions/session-cookies.service";
 
 const USER: SessionUser = {
   id: "user-1",

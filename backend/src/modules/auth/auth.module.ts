@@ -5,13 +5,13 @@ import { ThrottlingModule } from "../../common/throttling";
 import { MailModule } from "../mail";
 import { AuthResolver } from "./auth.resolver";
 import { AuthService } from "./auth.service";
-import { JwtAuthGuard } from "./jwt-auth.guard";
-import { PasswordResetResolver } from "./password-reset.resolver";
-import { PasswordResetService } from "./password-reset.service";
-import { SessionCookiesService } from "./session-cookies.service";
-import { TokenService } from "./token.service";
-import { VerificationResolver } from "./verification.resolver";
-import { VerificationService } from "./verification.service";
+import { JwtAuthGuard } from "./sessions/jwt-auth.guard";
+import { PasswordResetResolver } from "./password-reset/password-reset.resolver";
+import { PasswordResetService } from "./password-reset/password-reset.service";
+import { SessionCookiesService } from "./sessions/session-cookies.service";
+import { TokenService } from "./sessions/token.service";
+import { VerificationResolver } from "./verification/verification.resolver";
+import { VerificationService } from "./verification/verification.service";
 
 /**
  * Registers `JwtAuthGuard` for every resolver. Guards run in registration order, so `AppModule`

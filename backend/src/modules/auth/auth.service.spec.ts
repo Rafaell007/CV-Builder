@@ -8,8 +8,8 @@ import { Role } from "../../generated/prisma/enums";
 import type { PrismaService } from "../../prisma/prisma.service";
 import { AuthService, EMAIL_TAKEN_REASON, REFRESH_GRACE_WINDOW_MS } from "./auth.service";
 import { hashPassword } from "./password";
-import { REFRESH_TOKEN_TTL_MS, TokenService } from "./token.service";
-import type { VerificationService } from "./verification.service";
+import { REFRESH_TOKEN_TTL_MS, TokenService } from "./sessions/token.service";
+import type { VerificationService } from "./verification/verification.service";
 
 const NOW = new Date("2026-07-12T10:00:00.000Z");
 const PASSWORD = "Password123!";
