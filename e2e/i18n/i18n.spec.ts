@@ -22,7 +22,7 @@ test.describe("without a session", () => {
   test("an unknown page shows the not-found text in the language of the URL", async ({ page }) => {
     await page.goto("/pl/no-such-page");
 
-    await expect(page.getByRole("heading", { name: "Nie znaleziono strony" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Wróć" })).toBeVisible();
   });
 });
 

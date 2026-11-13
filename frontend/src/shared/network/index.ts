@@ -1,3 +1,2 @@
-// Public entry for the network status. `reportRequestFailure` is called by the Apollo error link.
-export { reportRequestFailure } from "./store";
-export { useNetworkFailure } from "./useNetworkFailure";
+export * from "./store";
+export type { NetworkStatus } from "./network.types";

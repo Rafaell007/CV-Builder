@@ -1,12 +1,17 @@
 import { useTranslations } from "next-intl";
+import { NotFoundScreen } from "@/features/not-found";
 
-// Placeholder (PLAN §6); the real page comes with the system pages step.
 export default function NotFound() {
-  const t = useTranslations("common");
+  const t = useTranslations("notFound");
 
   return (
     <main>
-      <h1>{t("pageNotFound")}</h1>
+      <NotFoundScreen
+        title={t("title")}
+        messageLine1={t("messageLine1")}
+        messageLine2={t("messageLine2")}
+        goBackLabel={t("goBack")}
+      />
     </main>
   );
 }

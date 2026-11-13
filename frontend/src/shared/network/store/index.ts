@@ -1,6 +1,7 @@
 export {
-  getNetworkFailed,
-  reportRequestFailure,
-  resetNetworkStatus,
-  subscribeToNetworkStatus,
-} from "./networkStatus.store";
+  clearQueryFailed,
+  getServerSnapshot,
+  getSnapshot,
+  markQueryFailed,
+  subscribe,
+} from "./network.store";

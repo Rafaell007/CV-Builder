@@ -7,4 +7,4 @@ Full-screen error for when the app cannot reach the server: an [ErrorScreen](../
 - For a failed list request inside a page, use [PageState](../PageState/README.md) instead.
 - **Exports:** `NoInternetState`, type `NoInternetStateProps`.
 
-Used by: the offline / network-error handling (S4.2). Docs: [docs/pages/07-no-internet-page.md](../../../../../docs/pages/07-no-internet-page.md); values in `docs/design-tokens.md` › No internet.
+Used by: `NoInternetScreen` in [no-internet](../../../features/no-internet/README.md) (S4.2). Docs: [docs/pages/07-no-internet-page.md](../../../../../docs/pages/07-no-internet-page.md); values in `docs/design-tokens.md` › No internet.

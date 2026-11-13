@@ -1,12 +1,11 @@
+/* Values: docs/design-tokens.md › No internet (the screen itself is ErrorScreen). */
+
 /* The page as if the wrapper were not there. */
 .page {
   display: contents;
 }
 
-/* Over everything, the toasts included: the screen replaces the page. */
-.overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  overflow-y: auto;
+/* Hidden while the No Internet screen shows; also hidden from screen readers. */
+.hiddenPage {
+  display: none;
 }

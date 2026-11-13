@@ -1,42 +1,25 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
-import { NoInternetState } from "@/shared/components";
-import { useNetworkFailure } from "@/shared/network";
 import styles from "./NoInternetGate.module.css";
+import { NoInternetScreen } from "../NoInternetScreen";
+import { useNetworkStatus } from "../useNetworkStatus";
+import { useRetryQueries } from "../useRetryQueries";
 
-function reloadPage() {
-  window.location.reload();
-}
+type NoInternetGateProps = {
+  children: ReactNode;
+};
 
-/** Shows the No Internet screen over the page while the app cannot reach the server. */
-export function NoInternetGate({ children }: { children: ReactNode }) {
-  const t = useTranslations("noInternet");
-  const failed = useNetworkFailure();
+// Offline or a failed query: the No Internet screen. The page stays mounted (hidden), so typed text
+// survives and RETRY can run its queries again.
+export function NoInternetGate({ children }: NoInternetGateProps) {
+  const isOnline = useNetworkStatus() === "online";
+  const retry = useRetryQueries();
 
   return (
     <>
-      {/* `inert`: the page below cannot be reached with the keyboard or a screen reader. */}
-      <div className={styles.page} inert={failed}>
-        {children}
-      </div>
-      {failed && (
-        <div className={styles.overlay}>
-          <NoInternetState
-            title={t("title")}
-            message={
-              <>
-                {t("messageLine1")}
-                <br />
-                {t("messageLine2")}
-              </>
-            }
-            retryLabel={t("retry")}
-            onRetry={reloadPage}
-          />
-        </div>
-      )}
+      <div className={isOnline ? styles.page : styles.hiddenPage}>{children}</div>
+      {!isOnline && <NoInternetScreen onRetry={retry} />}
     </>
   );
 }

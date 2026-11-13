@@ -5,6 +5,7 @@ import type deviceError from "@/features/device-error/messages/en.json";
 import type forgotPassword from "@/features/forgot-password/messages/en.json";
 import type health from "@/features/health/messages/en.json";
 import type noInternet from "@/features/no-internet/messages/en.json";
+import type notFound from "@/features/not-found/messages/en.json";
 import type projects from "@/features/projects/messages/en.json";
 import type resetPassword from "@/features/reset-password/messages/en.json";
 import type signIn from "@/features/sign-in/messages/en.json";
@@ -22,6 +23,7 @@ export type Messages = {
   forgotPassword: typeof forgotPassword;
   health: typeof health;
   noInternet: typeof noInternet;
+  notFound: typeof notFound;
   projects: typeof projects;
   resetPassword: typeof resetPassword;
   signIn: typeof signIn;
@@ -40,6 +42,7 @@ const loaders: Record<Locale, () => Promise<Messages>> = {
     forgotPassword: (await import("@/features/forgot-password/messages/en.json")).default,
     health: (await import("@/features/health/messages/en.json")).default,
     noInternet: (await import("@/features/no-internet/messages/en.json")).default,
+    notFound: (await import("@/features/not-found/messages/en.json")).default,
     projects: (await import("@/features/projects/messages/en.json")).default,
     resetPassword: (await import("@/features/reset-password/messages/en.json")).default,
     signIn: (await import("@/features/sign-in/messages/en.json")).default,
@@ -54,6 +57,7 @@ const loaders: Record<Locale, () => Promise<Messages>> = {
     forgotPassword: (await import("@/features/forgot-password/messages/pl.json")).default,
     health: (await import("@/features/health/messages/pl.json")).default,
     noInternet: (await import("@/features/no-internet/messages/pl.json")).default,
+    notFound: (await import("@/features/not-found/messages/pl.json")).default,
     projects: (await import("@/features/projects/messages/pl.json")).default,
     resetPassword: (await import("@/features/reset-password/messages/pl.json")).default,
     signIn: (await import("@/features/sign-in/messages/pl.json")).default,

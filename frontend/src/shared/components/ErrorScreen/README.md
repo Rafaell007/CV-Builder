@@ -7,4 +7,4 @@ The content of a full-screen error: the sad monitor, "Oops", a message and an op
 - Server Components import it by folder: `@/shared/components/ErrorScreen`.
 - **Exports:** `ErrorScreen`, type `ErrorScreenProps`.
 
-Used by: [DeviceErrorGate](../../../features/device-error/README.md), [NoInternetState](../NoInternetState/README.md). Docs: [docs/pages/09-device-error-page.md](../../../../../docs/pages/09-device-error-page.md); values in `docs/design-tokens.md` › Device error and › No internet.
+Used by: [DeviceErrorGate](../../../features/device-error/README.md), [NoInternetState](../NoInternetState/README.md), [NotFoundScreen](../../../features/not-found/README.md) and `RequireAdmin` (app shell). Docs: [docs/pages/09-device-error-page.md](../../../../../docs/pages/09-device-error-page.md); values in `docs/design-tokens.md` › Device error and › No internet.

@@ -1,16 +1,15 @@
 # No internet
 
-Shows the No Internet screen over any page while the app cannot reach the server (S1.4, KAN-82). It is a state, not a route.
+The "Oops" screen with RETRY when the app cannot reach the server (S4.2, KAN-93). It shows when the browser is offline or a query fails with a network error. It is a state, not a route. Mutations keep their error toast, so a failed save never removes a form.
 
-- Exports: `NoInternetGate` (wraps `children`).
-- When: the browser goes offline, or a request fails before the server answers (`@/shared/network`, set by the Apollo error link). The screen stays after the connection returns until the user presses RETRY, which reloads the page.
-- The page below is `inert` while the screen shows.
-- Texts: `messages/` (`noInternet` namespace); the screen itself is `NoInternetState` in `@/shared/components`.
-- Used by: the root layout `app/[locale]/layout.tsx`, inside `DeviceErrorGate`, so below 768px the device error shows instead.
+- Exports: `NoInternetGate` (wraps `children`), `NoInternetScreen` (`onRetry` prop) and `useClearQueryFailed`.
+- `NoInternetGate`: reads `useNetworkStatus`. When the status is not `"online"`, the page stays mounted but hidden (typed text survives, and screen readers skip it) and the screen shows. RETRY = `useRetryQueries`: runs the active queries again and clears the failed flag only when they succeed.
+- `NoInternetScreen`: the texts (`noInternet` namespace) on the shared [NoInternetState](../../shared/components/NoInternetState/README.md).
+- `useClearQueryFailed`: clears the failed flag on mount. `error.tsx` calls it: a `useSuspenseQuery` that fails throws to that error page, so without it the gate's screen would cover the error page's screen and RETRY would need two clicks.
+- `useNetworkStatus` (inside the feature): `useSyncExternalStore` over the store in [network](../../shared/network/README.md). Failed queries are reported by `networkErrorLink` in [apollo](../../shared/apollo/README.md).
+- Used by: `app/[locale]/layout.tsx` (`NoInternetGate`, inside `DeviceErrorGate`, so below 768px the device error shows instead) and `app/[locale]/error.tsx` (`NoInternetScreen`, a page that failed to render; RETRY = Next.js `retry`).
 - Docs: [docs/pages/07-no-internet-page.md](../../../../docs/pages/07-no-internet-page.md); values in `docs/design-tokens.md` › No internet.
 
-## Known issues
+## Known limits
 
-- Only a `TypeError` from `fetch` counts as "cannot reach the server". HTTP 5xx answers and a failed session refresh (`shared/session/refreshSession`, which calls `fetch` itself) do not show the screen.
-- RETRY reloads the whole page, so unsaved form input is lost. Repeating only the failed request needs a retry hook in the error link.
-- No Playwright test yet: the screen is covered by unit and story tests. Add one in `e2e/` with `context.setOffline(true)`.
+- When the browser goes from offline to online, the screen hides but the queries do not run again. Only RETRY runs them again. This is acceptable, because a failed query normally also sets the failed flag and keeps the screen until RETRY succeeds.

@@ -22,4 +22,11 @@ describe("DeviceErrorGate", () => {
       "This app isn’t supported on mobile devices.Please open it on a desktop or tablet to continue.",
     );
   });
+
+  it("has no button and is not announced as an alert", () => {
+    renderWithProviders(<DeviceErrorGate>Page content</DeviceErrorGate>);
+
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
 });
