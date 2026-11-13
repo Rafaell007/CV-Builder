@@ -30,6 +30,7 @@ export function useDatePicker({
   closeCalendar,
 }: UseDatePickerOptions) {
   const [view, setView] = useState<CalendarView>("day");
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   // react-datepicker keeps its own ref on the input; the caller gets the same element, found by its id.
   useElementByIdRef(ref, controlId);
@@ -46,6 +47,8 @@ export function useDatePicker({
 
   return {
     view,
+    isCalendarOpen,
+    onCalendarOpen: () => setIsCalendarOpen(true),
     // In the month list and the year list an arrow moves the saved date and the list follows it (a day view arrow only pages).
     isArrowDisabled: (direction: 1 | -1, shownDate: Date) =>
       getArrowTarget(direction, shownDate) === null,
@@ -74,7 +77,10 @@ export function useDatePicker({
     },
     // The calendar closes only after the year pick (closeCalendar), never by react-datepicker's own select rule.
     // The next opening starts on the days again.
-    onCalendarClose: () => setView("day"),
+    onCalendarClose: () => {
+      setView("day");
+      setIsCalendarOpen(false);
+    },
     // A click in the input while a list is open closes the calendar: the lists have no way back to the days, and
     // the next opening starts on the days. In the day view the click only places the cursor, for typing.
     onInputClick: () => {

@@ -114,6 +114,18 @@ describe("DatePicker", () => {
     expect(screen.getByText("December")).toBeInTheDocument();
   });
 
+  it("marks its box with data-calendar-open only while the calendar is open", async () => {
+    const { user } = renderWithProviders(<TestDatePicker />);
+    const input = screen.getByRole("textbox", { name: "Start date" });
+    const marked = () => input.closest("[data-calendar-open]");
+
+    expect(marked()).toBeNull();
+    await user.click(input);
+    expect(marked()).not.toBeNull();
+    await user.keyboard("{Escape}");
+    expect(marked()).toBeNull();
+  });
+
   describe("arrows of the month list", () => {
     it("move the saved date by one month, over the year end in both directions", async () => {
       const onValueChange = vi.fn();
