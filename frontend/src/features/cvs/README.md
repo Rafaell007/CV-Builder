@@ -80,10 +80,28 @@ Spec: [docs/pages/21-cv-details-page.md](../../../../docs/pages/21-cv-details-pa
   - `loading`: the skeleton, with the tabs. Data wins over `loading`: a refresh in the background does not replace a page that is shown.
   - `failed`: `Failed to load CV details` with Retry. `notFound` and `forbidden`: the shared `ErrorScreen` (`CV not found` or `No access`) with a link back to `/cvs`, without Retry, the tabs and the CV name.
 - `components/CvDetails({ cvId })`: the Details tab. It reads the CV with `useCv` (the cache has it, so no second request) and shows `CvDetailsForm`. It shows nothing when there is no CV.
-- Routes: `cvs/[cvId]/layout.tsx` (the shell), `details/page.tsx` (`CvDetails`). `skills`, `projects` and `preview` are placeholders that return `null` until S7.3, S7.4 and S7.5; the shell already gives them the breadcrumbs and the tabs.
+- Routes: `cvs/[cvId]/layout.tsx` (the shell), `details/page.tsx` (`CvDetails`). `skills/page.tsx` renders `CvSkills` (S7.3, see below). `projects` and `preview` are placeholders that return `null` until S7.4 and S7.5; the shell already gives them the breadcrumbs and the tabs.
 - Texts: `cvs.tabs` (the four tab names and the navigation label) and `cvs.details` (`update`, `states`, `notFound`, `forbidden`), `en` and `pl`.
 - Storybook: `components/CvLayout/CvLayout.stories.tsx` (`Features/Cvs/CvLayout`): Ready, Loading, NotFound, Forbidden, LoadFailed and Polish. `components/CvDetailsForm/CvDetailsForm.stories.tsx` (`Features/Cvs/CvDetailsForm`): Default, Changed, Invalid and Polish. The active tab in the shell stories depends on the mocked route (`nextjs.navigation.pathname`); not compared with Figma.
 - Route and tab helpers: `CV_TABS` (`cvs.constants.ts`), `CvTab` (`cvs.types.ts`) and `utils/toCvTabPath(cvId, tab)`.
+
+## CV Skills (S7.3, KAN-114)
+
+Spec: [docs/pages/22-cv-skills-page.md](../../../../docs/pages/22-cv-skills-page.md). Backend: `backend/src/modules/cvs/README.md` (section CV skills). The tab is `components/CvSkills` (route `cvs/[cvId]/skills`). Everything that only this tab uses lives inside it (fractal layout).
+
+- `CvSkills({ cvId })`: loads the skills, groups them by category, and shows ADD SKILL and REMOVE SKILLS. States: loading (skeleton, actions disabled), empty (`No skills added yet`, ADD SKILL stays available), error (`Failed to load skills` and Retry). The list stays on screen while a later request runs (`useCvSkills` returns `skills` as long as it has them), so a change does not blink the page.
+- `components/SkillGroups`: the categories as headings with their skills below. `SkillItem` is one `<button>`: the bar (`MasteryBar`), the name, and the level in words for screen readers (`TypeScript Mastery: Advanced`). In the selection mode it has `aria-pressed`. The bar follows the design: five levels, each with its own colour and fill (`cvSkills.constants.ts`, `MASTERY_LEVELS`).
+- Hooks (each one holds a modal flow and its request):
+  - `useCvSkills(cvId)`: the `CvSkills` query. `useAvailableCvSkills(cvId, enabled)`: the `AvailableCvSkills` query. It sends nothing while the Add modal is closed and always asks the backend again when it opens (`network-only`).
+  - `useAddCvSkill(cvId)`: Add skill. The options come from the backend, so the page never filters them. `Skill is required` shows for an empty choice, `CONFLICT` and `BAD_USER_INPUT` show under the field, other errors show once in the modal. A failed request keeps the chosen skill. Only success closes the modal.
+  - `useUpdateCvSkill()`: Update skill. The Skill field is disabled (page doc). The mastery is the one value that changes, so SAVE is enabled only when it differs from the saved one and no request that changes nothing is sent.
+  - `useRemoveCvSkills(cvId)`: the selection mode and the confirmation. A skill is chosen by the id of its CV-skill link. CANCEL and Escape leave the mode. A failed request keeps the choice. `NOT_FOUND` loads the list again and leaves the mode.
+  - `useMasteryLabel()`: the translated level name.
+- `utils/groupSkillsByCategory` (keeps the order of the backend, so no empty category) and `utils/toCvSkillFailure` (`notFound`, `forbidden`, `conflict`, `invalid`; anything else is a friendly general text).
+- UI changes come only after the backend answered. Add loads the list again. Update shows the cached skill that the answer changed. Remove leaves the skills out of the cached list when the answer arrives (`cache.modify`), then loads the list again.
+- Texts: `cvs.skills` (`en`, `pl`). Mocks for tests and stories: `cvSkills.mocks.ts`.
+- Storybook: `CvSkills.stories.tsx` (`Features/Cvs/CvSkills`): Desktop, Tablet, Loading, Empty, LoadFailed, SelectionMode, AddSkillModal, UpdateSkillModal, RemoveSkillsModal and Polish.
+- E2E: `e2e/cvs/cv-skills.spec.ts` (empty state, the owner rule, add, update, remove, Escape, admin, another user's CV).
 
 ## Notes
 
@@ -101,8 +119,16 @@ Spec: [docs/pages/21-cv-details-page.md](../../../../docs/pages/21-cv-details-pa
 - **The fade-out of the delete modal and the real backend were not checked by hand.**
 - **Stale total after a delete (fixed here, check the projects page).** `useDeleteCv` drops every cached `cvs` page when a CV is deleted. Before this, going back one page showed page 1 from the cache with the old total, so a second page button stayed for 10 CVs (found by the E2E test). `useDeleteProject` uses the same refetch of the open query only; it was not checked for the same problem.
 - **The shared `Tabs` differ from Figma on the CV Details page.** Figma shows four tabs of the same width (about 150px) with the line under the first one; the shared `Tabs` size each tab by its text with a 24px gap. Not changed here, because the other pages use `Tabs` too (check with the design).
-- **The tab pages after Details are placeholders** (`null`). The Skills, Projects and Preview tabs show the shell and an empty area until S7.3 to S7.5.
+- **The Projects and Preview tab pages are placeholders** (`null`). They show the shell and an empty area until S7.4 and S7.5.
 - **CV Details is not checked in a browser.** Vitest passes; nobody has compared the page with the Figma frame, tried a tablet width, a screen reader or the dark theme. The form is 852px wide and centred, as measured on the 1440px frame.
 - **E2E:** `e2e/cvs/cv-details.spec.ts` covers the CV shell: breadcrumbs, the four tabs, the fields, UPDATE (disabled until a change, saved after a reload), the required-field message, the tab route after a reload, the CV not found view for another user's CV, and an admin who opens a user CV. It does not cover the Polish texts, the tablet layout or the keyboard.
 - **The build fails if the route params are read outside `<Suspense>`.** Next.js 16 treats `params` as runtime data. Read them in a small inner component wrapped in `<Suspense>` (see `cvs/[cvId]/layout.tsx`). Only `pnpm build` and the E2E run find this; the typecheck, the lint and the unit tests do not.
 - **A CV name that is very long** is not cut in the breadcrumbs (no ellipsis rule in Figma). Check how it wraps.
+- **`features/skills` does not exist yet (KAN-108).** The ticket says S7.3 reuses it "in CV mode". It is not built, so the CV Skills tab has its own `SkillGroups`, `SkillItem` and `MasteryBar` inside `components/CvSkills`. When KAN-108 builds the same grouped list for the Skills page and the User Skills tab, move these three parts to the nearest common ancestor and use one copy.
+- **The first modal with a `Select` found a bug in the shared `Select`.** Its list had no `z-index`, so the modal overlay (20) covered it and no option could be clicked. It now has 21 (see the Select README). Unit tests and Storybook did not show it; only the E2E test did.
+- **The Update modal has a Mastery field that the page doc does not list.** The doc says the Skill field is disabled and "SAVE sends the mutation when an updateable skill property exists". The ticket names `updateCvSkill` (mastery per CV), so Mastery is that property. Without it the modal would have nothing to change. Confirm with the team.
+- **The Add modal has no Mastery field.** The doc shows only Skill. The backend copies the level of the owner. If the team wants a level in the Add modal, the mutation already accepts `mastery`.
+- **Not checked in a browser by a person.** Vitest, Storybook (Chromium) and the E2E test pass. Nobody compared the tab with the Figma frame (bar sizes, spacing, colours of the five levels), used it with a screen reader, on a touch screen or in the dark theme. The five bar colours follow the design picture; the match of each colour to a level is a reading of that picture.
+- **The list does not reload by itself** when the owner's skills change in another tab. The options of the Add modal are loaded each time it opens; the list loads again only after the user's own change or a retry.
+- **ADD SKILL and REMOVE SKILLS show for every user who can open the CV.** The backend lets the owner and an admin change the CV, and everybody who sees the CV is one of them, so no role check is made in the frontend. An unverified email gets `FORBIDDEN` from the backend; the modals show a message for it.
+- **No `maxLength` on the number of skills in the UI.** The backend accepts at most 100 ids in one remove. A CV with more than 100 chosen skills would be refused as `BAD_USER_INPUT` (general text).

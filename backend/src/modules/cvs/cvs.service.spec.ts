@@ -193,16 +193,18 @@ describe("CvsService.get", () => {
 });
 
 describe("CvsService.assertAccessible", () => {
-  it("passes for an own CV", async () => {
+  it("returns the owner for an own CV", async () => {
     prisma.cv.findUnique.mockResolvedValue(storedCv());
 
-    await expect(service.assertAccessible(USER, "cv-1")).resolves.toBeUndefined();
+    await expect(service.assertAccessible(USER, "cv-1")).resolves.toEqual({ ownerId: USER.id });
   });
 
-  it("passes for an admin on the CV of another user", async () => {
+  it("returns the owner for an admin on the CV of another user", async () => {
     prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-2" }));
 
-    await expect(service.assertAccessible(ADMIN, "cv-1")).resolves.toBeUndefined();
+    await expect(service.assertAccessible(ADMIN, "cv-1")).resolves.toEqual({
+      ownerId: "user-2",
+    });
   });
 
   it("answers NOT_FOUND for the CV of another user", async () => {

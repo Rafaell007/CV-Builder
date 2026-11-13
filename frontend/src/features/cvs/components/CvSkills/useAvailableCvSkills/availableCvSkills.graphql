@@ -1,0 +1,13 @@
+# The skills that the OWNER of the CV has and that are not yet in the CV: the options of the Add skill modal.
+# The backend is the source of truth; the page never filters the list itself.
+query AvailableCvSkills($cvId: ID!) {
+  availableCvSkills(cvId: $cvId) {
+    id
+    name
+    mastery
+    category {
+      id
+      name
+    }
+  }
+}

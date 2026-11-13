@@ -9,8 +9,8 @@ import type { SignUpInput } from "./dto/sign-up.input";
 import type { SessionUser } from "./models/session-user";
 import { SESSION_USER_SELECT } from "./models/session-user.select";
 import { hashPassword, verifyPassword } from "./password";
-import { REFRESH_TOKEN_TTL_MS, TokenService } from "./token.service";
-import { VerificationService } from "./verification.service";
+import { REFRESH_TOKEN_TTL_MS, TokenService } from "./sessions/token.service";
+import { VerificationService } from "./verification/verification.service";
 
 export interface SessionTokens {
   accessToken: string;

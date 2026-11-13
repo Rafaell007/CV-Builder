@@ -2,6 +2,7 @@
 
 The global catalog of projects (page 27) and the project roles. Admin only, except `projectRoles` (PLAN.md §7, D18, D25).
 
+- **Folders:** project roles live in `project-roles/` (resolver, service, `models/project-role.ts`, specs).
 - **GraphQL:**
   - `projects(search, sort, page)` returns `ProjectPage` (`{ items, total }`). `search` matches name and domain, without regard to case. `sort.field` is `name`, `startDate` or `endDate`; the default is `name` ascending. Projects with the same value are ordered by id, so pages do not repeat items.
   - `createProject(input)`, `updateProject(input)` return the `Project`. `updateProject` replaces all fields and the whole environment. `deleteProject(id)` returns `true`.
@@ -14,5 +15,5 @@ The global catalog of projects (page 27) and the project roles. Admin only, exce
   - `updateProject` changes the dates and CV entries would fall outside them (D25). An empty CV end date ("Present") is not checked. The check runs only when a date changes. It runs with the update in one serializable transaction, so if a CV changes at the same time, the update fails with `CONFLICT` ("Try again").
 - **Authorization:** `@Roles(Role.ADMIN)` on `ProjectsResolver`. `ProjectRolesResolver` has no role, so every signed-in user may use it.
 - **Used by CV projects:** `project-environment.ts` holds `WITH_ENVIRONMENT` and `toProject`. The CVs module uses them to return the project inside a `CvProject` (see [CVs README](../cvs/README.md)).
-- **Tests:** `*.spec.ts` next to the code; `backend/test/projects.int-spec.ts` runs every operation over HTTP against the test database.
+- **Tests:** `*.spec.ts` next to the code; `backend/test/projects/projects.int-spec.ts` runs every operation over HTTP against the test database.
 - **Docs:** [projects page](../../../../docs/pages/27-projects-page.md) · [PLAN.md S5.5, D18, D25](../../../../PLAN.md)

@@ -14,6 +14,9 @@ const pagination = (page: Page) => page.getByRole("navigation", { name: "CVs pag
 // data-row-detail, so it is left out here.
 const dataRows = (page: Page) =>
   page.locator("tbody tr:not([data-row-detail])").filter({ has: page.getByRole("cell") });
+// Other spec files run in parallel and create CVs whose names start with "E2E" (they remove them afterwards). The seed
+// CVs never have that text, so counts of the seed leave those rows out.
+const seedRows = (page: Page) => dataRows(page).filter({ hasNotText: "E2E" });
 const row = (page: Page, name: string) => dataRows(page).filter({ hasText: name });
 const dialog = (page: Page) => page.getByRole("dialog");
 // The delete modal is a ConfirmModal, which Radix marks as an alertdialog.
@@ -39,8 +42,8 @@ test.describe("CVs page, as an admin", () => {
   test("lists the CVs of all users, sorted by name ascending, with the owner email", async ({
     page,
   }) => {
-    await expect(dataRows(page)).toHaveCount(SEED_COUNT);
-    await expect(dataRows(page).first()).toContainText("Backend Developer");
+    await expect(seedRows(page)).toHaveCount(SEED_COUNT);
+    await expect(seedRows(page).first()).toContainText("Backend Developer");
     await expect(header(page, "Name")).toHaveAttribute("aria-sort", "ascending");
     await expect(row(page, "QA Engineer")).toContainText("user3@example.com");
     await expect(row(page, "Frontend Developer")).toContainText(USER_EMAIL);
@@ -56,7 +59,7 @@ test.describe("CVs page, as an admin", () => {
 
     await page.getByRole("button", { name: "Name" }).click();
     await expect(header(page, "Name")).toHaveAttribute("aria-sort", "ascending");
-    await expect(dataRows(page).first()).toContainText("Backend Developer");
+    await expect(seedRows(page).first()).toContainText("Backend Developer");
   });
 
   test("searches the name and the owner email, without regard to case", async ({ page }) => {
@@ -66,7 +69,7 @@ test.describe("CVs page, as an admin", () => {
 
     await find(page, "USER2@example");
     await expect(dataRows(page)).toHaveCount(1);
-    await expect(dataRows(page).first()).toContainText("Backend Developer");
+    await expect(seedRows(page).first()).toContainText("Backend Developer");
   });
 
   test("shows No CVs found when the search matches nothing, and keeps the search text", async ({
@@ -107,7 +110,7 @@ test.describe("CVs page, as a user", () => {
   });
 
   test("lists only the own CVs", async ({ page }) => {
-    await expect(dataRows(page)).toHaveCount(USER_SEED_COUNT);
+    await expect(seedRows(page)).toHaveCount(USER_SEED_COUNT);
     await expect(row(page, "Frontend Developer")).toContainText(USER_EMAIL);
     await expect(page.getByText("QA Engineer")).toBeHidden();
   });

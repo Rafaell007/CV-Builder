@@ -1,0 +1,26 @@
+/* Values: Figma CV Skills (1440 frame): the groups are centred under the tabs; ADD SKILL and REMOVE SKILLS sit below
+   them at the right end of the same 852px block. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-6);
+  align-items: center;
+  justify-content: flex-end;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 852px;
+  margin: 0 auto;
+}
+
+/* The state (loading, empty, error) has the width of the groups, so the page does not jump when the skills arrive. */
+.state {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 852px;
+  margin: 0 auto;
+}
