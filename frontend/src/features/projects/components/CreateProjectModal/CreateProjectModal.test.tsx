@@ -94,7 +94,8 @@ describe("CreateProjectModal", () => {
   });
 
   it("disables the Environment field while the skills load", async () => {
-    await open();
+    // A delayed answer keeps the request pending, so a slow machine cannot finish loading before the check.
+    await open({ mocks: [{ ...environmentOptionsMock(), delay: 10_000 }] });
 
     expect(screen.getByRole("combobox", { name: "Environment" })).toHaveAttribute(
       "aria-disabled",
