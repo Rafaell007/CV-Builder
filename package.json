@@ -13,7 +13,7 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
     "test:e2e": "pnpm --filter @cv-builder/e2e test:e2e",
-    "test-all": "pnpm test && pnpm --filter @cv-builder/backend test:int && pnpm test:e2e",
+    "test-all": "node scripts/test-all.mjs",
     "storybook": "pnpm --filter @cv-builder/frontend storybook",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
