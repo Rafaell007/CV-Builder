@@ -2,7 +2,7 @@
 
 List, read, create, change and delete CVs. A user works with their own CVs. An admin works with all CVs (D10).
 
-- **Folders:** CV projects live in `cv-projects/` (resolver, service, `dto/`, `models/`, specs). `require-user.ts` stays in the module root, because both topics use it.
+- **Folders:** CV projects live in `cv-projects/` and CV skills in `cv-skills/` (each has resolver, service, `dto/`, `models/`, specs). `require-user.ts` stays in the module root, because both topics use it.
 - **GraphQL:**
   - `cvs(search, sort, page, userId)` returns `{ items, total }`. `cv(id)` returns one CV.
   - `createCv(input)`, `updateCv(input)` and `deleteCv(id)` return the CV. `deleteCv` returns the CV that it removed.
@@ -43,7 +43,7 @@ The projects of one CV: `cv-projects.service.ts`, `cv-projects.resolver.ts`, `cv
 
 ## CV skills (S7.3a)
 
-The skills of one CV: `cv-skills.service.ts`, `cv-skills.resolver.ts`, `dto/*cv-skill*`, `models/cv-skill.ts`, `models/available-cv-skill.ts`. The shared `Mastery` enum and `SkillCategory` type are in `modules/skills/models/`.
+The skills of one CV, in `cv-skills/`: `cv-skills.service.ts`, `cv-skills.resolver.ts`, `dto/`, `models/`, specs. The shared `Mastery` enum and `SkillCategory` type are in `modules/skills/models/`.
 
 - **GraphQL:**
   - `cvSkills(cvId)` returns `[CvSkill!]!`. `availableCvSkills(cvId)` returns the skills that the owner of the CV has and that are not yet in the CV. There is no paging.
@@ -55,7 +55,7 @@ The skills of one CV: `cv-skills.service.ts`, `cv-skills.resolver.ts`, `dto/*cv-
 - **Mastery:** it belongs to the CV and can differ from the owner's level. `addCvSkill` without `mastery` copies the owner's level. `updateCvSkill` changes only the mastery of the link, never the owner's skill. The skill of a link cannot change (page doc: the Skill field is disabled in the Update modal).
 - **Duplicates:** the unique index `(cvId, skillId)` is the guard. The service turns the error into `CONFLICT` ("The skill is already in this CV"). Two parallel requests for the same skill give one link and one `CONFLICT`.
 - **Remove:** all or nothing. If one id is not in the CV, the answer is `NOT_FOUND` and nothing is removed. The skills of the catalog and of the owner stay (AC-36). Deleting a CV removes its links with it.
-- **Tests:** `cv-skills.service.spec.ts` and `cv-skills.resolver.spec.ts` next to the code. `backend/test/cv-skills.int-spec.ts` runs over HTTP against the test database.
+- **Tests:** `cv-skills.service.spec.ts` and `cv-skills.resolver.spec.ts` next to the code. `backend/test/cvs/cv-skills.int-spec.ts` runs over HTTP against the test database.
 - **Docs:** [CV skills page](../../../../docs/pages/22-cv-skills-page.md) · [PLAN.md S7.3](../../../../PLAN.md)
 
 ## Things to note
