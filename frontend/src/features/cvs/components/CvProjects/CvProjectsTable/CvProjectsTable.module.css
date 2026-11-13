@@ -1,0 +1,13 @@
+.text {
+  overflow-wrap: anywhere;
+}
+
+/* The responsibilities can be long: three lines, then an ellipsis (the whole text is in the Update modal). */
+.responsibilities {
+  display: -webkit-box;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}

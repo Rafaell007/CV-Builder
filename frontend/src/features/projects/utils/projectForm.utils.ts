@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { CreateProjectInput, UpdateProjectInput } from "@/shared/graphql";
+import { fromUtcDateIso, toUtcDateIso } from "@/shared/utils";
 import {
   MAX_DESCRIPTION_LENGTH,
   MAX_DOMAIN_LENGTH,
@@ -73,15 +74,6 @@ export function projectFormSchema(
     });
 }
 
-/**
- * A picked day as the backend wants it: midnight UTC of the same calendar day. The date picker returns local
- * midnight, and `toISOString` of that is the day before in a time zone east of UTC. The backend keeps only the
- * UTC day (`toDateOnly`), so the user would see a project one day off.
- */
-export function toUtcDateIso(date: Date): string {
-  return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())).toISOString();
-}
-
 /** The `createProject` input. `environmentIds` holds the technologies the user chose (an empty list for none). */
 export function toCreateProjectInput(values: ProjectFormSubmit): CreateProjectInput {
   return {
@@ -92,17 +84,6 @@ export function toCreateProjectInput(values: ProjectFormSubmit): CreateProjectIn
     description: values.description,
     environmentIds: values.environmentIds,
   };
-}
-
-/**
- * The reverse of `toUtcDateIso`: the calendar day the backend keeps (midnight UTC) as the local day the date
- * picker shows. `new Date(iso)` would show the day before in a time zone west of UTC. A value that is not a
- * date gives `null`, so the field is empty and the form asks for it.
- */
-export function fromUtcDateIso(iso: string): Date | null {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return null;
-  return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
 }
 
 /** The values the Update project form starts with: the current data of the project (page 27, Edit Project Modal). */

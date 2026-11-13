@@ -1,11 +1,11 @@
 import { useLocale, useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { DataTable, Menu, type DataTableColumn, type SortState } from "@/shared/components";
+import { formatCalendarDate } from "@/shared/utils";
 import { PROJECT_SORT_FIELDS, PROJECTS_DESKTOP_MIN_WIDTH } from "../../projects.constants";
 import type { ProjectListItem } from "../../projects.types";
 import { EnvironmentTags } from "./EnvironmentTags";
 import { ProjectDescription } from "./ProjectDescription";
-import { formatProjectDate } from "./utils";
 import styles from "./ProjectsTable.module.css";
 
 export interface ProjectsTableProps {
@@ -41,7 +41,7 @@ export function ProjectsTable({
 
   // A date that cannot be read shows a dash, with a text for screen readers, never an empty cell.
   const renderDate = (value: string): ReactNode => {
-    const text = formatProjectDate(value, locale);
+    const text = formatCalendarDate(value, locale);
     return (
       text ?? (
         <span role="img" aria-label={t("dateMissing")}>

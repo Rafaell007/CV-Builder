@@ -9,11 +9,9 @@ import { blog } from "../projects.mocks";
 import type { ProjectFormValues } from "../projects.types";
 import {
   projectFormSchema,
-  fromUtcDateIso,
   toCreateProjectInput,
   toProjectFormValues,
   toUpdateProjectInput,
-  toUtcDateIso,
   type ProjectFormMessages,
 } from "./projectForm.utils";
 
@@ -137,13 +135,6 @@ describe("projectFormSchema", () => {
   });
 });
 
-describe("toUtcDateIso", () => {
-  it("keeps the calendar day the user picked, whatever the time zone", () => {
-    // Local midnight of 10 January: `toISOString` would give the 9th in a time zone east of UTC.
-    expect(toUtcDateIso(new Date(2026, 0, 10))).toBe("2026-01-10T00:00:00.000Z");
-  });
-});
-
 describe("toCreateProjectInput", () => {
   it("turns the form values into the mutation input, with the chosen technologies", () => {
     expect(
@@ -161,25 +152,6 @@ describe("toCreateProjectInput", () => {
       description: "A blogging site",
       environmentIds: ["12", "13"],
     });
-  });
-});
-
-describe("fromUtcDateIso", () => {
-  it("gives the local day that has the same calendar date as the UTC day", () => {
-    // `new Date(iso)` would be the 9th (local time) in a time zone west of UTC.
-    const date = fromUtcDateIso("2026-01-10T00:00:00.000Z");
-
-    expect([date?.getFullYear(), date?.getMonth(), date?.getDate()]).toEqual([2026, 0, 10]);
-  });
-
-  it("round-trips with toUtcDateIso", () => {
-    const iso = "2026-03-29T00:00:00.000Z";
-
-    expect(toUtcDateIso(fromUtcDateIso(iso) as Date)).toBe(iso);
-  });
-
-  it("gives null for a text that is not a date", () => {
-    expect(fromUtcDateIso("not a date")).toBeNull();
   });
 });
 

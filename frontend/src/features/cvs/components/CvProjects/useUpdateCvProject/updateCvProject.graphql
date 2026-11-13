@@ -1,0 +1,27 @@
+# Changes the dates, roles and responsibilities of one project in the CV. The project itself cannot change.
+# Errors: BAD_USER_INPUT, CONFLICT (a project date changed at the same moment), NOT_FOUND, FORBIDDEN.
+mutation UpdateCvProject($input: UpdateCvProjectInput!) {
+  updateCvProject(input: $input) {
+    id
+    cvId
+    startDate
+    endDate
+    responsibilities
+    roles {
+      id
+      name
+    }
+    project {
+      id
+      name
+      domain
+      startDate
+      endDate
+      description
+      environment {
+        id
+        name
+      }
+    }
+  }
+}

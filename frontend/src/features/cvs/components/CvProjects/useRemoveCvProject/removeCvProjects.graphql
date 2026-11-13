@@ -1,0 +1,5 @@
+# Removes projects from the CV, all or nothing. The project of the catalog and the roles stay (AC-23, AC-39).
+# The delete modal removes one project: it sends a list with one id. Errors: NOT_FOUND, FORBIDDEN.
+mutation RemoveCvProjects($input: RemoveCvProjectsInput!) {
+  removeCvProjects(input: $input)
+}
