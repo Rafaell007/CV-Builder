@@ -7,6 +7,7 @@ import {
   banking,
   blog,
   createProjectMock,
+  environmentOptionsMock,
   deleteProjectMock,
   deleteProjectNetworkErrorMock,
   deleteProjectRefusedMock,
@@ -581,10 +582,13 @@ describe("Projects", () => {
       startDate: "2026-01-10T00:00:00.000Z",
       endDate: "2026-06-30T00:00:00.000Z",
       description: "A portal for staff",
+      environmentIds: [],
     };
 
     it("opens the Create project modal with the CREATE PROJECT button", async () => {
-      const { user } = renderWithProviders(<Projects />, { mocks: [projectsMock([blog])] });
+      const { user } = renderWithProviders(<Projects />, {
+        mocks: [environmentOptionsMock(), projectsMock([blog])],
+      });
       await screen.findByText("Blog");
 
       await user.click(screen.getByRole("button", { name: "CREATE PROJECT" }));
@@ -593,7 +597,7 @@ describe("Projects", () => {
     });
 
     it("shows the button while the list loads and when it failed to load", async () => {
-      renderWithProviders(<Projects />, { mocks: [projectsErrorMock()] });
+      renderWithProviders(<Projects />, { mocks: [environmentOptionsMock(), projectsErrorMock()] });
 
       expect(screen.getByRole("button", { name: "CREATE PROJECT" })).toBeInTheDocument();
       await screen.findByRole("alert");
@@ -604,6 +608,7 @@ describe("Projects", () => {
       const intranet = { ...blog, id: "new-1", ...input, environment: [] };
       const { user } = renderWithProviders(<Projects />, {
         mocks: [
+          environmentOptionsMock(),
           projectsMock([blog]),
           createProjectMock(input, { id: "new-1" }),
           projectsMock([blog, intranet]),
@@ -626,7 +631,7 @@ describe("Projects", () => {
     it("shows the form in Polish", async () => {
       const { user } = renderWithProviders(<Projects />, {
         locale: "pl",
-        mocks: [projectsMock([blog])],
+        mocks: [environmentOptionsMock(), projectsMock([blog])],
       });
       await user.click(await screen.findByRole("button", { name: "UTWÓRZ PROJEKT" }));
 
@@ -654,7 +659,9 @@ describe("Projects", () => {
     }
 
     it("opens the Update project modal filled with the project of the row", async () => {
-      const { user } = renderWithProviders(<Projects />, { mocks: [projectsMock([blog, sales])] });
+      const { user } = renderWithProviders(<Projects />, {
+        mocks: [environmentOptionsMock(), projectsMock([blog, sales])],
+      });
 
       await openEdit(user);
 
@@ -666,6 +673,7 @@ describe("Projects", () => {
       const renamed = { ...blog, name: "Blog 2" };
       const { user } = renderWithProviders(<Projects />, {
         mocks: [
+          environmentOptionsMock(),
           projectsMock([blog]),
           updateProjectMock(input, blog.environment),
           projectsMock([renamed]),
@@ -685,7 +693,7 @@ describe("Projects", () => {
     it("shows the form in Polish", async () => {
       const { user } = renderWithProviders(<Projects />, {
         locale: "pl",
-        mocks: [projectsMock([blog])],
+        mocks: [environmentOptionsMock(), projectsMock([blog])],
       });
       await user.click(await screen.findByRole("button", { name: "Akcje dla projektu Blog" }));
       await user.click(screen.getByRole("menuitem", { name: "Edytuj" }));

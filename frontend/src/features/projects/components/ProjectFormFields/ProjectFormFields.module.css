@@ -10,3 +10,15 @@
   color: var(--color-error-text);
   font: var(--text-body);
 }
+
+/* The multi-select and, when the skills failed to load, the retry button under it. */
+.environment {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.environment > :first-child {
+  align-self: stretch;
+}

@@ -20,3 +20,5 @@ export const DEFAULT_PROJECTS_SORT: SortState = {
 export const MAX_NAME_LENGTH = 100;
 export const MAX_DOMAIN_LENGTH = 100;
 export const MAX_DESCRIPTION_LENGTH = 2000;
+/** The backend accepts at most 50 technologies on a project (`environmentIds`). */
+export const MAX_ENVIRONMENT_SKILLS = 50;

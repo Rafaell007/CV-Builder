@@ -2,7 +2,11 @@ import { act, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import { renderWithProviders, type RenderWithProvidersOptions } from "@/shared/testing";
-import { environmentOptionsErrorMock, environmentOptionsMock } from "../projects.mocks";
+import {
+  catalogSkills,
+  environmentOptionsErrorMock,
+  environmentOptionsMock,
+} from "../projects.mocks";
 import { useEnvironmentOptions } from "./useEnvironmentOptions";
 
 // renderWithProviders renders elements; this small component lets the hook run inside the same providers.
@@ -23,11 +27,10 @@ describe("useEnvironmentOptions", () => {
     expect(result().loading).toBe(true);
     await waitFor(() => expect(result().loading).toBe(false));
 
-    expect(result().options).toEqual([
-      { value: "16", label: "MobX" },
-      { value: "13", label: "React" },
-      { value: "12", label: "TypeScript" },
-    ]);
+    expect(result().options.map((option) => option.label)).toEqual(
+      catalogSkills.map((skill) => skill.name),
+    );
+    expect(result().options[0]).toEqual({ value: "11", label: "CSS3" });
     expect(result().failed).toBe(false);
   });
 
@@ -46,6 +49,6 @@ describe("useEnvironmentOptions", () => {
     act(() => result().retry());
 
     await waitFor(() => expect(result().failed).toBe(false));
-    expect(result().options).toHaveLength(3);
+    expect(result().options).toHaveLength(catalogSkills.length);
   });
 });
