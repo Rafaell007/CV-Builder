@@ -1,0 +1,7 @@
+# The roles a person can have in a project (Roles field of the Add and Update project modals). Every signed-in user can read them.
+query ProjectRoles {
+  projectRoles {
+    id
+    name
+  }
+}

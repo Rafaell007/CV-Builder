@@ -1,0 +1,28 @@
+# Adds a catalog project to the CV, with the dates and roles of the person. The catalog project never changes.
+# Errors: BAD_USER_INPUT (dates outside the project, no role, unknown project or role), CONFLICT (already in the CV,
+# or a project date changed at the same moment), NOT_FOUND, FORBIDDEN.
+mutation AddCvProject($input: AddCvProjectInput!) {
+  addCvProject(input: $input) {
+    id
+    cvId
+    startDate
+    endDate
+    responsibilities
+    roles {
+      id
+      name
+    }
+    project {
+      id
+      name
+      domain
+      startDate
+      endDate
+      description
+      environment {
+        id
+        name
+      }
+    }
+  }
+}
