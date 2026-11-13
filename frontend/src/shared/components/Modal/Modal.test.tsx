@@ -141,7 +141,8 @@ describe("Modal", () => {
       ).not.toBeInTheDocument();
       expect(onOpenChange).not.toHaveBeenCalled();
       expect(screen.getByRole("dialog", { name: "Add project" })).toBeInTheDocument();
-      expect(input).toHaveFocus();
+      // Focus comes back to the field a moment after the calendar closes (CI saw it on <body> at first).
+      await waitFor(() => expect(input).toHaveFocus());
 
       await user.keyboard("{Escape}");
 
