@@ -295,13 +295,8 @@ for (const theme of ["light", "dark"] as const) {
 
       await expect(dialog(page)).toBeVisible();
       expect(await contrastOf(page, '[role="dialog"] h2')).toBeGreaterThanOrEqual(WCAG_AA_TEXT);
-      // Known issue (projects README): in the dark theme the field label (grey-400 on the grey-600 modal) has
-      // 4.32:1. The fix is a shared token change, so only the light theme is checked until that is done.
-      if (theme === "light") {
-        expect(await contrastOf(page, '[role="dialog"] label')).toBeGreaterThanOrEqual(
-          WCAG_AA_TEXT,
-        );
-      }
+      // The field label uses --color-text-secondary. In the dark theme it was 4.32:1 (KAN-139 fixed it).
+      expect(await contrastOf(page, '[role="dialog"] label')).toBeGreaterThanOrEqual(WCAG_AA_TEXT);
     });
   });
 }
