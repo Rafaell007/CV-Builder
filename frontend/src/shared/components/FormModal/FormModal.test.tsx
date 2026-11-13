@@ -5,6 +5,7 @@ import { z } from "zod";
 import { applyServerFieldErrors, useZodForm } from "@/shared/forms";
 import { renderWithProviders, screen } from "@/shared/testing";
 import { Button } from "../Button";
+import { DatePicker, type DatePickerLabels } from "../DatePicker";
 import { TextField } from "../TextField";
 import { FormModal } from "./FormModal";
 
@@ -68,6 +69,47 @@ function AddSkillModal({ submit }: { submit: (values: Values) => Promise<void> }
   );
 }
 
+const dateLabels: DatePickerLabels = {
+  calendar: "Choose a date",
+  previousMonth: "Previous month",
+  nextMonth: "Next month",
+  previousYear: "Previous year",
+  nextYear: "Next year",
+  chooseDayPrefix: "Choose",
+  unavailableDayPrefix: "Not available",
+  monthPrefix: "Month",
+};
+
+// A form whose first field is a date: the Update CV project modal looks like this (its Project and Domain fields are disabled).
+function DateFirstModal() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open dates</Button>
+      <FormModal
+        open={open}
+        onOpenChange={setOpen}
+        title="Dates"
+        closeLabel="Close"
+        submitLabel="Save"
+        cancelLabel="Cancel"
+        canSubmit
+        isSubmitting={false}
+        onSubmit={(event) => event.preventDefault()}
+      >
+        <DatePicker
+          label="Start Date"
+          value={null}
+          onValueChange={() => undefined}
+          locale="en"
+          labels={dateLabels}
+        />
+        <TextField label="Name" />
+      </FormModal>
+    </>
+  );
+}
+
 async function renderOpen(submit = vi.fn<(values: Values) => Promise<void>>()) {
   const rendered = renderWithProviders(<AddSkillModal submit={submit} />);
   await rendered.user.click(screen.getByRole("button", { name: "Add skill" }));
@@ -79,6 +121,15 @@ describe("FormModal", () => {
     await renderOpen();
 
     expect(screen.getByRole("dialog", { name: "Add skill" })).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "Name" })).toHaveFocus();
+  });
+
+  it("does not start on a date field, because a focused date field opens its calendar", async () => {
+    const { user } = renderWithProviders(<DateFirstModal />);
+
+    await user.click(screen.getByRole("button", { name: "Open dates" }));
+
+    expect(await screen.findByRole("dialog", { name: "Dates" })).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "Name" })).toHaveFocus();
   });
 

@@ -103,8 +103,10 @@ export function DatePicker({
       className={className}
     >
       {/* data-calendar-open: a Modal around the field skips its own Escape while the calendar is open (see Modal) */}
+      {/* data-date-picker: a FormModal does not start on a date field, because focus opens the calendar (see useFirstFieldFocus) */}
       <div
         className={styles.box}
+        data-date-picker=""
         onBlur={onFocusLeave}
         {...(isCalendarOpen && { "data-calendar-open": "true" })}
       >
