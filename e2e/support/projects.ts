@@ -1,20 +1,5 @@
 import type { BrowserContext } from "@playwright/test";
-
-interface GraphqlBody<Data> {
-  data?: Data;
-  errors?: { message: string }[];
-}
-
-async function graphql<Data>(
-  context: BrowserContext,
-  query: string,
-  variables: Record<string, unknown>,
-): Promise<Data> {
-  const response = await context.request.post("/graphql", { data: { query, variables } });
-  const body = (await response.json()) as GraphqlBody<Data>;
-  if (body.errors || !body.data) throw new Error(`GraphQL failed: ${body.errors?.[0]?.message}`);
-  return body.data;
-}
+import { graphql } from "./graphql";
 
 // The largest page the backend allows (backend/src/common/pagination/page.input.ts).
 const MAX_PAGE_SIZE = 100;

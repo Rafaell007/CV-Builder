@@ -1,0 +1,15 @@
+# One page of CVs. A user gets only their own CVs, an admin gets all of them (backend, docs/pages/20-cvs-page.md).
+# The backend searches (name, and the owner email for an admin), sorts by name and cuts the page.
+query Cvs($page: PageInput!, $search: String, $sort: SortInput, $userId: ID) {
+  cvs(page: $page, search: $search, sort: $sort, userId: $userId) {
+    items {
+      id
+      name
+      education
+      description
+      ownerEmail
+      userId
+    }
+    total
+  }
+}

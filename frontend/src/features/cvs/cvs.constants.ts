@@ -1,0 +1,20 @@
+import type { SortState } from "@/shared/components";
+
+/** Backend sort fields of the CVs query. The backend accepts only `name` (`resolveSort`). */
+export const CV_SORT_FIELDS = {
+  name: "name",
+} as const;
+
+/** The backend accepts a search of 100 characters at most. */
+export const SEARCH_MAX_LENGTH = 100;
+
+/** The order of the list when the page opens, and the order the backend uses without a sort. The Name header shows it. */
+export const DEFAULT_CVS_SORT: SortState = {
+  field: CV_SORT_FIELDS.name,
+  direction: "ASC",
+};
+
+// The longest values the CV form allows (page document: name 255, education 255; backend: description 2000).
+export const MAX_NAME_LENGTH = 255;
+export const MAX_EDUCATION_LENGTH = 255;
+export const MAX_DESCRIPTION_LENGTH = 2000;
