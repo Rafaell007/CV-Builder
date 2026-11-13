@@ -1,0 +1,8 @@
+# The skills catalog, for the Environment field of the project forms. Admin only (backend). The backend returns
+# every skill sorted by name, so the frontend never sorts it.
+query EnvironmentOptions {
+  skills {
+    id
+    name
+  }
+}
