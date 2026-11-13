@@ -1,11 +1,11 @@
 import { ConflictException, NotFoundException } from "@nestjs/common";
-import type { AuthUser } from "../../common/auth";
-import { ValidationFailedException } from "../../common/errors";
-import { Prisma } from "../../generated/prisma/client";
-import { Mastery, Role } from "../../generated/prisma/enums";
-import type { PrismaService } from "../../prisma/prisma.service";
+import type { AuthUser } from "../../../common/auth";
+import { ValidationFailedException } from "../../../common/errors";
+import { Prisma } from "../../../generated/prisma/client";
+import { Mastery, Role } from "../../../generated/prisma/enums";
+import type { PrismaService } from "../../../prisma/prisma.service";
 import { CvSkillsService } from "./cv-skills.service";
-import type { CvsService } from "./cvs.service";
+import type { CvsService } from "../cvs.service";
 
 const USER: AuthUser = { id: "user-1", role: Role.USER, isVerified: true };
 const ADMIN: AuthUser = { id: "admin-1", role: Role.ADMIN, isVerified: true };

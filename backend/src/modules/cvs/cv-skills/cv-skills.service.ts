@@ -1,9 +1,9 @@
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
-import type { AuthUser } from "../../common/auth";
-import { ValidationFailedException } from "../../common/errors";
-import { Prisma } from "../../generated/prisma/client";
-import { PrismaService } from "../../prisma/prisma.service";
-import { CvsService } from "./cvs.service";
+import type { AuthUser } from "../../../common/auth";
+import { ValidationFailedException } from "../../../common/errors";
+import { Prisma } from "../../../generated/prisma/client";
+import { PrismaService } from "../../../prisma/prisma.service";
+import { CvsService } from "../cvs.service";
 import type { AddCvSkillInput } from "./dto/add-cv-skill.input";
 import type { RemoveCvSkillsInput } from "./dto/remove-cv-skills.input";
 import type { UpdateCvSkillInput } from "./dto/update-cv-skill.input";

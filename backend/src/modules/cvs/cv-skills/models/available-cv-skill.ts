@@ -1,6 +1,6 @@
 import { Field, ID, ObjectType } from "@nestjs/graphql";
-import { Mastery } from "../../skills/models/mastery.enum";
-import { SkillCategory } from "../../skills/models/skill-category";
+import { Mastery } from "../../../skills/models/mastery.enum";
+import { SkillCategory } from "../../../skills/models/skill-category";
 
 /**
  * A skill that the owner of a CV has and that is not yet in the CV. The Add skill modal lists these.

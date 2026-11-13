@@ -1,10 +1,10 @@
 import type { NestExpressApplication } from "@nestjs/platform-express";
-import { Role } from "../src/generated/prisma/enums";
-import { PrismaService } from "../src/prisma/prisma.service";
-import { createTestApp } from "./support/create-test-app";
-import { createUser } from "./support/create-user";
-import { graphqlRequest, toCookiePair } from "./support/graphql-request";
-import type { GraphQLBody } from "./support/graphql-request";
+import { Role } from "../../src/generated/prisma/enums";
+import { PrismaService } from "../../src/prisma/prisma.service";
+import { createTestApp } from "../support/create-test-app";
+import { createUser } from "../support/create-user";
+import { graphqlRequest, toCookiePair } from "../support/graphql-request";
+import type { GraphQLBody } from "../support/graphql-request";
 
 const SIGN_IN = `mutation ($input: SignInInput!) { signIn(input: $input) { id } }`;
 const FIELDS = `id cvId skillId name mastery category { id name }`;

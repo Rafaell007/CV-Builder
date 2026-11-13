@@ -1,6 +1,6 @@
 import { Field, ID, ObjectType } from "@nestjs/graphql";
-import { Mastery } from "../../skills/models/mastery.enum";
-import { SkillCategory } from "../../skills/models/skill-category";
+import { Mastery } from "../../../skills/models/mastery.enum";
+import { SkillCategory } from "../../../skills/models/skill-category";
 
 /**
  * A skill in one CV (CV skills page). `id` is the id of the CV-skill link, `skillId` is the id of

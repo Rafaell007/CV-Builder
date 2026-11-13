@@ -1,6 +1,6 @@
 import { Field, ID, InputType } from "@nestjs/graphql";
 import { IsEnum, IsOptional, IsUUID } from "class-validator";
-import { Mastery } from "../../skills/models/mastery.enum";
+import { Mastery } from "../../../skills/models/mastery.enum";
 
 @InputType()
 export class AddCvSkillInput {

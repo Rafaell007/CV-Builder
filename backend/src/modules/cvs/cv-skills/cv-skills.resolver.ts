@@ -1,6 +1,6 @@
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { CurrentUser, Verified } from "../../common/auth";
-import type { AuthUser } from "../../common/auth";
+import { CurrentUser, Verified } from "../../../common/auth";
+import type { AuthUser } from "../../../common/auth";
 import { CvSkillsService } from "./cv-skills.service";
 import { AddCvSkillInput } from "./dto/add-cv-skill.input";
 import { CvSkillsArgs } from "./dto/cv-skills.args";
@@ -8,7 +8,7 @@ import { RemoveCvSkillsInput } from "./dto/remove-cv-skills.input";
 import { UpdateCvSkillInput } from "./dto/update-cv-skill.input";
 import { AvailableCvSkill } from "./models/available-cv-skill";
 import { CvSkill } from "./models/cv-skill";
-import { requireUser } from "./require-user";
+import { requireUser } from "../require-user";
 
 /** Reading needs a session; adding, changing and removing also need a verified email (D16). */
 @Resolver(() => CvSkill)

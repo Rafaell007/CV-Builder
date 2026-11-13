@@ -1,7 +1,7 @@
 import { UnauthorizedException } from "@nestjs/common";
-import type { AuthUser } from "../../common/auth";
-import { VERIFIED_KEY } from "../../common/auth/decorators";
-import { Role } from "../../generated/prisma/enums";
+import type { AuthUser } from "../../../common/auth";
+import { VERIFIED_KEY } from "../../../common/auth/decorators";
+import { Role } from "../../../generated/prisma/enums";
 import { CvSkillsResolver } from "./cv-skills.resolver";
 import type { CvSkillsService } from "./cv-skills.service";
 import type { AddCvSkillInput } from "./dto/add-cv-skill.input";
