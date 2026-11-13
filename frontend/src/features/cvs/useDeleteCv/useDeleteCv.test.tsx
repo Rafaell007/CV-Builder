@@ -1,6 +1,6 @@
 import { act, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders, type RenderWithProvidersOptions } from "@/shared/testing";
 import {
   cvToDelete,
@@ -8,17 +8,22 @@ import {
   deleteCvNetworkErrorMock,
   deleteCvRefusedMock,
 } from "./deleteCv.mocks";
-import { useDeleteCv } from "./useDeleteCv";
+import { useDeleteCv, type UseDeleteCvOptions } from "./useDeleteCv";
 
 // renderWithProviders renders elements; this small component lets the hook run inside the same providers.
-function setup(options: RenderWithProvidersOptions) {
+// The list is on page 1 with 10 rows unless a test says otherwise.
+function setup(
+  options: RenderWithProvidersOptions,
+  list: Partial<Omit<UseDeleteCvOptions, "onPageChange">> = {},
+) {
+  const onPageChange = vi.fn();
   let current!: ReturnType<typeof useDeleteCv>;
   function Probe(): ReactNode {
-    current = useDeleteCv();
+    current = useDeleteCv({ page: 1, rowsOnPage: 10, ...list, onPageChange });
     return null;
   }
   renderWithProviders(<Probe />, options);
-  return { result: () => current };
+  return { result: () => current, onPageChange };
 }
 
 const cv = cvToDelete;
@@ -131,4 +136,48 @@ describe("useDeleteCv", () => {
     );
     expect(screen.queryByText(/Failed to fetch/)).not.toBeInTheDocument();
   });
+
+  describe("page after the delete", () => {
+    async function deleteWith(list: Parameters<typeof setup>[1], mock = deleteCvMock(cv.id)) {
+      const view = setup({ mocks: [mock] }, list);
+      act(() => view.result().askToDelete(cv));
+      await act(async () => {
+        await view.result().confirm();
+      });
+      return view;
+    }
+
+    it("goes back one page after the only CV of page 2 or later is deleted", async () => {
+      const { onPageChange } = await deleteWith({ page: 3, rowsOnPage: 1 });
+
+      expect(onPageChange).toHaveBeenCalledExactlyOnceWith(2);
+    });
+
+    it("stays on page 1 when its only CV is deleted", async () => {
+      const { onPageChange } = await deleteWith({ page: 1, rowsOnPage: 1 });
+
+      expect(onPageChange).not.toHaveBeenCalled();
+    });
+
+    it("stays on the page when other CVs remain on it", async () => {
+      const { onPageChange } = await deleteWith({ page: 2, rowsOnPage: 2 });
+
+      expect(onPageChange).not.toHaveBeenCalled();
+    });
+
+    it("stays on the page when the delete fails", async () => {
+      const { onPageChange } = await deleteWith(
+        { page: 2, rowsOnPage: 1 },
+        deleteCvNetworkErrorMock(cv.id),
+      );
+
+      expect(onPageChange).not.toHaveBeenCalled();
+    });
+  });
+
+  // NOTE (KAN-112): waits for the list page. `confirm` calls `client.refetchQueries` after NOT_FOUND, and this test
+  // needs an active `Cvs` query to see that call. Fill it in when the hook is wired into the page: render the page
+  // with a `Cvs` mock twice (before and after the delete), delete a CV that answers NOT_FOUND, and expect the second
+  // `Cvs` request. Then replace `it.todo` with `it`. See README.delete.md, Notes.
+  it.todo("loads the Cvs list again when the CV was not found");
 });

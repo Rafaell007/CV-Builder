@@ -8,6 +8,15 @@ import { CvsDocument, DeleteCvDocument } from "@/shared/graphql";
 import type { CvListItem } from "../cvs.types";
 import { toDeleteCvFailure } from "../utils";
 
+export type UseDeleteCvOptions = {
+  /** The page the list shows now (starts at 1). */
+  page: number;
+  /** How many CVs the list shows on this page now. */
+  rowsOnPage: number;
+  /** Called with the new page when a delete leaves the current page empty. */
+  onPageChange: (page: number) => void;
+};
+
 export type UseDeleteCvResult = {
   /** The CV the user chose to delete. The modal is open while this is set. */
   cv: CvListItem | null;
@@ -27,8 +36,13 @@ export type UseDeleteCvResult = {
  * and the modal closes. On failure the modal closes too and an error toast shows the reason: a toast stays behind an
  * open modal where a keyboard user cannot reach it (see the Toast README).
  * `NOT_FOUND` and `FORBIDDEN` have their own texts. After `NOT_FOUND` the CV is gone, so the list loads again.
+ * When the deleted CV was the only one on page 2 or later, the same page would be empty: `onPageChange` goes back one page.
  */
-export function useDeleteCv(): UseDeleteCvResult {
+export function useDeleteCv({
+  page,
+  rowsOnPage,
+  onPageChange,
+}: UseDeleteCvOptions): UseDeleteCvResult {
   const t = useTranslations("cvs.delete");
   const toast = useToast();
   const client = useApolloClient();
@@ -42,6 +56,8 @@ export function useDeleteCv(): UseDeleteCvResult {
     // The same mutation must not be sent twice while it runs.
     if (cv === null || sending.current) return false;
     sending.current = true;
+    // Read before the request: the CV leaves the list while it runs.
+    const wasLastRowOfPage = rowsOnPage === 1 && page > 1;
     try {
       await deleteCv({
         variables: { id: cv.id },
@@ -55,6 +71,7 @@ export function useDeleteCv(): UseDeleteCvResult {
         refetchQueries: [CvsDocument],
       });
       setCv(null);
+      if (wasLastRowOfPage) onPageChange(page - 1);
       return true;
     } catch (error) {
       setCv(null);
