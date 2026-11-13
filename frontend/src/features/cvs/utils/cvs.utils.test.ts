@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_CVS_SORT } from "../cvs.constants";
-import { toCvDetailsPath, toCvsVariables } from "./cvs.utils";
+import { toCvDetailsPath, toCvsVariables, toCvTabPath } from "./cvs.utils";
 
 const state = { search: "", sort: DEFAULT_CVS_SORT, page: 1 };
 
@@ -39,5 +39,14 @@ describe("toCvsVariables", () => {
 describe("toCvDetailsPath", () => {
   it("points to the details page of the CV", () => {
     expect(toCvDetailsPath("12")).toBe("/cvs/12/details");
+  });
+});
+
+describe("toCvTabPath", () => {
+  it("points to every tab of the CV", () => {
+    expect(toCvTabPath("12", "details")).toBe("/cvs/12/details");
+    expect(toCvTabPath("12", "skills")).toBe("/cvs/12/skills");
+    expect(toCvTabPath("12", "projects")).toBe("/cvs/12/projects");
+    expect(toCvTabPath("12", "preview")).toBe("/cvs/12/preview");
   });
 });

@@ -18,3 +18,6 @@ export const DEFAULT_CVS_SORT: SortState = {
 export const MAX_NAME_LENGTH = 255;
 export const MAX_EDUCATION_LENGTH = 255;
 export const MAX_DESCRIPTION_LENGTH = 2000;
+
+/** The tabs of a CV, in the order the CV Details page shows them. Each one is a route: `/cvs/{id}/{tab}`. */
+export const CV_TABS = ["details", "skills", "projects", "preview"] as const;

@@ -1,4 +1,4 @@
-export { toCvDetailsPath, toCvsVariables } from "./cvs.utils";
+export { toCvDetailsPath, toCvsVariables, toCvTabPath } from "./cvs.utils";
 export {
   cvFormSchema,
   toCreateCvInput,
