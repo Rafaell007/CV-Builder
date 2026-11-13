@@ -6,6 +6,8 @@ import {
   createProjectInvalidMock,
   createProjectMock,
   createProjectNetworkErrorMock,
+  environmentOptionsErrorMock,
+  environmentOptionsMock,
 } from "../../projects.mocks";
 import { useCreateProjectForm } from "../../useCreateProjectForm";
 import { CreateProjectModal } from "./CreateProjectModal";
@@ -27,13 +29,25 @@ const input = {
   startDate: "2026-01-10T00:00:00.000Z",
   endDate: "2026-06-30T00:00:00.000Z",
   description: "A blogging site",
+  environmentIds: [],
 };
 
 async function open(options: RenderWithProvidersOptions = { mocks: [] }) {
-  const view = renderWithProviders(<Harness />, options);
+  // Every form asks the backend for the skills, so each test also answers that request.
+  const view = renderWithProviders(<Harness />, {
+    ...options,
+    mocks: [...(options.mocks ?? []), environmentOptionsMock()],
+  });
   await view.user.click(screen.getByRole("button", { name: "Open" }));
   const dialog = await screen.findByRole("dialog", { name: "Create project" });
   return { ...view, dialog };
+}
+
+// The field is disabled while the skills load; wait until it can be used.
+async function openEnvironment() {
+  const field = await screen.findByRole("combobox", { name: "Environment" });
+  await waitFor(() => expect(field).not.toHaveAttribute("aria-disabled", "true"));
+  return field;
 }
 
 async function fill(user: Awaited<ReturnType<typeof open>>["user"], overrides = {}) {
@@ -53,6 +67,53 @@ describe("CreateProjectModal", () => {
       expect(screen.getByRole("textbox", { name })).toHaveValue("");
     }
     expect(screen.getByRole("button", { name: "Create" })).toBeDisabled();
+  });
+
+  it("has an Environment field that lists the skills of the backend", async () => {
+    const { user } = await open();
+
+    await user.click(await openEnvironment());
+
+    const names = (await screen.findAllByRole("option")).map((option) => option.textContent);
+    expect(names).toEqual(["CSS3", "Firebase", "HTML5", "MobX", "React", "TypeScript", "Zustand"]);
+  });
+
+  it("sends the chosen technologies and allows none", async () => {
+    const { user } = await open({
+      mocks: [createProjectMock({ ...input, environmentIds: ["13", "12"] })],
+    });
+    await fill(user);
+    await user.click(await openEnvironment());
+    await user.click(await screen.findByRole("option", { name: "React" }));
+    await user.click(screen.getByRole("option", { name: "TypeScript" }));
+
+    await user.click(screen.getByRole("button", { name: "Create" }));
+
+    // The mock matches only this exact input, in the order the user chose.
+    expect(await screen.findByText("Project created")).toBeInTheDocument();
+  });
+
+  it("disables the Environment field while the skills load", async () => {
+    await open();
+
+    expect(screen.getByRole("combobox", { name: "Environment" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    expect(screen.getByText("Loading technologies")).toBeInTheDocument();
+  });
+
+  it("shows an error with a retry when the skills fail, and the form can still be sent", async () => {
+    const { user } = await open({
+      mocks: [environmentOptionsErrorMock(), createProjectMock(input)],
+    });
+
+    expect(await screen.findByText("The technologies could not be loaded.")).toBeInTheDocument();
+    await fill(user);
+    expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Create" }));
+
+    expect(await screen.findByText("Project created")).toBeInTheDocument();
   });
 
   it("enables CREATE when every field is valid", async () => {

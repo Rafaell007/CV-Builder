@@ -4,6 +4,8 @@ import { Projects } from "./Projects";
 import {
   blog,
   createProjectNetworkErrorMock,
+  environmentOptionsErrorMock,
+  environmentOptionsMock,
   fakeBackendMock,
   manyProjects,
   maxLengthProject,
@@ -199,6 +201,7 @@ const newProject = {
   startDate: "2026-01-10T00:00:00.000Z",
   endDate: "2026-06-30T00:00:00.000Z",
   description: "A portal for staff",
+  environmentIds: ["13", "12"],
 };
 
 /** Types all five fields of the Create project modal. */
@@ -211,9 +214,9 @@ const fillCreateForm = async (dialog: HTMLElement) => {
   await userEvent.type(form.getByRole("textbox", { name: "Description" }), newProject.description);
 };
 
-/** CREATE PROJECT opens the empty modal; CREATE stays disabled until all five fields are valid. */
+/** CREATE PROJECT opens the empty modal; CREATE stays disabled until all required fields are valid. The technologies are optional. */
 export const CreateProject: Story = {
-  parameters: { apollo: { mocks: [fakeBackendMock([blog, sales])] } },
+  parameters: { apollo: { mocks: [fakeBackendMock([blog, sales]), environmentOptionsMock()] } },
   play: async ({ canvas }) => {
     await userEvent.click(await canvas.findByRole("button", { name: "CREATE PROJECT" }));
     const dialog = await body.findByRole("dialog", { name: "Create project" });
@@ -224,11 +227,52 @@ export const CreateProject: Story = {
   },
 };
 
+/** The Environment field lists the skills of the backend; a chosen technology shows as a chip that can be removed. */
+export const CreateProjectEnvironment: Story = {
+  parameters: { apollo: { mocks: [fakeBackendMock([blog, sales]), environmentOptionsMock()] } },
+  play: async ({ canvas }) => {
+    await userEvent.click(await canvas.findByRole("button", { name: "CREATE PROJECT" }));
+    const dialog = await body.findByRole("dialog", { name: "Create project" });
+    const field = await within(dialog).findByRole("combobox", { name: "Environment" });
+    await waitFor(() => expect(field).not.toHaveAttribute("aria-disabled", "true"));
+
+    await userEvent.click(field);
+    await userEvent.click(await within(dialog).findByRole("option", { name: "React" }));
+    await userEvent.click(await within(dialog).findByRole("option", { name: "TypeScript" }));
+    await expect(
+      await within(dialog).findByRole("button", { name: "Remove React" }),
+    ).toBeInTheDocument();
+
+    await userEvent.click(within(dialog).getByRole("button", { name: "Remove React" }));
+    await expect(within(dialog).queryByRole("button", { name: "Remove React" })).toBeNull();
+  },
+};
+
+/** The skills cannot be loaded: the field shows an error and a retry, and the rest of the form still works. */
+export const CreateProjectEnvironmentFailed: Story = {
+  parameters: {
+    apollo: { mocks: [fakeBackendMock([blog, sales]), environmentOptionsErrorMock()] },
+  },
+  play: async ({ canvas }) => {
+    await userEvent.click(await canvas.findByRole("button", { name: "CREATE PROJECT" }));
+    const dialog = await body.findByRole("dialog", { name: "Create project" });
+
+    await expect(
+      await within(dialog).findByText("The technologies could not be loaded."),
+    ).toBeInTheDocument();
+    await expect(within(dialog).getByRole("button", { name: "Retry" })).toBeInTheDocument();
+  },
+};
+
 /** The request fails: the modal stays open, the values stay and the message shows inside the modal. */
 export const CreateProjectFailed: Story = {
   parameters: {
     apollo: {
-      mocks: [fakeBackendMock([blog, sales]), createProjectNetworkErrorMock(newProject)],
+      mocks: [
+        fakeBackendMock([blog, sales]),
+        environmentOptionsMock(),
+        createProjectNetworkErrorMock(newProject),
+      ],
     },
   },
   play: async ({ canvas }) => {
@@ -255,9 +299,9 @@ const renamedBlog = {
   environmentIds: blog.environment.map((skill) => skill.id),
 };
 
-/** Edit opens the modal filled with the row; UPDATE stays disabled until a value changes. */
+/** Edit opens the modal filled with the row and its technologies as chips; UPDATE stays disabled until a value changes. */
 export const UpdateProject: Story = {
-  parameters: { apollo: { mocks: [fakeBackendMock([blog, sales])] } },
+  parameters: { apollo: { mocks: [fakeBackendMock([blog, sales]), environmentOptionsMock()] } },
   play: async ({ canvas }) => {
     await userEvent.click(await canvas.findByRole("button", { name: "Actions for Blog" }));
     await userEvent.click(await body.findByRole("menuitem", { name: "Edit" }));
@@ -265,6 +309,7 @@ export const UpdateProject: Story = {
     const form = within(dialog);
     await expect(form.getByRole("textbox", { name: "Name" })).toHaveValue("Blog");
     await expect(form.getByRole("textbox", { name: "Start Date" })).toHaveValue("12/31/2025");
+    await expect(await form.findByRole("button", { name: "Remove Firebase" })).toBeInTheDocument();
     await expect(form.getByRole("button", { name: "Update" })).toBeDisabled();
 
     await userEvent.type(form.getByRole("textbox", { name: "Name" }), " 2");
@@ -275,7 +320,13 @@ export const UpdateProject: Story = {
 /** The request fails: the modal stays open, the values stay and the message shows inside the modal. */
 export const UpdateProjectFailed: Story = {
   parameters: {
-    apollo: { mocks: [fakeBackendMock([blog, sales]), updateProjectNetworkErrorMock(renamedBlog)] },
+    apollo: {
+      mocks: [
+        fakeBackendMock([blog, sales]),
+        environmentOptionsMock(),
+        updateProjectNetworkErrorMock(renamedBlog),
+      ],
+    },
   },
   play: async ({ canvas }) => {
     await userEvent.click(await canvas.findByRole("button", { name: "Actions for Blog" }));

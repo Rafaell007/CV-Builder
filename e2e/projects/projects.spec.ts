@@ -197,6 +197,10 @@ const dialog = (page: Page) => page.getByRole("dialog");
 // The delete modal is a ConfirmModal, which Radix marks as an alertdialog.
 const confirmDialog = (page: Page) => page.getByRole("alertdialog");
 
+// The tags are in the detail line under the project row. After `find` only one project is listed, so there is one list.
+const detailTags = (page: Page) =>
+  page.locator("tr[data-row-detail]").getByRole("list", { name: "Environment" });
+
 async function find(page: Page, text: string) {
   await search(page).fill(text);
   await search(page).press("Enter");
@@ -208,6 +212,15 @@ async function fillForm(page: Page, name: string) {
   await fillDate(page, "Start Date", "01/10/2026");
   await fillDate(page, "End Date", "06/30/2026");
   await dialog(page).getByRole("textbox", { name: "Description" }).fill("Made by an E2E test.");
+}
+
+// Opens the Environment list, picks the skills and leaves the field with Tab, so the list closes.
+async function chooseTechnologies(page: Page, names: string[]) {
+  const field = dialog(page).getByRole("combobox", { name: "Environment" });
+  await expect(field).not.toHaveAttribute("aria-disabled", "true");
+  await field.click();
+  for (const name of names) await dialog(page).getByRole("option", { name }).click();
+  await field.press("Tab");
 }
 
 // Tab leaves the field, so the calendar popup closes; an open popup covers the buttons of the modal.
@@ -248,6 +261,44 @@ test.describe("projects page, create, update and delete", () => {
     await find(page, name);
     await expect(row(page, name)).toHaveCount(1);
     await expect(row(page, name)).toContainText("E2E");
+  });
+
+  test("creates a project with technologies, then removes one of them with Update", async ({
+    page,
+  }) => {
+    const name = `${MANAGE_PREFIX} Technologies`;
+
+    await page.getByRole("button", { name: "CREATE PROJECT" }).click();
+    await fillForm(page, name);
+    await chooseTechnologies(page, ["React", "Docker"]);
+    await dialog(page).getByRole("button", { name: "Create" }).click();
+
+    await expect(dialog(page)).toBeHidden();
+    await find(page, name);
+    const tags = detailTags(page);
+    await expect(tags.getByRole("listitem")).toHaveText(["Docker", "React"]);
+
+    await openRowMenu(page, name, "Edit");
+    await expect(dialog(page).getByRole("button", { name: "Remove React" })).toBeVisible();
+    await dialog(page).getByRole("button", { name: "Remove React" }).click();
+    await dialog(page).getByRole("button", { name: "Update" }).click();
+
+    await expect(dialog(page)).toBeHidden();
+    await expect(tags.getByRole("listitem")).toHaveText(["Docker"]);
+  });
+
+  test("Update opens with the technologies of the project as chips", async ({ page }) => {
+    // The seed project Banking Portal has six technologies; the form must start with all of them.
+    await find(page, "Banking Portal");
+    const tags = detailTags(page);
+    await expect(tags.getByRole("listitem")).toHaveCount(6);
+
+    await openRowMenu(page, "Banking Portal", "Edit");
+    await expect(dialog(page).getByRole("button", { name: "Remove Docker" })).toBeVisible();
+    await dialog(page).getByRole("button", { name: "Cancel" }).click();
+
+    await expect(dialog(page)).toBeHidden();
+    await expect(tags.getByRole("listitem")).toHaveCount(6);
   });
 
   test("shows the date message and keeps Create disabled when the end is before the start", async ({

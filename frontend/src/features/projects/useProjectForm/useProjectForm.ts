@@ -7,7 +7,14 @@ import type { ProjectFormSubmit, ProjectFormValues } from "../projects.types";
 import { projectFormSchema } from "../utils";
 
 // The fields the backend validates (`CreateProjectInput`, `UpdateProjectInput`); each one can show a server error inline.
-const SERVER_FIELDS = ["name", "domain", "startDate", "endDate", "description"] as const;
+const SERVER_FIELDS = [
+  "name",
+  "domain",
+  "startDate",
+  "endDate",
+  "description",
+  "environmentIds",
+] as const;
 
 /**
  * The form that Create project and Update project share (page 27: "Same validation rules as Create Project"):
@@ -34,6 +41,8 @@ export function useProjectForm(defaultValues: ProjectFormValues) {
         endDateBeforeStart: t("errors.endDateBeforeStart"),
         descriptionRequired: t("errors.descriptionRequired"),
         descriptionTooLong: t("errors.descriptionTooLong"),
+        environmentTooMany: t("errors.environmentTooMany"),
+        environmentDuplicate: t("errors.environmentDuplicate"),
       }),
     [t],
   );
