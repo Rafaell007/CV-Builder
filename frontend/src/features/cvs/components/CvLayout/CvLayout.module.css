@@ -1,0 +1,14 @@
+.page {
+  padding: 0 var(--space-4) var(--space-6);
+}
+
+.content {
+  padding-top: var(--space-6);
+}
+
+.link {
+  margin-top: var(--space-6);
+  color: inherit;
+  font: var(--text-body);
+  text-decoration: underline;
+}

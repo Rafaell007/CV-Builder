@@ -1,6 +1,6 @@
 import { DEFAULT_PAGE_SIZE } from "@/shared/components";
 import type { CvsQueryVariables } from "@/shared/graphql";
-import type { CvsListState } from "../cvs.types";
+import type { CvsListState, CvTab } from "../cvs.types";
 
 /**
  * Turns the choices of the user into the variables of the `Cvs` query.
@@ -25,4 +25,9 @@ export function toCvsVariables(
 /** The CV Details page of a CV. The locale-aware router adds the language. */
 export function toCvDetailsPath(cvId: string): string {
   return `/cvs/${cvId}/details`;
+}
+
+/** The route of one tab of a CV. The locale-aware router adds the language. */
+export function toCvTabPath(cvId: string, tab: CvTab): string {
+  return `/cvs/${cvId}/${tab}`;
 }

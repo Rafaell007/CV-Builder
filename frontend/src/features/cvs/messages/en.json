@@ -68,6 +68,31 @@
       "text": "{name} was saved."
     }
   },
+  "tabs": {
+    "label": "CV sections",
+    "details": "Details",
+    "skills": "Skills",
+    "projects": "Projects",
+    "preview": "Preview"
+  },
+  "details": {
+    "update": "UPDATE",
+    "states": {
+      "loading": "Loading CV",
+      "error": "Failed to load CV details",
+      "retry": "Retry"
+    },
+    "notFound": {
+      "title": "CV not found",
+      "message": "This CV does not exist, or you cannot open it.",
+      "back": "Back to CVs"
+    },
+    "forbidden": {
+      "title": "No access",
+      "message": "You are not allowed to open this CV.",
+      "back": "Back to CVs"
+    }
+  },
   "delete": {
     "title": "Delete CV",
     "message": "Are you sure you want to delete CV <strong>{name}</strong>?",

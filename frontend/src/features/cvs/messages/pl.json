@@ -68,6 +68,31 @@
       "text": "{name} zostało zapisane."
     }
   },
+  "tabs": {
+    "label": "Sekcje CV",
+    "details": "Szczegóły",
+    "skills": "Umiejętności",
+    "projects": "Projekty",
+    "preview": "Podgląd"
+  },
+  "details": {
+    "update": "AKTUALIZUJ",
+    "states": {
+      "loading": "Ładowanie CV",
+      "error": "Nie udało się wczytać szczegółów CV",
+      "retry": "Spróbuj ponownie"
+    },
+    "notFound": {
+      "title": "Nie znaleziono CV",
+      "message": "To CV nie istnieje albo nie masz do niego dostępu.",
+      "back": "Wróć do listy CV"
+    },
+    "forbidden": {
+      "title": "Brak dostępu",
+      "message": "Nie masz uprawnień do otwarcia tego CV.",
+      "back": "Wróć do listy CV"
+    }
+  },
   "delete": {
     "title": "Usuń CV",
     "message": "Czy na pewno chcesz usunąć CV <strong>{name}</strong>?",

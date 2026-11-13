@@ -1,4 +1,4 @@
-export { toCvDetailsPath, toCvsVariables } from "./cvs.utils";
+export { toCvDetailsPath, toCvsVariables, toCvTabPath } from "./cvs.utils";
 export {
   cvFormSchema,
   toCreateCvInput,
@@ -6,4 +6,5 @@ export {
   toUpdateCvInput,
   type CvFormMessages,
 } from "./cvForm.utils";
+export { toCvLoadFailure, type CvLoadFailure } from "./toCvLoadFailure";
 export { toDeleteCvFailure, type DeleteCvFailure } from "./toDeleteCvFailure";

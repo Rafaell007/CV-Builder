@@ -62,8 +62,32 @@ Rules (the same in the backend):
   - The backend message is never shown. `utils/toDeleteCvFailure` returns `notFound`, `forbidden` or `undefined`, and the hook picks the translated text.
 - Who may delete (AC-32, AC-33, AC-34): the backend decides. A user deletes only their own CVs, an admin any CV. The frontend shows `Delete` for every row it receives, because the list already holds only rows the user may see.
 
+## CV Details: loading one CV
+
+Spec: [docs/pages/21-cv-details-page.md](../../../../docs/pages/21-cv-details-page.md) (PLAN S7.2, KAN-113). The page is built in steps; this is the data part.
+
+- `useCv(id)` sends the `Cv` query (`useCv/cv.graphql`) and returns `cv`, `loading`, `failure` and `retry`. `failure` is `undefined` when the request worked. `retry` repeats the request for the same id.
+- `utils/toCvLoadFailure(error)` turns a failed request into `notFound`, `forbidden` or `failed`:
+  - `notFound`: the backend code `NOT_FOUND`. It also means the CV belongs to another user (the backend gives the same answer, so a user cannot learn which ids exist). The page must not try to tell the two cases apart.
+  - `forbidden`: the backend code `FORBIDDEN`. The `cv` query does not send it today; the page is ready for it.
+  - `failed`: any other code, or a network error. Only this kind shows Retry, because a repeat cannot change the answer of the other two.
+- `useCv/cv.mocks.ts`: `cvMock`, `cvCodeErrorMock` and `cvNetworkErrorMock`. For tests and stories only.
+- `useCvDetailsForm(cv)`: the form of the Details tab. It reuses `useCvForm` (rules, double-submit guard, server errors) and `useUpdateCv`. Returns `{ form, failed, submit, canUpdate, isSubmitting }`. `canUpdate` is true only when the form is valid, differs from the saved CV and no request runs. After a successful save the values of the backend become the new unchanged state (UPDATE is disabled, the values stay). A failed save resets nothing. The success toast reuses the `cvs.update.success` texts.
+- `components/CvDetailsForm({ details })`: the Name, Education and Description fields (`CvFormFields`) with the UPDATE button below. The button shows its spinner while the request runs and stays focusable. Text: `cvs.details.update` (`en`, `pl`). The form uses `noValidate`: the messages come from the form hook. A field shows its error after the user leaves it (`useZodForm` validates on touch).
+
+- `components/CvLayout({ cvId, children })`: the shell of all four tabs, used by `app/[locale]/(app)/cvs/[cvId]/layout.tsx`. `useCvLayout` (next to it) loads the CV with `useCv`, reads the route (`usePathname` of `@/shared/i18n`) and builds the tabs and the breadcrumbs `CVs › {CV name} › {tab}` (the name in red, as in Figma). The `view` is one of:
+  - `ready`: the tab page (`children`) shows. This is the only view that shows it, so a direct link to `/cvs/{id}/skills` of another user's CV cannot get around the access check.
+  - `loading`: the skeleton, with the tabs. Data wins over `loading`: a refresh in the background does not replace a page that is shown.
+  - `failed`: `Failed to load CV details` with Retry. `notFound` and `forbidden`: the shared `ErrorScreen` (`CV not found` or `No access`) with a link back to `/cvs`, without Retry, the tabs and the CV name.
+- `components/CvDetails({ cvId })`: the Details tab. It reads the CV with `useCv` (the cache has it, so no second request) and shows `CvDetailsForm`. It shows nothing when there is no CV.
+- Routes: `cvs/[cvId]/layout.tsx` (the shell), `details/page.tsx` (`CvDetails`). `skills`, `projects` and `preview` are placeholders that return `null` until S7.3, S7.4 and S7.5; the shell already gives them the breadcrumbs and the tabs.
+- Texts: `cvs.tabs` (the four tab names and the navigation label) and `cvs.details` (`update`, `states`, `notFound`, `forbidden`), `en` and `pl`.
+- Storybook: `components/CvLayout/CvLayout.stories.tsx` (`Features/Cvs/CvLayout`): Ready, Loading, NotFound, Forbidden, LoadFailed and Polish. `components/CvDetailsForm/CvDetailsForm.stories.tsx` (`Features/Cvs/CvDetailsForm`): Default, Changed, Invalid and Polish. The active tab in the shell stories depends on the mocked route (`nextjs.navigation.pathname`); not compared with Figma.
+- Route and tab helpers: `CV_TABS` (`cvs.constants.ts`), `CvTab` (`cvs.types.ts`) and `utils/toCvTabPath(cvId, tab)`.
+
 ## Notes
 
+- **Signed-out users on the CV Details page.** The spec lists authentication errors as a separate case. `toCvLoadFailure` has no kind for it: a code like `UNAUTHENTICATED` becomes `failed`. This is decided: the page relies on the global handler in `shared/apollo/errorLink` (session refresh and redirect to sign-in, planned in PLAN D9 and S3), which is not built yet. Until it is, a signed-out user sees `failed` with Retry. When the handler exists, check that the redirect happens before this page shows an error.
 - **The description is a `role="button"` on a `<p>`**, like in projects (the same known issue). A real `<button>` would be cleaner.
 - **Two copies of `useClampedText`.** `CvDescription` and `ProjectDescription` have the same hook and nearly the same CSS. Move both to one shared place when a third list needs it. The 1023px limit is written in CSS only (no breakpoint token yet).
 - **A click on the description line does nothing for a CV that is not cut.** The row above opens the CV. This is the decided behaviour.
@@ -76,3 +100,9 @@ Rules (the same in the backend):
 - **The `NOT_FOUND` reload of a delete has no test** (`useDeleteCv.test.tsx` holds an `it.todo` with the steps; the hook needs an active `Cvs` query).
 - **The fade-out of the delete modal and the real backend were not checked by hand.**
 - **Stale total after a delete (fixed here, check the projects page).** `useDeleteCv` drops every cached `cvs` page when a CV is deleted. Before this, going back one page showed page 1 from the cache with the old total, so a second page button stayed for 10 CVs (found by the E2E test). `useDeleteProject` uses the same refetch of the open query only; it was not checked for the same problem.
+- **The shared `Tabs` differ from Figma on the CV Details page.** Figma shows four tabs of the same width (about 150px) with the line under the first one; the shared `Tabs` size each tab by its text with a 24px gap. Not changed here, because the other pages use `Tabs` too (check with the design).
+- **The tab pages after Details are placeholders** (`null`). The Skills, Projects and Preview tabs show the shell and an empty area until S7.3 to S7.5.
+- **CV Details is not checked in a browser.** Vitest passes; nobody has compared the page with the Figma frame, tried a tablet width, a screen reader or the dark theme. The form is 852px wide and centred, as measured on the 1440px frame.
+- **E2E:** `e2e/cvs/cv-details.spec.ts` covers the CV shell: breadcrumbs, the four tabs, the fields, UPDATE (disabled until a change, saved after a reload), the required-field message, the tab route after a reload, the CV not found view for another user's CV, and an admin who opens a user CV. It does not cover the Polish texts, the tablet layout or the keyboard.
+- **The build fails if the route params are read outside `<Suspense>`.** Next.js 16 treats `params` as runtime data. Read them in a small inner component wrapped in `<Suspense>` (see `cvs/[cvId]/layout.tsx`). Only `pnpm build` and the E2E run find this; the typecheck, the lint and the unit tests do not.
+- **A CV name that is very long** is not cut in the breadcrumbs (no ellipsis rule in Figma). Check how it wraps.
