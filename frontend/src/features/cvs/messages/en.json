@@ -178,5 +178,130 @@
       "notFound": "Some of these skills are not in the CV any more. The list was updated.",
       "forbidden": "You are not allowed to change this CV."
     }
+  },
+  "projects": {
+    "table": "CV projects",
+    "columns": {
+      "name": "Name",
+      "domain": "Domain",
+      "responsibilities": "Responsibilities",
+      "startDate": "Start Date",
+      "endDate": "End Date"
+    },
+    "present": "Present",
+    "dateMissing": "Date missing",
+    "noResponsibilities": "No responsibilities",
+    "actions": {
+      "add": "ADD PROJECT",
+      "column": "Actions",
+      "menu": "Actions for {name}",
+      "update": "Update",
+      "delete": "Delete"
+    },
+    "search": {
+      "label": "Search projects",
+      "placeholder": "Search"
+    },
+    "states": {
+      "loading": "Loading projects",
+      "empty": "No projects added yet",
+      "noResults": "No projects found",
+      "error": "Failed to load projects",
+      "retry": "Retry"
+    },
+    "form": {
+      "fields": {
+        "project": "Name",
+        "domain": "Domain",
+        "description": "Description",
+        "environment": "Environment",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "roles": "Roles",
+        "responsibilities": "Responsibilities"
+      },
+      "datePicker": {
+        "calendar": "Choose a date",
+        "previousMonth": "Previous month",
+        "nextMonth": "Next month",
+        "previousYear": "Previous year",
+        "nextYear": "Next year",
+        "chooseDayPrefix": "Choose",
+        "unavailableDayPrefix": "Not available",
+        "monthPrefix": "Month"
+      },
+      "environment": {
+        "remove": "Remove {option}"
+      },
+      "roles": {
+        "remove": "Remove {option}",
+        "loading": "Loading roles",
+        "failed": "The roles could not be loaded.",
+        "retry": "Retry"
+      },
+      "projectOptions": {
+        "loading": "Loading projects",
+        "failed": "The projects you can add could not be loaded.",
+        "retry": "Retry",
+        "none": "All projects of the catalog are already in this CV."
+      },
+      "errors": {
+        "projectRequired": "Project is required",
+        "startDateRequired": "Start date is required",
+        "startDateOutOfRange": "Start date must be within project duration",
+        "endDateOutOfRange": "End date must be within project duration",
+        "endDateBeforeStart": "End date cannot be earlier than start date",
+        "rolesRequired": "At least one role must be selected",
+        "rolesTooMany": "Select at most 50 roles",
+        "responsibilitiesTooLong": "Responsibilities must not exceed 2000 characters",
+        "server": {
+          "projectId": "This project cannot be added to the CV",
+          "startDate": "Start date must be within project duration",
+          "endDate": "End date must be within project duration",
+          "roleIds": "At least one valid role must be selected",
+          "responsibilities": "The server did not accept this value"
+        },
+        "invalid": "The server did not accept these values.",
+        "conflict": "This project is already in the CV, or its dates changed. Please try again.",
+        "notFound": "This CV does not exist any more.",
+        "forbidden": "You are not allowed to change this CV.",
+        "failed": "Something went wrong. Please try again later"
+      }
+    },
+    "add": {
+      "title": "Add project",
+      "close": "Close",
+      "submit": "Add",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Project added",
+        "text": "{name} was added to the CV."
+      }
+    },
+    "update": {
+      "title": "Update project",
+      "close": "Close",
+      "submit": "Save",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Project updated",
+        "text": "{name} was saved."
+      }
+    },
+    "remove": {
+      "title": "Remove project",
+      "message": "Are you sure you want to remove project <strong>{name}</strong>?",
+      "close": "Close",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "failedTitle": "Could not remove the project",
+      "failedText": "Something went wrong. Please try again.",
+      "notFound": "This project is not in the CV any more. The list was updated.",
+      "forbidden": "You are not allowed to change this CV.",
+      "success": {
+        "title": "Project removed",
+        "text": "{name} was removed from the CV."
+      }
+    }
   }
 }
