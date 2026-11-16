@@ -16,12 +16,15 @@ const cvId = cvPreviewSample.cvId;
 // renderWithProviders renders elements; this small component lets the hook run inside the same providers.
 function setup(options: RenderWithProvidersOptions) {
   let current!: ReturnType<typeof useCvPreview>;
+  // Every `loading` value the hook returned, in order: a mock answers too fast to catch a short loading state by polling.
+  const loadings: boolean[] = [];
   function Probe(): ReactNode {
     current = useCvPreview(cvId);
+    loadings.push(current.loading);
     return null;
   }
   renderWithProviders(<Probe />, options);
-  return { result: () => current };
+  return { result: () => current, loadings };
 }
 
 describe("useCvPreview", () => {
@@ -54,6 +57,18 @@ describe("useCvPreview", () => {
 
     await waitFor(() => expect(result().failed).toBe(false));
     expect(result().preview?.cvId).toBe(cvId);
+  });
+
+  it("is loading again during a retry, so the page shows the skeleton", async () => {
+    const { result, loadings } = setup({ mocks: [cvPreviewErrorMock(cvId), cvPreviewMock()] });
+    await waitFor(() => expect(result().failed).toBe(true));
+    loadings.length = 0;
+
+    act(() => result().retry());
+
+    await waitFor(() => expect(result().preview?.cvId).toBe(cvId));
+    expect(loadings).toContain(true);
+    expect(result().loading).toBe(false);
   });
 
   it("reports unauthorized when the backend answers NOT_FOUND", async () => {
