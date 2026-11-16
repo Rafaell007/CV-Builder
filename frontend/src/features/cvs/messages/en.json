@@ -303,5 +303,28 @@
         "text": "{name} was removed from the CV."
       }
     }
+  },
+  "preview": {
+    "sections": {
+      "general": {
+        "title": "General information",
+        "education": "Education",
+        "languages": "Languages",
+        "domains": "Domains"
+      },
+      "summary": {
+        "title": "Summary"
+      },
+      "skills": {
+        "title": "Skills"
+      },
+      "projects": {
+        "title": "Projects",
+        "roles": "Roles",
+        "period": "Period",
+        "responsibilities": "Responsibilities",
+        "environment": "Environment"
+      }
+    }
   }
 }

@@ -303,5 +303,28 @@
         "text": "Projekt {name} został usunięty z CV."
       }
     }
+  },
+  "preview": {
+    "sections": {
+      "general": {
+        "title": "Informacje ogólne",
+        "education": "Wykształcenie",
+        "languages": "Języki",
+        "domains": "Branże"
+      },
+      "summary": {
+        "title": "Podsumowanie"
+      },
+      "skills": {
+        "title": "Umiejętności"
+      },
+      "projects": {
+        "title": "Projekty",
+        "roles": "Role",
+        "period": "Okres",
+        "responsibilities": "Obowiązki",
+        "environment": "Środowisko"
+      }
+    }
   }
 }
