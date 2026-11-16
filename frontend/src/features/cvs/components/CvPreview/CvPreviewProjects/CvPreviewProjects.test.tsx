@@ -33,6 +33,19 @@ describe("CvPreviewProjects", () => {
     expect(project.getByText("Next.js")).toBeInTheDocument();
   });
 
+  it("hides the description and the environment when they are empty", () => {
+    const [first] = cvPreviewSample.projects;
+    if (!first) throw new Error("The sample has no project");
+    renderWithProviders(
+      <CvPreviewProjects projects={[{ ...first, description: "", environment: [] }]} />,
+    );
+
+    const project = within(projectArticle("Banking Portal"));
+    expect(project.queryByText("A web portal for retail banking customers.")).toBeNull();
+    expect(project.queryByText("Environment")).not.toBeInTheDocument();
+    expect(project.getByText("Period")).toBeInTheDocument();
+  });
+
   it("shows the period text exactly as the backend sent it", () => {
     const [first] = cvPreviewSample.projects;
     if (!first) throw new Error("The sample has no project");

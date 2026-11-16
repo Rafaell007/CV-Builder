@@ -8,7 +8,8 @@ export interface CvPreviewProjectsProps {
 
 /**
  * The projects of the CV document. Each project shows its name, description, roles, period (the text of the
- * backend), responsibilities and environment. Roles and responsibilities are hidden when empty.
+ * backend), responsibilities and environment. The description, roles, responsibilities and environment are hidden
+ * when empty.
  */
 export function CvPreviewProjects({ projects }: CvPreviewProjectsProps) {
   const t = useTranslations("cvs.preview.sections.projects");
@@ -21,7 +22,7 @@ export function CvPreviewProjects({ projects }: CvPreviewProjectsProps) {
       {projects.map((project, index) => (
         <article key={`${project.name}-${index}`} className={styles.project}>
           <h3 className={styles.name}>{project.name}</h3>
-          <p className={styles.text}>{project.description}</p>
+          {project.description ? <p className={styles.text}>{project.description}</p> : null}
           <dl className={styles.details}>
             {project.roles.length > 0 ? (
               <div className={styles.detail}>
@@ -41,10 +42,12 @@ export function CvPreviewProjects({ projects }: CvPreviewProjectsProps) {
                 </dd>
               </div>
             ) : null}
-            <div className={styles.detail}>
-              <dt className={styles.label}>{t("environment")}</dt>
-              <dd className={styles.value}>{project.environment.join(", ")}</dd>
-            </div>
+            {project.environment.length > 0 ? (
+              <div className={styles.detail}>
+                <dt className={styles.label}>{t("environment")}</dt>
+                <dd className={styles.value}>{project.environment.join(", ")}</dd>
+              </div>
+            ) : null}
           </dl>
         </article>
       ))}
