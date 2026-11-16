@@ -158,18 +158,18 @@ test.describe("CV Projects page, as a user", () => {
     await expect(row(page, "Banking Portal")).toContainText("Led the transfer screens.");
   });
 
-  test("shows an inline message for an end date earlier than the start date, and keeps SAVE disabled", async ({
-    page,
-  }) => {
+  test("ignores a typed end date earlier than the start date", async ({ page }) => {
     await page.goto(`/en/cvs/${cvId}/projects`);
     await openRowMenu(page, "Banking Portal", "Update");
     const dialog = updateDialog(page);
+    const end = dialog.getByRole("textbox", { name: "End Date" });
 
-    await dialog.getByRole("textbox", { name: "End Date" }).fill("01/15/2022");
-    await dialog.getByRole("textbox", { name: "End Date" }).blur();
+    // Inside the days of the project, but before the start date of 03/01/2022: the picker ignores it and keeps the old date.
+    await end.fill("01/15/2022");
+    await end.blur();
 
-    await expect(dialog.getByText("End date cannot be earlier than start date")).toBeVisible();
-    await expect(dialog.getByRole("button", { name: "Save" })).toBeDisabled();
+    await expect(end).toHaveValue("06/30/2023");
+    await expect(dialog.getByText("End date cannot be earlier than start date")).toBeHidden();
   });
 
   test("removes a project after a confirmation, a cancel removes nothing, and the project stays in the catalog", async ({

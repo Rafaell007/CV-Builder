@@ -13,7 +13,9 @@ const skill = (page: Page, name: string, level?: string) =>
   page.getByRole("button", { name: level ? `${name} Mastery: ${level}` : new RegExp(`^${name}`) });
 const addDialog = (page: Page) => page.getByRole("dialog", { name: "Add skill" });
 const updateDialog = (page: Page) => page.getByRole("dialog", { name: "Update skill" });
-const skillField = (page: Page) => addDialog(page).getByRole("combobox", { name: /Skill/ });
+// Exact: the modal also has an optional "Skill mastery" field, which /Skill/ matched as well.
+const skillField = (page: Page) =>
+  addDialog(page).getByRole("combobox", { name: "Skill", exact: true });
 
 async function openAddModal(page: Page) {
   await page.getByRole("button", { name: "ADD SKILL" }).click();
