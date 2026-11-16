@@ -18,7 +18,7 @@ describe("CvPreviewProjects", () => {
     const project = within(projectArticle("Banking Portal"));
     expect(project.getByText("A web portal for retail banking customers.")).toBeInTheDocument();
     expect(project.getByText("Frontend Developer, Team Lead")).toBeInTheDocument();
-    expect(project.getByText("Jan 2022 - Present")).toBeInTheDocument();
+    expect(project.getByText("01.2022 – Till now")).toBeInTheDocument();
     expect(project.getByText("Built the account pages and led code reviews.")).toBeInTheDocument();
     expect(project.getByText("React, TypeScript")).toBeInTheDocument();
   });
@@ -29,7 +29,7 @@ describe("CvPreviewProjects", () => {
     const project = within(projectArticle("Online Shop"));
     expect(project.queryByText("Roles")).not.toBeInTheDocument();
     expect(project.queryByText("Responsibilities")).not.toBeInTheDocument();
-    expect(project.getByText("Mar 2020 - Dec 2021")).toBeInTheDocument();
+    expect(project.getByText("03.2020 – 12.2021")).toBeInTheDocument();
     expect(project.getByText("Next.js")).toBeInTheDocument();
   });
 
