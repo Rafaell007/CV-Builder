@@ -1,4 +1,4 @@
-import { ConflictException, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, ConflictException, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { Clock } from "../../common/clock";
@@ -6,8 +6,13 @@ import type { Environment } from "../../config";
 import { Prisma } from "../../generated/prisma/client";
 import { Role } from "../../generated/prisma/enums";
 import type { PrismaService } from "../../prisma/prisma.service";
-import { AuthService, EMAIL_TAKEN_REASON, REFRESH_GRACE_WINDOW_MS } from "./auth.service";
-import { hashPassword } from "./password";
+import {
+  AuthService,
+  CURRENT_PASSWORD_INCORRECT_REASON,
+  EMAIL_TAKEN_REASON,
+  REFRESH_GRACE_WINDOW_MS,
+} from "./auth.service";
+import { hashPassword, verifyPassword } from "./password";
 import { REFRESH_TOKEN_TTL_MS, TokenService } from "./sessions/token.service";
 import type { VerificationService } from "./verification/verification.service";
 
@@ -15,13 +20,14 @@ const NOW = new Date("2026-07-12T10:00:00.000Z");
 const PASSWORD = "Password123!";
 
 const prisma = {
-  user: { findUnique: jest.fn(), create: jest.fn() },
+  user: { findUnique: jest.fn(), create: jest.fn(), update: jest.fn() },
   refreshToken: {
     create: jest.fn(),
     findUnique: jest.fn(),
     updateMany: jest.fn(),
     deleteMany: jest.fn(),
   },
+  $transaction: jest.fn(),
 };
 
 const verification = { issueCode: jest.fn() };
@@ -345,6 +351,82 @@ describe("AuthService", () => {
       await createService().signOut(undefined);
 
       expect(prisma.refreshToken.findUnique).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("changePassword", () => {
+    const NEW_PASSWORD = "NewPassword456!";
+
+    beforeEach(async () => {
+      prisma.user.findUnique.mockResolvedValue({ passwordHash: await hashPassword(PASSWORD) });
+      prisma.user.update.mockResolvedValue({ tokenVersion: 3 });
+      // The transaction client is the same mock, so the calls inside it can be checked as usual.
+      prisma.$transaction.mockImplementation((work: (tx: typeof prisma) => unknown) =>
+        work(prisma),
+      );
+    });
+
+    it("saves a hash of the new password and raises the token version in one transaction", async () => {
+      await createService().changePassword("user-1", {
+        currentPassword: PASSWORD,
+        newPassword: NEW_PASSWORD,
+      });
+
+      expect(prisma.$transaction).toHaveBeenCalledTimes(1);
+      const [{ where, data }] = prisma.user.update.mock.calls[0] as [
+        { where: unknown; data: { passwordHash: string; tokenVersion: unknown } },
+      ];
+      expect(where).toEqual({ id: "user-1" });
+      expect(data.passwordHash).not.toContain(NEW_PASSWORD);
+      expect(await verifyPassword(data.passwordHash, NEW_PASSWORD)).toBe(true);
+      expect(data.tokenVersion).toEqual({ increment: 1 });
+    });
+
+    it("deletes every refresh token of the user and opens a new session with the new version", async () => {
+      const session = await createService().changePassword("user-1", {
+        currentPassword: PASSWORD,
+        newPassword: NEW_PASSWORD,
+      });
+
+      expect(prisma.refreshToken.deleteMany).toHaveBeenCalledWith({ where: { userId: "user-1" } });
+      expect(prisma.refreshToken.deleteMany.mock.invocationCallOrder[0]).toBeLessThan(
+        prisma.refreshToken.create.mock.invocationCallOrder[0] ?? 0,
+      );
+      const [{ data }] = prisma.refreshToken.create.mock.calls[0] as [
+        { data: Record<string, unknown> },
+      ];
+      expect(data["tokenHash"]).toBe(tokens.hashRefreshToken(session.refreshToken));
+      expect(data["familyId"]).toEqual(expect.any(String));
+      await expect(tokens.verifyAccessToken(session.accessToken)).resolves.toEqual({
+        userId: "user-1",
+        tokenVersion: 3,
+      });
+    });
+
+    it("answers BAD_USER_INPUT with the reason CURRENT_PASSWORD_INCORRECT and changes nothing", async () => {
+      const result = createService().changePassword("user-1", {
+        currentPassword: "Wrong-password1",
+        newPassword: NEW_PASSWORD,
+      });
+
+      await expect(result).rejects.toBeInstanceOf(BadRequestException);
+      await expect(result).rejects.toMatchObject({
+        response: { reason: CURRENT_PASSWORD_INCORRECT_REASON },
+      });
+      expect(prisma.$transaction).not.toHaveBeenCalled();
+      expect(prisma.refreshToken.deleteMany).not.toHaveBeenCalled();
+    });
+
+    it("ends the session when the user no longer exists", async () => {
+      prisma.user.findUnique.mockResolvedValue(null);
+
+      await expect(
+        createService().changePassword("gone", {
+          currentPassword: PASSWORD,
+          newPassword: NEW_PASSWORD,
+        }),
+      ).rejects.toThrow(UnauthorizedException);
+      expect(prisma.$transaction).not.toHaveBeenCalled();
     });
   });
 
