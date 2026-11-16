@@ -303,5 +303,18 @@
         "text": "{name} was removed from the CV."
       }
     }
+  },
+  "preview": {
+    "skillsTable": {
+      "caption": "Professional skills",
+      "columns": {
+        "category": "Skills Category",
+        "skill": "Skill",
+        "experience": "Experience in Years",
+        "lastUsed": "Last Used"
+      },
+      "notAvailable": "{column}: not available",
+      "empty": "No skills added"
+    }
   }
 }

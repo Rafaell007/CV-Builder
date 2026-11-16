@@ -303,5 +303,18 @@
         "text": "Projekt {name} został usunięty z CV."
       }
     }
+  },
+  "preview": {
+    "skillsTable": {
+      "caption": "Umiejętności zawodowe",
+      "columns": {
+        "category": "Kategoria umiejętności",
+        "skill": "Umiejętność",
+        "experience": "Doświadczenie w latach",
+        "lastUsed": "Ostatnio używana"
+      },
+      "notAvailable": "{column}: brak danych",
+      "empty": "Brak dodanych umiejętności"
+    }
   }
 }

@@ -1,0 +1,51 @@
+/* Wide content scrolls sideways at tablet width instead of breaking the page. */
+.scroll {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--color-text);
+}
+
+.headCell {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  font: var(--text-table-header);
+  letter-spacing: var(--text-table-header-ls);
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Lines sit on the cells, not on the <tbody>: collapsed borders on row groups differ between browsers. */
+.category,
+.cell {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  font: var(--text-table-cell);
+  letter-spacing: var(--text-table-cell-ls);
+  text-align: left;
+}
+
+/* A thicker line under the last skill of a category separates the blocks. The category cell spans all rows, so its bottom edge is the block end. */
+.category {
+  vertical-align: top;
+  border-bottom-width: 2px;
+  font-weight: 600;
+}
+
+.row:last-child .cell {
+  border-bottom-width: 2px;
+}
+
+.empty {
+  padding: var(--space-4);
+  font: var(--text-table-cell);
+  letter-spacing: var(--text-table-cell-ls);
+  text-align: center;
+}
+
+.visuallyHidden {
+  composes: visuallyHidden from "../../../../../shared/styles/visuallyHidden.module.css";
+}
