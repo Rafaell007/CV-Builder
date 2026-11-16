@@ -87,7 +87,8 @@ export function useChangePassword() {
   return {
     getFieldProps,
     pending: loading,
-    canSubmit: isValid && !loading,
+    // Only validity: while `pending` the Button blocks clicks itself and keeps the focus (aria-disabled, not disabled).
+    canSubmit: isValid,
     formError:
       failure !== null && failure !== "currentPasswordIncorrect" ? translate(failure) : undefined,
     onSubmit: (event: FormEvent<HTMLFormElement>) => {
