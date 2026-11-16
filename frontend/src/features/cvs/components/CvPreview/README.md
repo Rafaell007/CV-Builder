@@ -18,4 +18,4 @@ Heading levels: each section is an `h2` with `h3` parts inside. Texts are in `cv
 
 - **The page `h1` is missing on purpose.** `CvPreviewHeader` uses an `h2` for the name. The container (KAN-160) must render the page `h1`. Without it, the heading order of the page is wrong.
 - **No `index.ts` in `components/CvPreview/`.** It was left out to avoid a merge conflict with KAN-159. KAN-160 adds it. Until then, import from the component folder, for example `./CvPreview/CvPreviewHeader`.
-- **Open checks:** the layout was not compared with Figma, and the dark theme was not tested. See the Jira ticket for these checks.
+- **Open checks:** the layout was not compared with Figma, and the dark theme was not tested. See KAN-161 for these checks.
