@@ -1,0 +1,45 @@
+/* Wide content scrolls sideways at tablet width instead of breaking the page. */
+.scroll {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--color-text);
+}
+
+.headCell {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  font: var(--text-table-header);
+  letter-spacing: var(--text-table-header-ls);
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* A thicker line between categories separates the blocks. */
+.group {
+  border-bottom: 2px solid var(--color-border);
+}
+
+.row:not(:last-child) {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.category,
+.cell {
+  padding: var(--space-3) var(--space-4);
+  font: var(--text-table-cell);
+  letter-spacing: var(--text-table-cell-ls);
+  text-align: left;
+}
+
+.category {
+  vertical-align: top;
+  font-weight: 600;
+}
+
+.visuallyHidden {
+  composes: visuallyHidden from "../../../../../shared/styles/visuallyHidden.module.css";
+}
