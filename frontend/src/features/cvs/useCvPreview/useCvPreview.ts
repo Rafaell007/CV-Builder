@@ -1,0 +1,38 @@
+"use client";
+
+import { useQuery } from "@apollo/client/react";
+import { CvPreviewDocument } from "@/shared/graphql";
+import type { CvPreviewData } from "../cvs.types";
+import { toCvLoadFailure } from "../utils";
+
+export type UseCvPreviewResult = {
+  /** The whole CV as the backend put it together. `undefined` while it loads and after a failure. */
+  preview: CvPreviewData | undefined;
+  loading: boolean;
+  /** The request failed in a way where Retry can help (network or server error). */
+  failed: boolean;
+  /** The CV is missing or the user may not open it (`NOT_FOUND` or `FORBIDDEN`). Retry cannot help. */
+  unauthorized: boolean;
+  /** Sends the failed request again for the same CV id. */
+  retry: () => void;
+};
+
+/** Loads the CV preview with the `CvPreview` query. The backend decides who may see it, so the page never checks the owner itself. */
+export function useCvPreview(cvId: string): UseCvPreviewResult {
+  // notifyOnNetworkStatusChange: `loading` is true again during a retry, so the page shows the skeleton.
+  const { data, loading, error, refetch } = useQuery(CvPreviewDocument, {
+    variables: { cvId },
+    notifyOnNetworkStatusChange: true,
+  });
+
+  const failure = error === undefined ? undefined : toCvLoadFailure(error);
+
+  return {
+    preview: data?.cvPreview,
+    loading,
+    failed: failure === "failed",
+    unauthorized: failure === "notFound" || failure === "forbidden",
+    // The error is already in the hook state, so the rejected promise of refetch needs no second handler.
+    retry: () => void refetch().catch(() => undefined),
+  };
+}
