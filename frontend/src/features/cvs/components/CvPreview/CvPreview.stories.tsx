@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect } from "storybook/test";
+import { expect, waitFor } from "storybook/test";
 import {
   cvPreviewErrorMock,
   cvPreviewForbiddenMock,
@@ -47,7 +47,9 @@ export const Tablet: Story = {
 export const Loading: Story = {
   parameters: { apollo: { mocks: [{ ...cvPreviewMock(), delay: NEVER }] } },
   play: async ({ canvas }) => {
-    await expect(await canvas.findByRole("status", { name: "Loading CV preview" })).toBeVisible();
+    const skeleton = await canvas.findByRole("status", { name: "Loading CV preview" });
+    // The skeleton fades in, so it is not visible until the fade ends.
+    await waitFor(() => expect(skeleton).toBeVisible());
   },
 };
 

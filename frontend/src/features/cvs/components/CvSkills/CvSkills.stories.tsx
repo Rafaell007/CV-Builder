@@ -70,7 +70,9 @@ export const Tablet: Story = {
 export const Loading: Story = {
   parameters: { apollo: { mocks: [{ ...cvSkillsMock(), delay: NEVER }] } },
   play: async ({ canvas }) => {
-    await expect(await canvas.findByRole("status", { name: "Loading skills" })).toBeVisible();
+    const skeleton = await canvas.findByRole("status", { name: "Loading skills" });
+    // The skeleton fades in, so it is not visible until the fade ends.
+    await waitFor(() => expect(skeleton).toBeVisible());
     await expect(canvas.getByRole("button", { name: "ADD SKILL" })).toBeDisabled();
   },
 };
