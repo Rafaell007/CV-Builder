@@ -16,6 +16,7 @@
     }
   },
   "changePassword": {
+    "title": "Zmiana hasła",
     "currentPassword": "Hasło",
     "newPassword": "Nowe hasło",
     "confirmPassword": "Potwierdź hasło",

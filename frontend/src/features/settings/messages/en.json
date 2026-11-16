@@ -16,6 +16,7 @@
     }
   },
   "changePassword": {
+    "title": "Change password",
     "currentPassword": "Password",
     "newPassword": "New Password",
     "confirmPassword": "Confirm Password",

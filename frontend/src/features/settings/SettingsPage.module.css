@@ -1,0 +1,11 @@
+/* Values: docs/design-tokens.md › Components › Settings. Same column as the CV Details form. */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 852px;
+  margin: 0 auto;
+  padding-top: var(--space-4);
+}
