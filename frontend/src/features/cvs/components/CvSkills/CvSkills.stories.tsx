@@ -119,7 +119,7 @@ export const AddSkillModal: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "ADD SKILL" }));
 
     const dialog = within(await within(document.body).findByRole("dialog", { name: "Add skill" }));
-    const field = dialog.getByRole("combobox", { name: /Skill/ });
+    const field = dialog.getByRole("combobox", { name: "Skill" });
     await waitFor(() => expect(field).toBeEnabled());
     await expect(dialog.getByRole("button", { name: "Add" })).toBeDisabled();
     await userEvent.click(field);

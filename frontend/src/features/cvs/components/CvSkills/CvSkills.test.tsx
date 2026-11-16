@@ -86,7 +86,7 @@ describe("CvSkills", () => {
       const { user, dialog } = await openAddModal(withAdd());
 
       expect(within(dialog).getByRole("button", { name: "Add" })).toBeDisabled();
-      const field = within(dialog).getByRole("combobox", { name: /Skill/ });
+      const field = within(dialog).getByRole("combobox", { name: "Skill" });
       await waitFor(() => expect(field).toBeEnabled());
       await user.click(field);
 
@@ -106,7 +106,7 @@ describe("CvSkills", () => {
       const { user, dialog } = await openAddModal(
         withAdd(addCvSkillMock(docker), cvSkillsMock([...sampleSkills, added])),
       );
-      const field = within(dialog).getByRole("combobox", { name: /Skill/ });
+      const field = within(dialog).getByRole("combobox", { name: "Skill" });
       await waitFor(() => expect(field).toBeEnabled());
       await user.click(field);
       await user.click(screen.getByRole("option", { name: "Docker" }));
@@ -119,13 +119,59 @@ describe("CvSkills", () => {
       expect(screen.getByText("Skill added")).toBeInTheDocument();
     });
 
+    it("shows an optional Skill mastery field and keeps ADD enabled without a mastery", async () => {
+      const { user, dialog } = await openAddModal(withAdd());
+      const field = within(dialog).getByRole("combobox", { name: "Skill" });
+      await waitFor(() => expect(field).toBeEnabled());
+      await user.click(field);
+      await user.click(screen.getByRole("option", { name: "Docker" }));
+
+      const mastery = within(dialog).getByRole("combobox", { name: "Skill mastery" });
+      expect(mastery).toBeEnabled();
+      await user.click(mastery);
+      expect(screen.getAllByRole("option").map((option) => option.textContent)).toEqual([
+        "Beginner",
+        "Elementary",
+        "Intermediate",
+        "Advanced",
+        "Expert",
+      ]);
+      await user.keyboard("{Escape}");
+      expect(within(dialog).getByRole("button", { name: "Add" })).toBeEnabled();
+    });
+
+    it("sends the chosen mastery with the skill", async () => {
+      const added = cvSkill({
+        id: "link-new",
+        skillId: docker.id,
+        name: docker.name,
+        mastery: "EXPERT",
+        category: docker.category,
+      });
+      const { user, dialog } = await openAddModal(
+        withAdd(addCvSkillMock(docker, CV_ID, "EXPERT"), cvSkillsMock([...sampleSkills, added])),
+      );
+      const field = within(dialog).getByRole("combobox", { name: "Skill" });
+      await waitFor(() => expect(field).toBeEnabled());
+      await user.click(field);
+      await user.click(screen.getByRole("option", { name: "Docker" }));
+      await user.click(within(dialog).getByRole("combobox", { name: "Skill mastery" }));
+      await user.click(screen.getByRole("option", { name: "Expert" }));
+
+      await user.click(within(dialog).getByRole("button", { name: "Add" }));
+
+      expect(
+        await screen.findByRole("button", { name: "Docker Mastery: Expert" }),
+      ).toBeInTheDocument();
+    });
+
     it("says why there is nothing to choose when the owner has no more skills", async () => {
       const { dialog } = await openAddModal({
         mocks: [cvSkillsMock(), availableCvSkillsMock([])],
       });
 
       expect(await within(dialog).findByText(/has no more skills to add/)).toBeInTheDocument();
-      expect(within(dialog).getByRole("combobox", { name: /Skill/ })).toBeDisabled();
+      expect(within(dialog).getByRole("combobox", { name: "Skill" })).toBeDisabled();
       expect(within(dialog).getByRole("button", { name: "Add" })).toBeDisabled();
     });
 
@@ -144,7 +190,7 @@ describe("CvSkills", () => {
       await user.click(within(dialog).getByRole("button", { name: "Retry" }));
 
       await waitFor(() =>
-        expect(within(dialog).getByRole("combobox", { name: /Skill/ })).toBeEnabled(),
+        expect(within(dialog).getByRole("combobox", { name: "Skill" })).toBeEnabled(),
       );
     });
 
@@ -153,7 +199,7 @@ describe("CvSkills", () => {
         // After CONFLICT the options load again.
         withAdd(addCvSkillRefusedMock(docker.id, "CONFLICT"), availableCvSkillsMock([docker])),
       );
-      const field = within(dialog).getByRole("combobox", { name: /Skill/ });
+      const field = within(dialog).getByRole("combobox", { name: "Skill" });
       await waitFor(() => expect(field).toBeEnabled());
       await user.click(field);
       await user.click(screen.getByRole("option", { name: "Docker" }));
@@ -169,7 +215,7 @@ describe("CvSkills", () => {
 
     it("shows a failed request in the modal and keeps the chosen skill (AC-42)", async () => {
       const { user, dialog } = await openAddModal(withAdd(addCvSkillNetworkErrorMock(docker.id)));
-      const field = within(dialog).getByRole("combobox", { name: /Skill/ });
+      const field = within(dialog).getByRole("combobox", { name: "Skill" });
       await waitFor(() => expect(field).toBeEnabled());
       await user.click(field);
       await user.click(screen.getByRole("option", { name: "Docker" }));
@@ -184,7 +230,7 @@ describe("CvSkills", () => {
       const { user, dialog } = await openAddModal(
         withAdd(addCvSkillRefusedMock(docker.id, "FORBIDDEN")),
       );
-      const field = within(dialog).getByRole("combobox", { name: /Skill/ });
+      const field = within(dialog).getByRole("combobox", { name: "Skill" });
       await waitFor(() => expect(field).toBeEnabled());
       await user.click(field);
       await user.click(screen.getByRole("option", { name: "Docker" }));
@@ -203,7 +249,7 @@ describe("CvSkills", () => {
           availableCvSkillsMock([docker]),
         ),
       );
-      const field = within(dialog).getByRole("combobox", { name: /Skill/ });
+      const field = within(dialog).getByRole("combobox", { name: "Skill" });
       await waitFor(() => expect(field).toBeEnabled());
       await user.click(field);
       await user.click(screen.getByRole("option", { name: "Docker" }));
@@ -213,7 +259,7 @@ describe("CvSkills", () => {
       await user.click(screen.getByRole("button", { name: "ADD SKILL" }));
 
       const reopened = await screen.findByRole("dialog", { name: "Add skill" });
-      expect(within(reopened).getByRole("combobox", { name: /Skill/ })).toHaveTextContent("");
+      expect(within(reopened).getByRole("combobox", { name: "Skill" })).toHaveTextContent("");
       expect(within(reopened).getByRole("button", { name: "Add" })).toBeDisabled();
     });
   });
@@ -232,7 +278,7 @@ describe("CvSkills", () => {
     it("shows the current skill in a disabled field and keeps SAVE disabled until the mastery changes (AC-23, AC-24)", async () => {
       const { dialog } = await openUpdateModal({ mocks: [cvSkillsMock()] });
 
-      const skill = within(dialog).getByRole("combobox", { name: /Skill/ });
+      const skill = within(dialog).getByRole("combobox", { name: "Skill" });
       expect(skill).toBeDisabled();
       expect(skill).toHaveTextContent("TypeScript");
       expect(within(dialog).getByRole("combobox", { name: /Mastery/ })).toHaveTextContent(

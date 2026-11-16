@@ -131,6 +131,7 @@
       "title": "Add skill",
       "close": "Close",
       "skill": "Skill",
+      "mastery": "Skill mastery",
       "submit": "Add",
       "cancel": "Cancel",
       "loading": "Loading skills",

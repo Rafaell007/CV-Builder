@@ -1,6 +1,8 @@
 import { useTranslations } from "next-intl";
 import { FormModal, Select } from "@/shared/components";
+import { MASTERY_LEVELS } from "../cvSkills.constants";
 import type { UseAddCvSkillResult } from "../useAddCvSkill";
+import { useMasteryLabel } from "../useMasteryLabel";
 import styles from "./AddCvSkillModal.module.css";
 
 export interface AddCvSkillModalProps {
@@ -8,14 +10,20 @@ export interface AddCvSkillModalProps {
   adding: UseAddCvSkillResult;
 }
 
-/** The Add skill modal: one Skill field with the skills of the CV owner, ADD and CANCEL (page 22, Add Skill). */
+/**
+ * The Add skill modal: the Skill field with the skills of the CV owner, the optional Skill mastery field, ADD and
+ * CANCEL. The doc of page 22 lists only Skill, but Figma shows the mastery and Figma wins (agreed with Rafal).
+ */
 export function AddCvSkillModal({ adding }: AddCvSkillModalProps) {
   const t = useTranslations("cvs.skills.add");
+  const masteryLabel = useMasteryLabel();
   const {
     isOpen,
     setOpen,
     skillId,
     select,
+    mastery,
+    selectMastery,
     submit,
     pending,
     options,
@@ -52,6 +60,15 @@ export function AddCvSkillModal({ adding }: AddCvSkillModalProps) {
         disabled={optionsLoading || optionsFailed || noneLeft}
         error={fieldError}
         required
+      />
+      <Select
+        label={t("mastery")}
+        options={MASTERY_LEVELS.map(({ level }) => ({ value: level, label: masteryLabel(level) }))}
+        value={mastery}
+        onValueChange={(value) => {
+          const next = MASTERY_LEVELS.find(({ level }) => level === value);
+          if (next) selectMastery(next.level);
+        }}
       />
       {optionsLoading && (
         <p role="status" className={styles.status}>
