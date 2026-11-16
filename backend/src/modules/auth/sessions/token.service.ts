@@ -17,10 +17,10 @@ export class TokenService {
     private readonly config: ConfigService<Environment, true>,
   ) {}
 
-  /** A signed JWT that holds only the user id. Role and verification are read fresh on every request. */
-  signAccessToken(userId: string): Promise<string> {
+  /** A signed JWT that holds the user id and the user's token version. Role and verification are read fresh on every request. */
+  signAccessToken(userId: string, tokenVersion: number): Promise<string> {
     return this.jwt.signAsync(
-      {},
+      { tokenVersion },
       {
         subject: userId,
         secret: this.config.get("JWT_ACCESS_SECRET", { infer: true }),
@@ -30,14 +30,19 @@ export class TokenService {
     );
   }
 
-  /** The user id inside a valid, unexpired access token. `undefined` for anything else. */
-  async verifyAccessToken(token: string): Promise<string | undefined> {
+  /** The user id and token version inside a valid, unexpired access token. `undefined` for anything else. */
+  async verifyAccessToken(
+    token: string,
+  ): Promise<{ userId: string; tokenVersion: number } | undefined> {
     try {
-      const payload = await this.jwt.verifyAsync<{ sub?: unknown }>(token, {
+      const payload = await this.jwt.verifyAsync<{ sub?: unknown; tokenVersion?: unknown }>(token, {
         secret: this.config.get("JWT_ACCESS_SECRET", { infer: true }),
         algorithms: [ALGORITHM], // never trust the algorithm named in the token itself
       });
-      return typeof payload.sub === "string" ? payload.sub : undefined;
+      if (typeof payload.sub !== "string" || typeof payload.tokenVersion !== "number") {
+        return undefined;
+      }
+      return { userId: payload.sub, tokenVersion: payload.tokenVersion };
     } catch {
       return undefined; // bad signature, expired or malformed
     }

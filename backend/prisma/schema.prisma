@@ -56,6 +56,7 @@ model User {
   passwordHash String
   role         Role     @default(USER)
   isVerified   Boolean  @default(false)
+  tokenVersion Int      @default(0)
   firstName    String?  @db.VarChar(100)
   lastName     String?  @db.VarChar(100)
   departmentId String?  @db.Uuid

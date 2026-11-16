@@ -78,7 +78,10 @@ describe("AuthService", () => {
       expect(data).not.toHaveProperty("isVerified");
       expect(verification.issueCode).toHaveBeenCalledWith(SIGNED_UP);
       expect(session.user).toEqual(SIGNED_UP);
-      await expect(tokens.verifyAccessToken(session.accessToken)).resolves.toBe("user-2");
+      await expect(tokens.verifyAccessToken(session.accessToken)).resolves.toEqual({
+        userId: "user-2",
+        tokenVersion: 0,
+      });
       expect(prisma.refreshToken.create).toHaveBeenCalledTimes(1);
     });
 
@@ -131,6 +134,7 @@ describe("AuthService", () => {
         firstName: "Una",
         lastName: "User",
         passwordHash: await hashPassword(PASSWORD),
+        tokenVersion: 4,
       };
     }
 
@@ -150,7 +154,10 @@ describe("AuthService", () => {
         firstName: "Una",
         lastName: "User",
       });
-      await expect(tokens.verifyAccessToken(session.accessToken)).resolves.toBe("user-1");
+      await expect(tokens.verifyAccessToken(session.accessToken)).resolves.toEqual({
+        userId: "user-1",
+        tokenVersion: 4,
+      });
 
       const [{ data }] = prisma.refreshToken.create.mock.calls[0] as [
         { data: Record<string, unknown> },
@@ -212,6 +219,7 @@ describe("AuthService", () => {
         familyId: "family-1",
         expiresAt: new Date(NOW.getTime() + hour),
         replacedAt: null,
+        user: { tokenVersion: 2 },
         ...overrides,
       };
     }
@@ -235,7 +243,10 @@ describe("AuthService", () => {
         },
       });
       expect(result.refreshToken).not.toBe("old-token");
-      await expect(tokens.verifyAccessToken(result.accessToken)).resolves.toBe("user-1");
+      await expect(tokens.verifyAccessToken(result.accessToken)).resolves.toEqual({
+        userId: "user-1",
+        tokenVersion: 2,
+      });
     });
 
     it("lets a replaced token be used once inside the grace window", async () => {
@@ -341,17 +352,26 @@ describe("AuthService", () => {
     it("returns the id, role and verification of an existing user", async () => {
       prisma.user.findUnique.mockResolvedValue({ id: "u", role: Role.ADMIN, isVerified: false });
 
-      await expect(createService().findAuthUser("u")).resolves.toEqual({
+      await expect(createService().findAuthUser("u", 0)).resolves.toEqual({
         id: "u",
         role: Role.ADMIN,
         isVerified: false,
       });
     });
 
+    it("matches the token version too, so a token from before a password change finds no one", async () => {
+      prisma.user.findUnique.mockResolvedValue(null);
+
+      await expect(createService().findAuthUser("u", 1)).resolves.toBeUndefined();
+      expect(prisma.user.findUnique).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: "u", tokenVersion: 1 } }),
+      );
+    });
+
     it("returns undefined when the user no longer exists", async () => {
       prisma.user.findUnique.mockResolvedValue(null);
 
-      await expect(createService().findAuthUser("gone")).resolves.toBeUndefined();
+      await expect(createService().findAuthUser("gone", 0)).resolves.toBeUndefined();
     });
   });
 

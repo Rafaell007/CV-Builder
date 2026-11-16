@@ -75,14 +75,15 @@ export class AuthService {
       );
     }
 
-    return { user, ...(await this.issueTokens(user.id, randomUUID())) };
+    // A new user starts at token version 0 (the database default).
+    return { user, ...(await this.issueTokens(user.id, 0, randomUUID())) };
   }
 
   /** Checks the credentials and opens a session. The error never says which of the two was wrong. */
   async signIn({ email, password }: SignInInput): Promise<SignedInSession> {
     const user = await this.prisma.user.findUnique({
       where: { email: email.trim().toLowerCase() },
-      select: { ...SESSION_USER_SELECT, passwordHash: true },
+      select: { ...SESSION_USER_SELECT, passwordHash: true, tokenVersion: true },
     });
 
     const passwordMatches = await verifyPassword(
@@ -103,7 +104,7 @@ export class AuthService {
       lastName: user.lastName,
     };
     // a new sign-in starts a new family of refresh tokens (D21)
-    const tokens = await this.issueTokens(user.id, randomUUID());
+    const tokens = await this.issueTokens(user.id, user.tokenVersion, randomUUID());
 
     return { user: sessionUser, ...tokens };
   }
@@ -121,7 +122,14 @@ export class AuthService {
     const now = this.clock.now();
     const stored = await this.prisma.refreshToken.findUnique({
       where: { tokenHash: this.tokens.hashRefreshToken(refreshToken) },
-      select: { id: true, userId: true, familyId: true, expiresAt: true, replacedAt: true },
+      select: {
+        id: true,
+        userId: true,
+        familyId: true,
+        expiresAt: true,
+        replacedAt: true,
+        user: { select: { tokenVersion: true } },
+      },
     });
     if (stored === null || stored.expiresAt <= now) throw new UnauthorizedException(SESSION_ENDED);
 
@@ -132,7 +140,8 @@ export class AuthService {
         where: { id: stored.id, replacedAt: null },
         data: { replacedAt: now },
       });
-      if (count === 1) return this.issueTokens(stored.userId, stored.familyId);
+      if (count === 1)
+        return this.issueTokens(stored.userId, stored.user.tokenVersion, stored.familyId);
     } else if (now.getTime() - stored.replacedAt.getTime() > REFRESH_GRACE_WINDOW_MS) {
       return this.revokeFamily(stored.familyId);
     }
@@ -143,7 +152,7 @@ export class AuthService {
       data: { graceUsedAt: now },
     });
     if (count === 0) return this.revokeFamily(stored.familyId);
-    return this.issueTokens(stored.userId, stored.familyId);
+    return this.issueTokens(stored.userId, stored.user.tokenVersion, stored.familyId);
   }
 
   /** Ends the session of this refresh token on this server. An unknown or missing token is not an error. */
@@ -159,10 +168,10 @@ export class AuthService {
     }
   }
 
-  /** What the guards need, read fresh so a changed role or a deleted user takes effect at once. */
-  async findAuthUser(userId: string): Promise<AuthUser | undefined> {
+  /** The signed-in user, or `undefined` when the user is gone or the token is from before a password change. */
+  async findAuthUser(userId: string, tokenVersion: number): Promise<AuthUser | undefined> {
     const user = await this.prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: userId, tokenVersion },
       select: { id: true, role: true, isVerified: true },
     });
     return user ?? undefined;
@@ -177,7 +186,11 @@ export class AuthService {
     throw new UnauthorizedException(SESSION_ENDED);
   }
 
-  private async issueTokens(userId: string, familyId: string): Promise<SessionTokens> {
+  private async issueTokens(
+    userId: string,
+    tokenVersion: number,
+    familyId: string,
+  ): Promise<SessionTokens> {
     const refreshToken = this.tokens.createRefreshToken();
     await this.prisma.refreshToken.create({
       data: {
@@ -187,7 +200,7 @@ export class AuthService {
         expiresAt: new Date(this.clock.now().getTime() + REFRESH_TOKEN_TTL_MS),
       },
     });
-    return { accessToken: await this.tokens.signAccessToken(userId), refreshToken };
+    return { accessToken: await this.tokens.signAccessToken(userId, tokenVersion), refreshToken };
   }
 
   private getUnknownUserHash(): Promise<string> {

@@ -15,6 +15,7 @@ const SIGN_IN = `mutation ($input: SignInInput!) { signIn(input: $input) { id } 
 const FORGOT = `mutation ($input: ForgotPasswordInput!) { forgotPassword(input: $input) }`;
 const RESET = `mutation ($input: ResetPasswordInput!) { resetPassword(input: $input) }`;
 const REFRESH = "mutation { refresh }";
+const ME = "{ me { id } }";
 const START = new Date("2026-07-12T10:00:00.000Z");
 const EMAIL = "forgetful@example.com";
 const NEW_PASSWORD = "NewPassword456!";
@@ -250,6 +251,20 @@ describe("forgot and reset password", () => {
         const { body } = await graphqlRequest(app, REFRESH, { cookies: [cookie] });
         expect(body.errors?.[0]?.extensions.code).toBe("UNAUTHENTICATED");
       }
+    });
+
+    it("makes an access token from before the reset stop working at once", async () => {
+      const { setCookies } = await signIn(TEST_PASSWORD);
+      const accessCookie = toCookiePair(findSetCookie(setCookies, "access_token") ?? "");
+      expect((await graphqlRequest(app, ME, { cookies: [accessCookie] })).body.data).toEqual({
+        me: { id: userId },
+      });
+
+      await reset(lastToken());
+
+      // `me` is public: an ended session reads as "nobody is signed in"
+      const { body } = await graphqlRequest(app, ME, { cookies: [accessCookie] });
+      expect(body).toEqual({ data: { me: null } });
     });
 
     it("leaves the sessions of other users alone", async () => {
