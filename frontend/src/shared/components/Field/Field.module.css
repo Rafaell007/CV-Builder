@@ -42,12 +42,27 @@
   border-color: var(--color-input-border-hover);
 }
 
+/* --field-focus-extra: extra border width on focus, drawn inside the 1px border (inset shadow), so the layout and the
+   floating label do not move. 0 by default (Figma: a 1px focus border); a form sets 1px on a wrapper (the CV project
+   modal) and every field below it gets a 2px focus border. Custom properties inherit, so no field needs a prop. */
 .control:where(:focus-within, :has([role="combobox"][aria-expanded="true"])) {
   border-color: var(--field-focus-border);
+  box-shadow: inset 0 0 0 var(--field-focus-extra, 0px) var(--field-focus-border);
+}
+
+/* A date field with its calendar open: a 2px strong border, because the centred calendar covers most of the input */
+.control:where(:has([data-calendar-open])) {
+  border-color: var(--color-input-border-focus-strong);
+  box-shadow: inset 0 0 0 1px var(--color-input-border-focus-strong);
 }
 
 .control:where(:has([aria-invalid="true"])) {
   border-color: var(--color-error);
+  box-shadow: none;
+}
+
+.control:where(:has([aria-invalid="true"]):focus-within) {
+  box-shadow: inset 0 0 0 var(--field-focus-extra, 0px) var(--color-error);
 }
 
 .control:where(

@@ -3,6 +3,9 @@
  * their text and border are grey. The wrapper adds no box, so the spacing between the fields stays the parent's.
  */
 .fields {
+  /* Every field of the form has a 2px focus border (see Field.module.css, --field-focus-extra) */
+  --field-focus-extra: 1px;
+
   --color-input-disabled-bg: transparent;
 
   display: contents;
