@@ -17,7 +17,8 @@ describe("CvPreviewGeneral", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("MSc Computer Science")).toBeInTheDocument();
     expect(screen.getByText("English — C1")).toBeInTheDocument();
-    expect(screen.getByText("Polish — NATIVE")).toBeInTheDocument();
+    expect(screen.getByText("Polish — Native")).toBeInTheDocument();
+    expect(screen.queryByText(/NATIVE/)).not.toBeInTheDocument();
     const domainBlock = screen.getByRole("heading", { name: "Domains" }).parentElement;
     expect(domainBlock).not.toBeNull();
     expect(

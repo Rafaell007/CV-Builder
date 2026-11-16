@@ -8,7 +8,7 @@ export interface CvPreviewGeneralProps {
   domains: CvPreviewData["domains"];
 }
 
-/** General information of the CV document: education, languages with their level (`English — C1`) and unique domains. An empty list is hidden. */
+/** General information of the CV document: education, languages with their level (`English — C1`) and unique domains. An empty list is hidden. The CEFR levels A1 to C2 are shown as they are; `NATIVE` is translated. */
 export function CvPreviewGeneral({ education, languages, domains }: CvPreviewGeneralProps) {
   const t = useTranslations("cvs.preview.sections.general");
 
@@ -28,7 +28,9 @@ export function CvPreviewGeneral({ education, languages, domains }: CvPreviewGen
           <h3 className={styles.label}>{t("languages")}</h3>
           <ul className={styles.list}>
             {languages.map((language) => (
-              <li key={language.name}>{`${language.name} — ${language.proficiency}`}</li>
+              <li key={language.name}>
+                {`${language.name} — ${language.proficiency === "NATIVE" ? t("levelNative") : language.proficiency}`}
+              </li>
             ))}
           </ul>
         </div>
