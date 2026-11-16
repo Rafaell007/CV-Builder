@@ -14,4 +14,5 @@ The parts of the CV Preview page (S7.5). Each part is a folder with its own test
 - On a narrow screen the table scrolls sideways inside its own box. Colours and spacing come from design tokens, so the light and dark themes work.
 - The shared `DataTable` is not used. It is made for sortable and clickable lists. This table is read-only and grouped.
 - Text: `cvs.preview.skillsTable` (`en`, `pl`).
-- Not done: layout check against Figma, a Storybook story.
+- Story: `CvPreviewSkillsTable.stories.tsx` (default, missing values, no skills, tablet, dark, Polish). The story tests do not resize the browser, so check the tablet scroll in the Storybook UI.
+- Not done: layout check against Figma. The component is not used by a page yet.
