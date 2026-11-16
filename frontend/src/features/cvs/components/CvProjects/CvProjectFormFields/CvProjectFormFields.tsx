@@ -1,5 +1,5 @@
 import { useLocale, useTranslations } from "next-intl";
-import { Controller } from "react-hook-form";
+import { Controller, useWatch } from "react-hook-form";
 import {
   Button,
   DatePicker,
@@ -11,7 +11,7 @@ import {
 } from "@/shared/components";
 import type { CatalogProject, ProjectRoleItem } from "../cvProjects.types";
 import type { UseCvProjectFormResult } from "../useCvProjectForm";
-import { toProjectRange } from "../utils";
+import { toDateLimits, toProjectRange } from "../utils";
 import styles from "./CvProjectFormFields.module.css";
 
 /** Where the options of a field come from, and whether they loaded. */
@@ -58,6 +58,9 @@ export function CvProjectFormFields({
   const { register, control, getValues, trigger } = form;
   const { errors } = form.formState;
   const range = project === undefined ? undefined : toProjectRange(project);
+  // Each date picker also stops at the other date, so its calendar offers only days the form accepts.
+  const [startDate = null, endDate = null] = useWatch({ control, name: ["startDate", "endDate"] });
+  const limits = toDateLimits(range, startDate, endDate);
 
   const dateLabels: DatePickerLabels = {
     calendar: t("datePicker.calendar"),
@@ -153,7 +156,7 @@ export function CvProjectFormFields({
               locale={locale}
               labels={dateLabels}
               minDate={range?.start}
-              maxDate={range?.end}
+              maxDate={limits.startMax}
               disabled={datesDisabled}
               required
               error={errors.startDate?.message}
@@ -173,7 +176,7 @@ export function CvProjectFormFields({
               onBlur={field.onBlur}
               locale={locale}
               labels={dateLabels}
-              minDate={range?.start}
+              minDate={limits.endMin}
               maxDate={range?.end}
               disabled={datesDisabled}
               error={errors.endDate?.message}

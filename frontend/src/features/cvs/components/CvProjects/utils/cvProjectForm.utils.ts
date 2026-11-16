@@ -43,6 +43,29 @@ export function toProjectRange(
   return start && end ? { start, end } : undefined;
 }
 
+/** The limits of the two date pickers: the days of the project, and each picker also stops at the other date. */
+export interface DateLimits {
+  startMax: Date | undefined;
+  endMin: Date | undefined;
+}
+
+/**
+ * Start Date may not pass the End Date and End Date may not come before the Start Date, inside the days of the
+ * project. An empty side sets no limit. Without this the End Date calendar offers days that the form rule then
+ * rejects ("End date cannot be earlier than start date").
+ */
+export function toDateLimits(
+  range: ProjectRange | undefined,
+  startDate: Date | null,
+  endDate: Date | null,
+): DateLimits {
+  const latest = (a: Date | undefined, b: Date | null) =>
+    a && b ? (a < b ? a : b) : (a ?? b ?? undefined);
+  const earliest = (a: Date | undefined, b: Date | null) =>
+    a && b ? (a > b ? a : b) : (a ?? b ?? undefined);
+  return { startMax: latest(range?.end, endDate), endMin: earliest(range?.start, startDate) };
+}
+
 // The date picker holds `null` while empty and when the typed text is not a date, so one message covers both.
 const requiredDate = (message: string) =>
   z
