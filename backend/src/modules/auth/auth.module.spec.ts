@@ -7,7 +7,7 @@ describe("AuthModule in AppModule", () => {
     process.env["DATABASE_URL"] = "postgresql://user:password@localhost:5432/test";
     process.env["JWT_ACCESS_SECRET"] = "unit-test-access-secret-0123456789abc";
     process.env["JWT_REFRESH_SECRET"] = "unit-test-refresh-secret-0123456789ab";
-    const { AppModule } = await import("../../app.module");
+    const { AppModule } = await import("../../app.module.js");
 
     const imports = Reflect.getMetadata("imports", AppModule) as unknown[];
 

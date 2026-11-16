@@ -17,7 +17,7 @@ describe("throttling behind a proxy (TRUST_PROXY_HOPS=1)", () => {
       process.env[name] = value;
     }
     // Imported only now: the config module reads the environment when `AppModule` is first loaded.
-    const { createTestApp } = await import("../support/create-test-app");
+    const { createTestApp } = await import("../support/create-test-app.js");
     app = await createTestApp();
     await createUser(app, { email: "user1@example.com" });
   });
