@@ -18,26 +18,32 @@
   white-space: nowrap;
 }
 
-/* A thicker line between categories separates the blocks. */
-.group {
-  border-bottom: 2px solid var(--color-border);
-}
-
-.row:not(:last-child) {
-  border-bottom: 1px solid var(--color-border);
-}
-
+/* Lines sit on the cells, not on the <tbody>: collapsed borders on row groups differ between browsers. */
 .category,
 .cell {
   padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
   font: var(--text-table-cell);
   letter-spacing: var(--text-table-cell-ls);
   text-align: left;
 }
 
+/* A thicker line under the last skill of a category separates the blocks. The category cell spans all rows, so its bottom edge is the block end. */
 .category {
   vertical-align: top;
+  border-bottom-width: 2px;
   font-weight: 600;
+}
+
+.row:last-child .cell {
+  border-bottom-width: 2px;
+}
+
+.empty {
+  padding: var(--space-4);
+  font: var(--text-table-cell);
+  letter-spacing: var(--text-table-cell-ls);
+  text-align: center;
 }
 
 .visuallyHidden {
