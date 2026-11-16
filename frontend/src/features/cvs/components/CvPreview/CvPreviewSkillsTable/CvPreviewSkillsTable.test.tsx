@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders, screen, within } from "@/shared/testing";
-import { cvPreviewSample } from "../../../useCvPreview/cvPreview.mocks";
+import { cvPreviewSample } from "../../../useCvPreview";
 import { CvPreviewSkillsTable } from "./CvPreviewSkillsTable";
 
 const groups = cvPreviewSample.skillGroups;
@@ -35,10 +35,10 @@ describe("CvPreviewSkillsTable", () => {
 
     const row = screen.getByRole("cell", { name: "GraphQL" }).closest("tr") as HTMLElement;
     const cells = within(row).getAllByRole("cell");
-    for (const cell of cells.slice(1)) {
-      expect(cell).toHaveTextContent("–");
-      expect(cell).toHaveTextContent("Not available");
-    }
+    expect(cells[1]).toHaveTextContent("–");
+    expect(cells[1]).toHaveTextContent("Experience in Years: not available");
+    expect(cells[2]).toHaveTextContent("–");
+    expect(cells[2]).toHaveTextContent("Last Used: not available");
   });
 
   it("hides a category without skills (AC-8)", () => {
@@ -54,10 +54,32 @@ describe("CvPreviewSkillsTable", () => {
     expect(screen.queryByText("Empty category")).not.toBeInTheDocument();
   });
 
-  it("keeps only the header row when there are no groups", () => {
+  it("shows a message under the header row when there are no skills", () => {
     renderWithProviders(<CvPreviewSkillsTable skillGroups={[]} />);
 
-    expect(screen.getAllByRole("row")).toHaveLength(1);
+    expect(screen.getAllByRole("row")).toHaveLength(2);
+    expect(screen.getByRole("cell", { name: "No skills added" })).toHaveAttribute("colspan", "4");
+  });
+
+  it("renders categories and skills that repeat without a React key warning", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const skill = {
+      __typename: "CvPreviewSkill" as const,
+      name: "React",
+      mastery: "EXPERT" as const,
+      experienceYears: 1,
+      lastUsedYear: 2026,
+    };
+    const group = {
+      __typename: "CvPreviewSkillGroup" as const,
+      category: "Frontend",
+      skills: [skill, skill],
+    };
+    renderWithProviders(<CvPreviewSkillsTable skillGroups={[group, group]} />);
+
+    expect(screen.getAllByRole("cell", { name: "React" })).toHaveLength(4);
+    expect(error).not.toHaveBeenCalled();
+    error.mockRestore();
   });
 
   it("renders a large dataset", () => {
@@ -81,5 +103,6 @@ describe("CvPreviewSkillsTable", () => {
     renderWithProviders(<CvPreviewSkillsTable skillGroups={groups} />, { locale: "pl" });
 
     expect(screen.getByRole("table", { name: "Umiejętności zawodowe" })).toBeInTheDocument();
+    expect(screen.getByText("Doświadczenie w latach: brak danych")).toBeInTheDocument();
   });
 });

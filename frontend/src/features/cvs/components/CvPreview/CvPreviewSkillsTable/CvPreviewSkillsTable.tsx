@@ -11,11 +11,11 @@ export function CvPreviewSkillsTable({ skillGroups }: CvPreviewSkillsTableProps)
   const t = useTranslations("cvs.preview.skillsTable");
   const groups = skillGroups.filter((group) => group.skills.length > 0);
 
-  // A missing value shows an en dash. The dash is hidden from screen readers, the words replace it.
-  const missing = (
+  // A missing value shows an en dash. The dash is hidden from screen readers, the words name the column and replace it.
+  const missing = (column: string) => (
     <>
       <span aria-hidden="true">–</span>
-      <span className={styles.visuallyHidden}>{t("notAvailable")}</span>
+      <span className={styles.visuallyHidden}>{t("notAvailable", { column })}</span>
     </>
   );
 
@@ -39,18 +39,32 @@ export function CvPreviewSkillsTable({ skillGroups }: CvPreviewSkillsTableProps)
             </th>
           </tr>
         </thead>
-        {groups.map((group) => (
-          <tbody key={group.category} className={styles.group}>
-            {group.skills.map((skill, index) => (
-              <tr key={skill.name} className={styles.row}>
-                {index === 0 && (
-                  <th scope="rowgroup" rowSpan={group.skills.length} className={styles.category}>
+        {groups.length === 0 && (
+          <tbody>
+            <tr>
+              <td colSpan={4} className={styles.empty}>
+                {t("empty")}
+              </td>
+            </tr>
+          </tbody>
+        )}
+        {groups.map((group, groupIndex) => (
+          // The category and the skill name can repeat, so the position is part of the key. The list is read-only and never reordered.
+          <tbody key={`${groupIndex}-${group.category}`}>
+            {group.skills.map((skill, skillIndex) => (
+              <tr key={`${skillIndex}-${skill.name}`} className={styles.row}>
+                {skillIndex === 0 && (
+                  <th scope="row" rowSpan={group.skills.length} className={styles.category}>
                     {group.category}
                   </th>
                 )}
                 <td className={styles.cell}>{skill.name}</td>
-                <td className={styles.cell}>{skill.experienceYears ?? missing}</td>
-                <td className={styles.cell}>{skill.lastUsedYear ?? missing}</td>
+                <td className={styles.cell}>
+                  {skill.experienceYears ?? missing(t("columns.experience"))}
+                </td>
+                <td className={styles.cell}>
+                  {skill.lastUsedYear ?? missing(t("columns.lastUsed"))}
+                </td>
               </tr>
             ))}
           </tbody>
