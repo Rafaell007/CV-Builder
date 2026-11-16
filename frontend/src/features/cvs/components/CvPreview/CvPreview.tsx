@@ -16,7 +16,7 @@ export interface CvPreviewProps {
 }
 
 /**
- * The content of the Preview tab (PLAN S7.5, KAN-118): the CV as a printable document, with the loading, error
+ * The content of the Preview tab (PLAN S7.5, KAN-160): the CV as a printable document, with the loading, error
  * (Retry), unauthorized and empty states. All data comes from the backend, which also decides who may see the CV.
  * The page `h1` (the CV name) is in `CvLayout`, so the document starts with `h2` headings. EXPORT PDF is S7.6.
  */
