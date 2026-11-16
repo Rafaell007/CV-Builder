@@ -82,21 +82,30 @@ describe("CvPreviewSkillsTable", () => {
     error.mockRestore();
   });
 
-  it("renders a large dataset", () => {
-    const many = Array.from({ length: 50 }, (_, c) => ({
+  it("keeps the order of the groups and skills and puts each skill in its own row", () => {
+    const many = ["Alpha", "Beta", "Gamma"].map((category) => ({
       __typename: "CvPreviewSkillGroup" as const,
-      category: `Category ${c}`,
-      skills: Array.from({ length: 20 }, (_, s) => ({
+      category,
+      skills: [1, 2, 3].map((n) => ({
         __typename: "CvPreviewSkill" as const,
-        name: `Skill ${c}-${s}`,
+        name: `${category} skill ${n}`,
         mastery: "ADVANCED" as const,
-        experienceYears: s,
-        lastUsedYear: 2026,
+        experienceYears: n,
+        lastUsedYear: 2020 + n,
       })),
     }));
     renderWithProviders(<CvPreviewSkillsTable skillGroups={many} />);
 
-    expect(screen.getAllByRole("row")).toHaveLength(1001);
+    expect(screen.getAllByRole("row")).toHaveLength(10);
+    expect(screen.getAllByRole("rowheader").map((h) => h.textContent)).toEqual([
+      "Alpha",
+      "Beta",
+      "Gamma",
+    ]);
+    const skills = screen.getAllByRole("cell").filter((c) => c.textContent?.includes("skill"));
+    expect(skills.map((c) => c.textContent)).toEqual(
+      many.flatMap((g) => g.skills.map((s) => s.name)),
+    );
   });
 
   it("shows Polish texts", () => {
