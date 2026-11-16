@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { renderWithProviders, screen, waitFor } from "@/shared/testing";
+import { renderWithProviders, screen } from "@/shared/testing";
 import {
   cvPreviewCodeErrorMock,
   cvPreviewErrorMock,
@@ -71,8 +71,6 @@ describe("CvPreview", () => {
       ],
     });
 
-    await waitFor(() =>
-      expect(screen.getByText("CV preview is not available")).toBeInTheDocument(),
-    );
+    expect(await screen.findByText("CV preview is not available")).toBeInTheDocument();
   });
 });
