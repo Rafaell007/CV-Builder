@@ -1,9 +1,16 @@
-import { ConflictException, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { randomUUID } from "node:crypto";
 import type { AuthUser } from "../../common/auth";
 import { Clock } from "../../common/clock";
 import { Prisma } from "../../generated/prisma/client";
 import { PrismaService } from "../../prisma/prisma.service";
+import type { ChangePasswordInput } from "./dto/change-password.input";
 import type { SignInInput } from "./dto/sign-in.input";
 import type { SignUpInput } from "./dto/sign-up.input";
 import type { SessionUser } from "./models/session-user";
@@ -28,6 +35,9 @@ const SESSION_ENDED = "Session ended, sign in again";
 
 /** `extensions.reason` of the `CONFLICT` error of `signUp`. The frontend shows its own message for it. */
 export const EMAIL_TAKEN_REASON = "EMAIL_TAKEN";
+
+/** `extensions.reason` of the `BAD_USER_INPUT` error of `changePassword`. The frontend shows it under the current password. */
+export const CURRENT_PASSWORD_INCORRECT_REASON = "CURRENT_PASSWORD_INCORRECT";
 
 @Injectable()
 export class AuthService {
@@ -168,6 +178,40 @@ export class AuthService {
     }
   }
 
+  /**
+   * Sets a new password for a signed-in user who knows the current one.
+   * All other sessions end at once: the token version goes up and every refresh token is deleted.
+   * This session gets new tokens with the new version, so it keeps working.
+   */
+  async changePassword(
+    userId: string,
+    { currentPassword, newPassword }: ChangePasswordInput,
+  ): Promise<SessionTokens> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { passwordHash: true },
+    });
+    if (user === null) throw new UnauthorizedException(SESSION_ENDED);
+
+    if (!(await verifyPassword(user.passwordHash, currentPassword))) {
+      throw new BadRequestException({
+        message: "Current password is incorrect",
+        reason: CURRENT_PASSWORD_INCORRECT_REASON,
+      });
+    }
+
+    const passwordHash = await hashPassword(newPassword);
+    return this.prisma.$transaction(async (tx) => {
+      const { tokenVersion } = await tx.user.update({
+        where: { id: userId },
+        data: { passwordHash, tokenVersion: { increment: 1 } },
+        select: { tokenVersion: true },
+      });
+      await tx.refreshToken.deleteMany({ where: { userId } });
+      return this.issueTokens(userId, tokenVersion, randomUUID(), tx);
+    });
+  }
+
   /** The signed-in user, or `undefined` when the user is gone or the token is from before a password change. */
   async findAuthUser(userId: string, tokenVersion: number): Promise<AuthUser | undefined> {
     const user = await this.prisma.user.findUnique({
@@ -190,9 +234,10 @@ export class AuthService {
     userId: string,
     tokenVersion: number,
     familyId: string,
+    db: Prisma.TransactionClient = this.prisma,
   ): Promise<SessionTokens> {
     const refreshToken = this.tokens.createRefreshToken();
-    await this.prisma.refreshToken.create({
+    await db.refreshToken.create({
       data: {
         userId,
         tokenHash: this.tokens.hashRefreshToken(refreshToken),
