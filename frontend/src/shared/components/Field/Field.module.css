@@ -101,6 +101,14 @@
   top: -2px;
 }
 
+/* Disabled: the label is as grey as the value of a disabled field (--color-input-disabled-text) */
+.control:where(
+    :has(:is(input, textarea, [role="combobox"]):disabled, [role="combobox"][aria-disabled="true"])
+  )
+  .label {
+  color: var(--color-input-disabled-text);
+}
+
 /* Prediction: red inside and above; Figma draws invalid only with a value */
 .control:where(:has([aria-invalid="true"])) .label {
   color: var(--color-error-text);
