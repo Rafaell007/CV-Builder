@@ -51,7 +51,7 @@ export const Loading: Story = {
   },
 };
 
-export const Error: Story = {
+export const LoadFailed: Story = {
   parameters: { apollo: { mocks: [cvPreviewErrorMock(CV_ID)] } },
   play: async ({ canvas }) => {
     await expect(await canvas.findByText("Failed to load CV preview")).toBeVisible();

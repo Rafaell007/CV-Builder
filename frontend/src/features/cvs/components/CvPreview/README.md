@@ -12,7 +12,7 @@ The document sections (KAN-158) are presentational: props in, JSX out. No data f
 - Heading order: the page `h1` is the CV name of `CvLayout` (`PageHeader`, visually hidden). The container adds no `h1`; the document starts with `h2`. The `<article>` has the label `CV preview`.
 - The document is a sheet with a border and the surface colour, at most 900px wide, in the middle of the page. Colours come from design tokens.
 - No EXPORT PDF button. It comes with S7.6 (KAN-119). The spec asks for it in the page header, and for a disabled state while the data is missing.
-- Stories: `CvPreview.stories.tsx` (Desktop, Tablet, Loading, Error, Unauthorized, Polish).
+- Stories: `CvPreview.stories.tsx` (Desktop, Tablet, Loading, LoadFailed, Unauthorized, Polish).
 - Not done: layout check against Figma, dark theme and keyboard check by a person. The print layout (a CSS `@media print` rule) is not made; it is part of S7.6.
 
 ## CvPreviewSkillsTable (KAN-159)
