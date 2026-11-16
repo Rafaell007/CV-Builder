@@ -8,6 +8,7 @@ import type noInternet from "@/features/no-internet/messages/en.json";
 import type notFound from "@/features/not-found/messages/en.json";
 import type projects from "@/features/projects/messages/en.json";
 import type resetPassword from "@/features/reset-password/messages/en.json";
+import type settings from "@/features/settings/messages/en.json";
 import type signIn from "@/features/sign-in/messages/en.json";
 import type signUp from "@/features/sign-up/messages/en.json";
 import type verifyEmail from "@/features/verify-email/messages/en.json";
@@ -26,6 +27,7 @@ export type Messages = {
   notFound: typeof notFound;
   projects: typeof projects;
   resetPassword: typeof resetPassword;
+  settings: typeof settings;
   signIn: typeof signIn;
   signUp: typeof signUp;
   verifyEmail: typeof verifyEmail;
@@ -45,6 +47,7 @@ const loaders: Record<Locale, () => Promise<Messages>> = {
     notFound: (await import("@/features/not-found/messages/en.json")).default,
     projects: (await import("@/features/projects/messages/en.json")).default,
     resetPassword: (await import("@/features/reset-password/messages/en.json")).default,
+    settings: (await import("@/features/settings/messages/en.json")).default,
     signIn: (await import("@/features/sign-in/messages/en.json")).default,
     signUp: (await import("@/features/sign-up/messages/en.json")).default,
     verifyEmail: (await import("@/features/verify-email/messages/en.json")).default,
@@ -60,6 +63,7 @@ const loaders: Record<Locale, () => Promise<Messages>> = {
     notFound: (await import("@/features/not-found/messages/pl.json")).default,
     projects: (await import("@/features/projects/messages/pl.json")).default,
     resetPassword: (await import("@/features/reset-password/messages/pl.json")).default,
+    settings: (await import("@/features/settings/messages/pl.json")).default,
     signIn: (await import("@/features/sign-in/messages/pl.json")).default,
     signUp: (await import("@/features/sign-up/messages/pl.json")).default,
     verifyEmail: (await import("@/features/verify-email/messages/pl.json")).default,

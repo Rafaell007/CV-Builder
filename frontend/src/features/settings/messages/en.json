@@ -1,0 +1,44 @@
+{
+  "title": "Settings",
+  "theme": {
+    "label": "Theme",
+    "options": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "Device settings"
+    }
+  },
+  "language": {
+    "label": "Language",
+    "options": {
+      "en": "English",
+      "pl": "Polski"
+    }
+  },
+  "changePassword": {
+    "currentPassword": "Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "showCurrentPassword": "Show password",
+    "hideCurrentPassword": "Hide password",
+    "showNewPassword": "Show new password",
+    "hideNewPassword": "Hide new password",
+    "showConfirmPassword": "Show confirm password",
+    "hideConfirmPassword": "Hide confirm password",
+    "submit": "Change",
+    "success": "Password changed",
+    "errors": {
+      "currentPasswordRequired": "Password is required",
+      "newPasswordRequired": "New password is required",
+      "newPasswordTooShort": "Password must be at least {min} characters long",
+      "newPasswordTooLong": "Password must be at most {max} characters long",
+      "newPasswordWeak": "Password must contain at least one letter and one digit",
+      "confirmRequired": "Confirm password is required",
+      "confirmMismatch": "Passwords do not match",
+      "currentPasswordIncorrect": "Current password is incorrect",
+      "tooManyRequests": "Too many attempts, try again later",
+      "invalidInput": "Please check the entered values and try again",
+      "unexpected": "Something went wrong. Please try again later"
+    }
+  }
+}

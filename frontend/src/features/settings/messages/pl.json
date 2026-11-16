@@ -1,0 +1,44 @@
+{
+  "title": "Ustawienia",
+  "theme": {
+    "label": "Motyw",
+    "options": {
+      "light": "Jasny",
+      "dark": "Ciemny",
+      "system": "Ustawienia urządzenia"
+    }
+  },
+  "language": {
+    "label": "Język",
+    "options": {
+      "en": "English",
+      "pl": "Polski"
+    }
+  },
+  "changePassword": {
+    "currentPassword": "Hasło",
+    "newPassword": "Nowe hasło",
+    "confirmPassword": "Potwierdź hasło",
+    "showCurrentPassword": "Pokaż hasło",
+    "hideCurrentPassword": "Ukryj hasło",
+    "showNewPassword": "Pokaż nowe hasło",
+    "hideNewPassword": "Ukryj nowe hasło",
+    "showConfirmPassword": "Pokaż potwierdzenie hasła",
+    "hideConfirmPassword": "Ukryj potwierdzenie hasła",
+    "submit": "Zmień",
+    "success": "Hasło zostało zmienione",
+    "errors": {
+      "currentPasswordRequired": "Hasło jest wymagane",
+      "newPasswordRequired": "Nowe hasło jest wymagane",
+      "newPasswordTooShort": "Hasło musi mieć co najmniej {min, plural, one {# znak} few {# znaki} other {# znaków}}",
+      "newPasswordTooLong": "Hasło może mieć najwyżej {max, plural, one {# znak} few {# znaki} other {# znaków}}",
+      "newPasswordWeak": "Hasło musi zawierać co najmniej jedną literę i jedną cyfrę",
+      "confirmRequired": "Potwierdzenie hasła jest wymagane",
+      "confirmMismatch": "Hasła nie są takie same",
+      "currentPasswordIncorrect": "Obecne hasło jest nieprawidłowe",
+      "tooManyRequests": "Zbyt wiele prób, spróbuj ponownie później",
+      "invalidInput": "Sprawdź wpisane dane i spróbuj ponownie",
+      "unexpected": "Coś poszło nie tak. Spróbuj ponownie później"
+    }
+  }
+}
