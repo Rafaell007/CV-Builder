@@ -315,6 +315,28 @@
       },
       "notAvailable": "{column}: brak danych",
       "empty": "Brak dodanych umiejętności"
+    },
+    "sections": {
+      "general": {
+        "title": "Informacje ogólne",
+        "education": "Wykształcenie",
+        "languages": "Języki",
+        "levelNative": "Ojczysty",
+        "domains": "Branże"
+      },
+      "summary": {
+        "title": "Podsumowanie"
+      },
+      "skills": {
+        "title": "Umiejętności"
+      },
+      "projects": {
+        "title": "Projekty",
+        "roles": "Role",
+        "period": "Okres",
+        "responsibilities": "Obowiązki",
+        "environment": "Środowisko"
+      }
     }
   }
 }

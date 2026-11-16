@@ -315,6 +315,28 @@
       },
       "notAvailable": "{column}: not available",
       "empty": "No skills added"
+    },
+    "sections": {
+      "general": {
+        "title": "General information",
+        "education": "Education",
+        "languages": "Languages",
+        "levelNative": "Native",
+        "domains": "Domains"
+      },
+      "summary": {
+        "title": "Summary"
+      },
+      "skills": {
+        "title": "Skills"
+      },
+      "projects": {
+        "title": "Projects",
+        "roles": "Roles",
+        "period": "Period",
+        "responsibilities": "Responsibilities",
+        "environment": "Environment"
+      }
     }
   }
 }
