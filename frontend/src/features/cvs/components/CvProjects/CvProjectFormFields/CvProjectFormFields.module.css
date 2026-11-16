@@ -1,3 +1,23 @@
+/*
+ * Disabled fields keep the transparent fill of the Figma modal (Domain, Description, Environment, the dates): only
+ * their text and border are grey. The wrapper adds no box, so the spacing between the fields stays the parent's.
+ */
+.fields {
+  --color-input-disabled-bg: transparent;
+
+  display: contents;
+}
+
+/* A disabled field shows the regular cursor, not the "not allowed" one, and no blinking caret. */
+.fields :is(input, textarea, button):disabled,
+.fields div[aria-disabled="true"] {
+  cursor: default;
+}
+
+.fields :is(input, textarea):is(:disabled, [readonly]) {
+  caret-color: transparent;
+}
+
 /* Start Date and End Date side by side; they stack when the modal is narrow. */
 .dates {
   display: grid;

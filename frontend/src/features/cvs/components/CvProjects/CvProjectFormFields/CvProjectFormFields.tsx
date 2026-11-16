@@ -85,7 +85,7 @@ export function CvProjectFormFields({
   const datesDisabled = project === undefined;
 
   return (
-    <>
+    <div className={styles.fields}>
       <Controller
         control={control}
         name="projectId"
@@ -231,6 +231,6 @@ export function CvProjectFormFields({
           {error}
         </p>
       )}
-    </>
+    </div>
   );
 }
