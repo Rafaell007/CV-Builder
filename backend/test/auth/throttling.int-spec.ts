@@ -13,7 +13,7 @@ describe("throttling", () => {
     previousLimit = process.env["THROTTLE_LIMIT"];
     process.env["THROTTLE_LIMIT"] = String(LIMIT);
     // Imported only now: the config module reads the environment when `AppModule` is first loaded.
-    const { createTestApp } = await import("../support/create-test-app");
+    const { createTestApp } = await import("../support/create-test-app.js");
     app = await createTestApp();
     await createUser(app, { email: "user1@example.com" });
   });
