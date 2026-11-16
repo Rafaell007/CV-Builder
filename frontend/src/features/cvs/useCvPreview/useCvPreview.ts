@@ -19,9 +19,12 @@ export type UseCvPreviewResult = {
 
 /** Loads the CV preview with the `CvPreview` query. The backend decides who may see it, so the page never checks the owner itself. */
 export function useCvPreview(cvId: string): UseCvPreviewResult {
+  // network-only: the backend builds the preview from the details, skills and projects, so a copy in the cache is
+  // old after any change on the other tabs. The page always asks again when it opens.
   // notifyOnNetworkStatusChange: `loading` is true again during a retry, so the page shows the skeleton.
   const { data, loading, error, refetch } = useQuery(CvPreviewDocument, {
     variables: { cvId },
+    fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
   });
 
