@@ -36,6 +36,12 @@ describe("CvPreviewGeneral", () => {
     expect(screen.getByRole("heading", { name: "Education" })).toBeInTheDocument();
   });
 
+  it("renders nothing when the education, the languages and the domains are all empty", () => {
+    renderWithProviders(<CvPreviewGeneral education="" languages={[]} domains={[]} />);
+
+    expect(screen.queryByRole("heading")).not.toBeInTheDocument();
+  });
+
   it("hides the education when it is empty", () => {
     renderWithProviders(<CvPreviewGeneral education="" languages={languages} domains={domains} />);
 

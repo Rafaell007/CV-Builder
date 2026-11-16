@@ -8,9 +8,11 @@ export interface CvPreviewGeneralProps {
   domains: CvPreviewData["domains"];
 }
 
-/** General information of the CV document: education, languages with their level (`English — C1`) and unique domains. An empty list is hidden. The CEFR levels A1 to C2 are shown as they are; `NATIVE` is translated. */
+/** General information of the CV document: education, languages with their level (`English — C1`) and unique domains. An empty part is hidden, and the whole section is hidden when all three are empty. The CEFR levels A1 to C2 are shown as they are; `NATIVE` is translated. */
 export function CvPreviewGeneral({ education, languages, domains }: CvPreviewGeneralProps) {
   const t = useTranslations("cvs.preview.sections.general");
+
+  if (!education && languages.length === 0 && domains.length === 0) return null;
 
   return (
     <section className={styles.section} aria-labelledby="cv-preview-general-title">

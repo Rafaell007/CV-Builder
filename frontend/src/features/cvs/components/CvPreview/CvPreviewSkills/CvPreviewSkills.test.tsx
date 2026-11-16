@@ -20,6 +20,16 @@ describe("CvPreviewSkills", () => {
     expect(screen.getByText("GraphQL")).toBeInTheDocument();
   });
 
+  it("renders nothing when no category has skills", () => {
+    renderWithProviders(
+      <CvPreviewSkills
+        skillGroups={[{ __typename: "CvPreviewSkillGroup", category: "Databases", skills: [] }]}
+      />,
+    );
+
+    expect(screen.queryByRole("heading")).not.toBeInTheDocument();
+  });
+
   it("hides a category without skills", () => {
     renderWithProviders(
       <CvPreviewSkills
