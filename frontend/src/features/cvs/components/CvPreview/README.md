@@ -2,7 +2,18 @@
 
 The parts of the CV Preview page (S7.5). Each part is a folder with its own test. Spec: [docs/pages/24-cv-preview-page.md](../../../../../../docs/pages/24-cv-preview-page.md).
 
-The document sections (KAN-158) are presentational: props in, JSX out. No data fetching. The container (KAN-160) passes the `CvPreviewData` of `useCvPreview` to them.
+The document sections (KAN-158) are presentational: props in, JSX out. No data fetching. The container `CvPreview` (KAN-160) passes the `CvPreviewData` of `useCvPreview` to them.
+
+## CvPreview (KAN-160)
+
+`CvPreview({ cvId })`: the container of the Preview tab (`"use client"`). It calls `useCvPreview(cvId)` and renders the document: Header, General, Summary, Skills, Projects, then the section "Professional skills" with the `CvPreviewSkillsTable`. Import it from `components/CvPreview` (`index.ts`) or from `features/cvs`. The route `cvs/[cvId]/preview/page.tsx` renders it.
+
+- States, all with the shared `PageState`: loading (`role="status"`), error (`role="alert"`) with Retry, unauthorized and empty. Unauthorized shows `You are not authorized to access this CV` and no CV data, with no Retry, because the answer would be the same. Empty (`CV preview is not available`) shows when the backend sends no preview. Texts: `cvs.preview.states` and `cvs.preview.sections.professionalSkills`.
+- Heading order: the page `h1` is the CV name of `CvLayout` (`PageHeader`, visually hidden). The container adds no `h1`; the document starts with `h2`. The `<article>` has the label `CV preview`.
+- The document is a sheet with a border and the surface colour, at most 900px wide, in the middle of the page. Colours come from design tokens.
+- No EXPORT PDF button. It comes with S7.6 (KAN-119). The spec asks for it in the page header, and for a disabled state while the data is missing.
+- Stories: `CvPreview.stories.tsx` (Desktop, Tablet, Loading, LoadFailed, Unauthorized, Polish).
+- Not done: layout check against Figma, dark theme and keyboard check by a person. The print layout (a CSS `@media print` rule) is not made; it is part of S7.6.
 
 ## CvPreviewSkillsTable (KAN-159)
 
@@ -17,7 +28,7 @@ The document sections (KAN-158) are presentational: props in, JSX out. No data f
 - The shared `DataTable` is not used. It is made for sortable and clickable lists. This table is read-only and grouped.
 - Text: `cvs.preview.skillsTable` (`en`, `pl`).
 - Story: `CvPreviewSkillsTable.stories.tsx` (default, missing values, no skills, tablet, dark, Polish). The story tests do not resize the browser, so check the tablet scroll in the Storybook UI.
-- Not done: layout check against Figma. The component is not used by a page yet.
+- Not done: layout check against Figma.
 
 ## Document sections (KAN-158)
 
@@ -33,6 +44,6 @@ Heading levels: each section is an `h2` with `h3` parts inside. Texts are in `cv
 
 ## Notes for the next developer
 
-- **The page `h1` is missing on purpose.** `CvPreviewHeader` uses an `h2` for the name. The container (KAN-160) must render the page `h1`. Without it, the heading order of the page is wrong.
-- **No `index.ts` in `components/CvPreview/`.** It was left out to avoid a merge conflict between KAN-158 and KAN-159. KAN-160 adds it. Until then, import from the component folder, for example `./CvPreview/CvPreviewHeader`.
-- **Open checks:** the layout of the document sections was not compared with Figma, and their dark theme was not tested. See KAN-161 for these checks.
+- **The page `h1` is in `CvLayout`**, not in the container. `CvPreviewHeader` uses an `h2` for the name. Do not add a second `h1`.
+- **Open checks:** the layout of the whole document was not compared with Figma, and the dark theme was not tested. See KAN-161 for these checks.
+- **The skills appear twice on purpose:** the section "Skills" (names per category) and the table "Professional skills" (with years), as in the spec.

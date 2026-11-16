@@ -305,6 +305,14 @@
     }
   },
   "preview": {
+    "document": "Podgląd CV",
+    "states": {
+      "loading": "Ładowanie podglądu CV",
+      "unauthorized": "Nie masz uprawnień do tego CV",
+      "error": "Nie udało się wczytać podglądu CV",
+      "retry": "Spróbuj ponownie",
+      "empty": "Podgląd CV jest niedostępny"
+    },
     "skillsTable": {
       "caption": "Umiejętności zawodowe",
       "columns": {
@@ -326,6 +334,9 @@
       },
       "summary": {
         "title": "Podsumowanie"
+      },
+      "professionalSkills": {
+        "title": "Umiejętności zawodowe"
       },
       "skills": {
         "title": "Umiejętności"
