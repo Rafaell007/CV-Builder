@@ -305,6 +305,14 @@
     }
   },
   "preview": {
+    "document": "CV preview",
+    "states": {
+      "loading": "Loading CV preview",
+      "unauthorized": "You are not authorized to access this CV",
+      "error": "Failed to load CV preview",
+      "retry": "Retry",
+      "empty": "CV preview is not available"
+    },
     "skillsTable": {
       "caption": "Professional skills",
       "columns": {
@@ -326,6 +334,9 @@
       },
       "summary": {
         "title": "Summary"
+      },
+      "professionalSkills": {
+        "title": "Professional skills"
       },
       "skills": {
         "title": "Skills"
