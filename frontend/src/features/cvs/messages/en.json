@@ -313,7 +313,8 @@
         "experience": "Experience in Years",
         "lastUsed": "Last Used"
       },
-      "notAvailable": "Not available"
+      "notAvailable": "{column}: not available",
+      "empty": "No skills added"
     }
   }
 }

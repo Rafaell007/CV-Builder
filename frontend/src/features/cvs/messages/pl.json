@@ -313,7 +313,8 @@
         "experience": "Doświadczenie w latach",
         "lastUsed": "Ostatnio używana"
       },
-      "notAvailable": "Brak danych"
+      "notAvailable": "{column}: brak danych",
+      "empty": "Brak dodanych umiejętności"
     }
   }
 }
