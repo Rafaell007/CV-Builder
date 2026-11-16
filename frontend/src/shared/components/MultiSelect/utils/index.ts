@@ -1,1 +1,1 @@
-export { getSelectedOptions, toggleValue } from "./multiSelect.utils";
+export { findScrollParent, getSelectedOptions, toggleValue } from "./multiSelect.utils";

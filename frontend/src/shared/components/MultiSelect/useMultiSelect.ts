@@ -3,6 +3,7 @@ import type { KeyboardEvent, MouseEvent, Ref } from "react";
 import { useElementByIdRef } from "@/shared/hooks";
 import { createFocusLeaveHandler } from "@/shared/utils";
 import type { SelectOption } from "../Select";
+import { useScrollListIntoView } from "./useScrollListIntoView";
 import { getSelectedOptions, toggleValue } from "./utils";
 
 const { ItemClick, ToggleButtonKeyDownEnter, ToggleButtonKeyDownSpaceButton } =
@@ -64,6 +65,8 @@ export function useMultiSelect({
       if (selectedItem) onValueChange(toggleValue(value, selectedItem.value));
     },
   });
+
+  useScrollListIntoView(select.isOpen, menuId);
 
   return {
     isOpen: select.isOpen,

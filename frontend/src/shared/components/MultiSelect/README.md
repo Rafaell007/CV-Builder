@@ -7,7 +7,7 @@ Several choices from a list, shown as chips inside the shared `Field` frame. The
 - Keyboard: the field opens with Enter, Space or the arrows. Enter or Space toggles the highlighted row, and the list stays open until Escape or Tab. Backspace on the closed field removes the last chip. Tab reaches each chip's × button.
 - Chips are plain text plus a real `<button>`; `getRemoveLabel` gives its translated name ("Remove React"). Downshift's `useTagGroup` was tried and dropped: its markup fails axe (`nested-interactive`, `label-content-name-mismatch`).
 - `onBlur` runs only when focus leaves the whole field (toggle and × buttons). After a × click, focus moves to the field.
-- The list is not in a portal: it is positioned under the field. Inside a clipping container (`overflow: hidden`), give it room.
+- The list is not in a portal: it is positioned under the field. Inside a clipping container (`overflow: hidden`), give it room. Inside a container that scrolls (a modal), the container scrolls to show the whole open list and goes back when the list closes (`useScrollListIntoView`; no animation with reduced motion).
 - Used by: project and CV forms (environment, skills). Values: [docs/design-tokens.md › Multi-select](../../../../../docs/design-tokens.md#multi-select-ds).
 
 ## Known issues (found in the KAN-78 review)
