@@ -124,12 +124,20 @@ describe("FormModal", () => {
     expect(screen.getByRole("textbox", { name: "Name" })).toHaveFocus();
   });
 
-  it("does not start on a date field, because a focused date field opens its calendar", async () => {
+  it("starts with the form focused when the first field is a date field: no cursor, and the first Tab reaches the date field", async () => {
     const { user } = renderWithProviders(<DateFirstModal />);
 
     await user.click(screen.getByRole("button", { name: "Open dates" }));
 
-    expect(await screen.findByRole("dialog", { name: "Dates" })).toBeInTheDocument();
+    const dialog = await screen.findByRole("dialog", { name: "Dates" });
+    // The form itself holds the focus: no field has a cursor, and no calendar opened
+    expect(dialog.querySelector("form")).toHaveFocus();
+    expect(screen.queryByRole("dialog", { name: "Choose a date" })).not.toBeInTheDocument();
+    await user.tab();
+    expect(screen.getByRole("textbox", { name: "Start Date" })).toHaveFocus();
+    expect(screen.queryByRole("dialog", { name: "Choose a date" })).not.toBeInTheDocument();
+    // Tab passes over the date field to the next one
+    await user.tab();
     expect(screen.getByRole("textbox", { name: "Name" })).toHaveFocus();
   });
 
