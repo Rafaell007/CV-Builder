@@ -270,6 +270,15 @@
   background: var(--color-surface);
 }
 
+/* A month or a year outside minDate / maxDate: grey and not clickable (react-datepicker sets only this class) */
+.calendar :global(.react-datepicker__month-text--disabled),
+.calendar :global(.react-datepicker__year-text--disabled) {
+  background: transparent;
+  color: var(--color-text-secondary);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .calendar :global(.react-datepicker__month-text)[aria-selected="true"],
 .calendar :global(.react-datepicker__year-text--selected) {
   background: var(--color-primary);
