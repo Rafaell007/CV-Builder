@@ -1,13 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
-import { expect, fn } from "storybook/test";
+import { expect, fn, within } from "storybook/test";
 import { MultiSelect, type MultiSelectProps } from "./MultiSelect";
 
 // Colours as Chromium reports them (docs/design-tokens.md › Multi-select, Select)
 const RED = "rgb(198, 48, 49)";
-const GREY_100 = "rgb(245, 245, 247)";
 const GREY_400 = "rgb(174, 174, 174)";
-const GREY_500 = "rgb(98, 98, 98)";
 const GREY_600 = "rgb(69, 69, 69)";
 const GREY_700 = "rgb(46, 46, 46)";
 
@@ -21,9 +19,11 @@ const SKILLS = [
   { value: "playwright", label: "Playwright" },
 ];
 
-// The chip elements, found through their text (chips have no role of their own)
-function chips(canvas: { getByText: (text: string) => HTMLElement }) {
-  return [canvas.getByText("React").parentElement, canvas.getByText("PostgreSQL").parentElement];
+// The chip elements, found through their text inside the chips group (chips have no role of their own; the closed
+// list holds hidden rows with the same names)
+function chips(canvas: { getByRole: (role: string, options: { name: string }) => HTMLElement }) {
+  const group = within(canvas.getByRole("group", { name: "Skills" }));
+  return [group.getByText("React").parentElement, group.getByText("PostgreSQL").parentElement];
 }
 
 // MultiSelect is controlled: the story holds the value, as a form does.
@@ -94,7 +94,9 @@ export const Open: Story = {
     await expect(option).toHaveStyle({ height: "47px" });
     await userEvent.click(option);
     await expect(args.onValueChange).toHaveBeenCalledWith(["nest"]);
-    await expect(option).toHaveStyle({ backgroundColor: GREY_500, color: GREY_100 });
+    // No grey fill, whatever the row's state (decision of Maciek): the checkbox shows the choice. The row that has
+    // the keyboard focus or the mouse has a 2px outline.
+    await expect(option).toHaveStyle({ backgroundColor: "rgba(0, 0, 0, 0)", outlineWidth: "2px" });
     await expect(combobox).toHaveAttribute("aria-expanded", "true");
   },
 };
@@ -104,9 +106,9 @@ export const OpenDark: Story = {
   globals: { theme: "dark" },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("combobox", { name: "Skills" }));
+    // A chosen row has no grey fill: its checkbox shows it
     await expect(canvas.getByRole("option", { name: "NestJS" })).toHaveStyle({
-      backgroundColor: GREY_100,
-      color: GREY_700,
+      backgroundColor: "rgba(0, 0, 0, 0)",
     });
   },
 };
@@ -154,7 +156,8 @@ export const Invalid: Story = {
 export const Disabled: Story = {
   args: { value: ["react", "pg"], disabled: true },
   play: async ({ canvas }) => {
-    await expect(canvas.getByText("React")).toHaveStyle({ color: GREY_400 });
+    const [first] = chips(canvas);
+    await expect(first!.querySelector("span")).toHaveStyle({ color: GREY_400 });
     await expect(canvas.queryByRole("button", { name: /Remove/ })).not.toBeInTheDocument();
   },
 };
