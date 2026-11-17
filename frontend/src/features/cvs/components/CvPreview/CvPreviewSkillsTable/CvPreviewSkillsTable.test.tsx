@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders, screen, within } from "@/shared/testing";
-import { cvPreviewSample } from "../../../useCvPreview";
+import { cvPreviewSample } from "../../../useCvPreview/cvPreview.mocks";
 import { CvPreviewSkillsTable } from "./CvPreviewSkillsTable";
 
 const groups = cvPreviewSample.skillGroups;

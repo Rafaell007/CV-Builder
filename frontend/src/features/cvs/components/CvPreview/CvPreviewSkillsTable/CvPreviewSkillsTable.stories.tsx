@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
-import { cvPreviewSample } from "../../../useCvPreview";
+import { cvPreviewSample } from "../../../useCvPreview/cvPreview.mocks";
 import { CvPreviewSkillsTable } from "./CvPreviewSkillsTable";
 
 const tablet = { viewport: { value: "tablet", isRotated: false } };
