@@ -90,19 +90,19 @@ describe("departments", () => {
   });
 
   describe("createDepartment", () => {
-    it("creates a department, trims the name and keeps it", async () => {
+    it("creates a department, normalises the spaces, keeps the letter case and keeps it", async () => {
       const { body } = await graphqlRequest(app, CREATE, {
         cookies: admin,
-        variables: { input: { name: "  Engineering  " } },
+        variables: { input: { name: "  Human   Resources  " } },
       });
 
       expect(body.errors).toBeUndefined();
       const created = (body.data as { createDepartment: { id: string; name: string } })
         .createDepartment;
-      expect(created.name).toBe("Engineering");
+      expect(created.name).toBe("Human Resources");
       await expect(
         prisma.department.findUniqueOrThrow({ where: { id: created.id } }),
-      ).resolves.toMatchObject({ name: "Engineering" });
+      ).resolves.toMatchObject({ name: "Human Resources" });
     });
 
     it.each([
@@ -128,12 +128,16 @@ describe("departments", () => {
       await expect(prisma.department.count()).resolves.toBe(1);
     });
 
-    it("fails with CONFLICT for a name that already exists", async () => {
-      await createDepartment("Engineering");
+    it.each([
+      ["the same name", "Human Resources"],
+      ["spaces around and inside", " Human   Resources "],
+      ["other letter case", "HUMAN resources"],
+    ])("fails with CONFLICT for a name that already exists, with %s (D35)", async (_case, name) => {
+      await createDepartment("Human Resources");
 
       const { body } = await graphqlRequest(app, CREATE, {
         cookies: admin,
-        variables: { input: { name: " Engineering " } },
+        variables: { input: { name } },
       });
 
       expect(body.errors?.[0]).toMatchObject({
@@ -141,6 +145,18 @@ describe("departments", () => {
         extensions: { code: "CONFLICT" },
       });
       await expect(prisma.department.count()).resolves.toBe(1);
+    });
+  });
+
+  describe("database rules (D35)", () => {
+    it("refuses a name that differs only in letter case, even without the service", async () => {
+      await prisma.department.create({ data: { name: "Engineering" } });
+
+      await expect(prisma.department.create({ data: { name: "engineering" } })).rejects.toThrow();
+    });
+
+    it("refuses a name longer than 100 characters, even without the service", async () => {
+      await expect(prisma.department.create({ data: { name: "a".repeat(101) } })).rejects.toThrow();
     });
   });
 
@@ -174,6 +190,12 @@ describe("departments", () => {
         "Engineering",
         "Design",
       ]);
+    });
+
+    it("sorts without regard to letter case (D35)", async () => {
+      await createDepartment("analytics");
+
+      await expect(names()).resolves.toEqual(["analytics", "Design", "Engineering", "Sales"]);
     });
 
     it("searches the name without regard to case", async () => {
@@ -225,13 +247,24 @@ describe("departments", () => {
       expect(body.errors).toBeUndefined();
     });
 
-    it("fails with CONFLICT for the name of another department", async () => {
+    it("allows changing only the letter case of its own name", async () => {
+      const id = await createDepartment("Engineering");
+
+      const { body } = await graphqlRequest(app, UPDATE, {
+        cookies: admin,
+        variables: { input: { id, name: "ENGINEERING" } },
+      });
+
+      expect(body).toEqual({ data: { updateDepartment: { id, name: "ENGINEERING" } } });
+    });
+
+    it("fails with CONFLICT for the name of another department, in any letter case", async () => {
       await createDepartment("Sales");
       const id = await createDepartment("Engineering");
 
       const { body } = await graphqlRequest(app, UPDATE, {
         cookies: admin,
-        variables: { input: { id, name: "Sales" } },
+        variables: { input: { id, name: "sALES" } },
       });
 
       expect(body.errors?.[0]).toMatchObject({

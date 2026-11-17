@@ -93,19 +93,19 @@ describe("positions", () => {
   });
 
   describe("createPosition", () => {
-    it("creates a position, trims the name and keeps it", async () => {
+    it("creates a position, normalises the spaces, keeps the letter case and keeps it", async () => {
       const { body } = await graphqlRequest(app, CREATE, {
         cookies: admin,
-        variables: { input: { name: "  Developer  " } },
+        variables: { input: { name: "  Team   lead  " } },
       });
 
       expect(body.errors).toBeUndefined();
       const created = (body.data as { createPosition: { id: string; name: string } })
         .createPosition;
-      expect(created.name).toBe("Developer");
+      expect(created.name).toBe("Team lead");
       await expect(
         prisma.position.findUniqueOrThrow({ where: { id: created.id } }),
-      ).resolves.toMatchObject({ name: "Developer" });
+      ).resolves.toMatchObject({ name: "Team lead" });
     });
 
     it.each([
@@ -131,12 +131,16 @@ describe("positions", () => {
       await expect(prisma.position.count()).resolves.toBe(1);
     });
 
-    it("fails with CONFLICT for a name that already exists", async () => {
-      await createPosition("Developer");
+    it.each([
+      ["the same name", "Team lead"],
+      ["spaces around and inside", " Team   lead "],
+      ["other letter case", "TEAM lead"],
+    ])("fails with CONFLICT for a name that already exists, with %s (D35)", async (_case, name) => {
+      await createPosition("Team lead");
 
       const { body } = await graphqlRequest(app, CREATE, {
         cookies: admin,
-        variables: { input: { name: " Developer " } },
+        variables: { input: { name } },
       });
 
       expect(body.errors?.[0]).toMatchObject({
@@ -144,6 +148,18 @@ describe("positions", () => {
         extensions: { code: "CONFLICT" },
       });
       await expect(prisma.position.count()).resolves.toBe(1);
+    });
+  });
+
+  describe("database rules (D35)", () => {
+    it("refuses a name that differs only in letter case, even without the service", async () => {
+      await prisma.position.create({ data: { name: "Developer" } });
+
+      await expect(prisma.position.create({ data: { name: "developer" } })).rejects.toThrow();
+    });
+
+    it("refuses a name longer than 100 characters, even without the service", async () => {
+      await expect(prisma.position.create({ data: { name: "a".repeat(101) } })).rejects.toThrow();
     });
   });
 
@@ -179,6 +195,12 @@ describe("positions", () => {
       ]);
     });
 
+    it("sorts without regard to letter case (D35)", async () => {
+      await createPosition("accountant");
+
+      await expect(names()).resolves.toEqual(["accountant", "Architect", "Developer", "Tester"]);
+    });
+
     it("searches the name without regard to case", async () => {
       await expect(names({ search: "DEV" })).resolves.toEqual(["Developer"]);
     });
@@ -211,10 +233,10 @@ describe("positions", () => {
 
       const { body } = await graphqlRequest(app, UPDATE, {
         cookies: admin,
-        variables: { input: { id, name: " Team lead " } },
+        variables: { input: { id, name: " Scrum master " } },
       });
 
-      expect(body).toEqual({ data: { updatePosition: { id, name: "Team lead" } } });
+      expect(body).toEqual({ data: { updatePosition: { id, name: "Scrum master" } } });
     });
 
     it("allows saving the same name again", async () => {
@@ -228,13 +250,24 @@ describe("positions", () => {
       expect(body.errors).toBeUndefined();
     });
 
-    it("fails with CONFLICT for the name of another position", async () => {
+    it("allows changing only the letter case of its own name", async () => {
+      const id = await createPosition("Developer");
+
+      const { body } = await graphqlRequest(app, UPDATE, {
+        cookies: admin,
+        variables: { input: { id, name: "DEVELOPER" } },
+      });
+
+      expect(body).toEqual({ data: { updatePosition: { id, name: "DEVELOPER" } } });
+    });
+
+    it("fails with CONFLICT for the name of another position, in any letter case", async () => {
       await createPosition("Tester");
       const id = await createPosition("Developer");
 
       const { body } = await graphqlRequest(app, UPDATE, {
         cookies: admin,
-        variables: { input: { id, name: "Tester" } },
+        variables: { input: { id, name: "tESTER" } },
       });
 
       expect(body.errors?.[0]).toMatchObject({

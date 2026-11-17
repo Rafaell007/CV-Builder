@@ -1,11 +1,11 @@
 import { Field, InputType } from "@nestjs/graphql";
 import { IsNotEmpty, IsString, MaxLength } from "class-validator";
-import { Trim } from "../../../common/validation";
+import { NormalizeSpaces } from "../../../common/validation";
 
 @InputType()
 export class CreateDepartmentInput {
   @Field()
-  @Trim()
+  @NormalizeSpaces()
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)
