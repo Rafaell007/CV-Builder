@@ -7,6 +7,7 @@ import { ClockModule } from "./common/clock";
 import { AppConfigModule } from "./config";
 import { AuthModule } from "./modules/auth/auth.module";
 import { CvsModule } from "./modules/cvs/cvs.module";
+import { DepartmentsModule } from "./modules/departments/departments.module";
 import { HealthModule } from "./modules/health/health.module";
 import { ProjectsModule } from "./modules/projects/projects.module";
 import { SkillsModule } from "./modules/skills/skills.module";
@@ -33,6 +34,7 @@ import { PrismaModule } from "./prisma/prisma.module";
     ProjectsModule,
     SkillsModule,
     CvsModule,
+    DepartmentsModule,
   ],
 })
 export class AppModule {}
