@@ -35,6 +35,10 @@ input CreateDepartmentInput {
   name: String!
 }
 
+input CreatePositionInput {
+  name: String!
+}
+
 input CreateProjectInput {
   description: String!
   domain: String!
@@ -166,9 +170,11 @@ type Mutation {
   addCvSkill(input: AddCvSkillInput!): CvSkill!
   createCv(input: CreateCvInput!): Cv!
   createDepartment(input: CreateDepartmentInput!): Department!
+  createPosition(input: CreatePositionInput!): Position!
   createProject(input: CreateProjectInput!): Project!
   deleteCv(id: ID!): Cv!
   deleteDepartment(id: ID!): Boolean!
+  deletePosition(id: ID!): Boolean!
   deleteProject(id: ID!): Boolean!
   forgotPassword(input: ForgotPasswordInput!): Boolean!
   refresh: Boolean!
@@ -183,6 +189,7 @@ type Mutation {
   updateCvProject(input: UpdateCvProjectInput!): CvProject!
   updateCvSkill(input: UpdateCvSkillInput!): CvSkill!
   updateDepartment(input: UpdateDepartmentInput!): Department!
+  updatePosition(input: UpdatePositionInput!): Position!
   updateProject(input: UpdateProjectInput!): Project!
   verifyEmail(input: VerifyEmailInput!): SessionUser!
 }
@@ -190,6 +197,16 @@ type Mutation {
 input PageInput {
   number: Int! = 1
   size: Int! = 10
+}
+
+type Position {
+  id: ID!
+  name: String!
+}
+
+type PositionPage {
+  items: [Position!]!
+  total: Int!
 }
 
 enum Proficiency {
@@ -234,6 +251,7 @@ type Query {
   departments(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): DepartmentPage!
   health: Health!
   me: SessionUser
+  positions(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): PositionPage!
   projectRoles: [ProjectRole!]!
   projects(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): ProjectPage!
   skills: [EnvironmentSkill!]!
@@ -314,6 +332,11 @@ input UpdateCvSkillInput {
 }
 
 input UpdateDepartmentInput {
+  id: ID!
+  name: String!
+}
+
+input UpdatePositionInput {
   id: ID!
   name: String!
 }
