@@ -112,6 +112,18 @@ describe("changePassword", () => {
     expect(await prisma.refreshToken.count({ where: { userId } })).toBe(1);
   });
 
+  it("ends a session whose refresh ran during the change (its token came after the delete)", async () => {
+    const other = await openSession();
+    const otherRow = await prisma.refreshToken.findFirstOrThrow({ where: { userId } });
+    await change(await openSession());
+    // The race: the other session's refresh read the old version, then wrote its token after the change
+    // deleted all tokens. Recreating the row gives the same state.
+    await prisma.refreshToken.create({ data: { ...otherRow, replacedAt: null } });
+
+    expect((await refresh(other)).body.errors?.[0]?.extensions.code).toBe("UNAUTHENTICATED");
+    expect(await prisma.refreshToken.count({ where: { familyId: otherRow.familyId } })).toBe(0);
+  });
+
   it("rejects a wrong current password and changes nothing", async () => {
     const session = await openSession();
 
@@ -127,6 +139,22 @@ describe("changePassword", () => {
     expect(setCookies).toEqual([]);
     expect((await me(session)).body.data).toEqual({ me: { id: userId } });
     expect((await signIn(TEST_PASSWORD)).body.errors).toBeUndefined();
+  });
+
+  it("rejects a new password that equals the current one and keeps the other sessions", async () => {
+    const other = await openSession();
+
+    const { body, setCookies } = await change(await openSession(), {
+      currentPassword: TEST_PASSWORD,
+      newPassword: TEST_PASSWORD,
+    });
+
+    expect(body.errors?.[0]?.extensions).toMatchObject({
+      code: "BAD_USER_INPUT",
+      reason: "NEW_PASSWORD_SAME",
+    });
+    expect(setCookies).toEqual([]);
+    expect((await me(other)).body.data).toEqual({ me: { id: userId } });
   });
 
   it("needs a signed-in user", async () => {

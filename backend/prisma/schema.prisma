@@ -302,17 +302,20 @@ model PasswordResetToken {
 }
 
 model RefreshToken {
-  id          String    @id @default(uuid()) @db.Uuid
-  userId      String    @db.Uuid
-  tokenHash   String    @unique
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @db.Uuid
+  tokenHash    String    @unique
   // Tokens from one sign-in share a family; reuse of a replaced token revokes the whole family (D21).
-  familyId    String    @db.Uuid
-  expiresAt   DateTime
+  familyId     String    @db.Uuid
+  expiresAt    DateTime
   // Set when the token is swapped for a new one; the 30 s grace window is measured from it (D21).
-  replacedAt  DateTime?
+  replacedAt   DateTime?
   // Set when the replaced token is used once more inside the grace window; a second use revokes the family (D21).
-  graceUsedAt DateTime?
-  createdAt   DateTime  @default(now())
+  graceUsedAt  DateTime?
+  // The user's tokenVersion when the token was made. A refresh that ran during a password change can
+  // create a token after the change deleted the others; its old version ends it on the next refresh.
+  tokenVersion Int       @default(0)
+  createdAt    DateTime  @default(now())
 
   // Cascade: a user's tokens go with the user (D13).
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

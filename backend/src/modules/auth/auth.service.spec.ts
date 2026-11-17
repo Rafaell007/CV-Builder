@@ -10,6 +10,7 @@ import {
   AuthService,
   CURRENT_PASSWORD_INCORRECT_REASON,
   EMAIL_TAKEN_REASON,
+  NEW_PASSWORD_SAME_REASON,
   REFRESH_GRACE_WINDOW_MS,
 } from "./auth.service";
 import { hashPassword, verifyPassword } from "./password";
@@ -225,6 +226,7 @@ describe("AuthService", () => {
         familyId: "family-1",
         expiresAt: new Date(NOW.getTime() + hour),
         replacedAt: null,
+        tokenVersion: 2,
         user: { tokenVersion: 2 },
         ...overrides,
       };
@@ -245,6 +247,7 @@ describe("AuthService", () => {
           userId: "user-1",
           tokenHash: tokens.hashRefreshToken(result.refreshToken),
           familyId: "family-1",
+          tokenVersion: 2,
           expiresAt: new Date(NOW.getTime() + REFRESH_TOKEN_TTL_MS),
         },
       });
@@ -292,6 +295,19 @@ describe("AuthService", () => {
 
       await expect(createService().refresh("old-token")).rejects.toThrow(UnauthorizedException);
 
+      expect(prisma.refreshToken.deleteMany).toHaveBeenCalledWith({
+        where: { familyId: "family-1" },
+      });
+      expect(prisma.refreshToken.create).not.toHaveBeenCalled();
+    });
+
+    it("deletes the whole family of a token made before the last password change", async () => {
+      // A refresh that ran during changePassword can create such a token after the change deleted the others.
+      prisma.refreshToken.findUnique.mockResolvedValue(stored({ tokenVersion: 1 }));
+
+      await expect(createService().refresh("old-token")).rejects.toThrow(UnauthorizedException);
+
+      expect(prisma.refreshToken.updateMany).not.toHaveBeenCalled();
       expect(prisma.refreshToken.deleteMany).toHaveBeenCalledWith({
         where: { familyId: "family-1" },
       });
@@ -415,6 +431,31 @@ describe("AuthService", () => {
       });
       expect(prisma.$transaction).not.toHaveBeenCalled();
       expect(prisma.refreshToken.deleteMany).not.toHaveBeenCalled();
+    });
+
+    it("answers BAD_USER_INPUT with the reason NEW_PASSWORD_SAME when nothing would change", async () => {
+      const result = createService().changePassword("user-1", {
+        currentPassword: PASSWORD,
+        newPassword: PASSWORD,
+      });
+
+      await expect(result).rejects.toBeInstanceOf(BadRequestException);
+      await expect(result).rejects.toMatchObject({
+        response: { reason: NEW_PASSWORD_SAME_REASON },
+      });
+      expect(prisma.$transaction).not.toHaveBeenCalled();
+    });
+
+    it("checks the current password before comparing it with the new one", async () => {
+      // A wrong guess typed twice must not get a different answer than any other wrong guess.
+      const result = createService().changePassword("user-1", {
+        currentPassword: "Wrong-password1",
+        newPassword: "Wrong-password1",
+      });
+
+      await expect(result).rejects.toMatchObject({
+        response: { reason: CURRENT_PASSWORD_INCORRECT_REASON },
+      });
     });
 
     it("ends the session when the user no longer exists", async () => {

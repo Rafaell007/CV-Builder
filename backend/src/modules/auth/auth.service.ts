@@ -39,6 +39,9 @@ export const EMAIL_TAKEN_REASON = "EMAIL_TAKEN";
 /** `extensions.reason` of the `BAD_USER_INPUT` error of `changePassword`. The frontend shows it under the current password. */
 export const CURRENT_PASSWORD_INCORRECT_REASON = "CURRENT_PASSWORD_INCORRECT";
 
+/** `extensions.reason` of the `BAD_USER_INPUT` error of `changePassword`. The frontend shows it under the new password. */
+export const NEW_PASSWORD_SAME_REASON = "NEW_PASSWORD_SAME";
+
 @Injectable()
 export class AuthService {
   // Checked when the email is unknown, so that "no such user" takes as long as "wrong password".
@@ -125,6 +128,7 @@ export class AuthService {
    * - A replaced token works once more inside `REFRESH_GRACE_WINDOW_MS`, for a parallel request.
    * - A replaced token used after that window, or a second time inside it, means the token may be
    *   stolen: the whole family is deleted.
+   * - A token made before the last password change ends its family (see `RefreshToken.tokenVersion`).
    */
   async refresh(refreshToken: string | undefined): Promise<SessionTokens> {
     if (refreshToken === undefined) throw new UnauthorizedException(SESSION_ENDED);
@@ -138,10 +142,12 @@ export class AuthService {
         familyId: true,
         expiresAt: true,
         replacedAt: true,
+        tokenVersion: true,
         user: { select: { tokenVersion: true } },
       },
     });
     if (stored === null || stored.expiresAt <= now) throw new UnauthorizedException(SESSION_ENDED);
+    if (stored.tokenVersion !== stored.user.tokenVersion) return this.revokeFamily(stored.familyId);
 
     if (stored.replacedAt === null) {
       // Only one of two parallel requests can change the row; the other one gets `count: 0`
@@ -199,6 +205,14 @@ export class AuthService {
         reason: CURRENT_PASSWORD_INCORRECT_REASON,
       });
     }
+    // Checked after the current password, so it never tells a stranger what the password is.
+    // The same password would end every other session and change nothing.
+    if (newPassword === currentPassword) {
+      throw new BadRequestException({
+        message: "The new password must differ from the current one",
+        reason: NEW_PASSWORD_SAME_REASON,
+      });
+    }
 
     const passwordHash = await hashPassword(newPassword);
     return this.prisma.$transaction(async (tx) => {
@@ -242,6 +256,7 @@ export class AuthService {
         userId,
         tokenHash: this.tokens.hashRefreshToken(refreshToken),
         familyId,
+        tokenVersion,
         expiresAt: new Date(this.clock.now().getTime() + REFRESH_TOKEN_TTL_MS),
       },
     });
