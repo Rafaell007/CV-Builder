@@ -98,4 +98,21 @@ describe("useAddCvSkill", () => {
     expect(requests).toBe(1);
     expect(result().isOpen).toBe(false);
   });
+
+  it("sends no mastery after the user chose a level and then cleared it", async () => {
+    const { result } = setup({
+      mocks: [availableCvSkillsMock([docker]), addCvSkillMock(docker), cvSkillsMock()],
+    });
+    act(() => result().open());
+    act(() => result().select(docker.id));
+    act(() => result().selectMastery("EXPERT"));
+    expect(result().mastery).toBe("EXPERT");
+
+    act(() => result().selectMastery(""));
+    expect(result().mastery).toBe("");
+
+    // The mock has no mastery in its variables: a request with one would fail.
+    await act(() => result().submit());
+    expect(result().isOpen).toBe(false);
+  });
 });

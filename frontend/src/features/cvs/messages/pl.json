@@ -132,6 +132,7 @@
       "close": "Zamknij",
       "skill": "Umiejętność",
       "mastery": "Poziom umiejętności",
+      "noMastery": "Brak poziomu",
       "submit": "Dodaj",
       "cancel": "Anuluj",
       "loading": "Ładowanie umiejętności",

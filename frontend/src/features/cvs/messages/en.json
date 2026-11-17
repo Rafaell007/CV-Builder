@@ -132,6 +132,7 @@
       "close": "Close",
       "skill": "Skill",
       "mastery": "Skill mastery",
+      "noMastery": "No mastery",
       "submit": "Add",
       "cancel": "Cancel",
       "loading": "Loading skills",

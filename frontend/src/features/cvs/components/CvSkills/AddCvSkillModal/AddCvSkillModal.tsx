@@ -5,6 +5,10 @@ import type { UseAddCvSkillResult } from "../useAddCvSkill";
 import { useMasteryLabel } from "../useMasteryLabel";
 import styles from "./AddCvSkillModal.module.css";
 
+// Radix Select does not allow an option with the value "", so the "No mastery" option uses this value and the
+// modal turns it back into "" (nothing chosen) before it reaches the flow.
+const NO_MASTERY = "NONE";
+
 export interface AddCvSkillModalProps {
   /** The state of the add flow: open state, options, chosen skill, submit and the errors. */
   adding: UseAddCvSkillResult;
@@ -63,9 +67,16 @@ export function AddCvSkillModal({ adding }: AddCvSkillModalProps) {
       />
       <Select
         label={t("mastery")}
-        options={MASTERY_LEVELS.map(({ level }) => ({ value: level, label: masteryLabel(level) }))}
+        options={[
+          { value: NO_MASTERY, label: t("noMastery") },
+          ...MASTERY_LEVELS.map(({ level }) => ({ value: level, label: masteryLabel(level) })),
+        ]}
         value={mastery}
         onValueChange={(value) => {
+          if (value === NO_MASTERY) {
+            selectMastery("");
+            return;
+          }
           const next = MASTERY_LEVELS.find(({ level }) => level === value);
           if (next) selectMastery(next.level);
         }}

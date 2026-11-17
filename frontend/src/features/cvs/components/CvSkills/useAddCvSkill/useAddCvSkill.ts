@@ -46,7 +46,8 @@ export function useAddCvSkill(cvId: string) {
     setError(undefined);
   }
 
-  function selectMastery(next: CvSkillMastery) {
+  /** An empty string clears the mastery: the request then has no mastery. */
+  function selectMastery(next: CvSkillMastery | "") {
     setMastery(next);
     setError(undefined);
   }
