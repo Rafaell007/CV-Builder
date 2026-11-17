@@ -72,7 +72,6 @@ describe("CvPreviewSkillsTable", () => {
     const skill = {
       __typename: "CvPreviewSkill" as const,
       name: "React",
-      mastery: "EXPERT" as const,
       experienceYears: 1,
       lastUsedYear: 2026,
     };
@@ -95,7 +94,6 @@ describe("CvPreviewSkillsTable", () => {
       skills: [1, 2, 3].map((n) => ({
         __typename: "CvPreviewSkill" as const,
         name: `${category} skill ${n}`,
-        mastery: "ADVANCED" as const,
         experienceYears: n,
         lastUsedYear: 2020 + n,
       })),

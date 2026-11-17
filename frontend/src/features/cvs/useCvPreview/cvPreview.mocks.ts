@@ -26,14 +26,12 @@ export const cvPreviewSample: CvPreviewData = {
         {
           __typename: "CvPreviewSkill",
           name: "React",
-          mastery: "EXPERT",
           experienceYears: 5,
           lastUsedYear: 2026,
         },
         {
           __typename: "CvPreviewSkill",
           name: "CSS",
-          mastery: "ADVANCED",
           experienceYears: 6,
           lastUsedYear: 2026,
         },
@@ -46,7 +44,6 @@ export const cvPreviewSample: CvPreviewData = {
         {
           __typename: "CvPreviewSkill",
           name: "GraphQL",
-          mastery: "BEGINNER",
           experienceYears: null,
           lastUsedYear: null,
         },
@@ -99,14 +96,12 @@ export const cvPreviewFigmaSample: CvPreviewData = {
         {
           __typename: "CvPreviewSkill",
           name: "TypeScript",
-          mastery: "ADVANCED",
           experienceYears: 2,
           lastUsedYear: 2025,
         },
         {
           __typename: "CvPreviewSkill",
           name: "JavaScript",
-          mastery: "ADVANCED",
           experienceYears: 2,
           lastUsedYear: 2025,
         },
@@ -119,7 +114,6 @@ export const cvPreviewFigmaSample: CvPreviewData = {
         {
           __typename: "CvPreviewSkill",
           name: "React",
-          mastery: "ADVANCED",
           experienceYears: 2,
           lastUsedYear: 2025,
         },
@@ -132,7 +126,6 @@ export const cvPreviewFigmaSample: CvPreviewData = {
         {
           __typename: "CvPreviewSkill",
           name: "Redux",
-          mastery: "ADVANCED",
           experienceYears: 2,
           lastUsedYear: 2025,
         },
@@ -145,7 +138,6 @@ export const cvPreviewFigmaSample: CvPreviewData = {
         {
           __typename: "CvPreviewSkill",
           name: "gRPC",
-          mastery: "INTERMEDIATE",
           experienceYears: 2,
           lastUsedYear: 2025,
         },

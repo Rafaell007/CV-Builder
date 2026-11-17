@@ -25,7 +25,6 @@ describe("CvPreviewSkills", () => {
     const skill = {
       __typename: "CvPreviewSkill" as const,
       name: "React",
-      mastery: "EXPERT" as const,
       experienceYears: 1,
       lastUsedYear: 2026,
     };

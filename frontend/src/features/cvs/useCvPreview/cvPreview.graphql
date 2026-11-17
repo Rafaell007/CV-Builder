@@ -18,7 +18,6 @@ query CvPreview($cvId: ID!) {
       category
       skills {
         name
-        mastery
         experienceYears
         lastUsedYear
       }
