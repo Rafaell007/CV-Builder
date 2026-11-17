@@ -317,8 +317,7 @@
     "skillsTable": {
       "caption": "Umiejętności zawodowe",
       "columns": {
-        "category": "Kategoria umiejętności",
-        "skill": "Umiejętność",
+        "skills": "Umiejętności",
         "experience": "Doświadczenie w latach",
         "lastUsed": "Ostatnio używana"
       },

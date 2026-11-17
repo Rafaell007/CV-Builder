@@ -317,8 +317,7 @@
     "skillsTable": {
       "caption": "Professional skills",
       "columns": {
-        "category": "Skills Category",
-        "skill": "Skill",
+        "skills": "Skills",
         "experience": "Experience in Years",
         "lastUsed": "Last Used"
       },

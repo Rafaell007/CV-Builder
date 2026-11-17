@@ -25,11 +25,8 @@ export function CvPreviewSkillsTable({ skillGroups }: CvPreviewSkillsTableProps)
         <caption className={styles.visuallyHidden}>{t("caption")}</caption>
         <thead>
           <tr>
-            <th scope="col" className={styles.headCell}>
-              {t("columns.category")}
-            </th>
-            <th scope="col" className={styles.headCell}>
-              {t("columns.skill")}
+            <th scope="col" colSpan={2} className={styles.headCell}>
+              {t("columns.skills")}
             </th>
             <th scope="col" className={styles.headCell}>
               {t("columns.experience")}

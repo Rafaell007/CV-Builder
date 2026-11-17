@@ -6,12 +6,18 @@ import { CvPreviewSkillsTable } from "./CvPreviewSkillsTable";
 const groups = cvPreviewSample.skillGroups;
 
 describe("CvPreviewSkillsTable", () => {
-  it("is a table with a name and four column headers (AC-16)", () => {
+  it("is a table with a name and one Skills header over the category and skill columns (AC-16)", () => {
     renderWithProviders(<CvPreviewSkillsTable skillGroups={groups} />);
 
     expect(screen.getByRole("table", { name: "Professional skills" })).toBeInTheDocument();
-    const headers = screen.getAllByRole("columnheader").map((h) => h.textContent);
-    expect(headers).toEqual(["Skills Category", "Skill", "Experience in Years", "Last Used"]);
+    const headers = screen.getAllByRole("columnheader");
+    expect(headers.map((h) => h.textContent)).toEqual([
+      "Skills",
+      "Experience in Years",
+      "Last Used",
+    ]);
+    expect(headers[0]).toHaveAttribute("colspan", "2");
+    expect(headers[0]).toHaveAttribute("scope", "col");
   });
 
   it("shows the category once per group and spans its rows", () => {
