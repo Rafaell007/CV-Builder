@@ -42,13 +42,19 @@ export function CvPreview({ cvId }: CvPreviewProps) {
   return (
     <article className={styles.document} aria-label={t("document")}>
       <CvPreviewHeader fullName={preview.fullName} position={preview.position} />
-      <CvPreviewGeneral
-        education={preview.education}
-        languages={preview.languages}
-        domains={preview.domains}
-      />
-      <CvPreviewSummary name={preview.name} description={preview.description} />
-      <CvPreviewSkills skillGroups={preview.skillGroups} />
+      <div className={styles.overview}>
+        <div className={styles.aside}>
+          <CvPreviewGeneral
+            education={preview.education}
+            languages={preview.languages}
+            domains={preview.domains}
+          />
+        </div>
+        <div className={styles.main}>
+          <CvPreviewSummary name={preview.name} description={preview.description} />
+          <CvPreviewSkills skillGroups={preview.skillGroups} />
+        </div>
+      </div>
       <CvPreviewProjects projects={preview.projects} />
       <section className={styles.section} aria-labelledby="cv-preview-professional-skills-title">
         <h2 id="cv-preview-professional-skills-title" className={styles.title}>

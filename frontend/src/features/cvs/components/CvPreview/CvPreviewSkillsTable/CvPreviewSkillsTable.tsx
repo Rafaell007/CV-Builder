@@ -28,10 +28,10 @@ export function CvPreviewSkillsTable({ skillGroups }: CvPreviewSkillsTableProps)
             <th scope="col" colSpan={2} className={styles.headCell}>
               {t("columns.skills")}
             </th>
-            <th scope="col" className={styles.headCell}>
+            <th scope="col" className={styles.headCellNumber}>
               {t("columns.experience")}
             </th>
-            <th scope="col" className={styles.headCell}>
+            <th scope="col" className={styles.headCellNumber}>
               {t("columns.lastUsed")}
             </th>
           </tr>
@@ -56,10 +56,10 @@ export function CvPreviewSkillsTable({ skillGroups }: CvPreviewSkillsTableProps)
                   </th>
                 )}
                 <td className={styles.cell}>{skill.name}</td>
-                <td className={styles.cell}>
+                <td className={styles.cellNumber}>
                   {skill.experienceYears ?? missing(t("columns.experience"))}
                 </td>
-                <td className={styles.cell}>
+                <td className={styles.cellNumber}>
                   {skill.lastUsedYear ?? missing(t("columns.lastUsed"))}
                 </td>
               </tr>
