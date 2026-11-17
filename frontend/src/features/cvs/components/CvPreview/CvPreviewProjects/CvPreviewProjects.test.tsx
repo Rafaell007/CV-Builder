@@ -17,6 +17,7 @@ describe("CvPreviewProjects", () => {
     expect(screen.getByRole("heading", { level: 2, name: "Projects" })).toBeInTheDocument();
     const project = within(projectArticle("Banking Portal"));
     expect(project.getByText("A web portal for retail banking customers.")).toBeInTheDocument();
+    expect(project.getByText("Project roles")).toBeInTheDocument();
     expect(project.getByText("Frontend Developer, Team Lead")).toBeInTheDocument();
     expect(project.getByText("01.2022 – Till now")).toBeInTheDocument();
     expect(project.getByText("Built the account pages and led code reviews.")).toBeInTheDocument();
@@ -27,7 +28,7 @@ describe("CvPreviewProjects", () => {
     renderWithProviders(<CvPreviewProjects projects={cvPreviewSample.projects} />);
 
     const project = within(projectArticle("Online Shop"));
-    expect(project.queryByText("Roles")).not.toBeInTheDocument();
+    expect(project.queryByText("Project roles")).not.toBeInTheDocument();
     expect(project.queryByText("Responsibilities")).not.toBeInTheDocument();
     expect(project.getByText("03.2020 – 12.2021")).toBeInTheDocument();
     expect(project.getByText("Next.js")).toBeInTheDocument();

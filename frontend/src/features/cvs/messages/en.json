@@ -329,7 +329,7 @@
       "general": {
         "title": "General information",
         "education": "Education",
-        "languages": "Languages",
+        "languages": "Language proficiency",
         "levelNative": "Native",
         "domains": "Domains"
       },
@@ -344,7 +344,7 @@
       },
       "projects": {
         "title": "Projects",
-        "roles": "Roles",
+        "roles": "Project roles",
         "period": "Period",
         "responsibilities": "Responsibilities",
         "environment": "Environment"

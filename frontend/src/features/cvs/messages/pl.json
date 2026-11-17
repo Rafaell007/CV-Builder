@@ -329,7 +329,7 @@
       "general": {
         "title": "Informacje ogólne",
         "education": "Wykształcenie",
-        "languages": "Języki",
+        "languages": "Znajomość języków",
         "levelNative": "Ojczysty",
         "domains": "Branże"
       },
@@ -344,7 +344,7 @@
       },
       "projects": {
         "title": "Projekty",
-        "roles": "Role",
+        "roles": "Role w projekcie",
         "period": "Okres",
         "responsibilities": "Obowiązki",
         "environment": "Środowisko"
