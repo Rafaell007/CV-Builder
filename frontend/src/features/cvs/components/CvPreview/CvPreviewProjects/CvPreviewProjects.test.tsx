@@ -47,6 +47,12 @@ describe("CvPreviewProjects", () => {
     expect(project.getByText("Period")).toBeInTheDocument();
   });
 
+  it("renders nothing, not even the Projects heading, when there are no projects", () => {
+    renderWithProviders(<CvPreviewProjects projects={[]} />);
+
+    expect(screen.queryByRole("heading")).not.toBeInTheDocument();
+  });
+
   it("shows the period text exactly as the backend sent it", () => {
     const [first] = cvPreviewSample.projects;
     if (!first) throw new Error("The sample has no project");

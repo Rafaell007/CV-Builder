@@ -9,10 +9,12 @@ export interface CvPreviewProjectsProps {
 /**
  * The projects of the CV document. Each project shows its name, description, roles, period (the text of the
  * backend), responsibilities and environment. The description, roles, responsibilities and environment are hidden
- * when empty.
+ * when empty. The whole section, with its heading, is hidden when there are no projects.
  */
 export function CvPreviewProjects({ projects }: CvPreviewProjectsProps) {
   const t = useTranslations("cvs.preview.sections.projects");
+
+  if (projects.length === 0) return null;
 
   return (
     <section className={styles.section} aria-labelledby="cv-preview-projects-title">
