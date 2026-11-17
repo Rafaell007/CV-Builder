@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 // Inputs, textareas and the combobox buttons of Select, MultiSelect and DatePicker.
 const FIELD_SELECTOR = [
@@ -7,7 +7,7 @@ const FIELD_SELECTOR = [
   '[role="combobox"]:not(:disabled)',
 ].join(", ");
 
-// How long after opening a selection is undone. A menu that opened the modal (a row's Actions menu) returns the focus
+// Longest time after opening that a selection is undone (it ends sooner at the first key or pointer press). A menu that opened the modal (a row's Actions menu) returns the focus
 // to its button as it closes; the Radix focus trap then pulls the focus back with select(), which selects the whole
 // text of the field (the date of a filled date field). The pull-back comes some milliseconds after the modal opened.
 const SELECTION_GUARD_MS = 1000;
@@ -28,12 +28,28 @@ function collapseSelection(field: HTMLElement) {
   }
 }
 
-// Collapses at once and again for every select() in the first second (the "select" event fires after select()).
+// Collapses at once and again for every select() until the user presses a key or a pointer button, or the guard time
+// ends (the "select" event fires after select()). A selection the user makes (double-click, Ctrl+A) comes after such
+// an interaction, so it stays. Returns a function that stops the guard at once.
 function keepSelectionCollapsed(field: HTMLElement) {
   collapseSelection(field);
-  const onSelect = () => collapseSelection(field);
+  let timer = 0;
+  const stop = () => {
+    window.clearTimeout(timer);
+    field.removeEventListener("select", onSelect);
+    document.removeEventListener("pointerdown", stop, true);
+    document.removeEventListener("keydown", stop, true);
+  };
+  const onSelect = () => {
+    if (!field.isConnected)
+      stop(); // the modal closed
+    else collapseSelection(field);
+  };
   field.addEventListener("select", onSelect);
-  window.setTimeout(() => field.removeEventListener("select", onSelect), SELECTION_GUARD_MS);
+  document.addEventListener("pointerdown", stop, true);
+  document.addEventListener("keydown", stop, true);
+  timer = window.setTimeout(stop, SELECTION_GUARD_MS);
+  return stop;
 }
 
 // The DatePicker marks its box with this attribute.
@@ -48,6 +64,10 @@ const DATE_PICKER_SELECTOR = "[data-date-picker]";
  */
 export function useFirstFieldFocus() {
   const formRef = useRef<HTMLFormElement>(null);
+  const stopGuard = useRef<(() => void) | null>(null);
+
+  // Stops the guard (listeners and timer) when the component unmounts.
+  useEffect(() => () => stopGuard.current?.(), []);
 
   function onOpenAutoFocus(event: Event) {
     const fields = formRef.current?.querySelectorAll<HTMLElement>(FIELD_SELECTOR) ?? [];
@@ -59,7 +79,8 @@ export function useFirstFieldFocus() {
       return;
     }
     firstField.focus();
-    keepSelectionCollapsed(firstField);
+    stopGuard.current?.();
+    stopGuard.current = keepSelectionCollapsed(firstField);
   }
 
   return { formRef, onOpenAutoFocus };
