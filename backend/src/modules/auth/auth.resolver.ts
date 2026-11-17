@@ -1,10 +1,11 @@
 import { UnauthorizedException, UseGuards } from "@nestjs/common";
 import { Args, Context, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { CurrentUser, Public } from "../../common/auth";
+import { CurrentUser, Public, requireUser } from "../../common/auth";
 import type { AuthUser } from "../../common/auth";
 import { GqlThrottlerGuard } from "../../common/throttling";
 import type { AuthContext } from "./auth-context";
 import { AuthService } from "./auth.service";
+import { ChangePasswordInput } from "./dto/change-password.input";
 import { SignInInput } from "./dto/sign-in.input";
 import { SignUpInput } from "./dto/sign-up.input";
 import { SessionUser } from "./models/session-user";
@@ -40,6 +41,19 @@ export class AuthResolver {
     const { user, accessToken, refreshToken } = await this.authService.signUp(input);
     this.cookies.set(res, { accessToken, refreshToken });
     return user;
+  }
+
+  // Signed-in users only, verified or not (decision C). Other sessions end; this one gets new cookies.
+  @UseGuards(GqlThrottlerGuard)
+  @Mutation(() => Boolean)
+  async changePassword(
+    @CurrentUser() user: AuthUser | undefined,
+    @Args("input") input: ChangePasswordInput,
+    @Context() { res }: AuthContext,
+  ): Promise<boolean> {
+    const tokens = await this.authService.changePassword(requireUser(user).id, input);
+    this.cookies.set(res, tokens);
+    return true;
   }
 
   // Public, because a user whose access token has expired must still be able to sign out.

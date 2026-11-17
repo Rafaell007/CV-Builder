@@ -24,6 +24,11 @@ type AvailableCvSkill {
   name: String!
 }
 
+input ChangePasswordInput {
+  currentPassword: String!
+  newPassword: String!
+}
+
 input CreateCvInput {
   description: String!
   education: String!
@@ -150,6 +155,7 @@ enum Mastery {
 type Mutation {
   addCvProject(input: AddCvProjectInput!): CvProject!
   addCvSkill(input: AddCvSkillInput!): CvSkill!
+  changePassword(input: ChangePasswordInput!): Boolean!
   createCv(input: CreateCvInput!): Cv!
   createProject(input: CreateProjectInput!): Project!
   deleteCv(id: ID!): Cv!

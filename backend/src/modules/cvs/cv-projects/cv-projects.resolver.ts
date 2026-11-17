@@ -7,7 +7,7 @@ import { CvProjectsArgs } from "./dto/cv-projects.args";
 import { RemoveCvProjectsInput } from "./dto/remove-cv-projects.input";
 import { UpdateCvProjectInput } from "./dto/update-cv-project.input";
 import { CvProject } from "./models/cv-project";
-import { requireUser } from "../require-user";
+import { requireUser } from "../../../common/auth";
 
 /** Reading needs a session; adding, changing and removing also need a verified email (D16). */
 @Resolver(() => CvProject)

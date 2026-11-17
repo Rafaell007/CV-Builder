@@ -28,6 +28,9 @@ function setup() {
     signOut: jest.fn().mockResolvedValue(undefined),
     refresh: jest.fn().mockResolvedValue({ accessToken: "access-2", refreshToken: "refresh-2" }),
     findSessionUser: jest.fn().mockResolvedValue(USER),
+    changePassword: jest
+      .fn()
+      .mockResolvedValue({ accessToken: "access-3", refreshToken: "refresh-3" }),
   } as unknown as jest.Mocked<AuthService>;
   const cookies = {
     set: jest.fn(),
@@ -125,6 +128,42 @@ describe("AuthResolver", () => {
     await expect(resolver.refresh(context)).rejects.toThrow("database down");
 
     expect(cookies.clear).not.toHaveBeenCalled();
+  });
+
+  describe("changePassword", () => {
+    const AUTH_USER = { id: "user-1", role: Role.USER, isVerified: false };
+    const INPUT = { currentPassword: "Password123!", newPassword: "NewPassword456!" };
+
+    it("changes the password of the signed-in user and sets the new cookies", async () => {
+      const { resolver, authService, cookies, context } = setup();
+
+      await expect(resolver.changePassword(AUTH_USER, INPUT, context)).resolves.toBe(true);
+
+      expect(authService.changePassword).toHaveBeenCalledWith("user-1", INPUT);
+      expect(cookies.set).toHaveBeenCalledWith(context.res, {
+        accessToken: "access-3",
+        refreshToken: "refresh-3",
+      });
+    });
+
+    it("sets no cookie when the current password is wrong", async () => {
+      const { resolver, authService, cookies, context } = setup();
+      authService.changePassword.mockRejectedValue(new Error("Current password is incorrect"));
+
+      await expect(resolver.changePassword(AUTH_USER, INPUT, context)).rejects.toThrow();
+
+      expect(cookies.set).not.toHaveBeenCalled();
+    });
+
+    it("rejects a call without a signed-in user", async () => {
+      const { resolver, authService, context } = setup();
+
+      await expect(resolver.changePassword(undefined, INPUT, context)).rejects.toThrow(
+        UnauthorizedException,
+      );
+
+      expect(authService.changePassword).not.toHaveBeenCalled();
+    });
   });
 
   it("me returns the current user", async () => {
