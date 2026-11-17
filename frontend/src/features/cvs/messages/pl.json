@@ -311,8 +311,7 @@
       "loading": "Ładowanie podglądu CV",
       "unauthorized": "Nie masz uprawnień do tego CV",
       "error": "Nie udało się wczytać podglądu CV",
-      "retry": "Spróbuj ponownie",
-      "empty": "Podgląd CV jest niedostępny"
+      "retry": "Spróbuj ponownie"
     },
     "skillsTable": {
       "caption": "Umiejętności zawodowe",

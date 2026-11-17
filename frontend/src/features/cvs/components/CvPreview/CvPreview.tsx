@@ -17,17 +17,15 @@ export interface CvPreviewProps {
 
 /**
  * The content of the Preview tab (PLAN S7.5, KAN-160): the CV as a printable document, with the loading, error
- * (Retry), unauthorized and empty states. All data comes from the backend, which also decides who may see the CV.
+ * (Retry), and unauthorized states. All data comes from the backend, which also decides who may see the CV.
  * The page `h1` (the CV name) is in `CvLayout`, so the document starts with `h2` headings. EXPORT PDF is S7.6.
  */
 export function CvPreview({ cvId }: CvPreviewProps) {
   const t = useTranslations("cvs.preview");
   const { preview, loading, failed, unauthorized, retry } = useCvPreview(cvId);
 
-  const stateLabels: PageStateLabels = {
+  const stateLabels: Partial<PageStateLabels> = {
     loading: t("states.loading"),
-    empty: t("states.empty"),
-    noResults: t("states.empty"),
     error: t("states.error"),
     retry: t("states.retry"),
   };
@@ -38,7 +36,8 @@ export function CvPreview({ cvId }: CvPreviewProps) {
     return <PageState kind="error" labels={{ error: t("states.unauthorized") }} />;
   }
   if (failed) return <PageState kind="error" labels={stateLabels} onRetry={retry} />;
-  if (!preview) return <PageState kind="empty" labels={stateLabels} />;
+  // `cvPreview` is non-null in the schema, so after loading and without a failure the data is there.
+  if (!preview) return null;
 
   return (
     <article className={styles.document} aria-label={t("document")}>

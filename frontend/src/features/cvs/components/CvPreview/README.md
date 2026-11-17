@@ -8,7 +8,7 @@ The document sections (KAN-158) are presentational: props in, JSX out. No data f
 
 `CvPreview({ cvId })`: the container of the Preview tab (`"use client"`). It calls `useCvPreview(cvId)` and renders the document: Header, General, Summary, Skills, Projects, then the section "Professional skills" with the `CvPreviewSkillsTable`. Import it from `components/CvPreview` (`index.ts`) or from `features/cvs`. The route `cvs/[cvId]/preview/page.tsx` renders it.
 
-- States, all with the shared `PageState`: loading (`role="status"`), error (`role="alert"`) with Retry, unauthorized and empty. Unauthorized shows `You are not authorized to access this CV` and no CV data, with no Retry, because the answer would be the same. Empty (`CV preview is not available`) shows when the backend sends no preview. Texts: `cvs.preview.states` and `cvs.preview.sections.professionalSkills`.
+- States, all with the shared `PageState`: loading (`role="status"`), error (`role="alert"`) with Retry, and unauthorized. Unauthorized shows `You are not authorized to access this CV` and no CV data, with no Retry, because the answer would be the same. There is no empty state: `cvPreview` is non-null in the schema. Texts: `cvs.preview.states` and `cvs.preview.sections.professionalSkills`.
 - Heading order: the page `h1` is the CV name of `CvLayout` (`PageHeader`, visually hidden). The container adds no `h1`; the document starts with `h2`. The `<article>` has the label `CV preview`.
 - The document is a sheet with a border and the surface colour, at most 900px wide, in the middle of the page. Colours come from design tokens.
 - No EXPORT PDF button. It comes with S7.6 (KAN-119). The spec asks for it in the page header, and for a disabled state while the data is missing.

@@ -60,17 +60,4 @@ describe("CvPreview", () => {
     expect(screen.queryByRole("button", { name: "Retry" })).not.toBeInTheDocument();
     expect(screen.queryByText("Anna Kowalska")).not.toBeInTheDocument();
   });
-
-  it("shows the empty state when the backend sends no preview", async () => {
-    renderWithProviders(<CvPreview cvId={CV_ID} />, {
-      mocks: [
-        {
-          request: cvPreviewMock().request,
-          result: { data: { cvPreview: null } },
-        },
-      ],
-    });
-
-    expect(await screen.findByText("CV preview is not available")).toBeInTheDocument();
-  });
 });

@@ -311,8 +311,7 @@
       "loading": "Loading CV preview",
       "unauthorized": "You are not authorized to access this CV",
       "error": "Failed to load CV preview",
-      "retry": "Retry",
-      "empty": "CV preview is not available"
+      "retry": "Retry"
     },
     "skillsTable": {
       "caption": "Professional skills",
