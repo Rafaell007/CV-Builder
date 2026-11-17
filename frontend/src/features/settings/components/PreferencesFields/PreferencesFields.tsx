@@ -1,8 +1,8 @@
 "use client";
 
-import { useTranslations, hasLocale } from "next-intl";
+import { hasLocale, useTranslations } from "next-intl";
 import { useLanguage } from "@/shared/i18n";
-import { Select } from "@/shared/components/Select";
+import { Select } from "@/shared/components";
 import { THEMES, usePreferences } from "@/shared/preferences";
 
 export function PreferencesFields() {
