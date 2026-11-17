@@ -23,3 +23,5 @@ Docs: [Playwright webServer](https://playwright.dev/docs/test-webserver), [Next.
 ## Known problems (found 2026-11-13, KAN-114)
 
 - **`projects/projects.a11y.spec.ts` fails in a full run with one worker** (`the search field, CREATE PROJECT, the sort buttons and every row menu can be reached with Tab`, `only one row menu is open at a time`). It passes when run alone, and it fails the same on a clean `development` branch, so it does not come from the CV work. Probably a data left by an earlier spec; not investigated.
+
+**Open note (KAN-94):** the `sign-up` spec failed once in a full `pnpm test-all` run under load, and passed 40 of 40 times alone. The cause is not found yet. Check it again before you trust a red `sign-up` run.
