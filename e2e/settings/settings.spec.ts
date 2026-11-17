@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { canSignIn } from "../support/account";
+import { signIn } from "../support/signIn";
 import { signUp } from "../support/signUp";
 
 // Every test signs up its own account: changing a seeded user's password would break the specs that run
@@ -81,4 +82,31 @@ test("a wrong current password is explained and the password stays the same", as
   await expect(page.getByText("Current password is incorrect")).toBeVisible();
   await expect(page.getByLabel("New Password", { exact: true })).toHaveValue(NEW_PASSWORD);
   expect(await canSignIn(request, email, OLD_PASSWORD)).toBe(true);
+});
+
+test("a password change signs out the user's other sessions at once (D22)", async ({
+  browser,
+  page,
+}) => {
+  // A second browser: another device of the same user, signed in before the change.
+  const otherContext = await browser.newContext();
+  try {
+    await signIn(otherContext, email);
+    const otherPage = await otherContext.newPage();
+    await otherPage.goto("/settings");
+    await expect(otherPage.getByRole("combobox", { name: "Theme" })).toBeVisible();
+
+    await fillPasswords(page, OLD_PASSWORD);
+    await submit(page).click();
+    await expect(page.getByText("Password changed", { exact: true })).toBeVisible();
+
+    // The proxy only checks that the cookies exist; the first request that needs a session ends it.
+    await otherPage.goto("/cvs");
+    await expect(otherPage).toHaveURL(/\/sign-in$/);
+    // This session keeps working.
+    await page.reload();
+    await expect(themeSelect(page)).toBeVisible();
+  } finally {
+    await otherContext.close();
+  }
 });
