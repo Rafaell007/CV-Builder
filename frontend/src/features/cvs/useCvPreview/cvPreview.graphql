@@ -26,10 +26,7 @@ query CvPreview($cvId: ID!) {
     projects {
       name
       description
-      domain
       period
-      startDate
-      endDate
       roles
       responsibilities
       environment
