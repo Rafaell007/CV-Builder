@@ -34,6 +34,7 @@
       "newPasswordTooShort": "Password must be at least {min} characters long",
       "newPasswordTooLong": "Password must be at most {max} characters long",
       "newPasswordWeak": "Password must contain at least one letter and one digit",
+      "newPasswordSame": "New password must be different from the current one",
       "confirmRequired": "Confirm password is required",
       "confirmMismatch": "Passwords do not match",
       "currentPasswordIncorrect": "Current password is incorrect",

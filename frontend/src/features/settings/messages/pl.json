@@ -34,6 +34,7 @@
       "newPasswordTooShort": "Hasło musi mieć co najmniej {min, plural, one {# znak} few {# znaki} other {# znaków}}",
       "newPasswordTooLong": "Hasło może mieć najwyżej {max, plural, one {# znak} few {# znaki} other {# znaków}}",
       "newPasswordWeak": "Hasło musi zawierać co najmniej jedną literę i jedną cyfrę",
+      "newPasswordSame": "Nowe hasło musi być inne niż obecne",
       "confirmRequired": "Potwierdzenie hasła jest wymagane",
       "confirmMismatch": "Hasła nie są takie same",
       "currentPasswordIncorrect": "Obecne hasło jest nieprawidłowe",

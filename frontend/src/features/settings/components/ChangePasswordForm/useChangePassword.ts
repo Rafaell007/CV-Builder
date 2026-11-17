@@ -11,7 +11,7 @@ import type {
   ChangePasswordField,
   ChangePasswordValues,
 } from "./change-password.types";
-import { toChangePasswordFailure, validateChangePassword } from "./utils";
+import { FIELD_FAILURES, toChangePasswordFailure, validateChangePassword } from "./utils";
 
 const EMPTY_VALUES: ChangePasswordValues = {
   currentPassword: "",
@@ -29,7 +29,7 @@ export type ChangePasswordFieldProps = {
 /**
  * State of the change-password form (settings, decision G). A field shows its error after it was left,
  * and the submit button stays disabled until all fields are valid. Success: toast + empty form.
- * Failure: the values stay; a wrong current password shows under that field, other errors under the form.
+ * Failure: the values stay; a wrong current password or a reused one shows under its field, other errors under the form.
  */
 export function useChangePassword() {
   const t = useTranslations("settings.changePassword");
@@ -48,8 +48,11 @@ export function useChangePassword() {
       : t(`errors.${key}`, { min: PASSWORD_MIN_LENGTH, max: PASSWORD_MAX_LENGTH });
   }
 
+  // The field a server failure belongs to, or undefined when it is shown under the form.
+  const failureField = failure === null ? undefined : FIELD_FAILURES[failure];
+
   function fieldError(field: ChangePasswordField): ChangePasswordErrorKey | undefined {
-    if (field === "currentPassword" && failure === "currentPasswordIncorrect") return failure;
+    if (failure !== null && failureField === field) return failure;
     return touched.has(field) ? validation[field] : undefined;
   }
 
@@ -60,7 +63,9 @@ export function useChangePassword() {
       onChange: (event) => {
         const { value } = event.target;
         setValues((current) => ({ ...current, [field]: value }));
-        setFailure(null);
+        // A field's server error stays until that field changes (the current password is still wrong
+        // while the user edits the new one); an error under the form goes on any change.
+        if (failureField === undefined || failureField === field) setFailure(null);
       },
       onBlur: () => setTouched((current) => new Set(current).add(field)),
     };
@@ -89,8 +94,7 @@ export function useChangePassword() {
     pending: loading,
     // Only validity: while `pending` the Button blocks clicks itself and keeps the focus (aria-disabled, not disabled).
     canSubmit: isValid,
-    formError:
-      failure !== null && failure !== "currentPasswordIncorrect" ? translate(failure) : undefined,
+    formError: failure !== null && failureField === undefined ? translate(failure) : undefined,
     onSubmit: (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       submit();

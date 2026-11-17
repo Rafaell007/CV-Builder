@@ -160,8 +160,45 @@ describe("ChangePasswordForm", () => {
     expect(newField()).toHaveValue(PASSWORD);
     expect(confirmField()).toHaveValue(PASSWORD);
 
+    // The current password is still wrong while the user edits the other fields.
+    await user.type(newField(), "3");
+    expect(screen.getByText("Current password is incorrect")).toBeInTheDocument();
+
     await user.type(currentField(), "2");
     expect(screen.queryByText("Current password is incorrect")).not.toBeInTheDocument();
+  });
+
+  it("refuses a new password that equals the current one and sends nothing", async () => {
+    // No mocks: a request would find no mock and show an error.
+    const { user } = renderWithProviders(<ChangePasswordForm />);
+
+    await user.type(currentField(), PASSWORD);
+    await user.type(newField(), PASSWORD);
+    await user.type(confirmField(), PASSWORD);
+    await user.tab();
+
+    expect(
+      screen.getByText("New password must be different from the current one"),
+    ).toBeInTheDocument();
+    expect(submit()).toBeDisabled();
+  });
+
+  it("shows the server's same-password answer under the new password", async () => {
+    // The backend checks it again; this covers a client that skipped the check.
+    const { user } = renderWithProviders(<ChangePasswordForm />, {
+      mocks: [changePasswordMock(failure("BAD_USER_INPUT", "NEW_PASSWORD_SAME"))],
+    });
+
+    await fillForm(user);
+    await user.click(submit());
+
+    expect(
+      await screen.findByText("New password must be different from the current one"),
+    ).toBeInTheDocument();
+    expect(newField()).toHaveAccessibleDescription(
+      "New password must be different from the current one",
+    );
+    expect(screen.getAllByRole("alert")).toHaveLength(1);
   });
 
   it.each([

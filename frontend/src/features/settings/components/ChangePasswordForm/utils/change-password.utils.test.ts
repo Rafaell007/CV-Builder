@@ -47,13 +47,30 @@ describe("validateChangePassword", () => {
       confirmPassword: "confirmMismatch",
     });
   });
+
+  it("refuses a new password that equals the current one", () => {
+    expect(validateChangePassword({ ...VALID, currentPassword: PASSWORD })).toEqual({
+      newPassword: "newPasswordSame",
+    });
+  });
+
+  it("names the rule problem first when the reused password also breaks a rule", () => {
+    expect(
+      validateChangePassword({
+        currentPassword: "short1",
+        newPassword: "short1",
+        confirmPassword: "short1",
+      }),
+    ).toEqual({ newPassword: "newPasswordTooShort" });
+  });
 });
 
 describe("toChangePasswordFailure", () => {
-  it("maps a wrong current password", () => {
-    expect(
-      toChangePasswordFailure(graphQLError("BAD_USER_INPUT", "CURRENT_PASSWORD_INCORRECT")),
-    ).toBe("currentPasswordIncorrect");
+  it.each([
+    ["CURRENT_PASSWORD_INCORRECT", "currentPasswordIncorrect"],
+    ["NEW_PASSWORD_SAME", "newPasswordSame"],
+  ])("maps the reason %s to %s", (reason, key) => {
+    expect(toChangePasswordFailure(graphQLError("BAD_USER_INPUT", reason))).toBe(key);
   });
 
   it.each([undefined, "SOMETHING_ELSE"])(
