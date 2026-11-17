@@ -18,12 +18,13 @@ export function CvPreviewSkills({ skillGroups }: CvPreviewSkillsProps) {
       <h2 id="cv-preview-skills-title" className={styles.title}>
         {t("title")}
       </h2>
-      {groups.map((group) => (
-        <div key={group.category} className={styles.group}>
+      {groups.map((group, groupIndex) => (
+        // The category and the skill name can repeat, so the position is part of the key. The list is read-only and never reordered.
+        <div key={`${groupIndex}-${group.category}`} className={styles.group}>
           <h3 className={styles.category}>{group.category}</h3>
           <ul className={styles.list}>
-            {group.skills.map((skill) => (
-              <li key={skill.name}>{skill.name}</li>
+            {group.skills.map((skill, skillIndex) => (
+              <li key={`${skillIndex}-${skill.name}`}>{skill.name}</li>
             ))}
           </ul>
         </div>

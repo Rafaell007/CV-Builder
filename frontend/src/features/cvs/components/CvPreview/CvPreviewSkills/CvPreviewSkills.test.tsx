@@ -1,5 +1,5 @@
 import { screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "@/shared/testing";
 import { cvPreviewSample } from "../../../useCvPreview/cvPreview.mocks";
 import { CvPreviewSkills } from "./CvPreviewSkills";
@@ -18,6 +18,28 @@ describe("CvPreviewSkills", () => {
     ).toEqual(["React", "CSS"]);
     expect(screen.getByRole("heading", { level: 3, name: "Backend" })).toBeInTheDocument();
     expect(screen.getByText("GraphQL")).toBeInTheDocument();
+  });
+
+  it("renders categories and skills that repeat without a React key warning", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const skill = {
+      __typename: "CvPreviewSkill" as const,
+      name: "React",
+      mastery: "EXPERT" as const,
+      experienceYears: 1,
+      lastUsedYear: 2026,
+    };
+    const group = {
+      __typename: "CvPreviewSkillGroup" as const,
+      category: "Frontend",
+      skills: [skill, skill],
+    };
+    renderWithProviders(<CvPreviewSkills skillGroups={[group, group]} />);
+
+    expect(screen.getAllByRole("heading", { level: 3, name: "Frontend" })).toHaveLength(2);
+    expect(screen.getAllByText("React")).toHaveLength(4);
+    expect(error).not.toHaveBeenCalled();
+    error.mockRestore();
   });
 
   it("renders nothing when no category has skills", () => {
