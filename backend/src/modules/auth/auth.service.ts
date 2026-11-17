@@ -215,15 +215,24 @@ export class AuthService {
     }
 
     const passwordHash = await hashPassword(newPassword);
-    return this.prisma.$transaction(async (tx) => {
-      const { tokenVersion } = await tx.user.update({
-        where: { id: userId },
-        data: { passwordHash, tokenVersion: { increment: 1 } },
-        select: { tokenVersion: true },
+    try {
+      return await this.prisma.$transaction(async (tx) => {
+        // The old hash is part of `where`: the password was read before the slow hashing above, so a
+        // parallel change or reset (or a deleted user) must not be overwritten. Then no row matches (P2025).
+        const { tokenVersion } = await tx.user.update({
+          where: { id: userId, passwordHash: user.passwordHash },
+          data: { passwordHash, tokenVersion: { increment: 1 } },
+          select: { tokenVersion: true },
+        });
+        await tx.refreshToken.deleteMany({ where: { userId } });
+        return this.issueTokens(userId, tokenVersion, randomUUID(), tx);
       });
-      await tx.refreshToken.deleteMany({ where: { userId } });
-      return this.issueTokens(userId, tokenVersion, randomUUID(), tx);
-    });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
+        throw new UnauthorizedException(SESSION_ENDED);
+      }
+      throw error;
+    }
   }
 
   /** The signed-in user, or `undefined` when the user is gone or the token is from before a password change. */

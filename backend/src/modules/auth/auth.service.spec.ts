@@ -392,7 +392,7 @@ describe("AuthService", () => {
       const [{ where, data }] = prisma.user.update.mock.calls[0] as [
         { where: unknown; data: { passwordHash: string; tokenVersion: unknown } },
       ];
-      expect(where).toEqual({ id: "user-1" });
+      expect(where).toEqual({ id: "user-1", passwordHash: expect.any(String) });
       expect(data.passwordHash).not.toContain(NEW_PASSWORD);
       expect(await verifyPassword(data.passwordHash, NEW_PASSWORD)).toBe(true);
       expect(data.tokenVersion).toEqual({ increment: 1 });
@@ -456,6 +456,34 @@ describe("AuthService", () => {
       await expect(result).rejects.toMatchObject({
         response: { reason: CURRENT_PASSWORD_INCORRECT_REASON },
       });
+    });
+
+    it("ends the session when the password changed or the user was deleted during the hashing", async () => {
+      prisma.user.update.mockRejectedValue(
+        new Prisma.PrismaClientKnownRequestError("Record not found", {
+          code: "P2025",
+          clientVersion: "test",
+        }),
+      );
+
+      await expect(
+        createService().changePassword("user-1", {
+          currentPassword: PASSWORD,
+          newPassword: NEW_PASSWORD,
+        }),
+      ).rejects.toThrow(UnauthorizedException);
+      expect(prisma.refreshToken.create).not.toHaveBeenCalled();
+    });
+
+    it("does not hide other database errors", async () => {
+      prisma.user.update.mockRejectedValue(new Error("connection lost"));
+
+      await expect(
+        createService().changePassword("user-1", {
+          currentPassword: PASSWORD,
+          newPassword: NEW_PASSWORD,
+        }),
+      ).rejects.toThrow("connection lost");
     });
 
     it("ends the session when the user no longer exists", async () => {
