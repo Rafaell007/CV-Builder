@@ -12,8 +12,8 @@ const submit = (page: Page) => page.getByRole("button", { name: "Change" });
 
 async function fillPasswords(page: Page, current: string, next = NEW_PASSWORD) {
   await page.getByLabel("Password", { exact: true }).fill(current);
-  await page.getByLabel("New Password").fill(next);
-  await page.getByLabel("Confirm Password").fill(next);
+  await page.getByLabel("New Password", { exact: true }).fill(next);
+  await page.getByLabel("Confirm Password", { exact: true }).fill(next);
 }
 
 let email: string;
@@ -60,8 +60,9 @@ test("changes the password: the new one signs in, the old one no longer does", a
   await fillPasswords(page, OLD_PASSWORD);
   await submit(page).click();
 
-  await expect(page.getByText("Password changed")).toBeVisible();
-  await expect(page.getByLabel("New Password")).toHaveValue("");
+  // Radix adds a hidden copy of the toast text for screen readers: match the visible title exactly.
+  await expect(page.getByText("Password changed", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("New Password", { exact: true })).toHaveValue("");
   // The current session got new tokens, so the page keeps working after a reload.
   await page.reload();
   await expect(themeSelect(page)).toBeVisible();
@@ -78,6 +79,6 @@ test("a wrong current password is explained and the password stays the same", as
   await submit(page).click();
 
   await expect(page.getByText("Current password is incorrect")).toBeVisible();
-  await expect(page.getByLabel("New Password")).toHaveValue(NEW_PASSWORD);
+  await expect(page.getByLabel("New Password", { exact: true })).toHaveValue(NEW_PASSWORD);
   expect(await canSignIn(request, email, OLD_PASSWORD)).toBe(true);
 });
