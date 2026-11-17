@@ -6,6 +6,7 @@ import {
   cvProjectFormSchema,
   toAddCvProjectInput,
   toCvProjectFormValues,
+  toDateLimits,
   toProjectRange,
   toUpdateCvProjectInput,
   type CvProjectFormMessages,
@@ -205,5 +206,35 @@ describe("toUpdateCvProjectInput", () => {
       responsibilities: null,
       roleIds: ["role-1", "role-2"],
     });
+  });
+});
+
+describe("toDateLimits", () => {
+  const range = { start: new Date(2022, 2, 16), end: new Date(2023, 5, 30) };
+
+  it("gives the days of the project when both dates are empty", () => {
+    expect(toDateLimits(range, null, null)).toEqual({ startMax: range.end, endMin: range.start });
+  });
+
+  it("stops the End Date at the Start Date, and the Start Date at the End Date", () => {
+    expect(toDateLimits(range, new Date(2023, 3, 17), new Date(2023, 4, 1))).toEqual({
+      startMax: new Date(2023, 4, 1),
+      endMin: new Date(2023, 3, 17),
+    });
+  });
+
+  it("keeps the project end when the End Date is later, and the project start when the Start Date is earlier", () => {
+    expect(toDateLimits(range, new Date(2022, 0, 1), new Date(2024, 0, 1))).toEqual({
+      startMax: range.end,
+      endMin: range.start,
+    });
+  });
+
+  it("uses the other date alone when the project has no readable range", () => {
+    expect(toDateLimits(undefined, new Date(2023, 3, 17), new Date(2023, 4, 1))).toEqual({
+      startMax: new Date(2023, 4, 1),
+      endMin: new Date(2023, 3, 17),
+    });
+    expect(toDateLimits(undefined, null, null)).toEqual({ startMax: undefined, endMin: undefined });
   });
 });

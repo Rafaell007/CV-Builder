@@ -81,3 +81,20 @@ export function stepSelection(
 
   return clampToLimits(target, { minDate, maxDate });
 }
+
+/**
+ * The limits to give react-datepicker while a list is open. Its arrow keys move the pre-selected date by one month or
+ * one year and keep the day (and the month in the year list), and refuse a move that lands outside minDate / maxDate.
+ * With a maxDate of 30 June 2023 a move from September 2022 to September 2023 is refused, so focus cannot leave 2022
+ * although 2023 is allowed. The lists only need whole months or whole years, so the limits widen to them. Picks are
+ * cut to the real limits again by `applyListPick`. The day view keeps the real limits.
+ */
+export function widenLimitsForList(
+  view: "day" | StepUnit,
+  { minDate, maxDate }: StepLimits,
+): StepLimits {
+  if (view === "day") return { minDate, maxDate };
+  const start = view === "month" ? startOfMonth : startOfYear;
+  const end = view === "month" ? endOfMonth : endOfYear;
+  return { minDate: minDate && start(minDate), maxDate: maxDate && end(maxDate) };
+}

@@ -1,0 +1,20 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.name {
+  margin: 0;
+  color: var(--color-text);
+  font: var(--text-title);
+  overflow-wrap: anywhere;
+}
+
+.position {
+  margin: 0;
+  color: var(--color-text);
+  font: var(--text-body);
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}

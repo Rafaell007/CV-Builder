@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getSelectedOptions, toggleValue } from "./multiSelect.utils";
+import { findScrollParent, getSelectedOptions, toggleValue } from "./multiSelect.utils";
 
 const OPTIONS = [
   { value: "react", label: "React" },
@@ -24,5 +24,20 @@ describe("getSelectedOptions", () => {
 
   it("skips values that have no option", () => {
     expect(getSelectedOptions(OPTIONS, ["vue", "nest"])).toEqual([OPTIONS[1]]);
+  });
+});
+
+describe("findScrollParent", () => {
+  it("returns the nearest ancestor that scrolls vertically", () => {
+    document.body.innerHTML = `<div id="outer" style="overflow-y: auto"><div id="inner" style="overflow-y: scroll"><p id="item"></p></div></div>`;
+    const item = document.getElementById("item")!;
+
+    expect(findScrollParent(item)?.id).toBe("inner");
+  });
+
+  it("returns null when no ancestor scrolls", () => {
+    document.body.innerHTML = `<div><p id="item"></p></div>`;
+
+    expect(findScrollParent(document.getElementById("item")!)).toBeNull();
   });
 });

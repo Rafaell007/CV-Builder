@@ -12,3 +12,12 @@ export function getSelectedOptions(
 ): SelectOption[] {
   return values.flatMap((value) => options.find((option) => option.value === value) ?? []);
 }
+
+// The nearest ancestor that scrolls vertically (a modal with a long form), or null when only the page scrolls.
+export function findScrollParent(element: HTMLElement): HTMLElement | null {
+  for (let parent = element.parentElement; parent; parent = parent.parentElement) {
+    const { overflowY } = getComputedStyle(parent);
+    if (overflowY === "auto" || overflowY === "scroll") return parent;
+  }
+  return null;
+}

@@ -106,6 +106,12 @@
   white-space: nowrap;
 }
 
+/* Header of the checkbox and actions columns: it draws the line under the header like the other header cells. */
+.controlHeadCell {
+  composes: controlCell;
+  border-bottom: 1px solid var(--color-border);
+}
+
 .messageCell {
   padding: var(--space-8) var(--space-4);
   text-align: center;

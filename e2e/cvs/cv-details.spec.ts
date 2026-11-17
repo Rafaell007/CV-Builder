@@ -116,7 +116,9 @@ test.describe("CV Details page, access", () => {
     await page.getByRole("button", { name: "Name" }).waitFor();
     await page.getByRole("cell", { name: "Frontend Developer", exact: true }).click();
 
-    await expect(page).toHaveURL(/\/en\/cvs\/[^/]+\/details$/);
+    // A click on a row opens the preview tab; the Details tab is one click away.
+    await expect(page).toHaveURL(/\/en\/cvs\/[^/]+\/preview$/);
+    await page.goto(page.url().replace(/\/preview$/, "/details"));
     await expect(field(page, "Name")).toHaveValue("Frontend Developer");
     await expect(update(page)).toBeDisabled();
   });

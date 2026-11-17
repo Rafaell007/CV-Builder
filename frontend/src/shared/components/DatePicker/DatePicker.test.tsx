@@ -344,11 +344,15 @@ describe("DatePicker", () => {
     const onValueChange = vi.fn();
     const { user } = renderWithProviders(<TestDatePicker onValueChange={onValueChange} />);
 
+    // Tab only focuses the input: Tab must be able to pass over a date field
     await user.tab();
+    expect(screen.getByRole("textbox", { name: "Start date" })).toHaveFocus();
+    expect(screen.queryByRole("dialog", { name: "Choose a date" })).not.toBeInTheDocument();
+
+    // Enter opens the calendar (and does not submit a form), with the focus on the 4th;
+    // Down moves a week and Right a day: 4 → 11 → 12 November
+    await user.keyboard("{Enter}");
     expect(screen.getByRole("dialog", { name: "Choose a date" })).toBeInTheDocument();
-    // The first Down moves focus from the input into the calendar (on the 4th);
-    // then Down moves a week and Right a day: 4 → 11 → 12 November
-    await user.keyboard("{ArrowDown}");
     expect(screen.getByRole("gridcell", { name: /\b4 November 2026/ })).toHaveFocus();
     await user.keyboard("{ArrowDown}{ArrowRight}{Enter}");
 
@@ -358,6 +362,21 @@ describe("DatePicker", () => {
       "aria-pressed",
       "true",
     );
+    // The focus follows into the month list, on the saved month
+    expect(screen.getByText("November", { selector: "[role=option]" })).toHaveFocus();
+  });
+
+  it("opens its calendar with an arrow key too, and Escape gives the focus back to the input", async () => {
+    const { user } = renderWithProviders(<TestDatePicker />);
+    const input = screen.getByRole("textbox", { name: "Start date" });
+
+    await user.tab();
+    await user.keyboard("{ArrowDown}");
+    expect(screen.getByRole("gridcell", { name: /\b4 November 2026/ })).toHaveFocus();
+
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog", { name: "Choose a date" })).not.toBeInTheDocument();
+    expect(input).toHaveFocus();
   });
 
   it("takes a typed date", async () => {

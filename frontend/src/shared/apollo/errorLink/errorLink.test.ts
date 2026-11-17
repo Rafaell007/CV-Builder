@@ -28,6 +28,19 @@ describe("errorLink", () => {
     expect(log).toHaveBeenCalledWith("[GraphQL] Health: Not signed in", "UNAUTHENTICATED");
   });
 
+  it.each(["NOT_FOUND", "FORBIDDEN"])("logs %s as a warning, not as an error", async (code) => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const backend = new ApolloLink(() =>
+      of({ errors: [{ message: "CV not found", extensions: { code } }] }),
+    );
+
+    await queryHealth(backend);
+
+    expect(warn).toHaveBeenCalledWith("[GraphQL] Health: CV not found", code);
+    expect(error).not.toHaveBeenCalled();
+  });
+
   it("logs network errors", async () => {
     const log = vi.spyOn(console, "error").mockImplementation(() => {});
     const failure = new Error("Failed to fetch");

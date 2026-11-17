@@ -236,19 +236,29 @@ describe("CvProjects", () => {
       expect(screen.getByText("Project updated")).toBeInTheDocument();
     });
 
-    it("shows an inline message for an end date earlier than the start date, and keeps SAVE disabled (AC-24)", async () => {
+    it("marks the days before the start date as not available in the End Date calendar, and the days after the end date in the Start Date calendar (AC-24)", async () => {
       const { user, dialog } = await openUpdate({ mocks: [cvProjectsMock(), projectRolesMock()] });
 
+      // Start 02/01/2025, End 11/30/2025 (inside the days of the project, 01/01/2025 to 12/31/2026).
+      // A click keeps the focus in the input; a bare focus would move it into the calendar (DatePicker README).
       const end = within(dialog).getByRole("textbox", { name: "End Date" });
+      await user.click(end);
       await user.clear(end);
-      // Inside the days of the project (01/01/2025 to 12/31/2026), but before the start date of 02/01/2025.
-      await user.type(end, "01/15/2025");
-      await user.tab();
-
+      await user.type(end, "02/15/2025");
       expect(
-        await within(dialog).findByText("End date cannot be earlier than start date"),
+        await screen.findByRole("gridcell", { name: /Not available .*\b31 January 2025/ }),
       ).toBeInTheDocument();
-      expect(within(dialog).getByRole("button", { name: "Save" })).toBeDisabled();
+      expect(
+        screen.getByRole("gridcell", { name: /\bChoose .*\b20 February 2025/ }),
+      ).toBeInTheDocument();
+
+      const start = within(dialog).getByRole("textbox", { name: "Start Date" });
+      await user.click(start);
+      await user.clear(start);
+      await user.type(start, "02/10/2025");
+      expect(
+        await screen.findByRole("gridcell", { name: /Not available .*\b16 February 2025/ }),
+      ).toBeInTheDocument();
     });
   });
 
@@ -302,7 +312,10 @@ describe("CvProjects", () => {
         "aria-disabled",
         "true",
       );
-      expect(within(dialog).getByText("React")).toBeInTheDocument();
+      // The chips of the Environment field (its closed list holds hidden rows with the same names)
+      expect(
+        within(within(dialog).getByRole("group", { name: "Environment" })).getByText("React"),
+      ).toBeInTheDocument();
       expect(within(dialog).getByRole("textbox", { name: "Start Date" })).toHaveValue("03/01/2024");
       expect(within(dialog).getByRole("textbox", { name: "End Date" })).toHaveValue("06/30/2025");
       // A project alone is not enough: at least one role is needed (AC-16).

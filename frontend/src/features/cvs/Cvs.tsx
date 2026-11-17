@@ -16,7 +16,7 @@ import { DeleteCvModal } from "./components/DeleteCvModal";
 import { UpdateCvModal } from "./components/UpdateCvModal";
 import { SEARCH_MAX_LENGTH } from "./cvs.constants";
 import type { CvListItem } from "./cvs.types";
-import { toCvDetailsPath, toCvsVariables } from "./utils";
+import { toCvTabPath, toCvsVariables } from "./utils";
 import { useCreateCvForm } from "./useCreateCvForm";
 import { useCvs } from "./useCvs";
 import { useCvsListState } from "./useCvsListState";
@@ -27,7 +27,7 @@ import styles from "./Cvs.module.css";
 export interface CvsProps {
   /** Shows the CVs of this user only (the User CVs tab). Without it the backend decides by the role of the signed-in user. */
   userId?: string;
-  /** Called with the CV on View and on a row click. Without it, the page opens the CV Details page. */
+  /** Called with the CV on View and on a row click. Without it, the page opens the CV Preview page. */
   onView?: (cv: CvListItem) => void;
 }
 
@@ -87,7 +87,7 @@ export function Cvs({ userId, onView }: CvsProps) {
             cvs={cvs}
             sort={list.sort}
             onSortChange={list.setSort}
-            onView={onView ?? ((cv) => router.push(toCvDetailsPath(cv.id)))}
+            onView={onView ?? ((cv) => router.push(toCvTabPath(cv.id, "preview")))}
             onEdit={editing.open}
             onDelete={deletion.askToDelete}
             loading={loading}

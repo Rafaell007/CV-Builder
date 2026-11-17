@@ -354,21 +354,21 @@ describe("Cvs", () => {
       expect(onView).not.toHaveBeenCalled();
     });
 
-    it("opens the CV Details page on a row click when no onView is given", async () => {
+    it("opens the CV Preview page on a row click when no onView is given", async () => {
       const { user } = renderWithProviders(<Cvs />, { mocks: [cvsMock([frontendCv])] });
 
       await user.click(await screen.findByText("Frontend Developer"));
 
-      expect(push).toHaveBeenCalledExactlyOnceWith("/cvs/1/details");
+      expect(push).toHaveBeenCalledExactlyOnceWith("/cvs/1/preview");
     });
 
-    it("opens the CV Details page with View in the row menu when no onView is given", async () => {
+    it("opens the CV Preview page with View in the row menu when no onView is given", async () => {
       const { user } = renderWithProviders(<Cvs />, { mocks: [cvsMock([backendCv])] });
 
       await user.click(await screen.findByRole("button", { name: "Actions for Backend Engineer" }));
       await user.click(screen.getByRole("menuitem", { name: "View" }));
 
-      expect(push).toHaveBeenCalledExactlyOnceWith("/cvs/2/details");
+      expect(push).toHaveBeenCalledExactlyOnceWith("/cvs/2/preview");
     });
 
     it("opens the right dialog for each row menu item", async () => {

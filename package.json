@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "pnpm --parallel -r --if-present dev",
+    "start-all": "node scripts/start-all.mjs",
     "build": "pnpm -r --if-present build",
     "lint": "pnpm -r --if-present lint",
     "typecheck": "pnpm -r --if-present typecheck",
