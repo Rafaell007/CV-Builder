@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, waitFor } from "storybook/test";
 import {
   cvPreviewErrorMock,
+  cvPreviewFigmaSample,
   cvPreviewForbiddenMock,
   cvPreviewMock,
 } from "../../useCvPreview/cvPreview.mocks";
@@ -27,20 +28,33 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-/** The whole CV document on a desktop screen. */
+// The Desktop and Tablet stories use the content of the Figma frames (frame 41 and frame 32), to compare the layout.
+const figmaMock = cvPreviewMock(cvPreviewFigmaSample);
+
+/** The whole CV document on a desktop screen, with the content of the Figma desktop frame. */
 export const Desktop: Story = {
+  parameters: { apollo: { mocks: [figmaMock] } },
   play: async ({ canvas }) => {
-    await expect(await canvas.findByText("Anna Kowalska")).toBeVisible();
+    await expect(await canvas.findByText("Rostislav Harlanov")).toBeVisible();
     await expect(canvas.getByRole("table", { name: "Professional skills" })).toBeVisible();
-    await expect(canvas.getByText("Banking Portal")).toBeVisible();
+    await expect(canvas.getByText("SaaS Media Platform")).toBeVisible();
   },
 };
 
-/** The same document on a 768px tablet screen. */
+/** The same document on a 768px tablet screen, with the content of the Figma tablet frame. */
 export const Tablet: Story = {
   globals: tablet,
+  parameters: { apollo: { mocks: [figmaMock] } },
+  play: async ({ canvas }) => {
+    await expect(await canvas.findByText("Rostislav Harlanov")).toBeVisible();
+  },
+};
+
+/** The short sample CV that the tests use: two skill groups, a skill without experience, a project without roles. */
+export const ShortCv: Story = {
   play: async ({ canvas }) => {
     await expect(await canvas.findByText("Anna Kowalska")).toBeVisible();
+    await expect(canvas.getByText("Banking Portal")).toBeVisible();
   },
 };
 
