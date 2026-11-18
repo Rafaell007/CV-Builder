@@ -94,6 +94,9 @@
   /* Date picker calendar (docs/design-tokens.md › Date picker) */
   --color-calendar-arrow: var(--palette-grey-500);
   --shadow-calendar: 1px 1px 4px 1px var(--palette-indigo-shadow);
+
+  /* Table sort arrow (docs/design-tokens.md › List page) */
+  --color-sort-icon: var(--palette-grey-500);
 }
 
 /* Dark: chosen explicitly */
@@ -158,6 +161,7 @@
   --color-chip-remove-icon: var(--palette-grey-600);
   --color-calendar-arrow: var(--palette-grey-100);
   --shadow-calendar: none;
+  --color-sort-icon: var(--palette-grey-400);
 }
 
 /* Dark: Device settings, when the OS is dark and no theme is forced. Keep in sync with the block above. */
@@ -219,5 +223,6 @@
     --color-chip-remove-icon: var(--palette-grey-600);
     --color-calendar-arrow: var(--palette-grey-100);
     --shadow-calendar: none;
+    --color-sort-icon: var(--palette-grey-400);
   }
 }

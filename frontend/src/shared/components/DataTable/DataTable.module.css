@@ -38,23 +38,12 @@
   outline-offset: 2px;
 }
 
-/* Arrow made of borders: points up for ASC, down for DESC, faint until the column is sorted. */
+/* Figma: a 12×12 arrow in an 18×18 box, always fully visible. It points down for DESC; aria-sort tells screen readers. */
 .sortIcon {
-  width: 0;
-  height: 0;
-  border-right: 5px solid transparent;
-  border-left: 5px solid transparent;
-  border-bottom: 6px solid var(--color-text-secondary);
-  opacity: 0.4;
-}
-
-.sortButton:hover .sortIcon {
-  opacity: 1;
-}
-
-.sortIcon[data-direction] {
-  opacity: 1;
-  border-bottom-color: var(--color-text);
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  color: var(--color-sort-icon);
 }
 
 .sortIcon[data-direction="descending"] {

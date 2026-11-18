@@ -91,6 +91,26 @@ describe("DataTable", () => {
         "descending",
       );
     });
+
+    it("turns the arrow down only for the column sorted in descending order", () => {
+      const sortableColumns: DataTableColumn<Person>[] = [
+        {
+          id: "firstName",
+          header: "First name",
+          cell: (row) => row.firstName,
+          sortField: "firstName",
+        },
+        { id: "position", header: "Position", cell: (row) => row.position, sortField: "position" },
+      ];
+      renderTable({
+        columns: sortableColumns,
+        sort: { field: "firstName", direction: "DESC" },
+      });
+
+      const arrowOf = (name: string) => screen.getByRole("button", { name }).querySelector("svg");
+      expect(arrowOf("First name")).toHaveAttribute("data-direction", "descending");
+      expect(arrowOf("Position")).not.toHaveAttribute("data-direction");
+    });
   });
 
   describe("row click", () => {

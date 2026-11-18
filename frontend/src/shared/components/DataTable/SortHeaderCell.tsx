@@ -1,3 +1,4 @@
+import { ArrowUpwardIcon } from "../icons";
 import type { SortState } from "./DataTable.types";
 import { getAriaSort, getNextSort } from "./utils";
 import styles from "./DataTable.module.css";
@@ -21,10 +22,9 @@ export function SortHeaderCell({ header, field, sort, onSortChange }: SortHeader
         onClick={() => onSortChange(getNextSort(sort, field))}
       >
         {header}
-        <span
+        <ArrowUpwardIcon
           className={styles.sortIcon}
           data-direction={ariaSort === "none" ? undefined : ariaSort}
-          aria-hidden="true"
         />
       </button>
     </th>
