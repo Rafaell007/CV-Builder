@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import type { SortState } from "@/shared/components";
-import { DEFAULT_PROJECTS_SORT } from "../projects.constants";
-import type { ProjectsListState } from "../projects.types";
+import type { ListState } from "../lists.types";
 
-export type UseProjectsListStateResult = ProjectsListState & {
+export type UseListStateResult = ListState & {
   /** A new search shows the first page of the new result. The same search again (also with other spaces around it) changes nothing. */
   setSearch: (search: string) => void;
   /** A new sort shows the first page of the new order. */
@@ -13,11 +12,13 @@ export type UseProjectsListStateResult = ProjectsListState & {
   setPage: (page: number) => void;
 };
 
-const INITIAL_STATE: ProjectsListState = { search: "", sort: DEFAULT_PROJECTS_SORT, page: 1 };
-
-/** Holds what the user chose for the projects list: search, sort and page. Nothing is filtered or sorted here. */
-export function useProjectsListState(): UseProjectsListStateResult {
-  const [state, setState] = useState<ProjectsListState>(INITIAL_STATE);
+/**
+ * Holds what the user chose for a list page: search, sort and page. Nothing is filtered or sorted here;
+ * the backend does it. The list starts with no search, `initialSort` and page 1.
+ */
+export function useListState(initialSort: SortState): UseListStateResult {
+  // The initializer runs only on the first render, so a new `initialSort` later does not reset the list.
+  const [state, setState] = useState<ListState>(() => ({ search: "", sort: initialSort, page: 1 }));
 
   return {
     ...state,

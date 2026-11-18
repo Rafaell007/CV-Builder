@@ -1,20 +1,29 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { useProjectsListState } from "./useProjectsListState";
+import type { SortState } from "@/shared/components";
+import { useListState } from "./useListState";
 
-describe("useProjectsListState", () => {
-  it("starts with no search, the sort by name ascending and page 1", () => {
-    const { result } = renderHook(() => useProjectsListState());
+const NAME_ASC: SortState = { field: "name", direction: "ASC" };
 
-    expect(result.current).toMatchObject({
-      search: "",
-      sort: { field: "name", direction: "ASC" },
-      page: 1,
+describe("useListState", () => {
+  it("starts with no search, the given sort and page 1", () => {
+    const { result } = renderHook(() => useListState(NAME_ASC));
+
+    expect(result.current).toMatchObject({ search: "", sort: NAME_ASC, page: 1 });
+  });
+
+  it("keeps its sort when the initial sort changes on a later render", () => {
+    const { result, rerender } = renderHook(({ sort }) => useListState(sort), {
+      initialProps: { sort: NAME_ASC },
     });
+
+    rerender({ sort: { field: "startDate", direction: "DESC" } });
+
+    expect(result.current.sort).toEqual(NAME_ASC);
   });
 
   it("changes the page", () => {
-    const { result } = renderHook(() => useProjectsListState());
+    const { result } = renderHook(() => useListState(NAME_ASC));
 
     act(() => result.current.setPage(4));
 
@@ -22,7 +31,7 @@ describe("useProjectsListState", () => {
   });
 
   it("goes back to page 1 when the search changes, and keeps the sort", () => {
-    const { result } = renderHook(() => useProjectsListState());
+    const { result } = renderHook(() => useListState(NAME_ASC));
     act(() => result.current.setSort({ field: "name", direction: "DESC" }));
     act(() => result.current.setPage(3));
 
@@ -36,7 +45,7 @@ describe("useProjectsListState", () => {
   });
 
   it("goes back to page 1 when the sort changes, and keeps the search", () => {
-    const { result } = renderHook(() => useProjectsListState());
+    const { result } = renderHook(() => useListState(NAME_ASC));
     act(() => result.current.setSearch("bank"));
     act(() => result.current.setPage(2));
 
@@ -50,7 +59,7 @@ describe("useProjectsListState", () => {
   });
 
   it("stays on the same page when the same search is sent again", () => {
-    const { result } = renderHook(() => useProjectsListState());
+    const { result } = renderHook(() => useListState(NAME_ASC));
     act(() => result.current.setSearch("bank"));
     act(() => result.current.setPage(2));
 
@@ -60,7 +69,7 @@ describe("useProjectsListState", () => {
   });
 
   it("stays on the same page when only the spaces around the search change", () => {
-    const { result } = renderHook(() => useProjectsListState());
+    const { result } = renderHook(() => useListState(NAME_ASC));
     act(() => result.current.setSearch("bank"));
     act(() => result.current.setPage(2));
 
@@ -71,7 +80,7 @@ describe("useProjectsListState", () => {
   });
 
   it("goes back to page 1 when the search is cleared", () => {
-    const { result } = renderHook(() => useProjectsListState());
+    const { result } = renderHook(() => useListState(NAME_ASC));
     act(() => result.current.setSearch("bank"));
     act(() => result.current.setPage(2));
 

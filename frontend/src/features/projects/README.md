@@ -3,7 +3,7 @@
 The `/admin/projects` page (PLAN S5.5b, KAN-102): the global list of projects, for Admin users.
 
 - Exports: `Projects` (the whole page content; the route only renders it).
-- `useProjectsListState`: holds the choices of the user: `search`, `sort` and `page`. A new search or sort goes back to page 1. Nothing is filtered or sorted in the frontend.
+- List state: the shared `useListState(DEFAULT_PROJECTS_SORT)` (`@/shared/lists`) holds the choices of the user: `search`, `sort` and `page`. A new search or sort goes back to page 1. Nothing is filtered or sorted in the frontend.
 - `utils/toProjectsVariables`: turns that state into the query variables. It always sends `page: { number, size: 10 }` and the sort, trims the search, and leaves out an empty search. The page size 10 is one rule: the backend default (`DEFAULT_PAGE_SIZE` in `common/pagination`) and the frontend `DEFAULT_PAGE_SIZE` are both 10, and a test checks the size that is sent. (The backend accepts `sort: null` too, since the `resolveSort` fix.)
 - `useProjects`: sends the `Projects` query (`useProjects/projects.graphql`) with those variables and returns `projects`, `total`, `loading`, `failed` and `retry`. `failed` hides the list, so a failed request never looks like an empty list. `retry` repeats the same request, so search, sort and page stay.
   - **Note for the next list page** (users, skills, languages): this hook has the same `loading`, `failed` and `retry` shape that every list query needs. Do not copy it a second time. When a second list page needs it, move one shared hook to the nearest common ancestor (`PLAN.md` S5.9) and let `useProjects` call it.

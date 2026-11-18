@@ -1,10 +1,10 @@
 import { CombinedGraphQLErrors } from "@apollo/client";
 import { describe, expect, it } from "vitest";
-import type { ProjectsListState } from "../projects.types";
+import type { ListState } from "@/shared/lists";
 import { toDeleteProjectFailure, toProjectsVariables } from "./projects.utils";
 
 const nameAscending = { field: "name", direction: "ASC" } as const;
-const state = (changes: Partial<ProjectsListState> = {}): ProjectsListState => ({
+const state = (changes: Partial<ListState> = {}): ListState => ({
   search: "",
   sort: nameAscending,
   page: 1,

@@ -1,7 +1,7 @@
 import { CombinedGraphQLErrors } from "@apollo/client";
 import { DEFAULT_PAGE_SIZE } from "@/shared/components";
 import type { ProjectsQueryVariables } from "@/shared/graphql";
-import type { ProjectsListState } from "../projects.types";
+import type { ListState } from "@/shared/lists";
 
 /**
  * Turns the choices of the user into the variables of the `Projects` query.
@@ -9,11 +9,7 @@ import type { ProjectsListState } from "../projects.types";
  * The sort is always sent: the list starts sorted by name ascending and a click only switches direction or column.
  * An empty search is left out. Without it the backend returns every project.
  */
-export function toProjectsVariables({
-  search,
-  sort,
-  page,
-}: ProjectsListState): ProjectsQueryVariables {
+export function toProjectsVariables({ search, sort, page }: ListState): ProjectsQueryVariables {
   const text = search.trim();
   return {
     page: { number: page, size: DEFAULT_PAGE_SIZE },
