@@ -28,10 +28,9 @@ const names = () =>
     .map((row) => within(row).getAllByRole("cell")[0]!.querySelector("span")?.textContent);
 
 describe("Projects", () => {
-  it("shows the title and a loading state while the projects load", () => {
+  it("shows a loading state while the projects load", () => {
     renderWithProviders(<Projects />, { mocks: [projectsMock([blog])] });
 
-    expect(screen.getByRole("heading", { name: "Projects" })).toBeInTheDocument();
     expect(screen.getByRole("status", { name: "Loading projects" })).toBeInTheDocument();
     // The structure of the list stays visible while loading.
     expect(screen.getByRole("table", { name: "Projects list" })).toBeInTheDocument();
@@ -75,7 +74,7 @@ describe("Projects", () => {
   it("shows the texts in Polish", async () => {
     renderWithProviders(<Projects />, { locale: "pl", mocks: [projectsMock([])] });
 
-    expect(screen.getByRole("heading", { name: "Projekty" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "UTWÓRZ PROJEKT" })).toBeInTheDocument();
     expect(await screen.findByText("Nie znaleziono projektów")).toBeInTheDocument();
   });
 

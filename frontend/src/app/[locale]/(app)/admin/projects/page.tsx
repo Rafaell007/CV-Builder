@@ -1,4 +1,6 @@
+import { useTranslations } from "next-intl";
 import { Projects } from "@/features/projects";
+import { PageHeader } from "@/shared/components/PageHeader";
 
 // RequireAdmin (admin/layout.tsx) shows a loading state until the user is known, so this page is not rendered
 // during prerender and Next.js cannot check it for instant navigation. That is intended: the page must not
@@ -6,5 +8,17 @@ import { Projects } from "@/features/projects";
 export const instant = false;
 
 export default function AdminProjectsPage() {
-  return <Projects />;
+  const t = useTranslations();
+  const title = t("appShell.nav.projects");
+
+  return (
+    <>
+      <PageHeader
+        title={title}
+        breadcrumbs={[{ label: title }]}
+        breadcrumbsLabel={t("common.breadcrumbs")}
+      />
+      <Projects />
+    </>
+  );
 }

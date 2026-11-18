@@ -1,0 +1,76 @@
+/* Values: docs/design-tokens.md › Components › List page (Figma Departments, Positions and Projects, 1440 and 768). */
+
+/*
+ * Sticky under the 56px PageHeader of the route, page background so the scrolled list does not show through.
+ * A page with more sticky bars above (the user tabs: 56 header + 56 tabs) sets --list-page-toolbar-top to 112px.
+ */
+.toolbar {
+  position: sticky;
+  top: var(--list-page-toolbar-top, var(--space-14));
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  box-sizing: border-box;
+  height: var(--space-14);
+  /* Search at left 20, the create button 20 from the right edge (off the 4px grid, kept exact). */
+  padding: 0 20px;
+  background: var(--color-bg);
+}
+
+.search {
+  flex: 1;
+  max-width: 320px;
+}
+
+/*
+ * The text Button, 40 high: plus icon at left 12, text at left 52 (icon → text 16), 220 wide.
+ * Two classes, so these win over the Button's own size whatever order the stylesheets load in.
+ */
+.toolbar .createButton {
+  justify-content: flex-start;
+  gap: var(--space-4);
+  min-width: 220px;
+  height: var(--space-10);
+  padding: 0 var(--space-3);
+}
+
+.createIcon {
+  flex: none;
+}
+
+/* Not drawn in Figma: centred, 24 under the list (prediction). */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-6);
+}
+
+/* Tablet (keep 1023.98px in sync with the AppShell): search 276 wide, the button is the plus icon only (58×40). */
+@media (max-width: 1023.98px) {
+  .toolbar {
+    padding-right: 0;
+  }
+
+  .search {
+    max-width: 276px;
+  }
+
+  .toolbar .createButton {
+    justify-content: center;
+    width: 58px;
+    min-width: 0;
+    padding: 0;
+  }
+
+  /* Hidden but still read by screen readers: it stays the button's accessible name. */
+  .createLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
