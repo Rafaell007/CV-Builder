@@ -16,6 +16,7 @@ import type { DatePickerLabels } from "./datePicker.types";
 import styles from "./DatePicker.module.css";
 import { centreCalendar } from "./centreCalendar";
 import { useDatePicker } from "./useDatePicker";
+import { widenLimitsForList } from "./utils";
 
 export type DatePickerProps = {
   label: string;
@@ -62,6 +63,7 @@ export function DatePicker({
   className,
 }: DatePickerProps) {
   const pickerRef = useRef<ReactDatePicker>(null);
+  const boxRef = useRef<HTMLDivElement>(null);
   const { controlId, helperId, errorId, controlProps } = useFieldIds({
     id,
     hasHelperText: Boolean(helperText),
@@ -71,6 +73,7 @@ export function DatePicker({
     view,
     isCalendarOpen,
     onCalendarOpen,
+    onKeyDown,
     isArrowDisabled,
     onArrowClick,
     showMonthList,
@@ -87,10 +90,14 @@ export function DatePicker({
     onBlur,
     ref,
     controlId,
+    boxRef,
+    openCalendar: () => pickerRef.current?.setOpen(true),
     // skipSetBlur: the focus stays in the input
     closeCalendar: () => pickerRef.current?.setOpen(false, true),
   });
   const dateFnsLocale = DATE_FNS_LOCALES[locale];
+  // The lists need whole months or years, or the arrow keys cannot reach an allowed year (see widenLimitsForList)
+  const limits = widenLimitsForList(view, { minDate, maxDate });
 
   return (
     <Field
@@ -103,11 +110,14 @@ export function DatePicker({
       className={className}
     >
       {/* data-calendar-open: a Modal around the field skips its own Escape while the calendar is open (see Modal) */}
-      {/* data-date-picker: a FormModal does not start on a date field, because focus opens the calendar (see useFirstFieldFocus) */}
       <div
+        ref={boxRef}
         className={styles.box}
+        // data-date-picker: a FormModal that starts with a date field focuses its form, not the field (see useFirstFieldFocus)
         data-date-picker=""
         onBlur={onFocusLeave}
+        // Capture: runs before react-datepicker's own handlers
+        onKeyDownCapture={onKeyDown}
         {...(isCalendarOpen && { "data-calendar-open": "true" })}
       >
         <CalendarLabelContext value={labels.calendar}>
@@ -120,6 +130,8 @@ export function DatePicker({
             onChange={onPick}
             onCalendarOpen={onCalendarOpen}
             onCalendarClose={onCalendarClose}
+            // Tab only focuses the input; a click, Enter or an arrow opens the calendar (useDatePicker)
+            preventOpenOnFocus
             onInputClick={onInputClick}
             // Closed by the year pick (useDatePicker), not by a day pick
             shouldCloseOnSelect={false}
@@ -132,8 +144,8 @@ export function DatePicker({
             // The design shows full month names ("January"), not the short ones
             renderMonthContent={(_monthIndex, _shortName, fullName) => fullName}
             // react-datepicker's types take no explicit undefined (exactOptionalPropertyTypes): set only when given
-            {...(minDate && { minDate })}
-            {...(maxDate && { maxDate })}
+            {...(limits.minDate && { minDate: limits.minDate })}
+            {...(limits.maxDate && { maxDate: limits.maxDate })}
             {...(name && { name })}
             {...(error && { ariaInvalid: "true" })}
             {...(controlProps["aria-describedby"] && {

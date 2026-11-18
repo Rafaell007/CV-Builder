@@ -131,6 +131,8 @@
       "title": "Dodaj umiejętność",
       "close": "Zamknij",
       "skill": "Umiejętność",
+      "mastery": "Poziom umiejętności",
+      "noMastery": "Brak poziomu",
       "submit": "Dodaj",
       "cancel": "Anuluj",
       "loading": "Ładowanie umiejętności",
@@ -301,6 +303,50 @@
       "success": {
         "title": "Usunięto projekt",
         "text": "Projekt {name} został usunięty z CV."
+      }
+    }
+  },
+  "preview": {
+    "document": "Podgląd CV",
+    "states": {
+      "loading": "Ładowanie podglądu CV",
+      "unauthorized": "Nie masz uprawnień do tego CV",
+      "error": "Nie udało się wczytać podglądu CV",
+      "retry": "Spróbuj ponownie"
+    },
+    "skillsTable": {
+      "caption": "Umiejętności zawodowe",
+      "columns": {
+        "skills": "Umiejętności",
+        "experience": "Doświadczenie w latach",
+        "lastUsed": "Ostatnio używana"
+      },
+      "notAvailable": "{column}: brak danych",
+      "empty": "Brak dodanych umiejętności"
+    },
+    "sections": {
+      "general": {
+        "title": "Informacje ogólne",
+        "education": "Wykształcenie",
+        "languages": "Znajomość języków",
+        "levelNative": "Ojczysty",
+        "domains": "Branże"
+      },
+      "summary": {
+        "title": "Podsumowanie"
+      },
+      "professionalSkills": {
+        "title": "Umiejętności zawodowe"
+      },
+      "skills": {
+        "title": "Umiejętności"
+      },
+      "projects": {
+        "title": "Projekty",
+        "roles": "Role w projekcie",
+        "period": "Okres",
+        "responsibilities": "Obowiązki",
+        "environment": "Środowisko"
       }
     }
   }

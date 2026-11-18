@@ -95,7 +95,10 @@ export class PasswordResetService {
       if (count === 0) {
         throw tokenError("Reset link has already been used", PasswordResetReason.TokenUsed);
       }
-      await tx.user.update({ where: { id: stored.userId }, data: { passwordHash } });
+      await tx.user.update({
+        where: { id: stored.userId },
+        data: { passwordHash, tokenVersion: { increment: 1 } },
+      });
       await tx.passwordResetToken.deleteMany({
         where: { userId: stored.userId, id: { not: stored.id } },
       });

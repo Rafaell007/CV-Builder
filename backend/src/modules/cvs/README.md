@@ -2,7 +2,7 @@
 
 List, read, create, change and delete CVs. A user works with their own CVs. An admin works with all CVs (D10).
 
-- **Folders:** CV projects live in `cv-projects/`, CV skills in `cv-skills/` and the CV preview in `cv-preview/` (each has resolver, service, `dto/`, `models/`, specs). `require-user.ts` stays in the module root, because both topics use it.
+- **Folders:** CV projects live in `cv-projects/`, CV skills in `cv-skills/` and the CV preview in `cv-preview/` (each has resolver, service, `dto/`, `models/`, specs).
 - **GraphQL:**
   - `cvs(search, sort, page, userId)` returns `{ items, total }`. `cv(id)` returns one CV.
   - `createCv(input)`, `updateCv(input)` and `deleteCv(id)` return the CV. `deleteCv` returns the CV that it removed.

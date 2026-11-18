@@ -15,18 +15,24 @@ function createService(secrets: Partial<typeof SECRETS> = {}): TokenService {
 
 describe("TokenService", () => {
   describe("access token", () => {
-    it("carries the user id and lasts 15 minutes", async () => {
+    it("carries the user id and token version and lasts 15 minutes", async () => {
       const service = createService();
-      const token = await service.signAccessToken("user-1");
+      const token = await service.signAccessToken("user-1", 3);
 
       const payload = new JwtService().decode<{ sub: string; iat: number; exp: number }>(token);
       expect(payload.sub).toBe("user-1");
       expect(payload.exp - payload.iat).toBe(ACCESS_TOKEN_TTL_SECONDS);
-      await expect(service.verifyAccessToken(token)).resolves.toBe("user-1");
+      await expect(service.verifyAccessToken(token)).resolves.toEqual({
+        userId: "user-1",
+        tokenVersion: 3,
+      });
     });
 
     it("rejects a token signed with another secret", async () => {
-      const token = await createService({ JWT_ACCESS_SECRET: "x".repeat(32) }).signAccessToken("u");
+      const token = await createService({ JWT_ACCESS_SECRET: "x".repeat(32) }).signAccessToken(
+        "u",
+        0,
+      );
 
       await expect(createService().verifyAccessToken(token)).resolves.toBeUndefined();
     });
@@ -51,8 +57,17 @@ describe("TokenService", () => {
 
     it("rejects a token without a user id", async () => {
       const token = await new JwtService().signAsync(
-        {},
+        { tokenVersion: 0 },
         { secret: SECRETS.JWT_ACCESS_SECRET, expiresIn: 60 },
+      );
+
+      await expect(createService().verifyAccessToken(token)).resolves.toBeUndefined();
+    });
+
+    it("rejects a token without a token version, made before versions existed", async () => {
+      const token = await new JwtService().signAsync(
+        {},
+        { subject: "user-1", secret: SECRETS.JWT_ACCESS_SECRET, expiresIn: 60 },
       );
 
       await expect(createService().verifyAccessToken(token)).resolves.toBeUndefined();

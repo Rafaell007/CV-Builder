@@ -82,16 +82,16 @@ test.describe("CVs page, as an admin", () => {
     await expect(row(page, "QA Engineer")).toHaveCount(0);
   });
 
-  test("a click on a row opens the CV Details page", async ({ page }) => {
+  test("a click on a row opens the CV Preview page", async ({ page }) => {
     await row(page, "QA Engineer").getByRole("cell").first().click();
 
-    await expect(page).toHaveURL(/\/en\/cvs\/[\w-]+\/details$/);
+    await expect(page).toHaveURL(/\/en\/cvs\/[\w-]+\/preview$/);
   });
 
-  test("View in the row menu opens the CV Details page", async ({ page }) => {
+  test("View in the row menu opens the CV Preview page", async ({ page }) => {
     await openRowMenu(page, "QA Engineer", "View");
 
-    await expect(page).toHaveURL(/\/en\/cvs\/[\w-]+\/details$/);
+    await expect(page).toHaveURL(/\/en\/cvs\/[\w-]+\/preview$/);
   });
 
   test("the row menu does not open the CV by itself", async ({ page }) => {

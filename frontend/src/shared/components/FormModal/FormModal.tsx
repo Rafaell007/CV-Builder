@@ -76,7 +76,15 @@ export function FormModal({
         </>
       }
     >
-      <form ref={formRef} id={formId} className={styles.form} onSubmit={handleSubmit} noValidate>
+      {/* tabIndex -1: the form can hold the focus on open (useFirstFieldFocus) but is not a Tab stop */}
+      <form
+        ref={formRef}
+        id={formId}
+        tabIndex={-1}
+        className={styles.form}
+        onSubmit={handleSubmit}
+        noValidate
+      >
         {children}
       </form>
     </Modal>

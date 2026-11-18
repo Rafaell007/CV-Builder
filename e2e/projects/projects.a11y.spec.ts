@@ -193,7 +193,7 @@ test.describe("projects page, keyboard and focus", () => {
     await startDate.fill("01/10/2026");
     await startDate.focus();
 
-    // The first Arrow Down moves into the calendar, the next ones move by day or week (DatePicker README).
+    // Arrow Down opens the calendar with the focus on a day (a bare focus does not open it), then Right moves a day (DatePicker README).
     await page.keyboard.press("ArrowDown");
     await expect(page.getByRole("dialog", { name: "Choose a date" })).toBeVisible();
     await page.keyboard.press("ArrowRight");

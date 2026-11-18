@@ -198,7 +198,40 @@ describe("MultiSelect", () => {
     expect(combobox).toHaveAttribute("aria-disabled", "true");
     expect(combobox).toHaveAttribute("tabindex", "-1");
     expect(combobox).toHaveAttribute("aria-expanded", "false");
-    expect(screen.getByText("React")).toBeInTheDocument();
+    expect(
+      within(screen.getByRole("group", { name: "Skills" })).getByText("React"),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("option")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Remove React" })).not.toBeInTheDocument();
+  });
+
+  it("starts on a row when it opens with the keyboard, so Enter toggles it and the user sees where they are", async () => {
+    const { user } = renderWithProviders(<TestMultiSelect initialValue={["nest"]} />);
+
+    await user.tab();
+    await user.keyboard("{Enter}");
+
+    // The first chosen row, not nothing
+    expect(screen.getByRole("option", { name: "NestJS" })).toHaveAttribute("data-highlighted");
+    await user.keyboard("{Enter}");
+    expect(screen.getByRole("option", { name: "NestJS", selected: false })).toBeInTheDocument();
+  });
+
+  it("lets Tab leave the open list for the next control, and keeps its rows in the page while closed", async () => {
+    const { user } = renderWithProviders(
+      <>
+        <TestMultiSelect initialValue={["react"]} />
+        <button type="button">Next</button>
+      </>,
+    );
+
+    await user.tab();
+    await user.keyboard("{Enter}");
+    expect(screen.getByRole("option", { name: "React" })).toBeInTheDocument();
+    await user.tab();
+
+    // The × of the chip comes first, then the next control; the closed list has no visible rows
+    expect(screen.getByRole("button", { name: "Remove React" })).toHaveFocus();
+    expect(screen.queryByRole("option")).not.toBeInTheDocument();
   });
 });

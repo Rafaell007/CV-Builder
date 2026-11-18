@@ -124,13 +124,66 @@ describe("FormModal", () => {
     expect(screen.getByRole("textbox", { name: "Name" })).toHaveFocus();
   });
 
-  it("does not start on a date field, because a focused date field opens its calendar", async () => {
+  it("starts with the form focused when the first field is a date field: no cursor, and the first Tab reaches the date field", async () => {
     const { user } = renderWithProviders(<DateFirstModal />);
 
     await user.click(screen.getByRole("button", { name: "Open dates" }));
 
-    expect(await screen.findByRole("dialog", { name: "Dates" })).toBeInTheDocument();
+    const dialog = await screen.findByRole("dialog", { name: "Dates" });
+    // The form itself holds the focus: no field has a cursor, and no calendar opened
+    expect(dialog.querySelector("form")).toHaveFocus();
+    expect(screen.queryByRole("dialog", { name: "Choose a date" })).not.toBeInTheDocument();
+    await user.tab();
+    expect(screen.getByRole("textbox", { name: "Start Date" })).toHaveFocus();
+    expect(screen.queryByRole("dialog", { name: "Choose a date" })).not.toBeInTheDocument();
+    // Tab passes over the date field to the next one
+    await user.tab();
     expect(screen.getByRole("textbox", { name: "Name" })).toHaveFocus();
+  });
+
+  it("undoes a select() from the focus trap right after opening, but keeps a selection the user makes", async () => {
+    const { user } = await renderOpen();
+    const input = screen.getByRole("textbox", { name: "Name" }) as HTMLInputElement;
+
+    await user.type(input, "React");
+    input.setSelectionRange(0, 0);
+    // Not guarded any more after typing, so this is the user's selection
+    input.select();
+    await user.keyboard("{Control>}a{/Control}");
+    expect(input.selectionStart).toBe(0);
+    expect(input.selectionEnd).toBe(5);
+  });
+
+  it("collapses a focus-trap select() before the first user interaction", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const { user } = renderWithProviders(<AddSkillModal submit={vi.fn()} />);
+      await user.click(screen.getByRole("button", { name: "Add skill" }));
+      const input = screen.getByRole("textbox", { name: "Name" }) as HTMLInputElement;
+      input.value = "React";
+
+      input.select(); // what the Radix focus trap does
+      await vi.waitFor(() => expect(input.selectionStart).toBe(input.selectionEnd));
+
+      vi.advanceTimersByTime(1100); // guard time is over
+      input.select();
+      await vi.waitFor(() => expect(input.selectionEnd).toBe(5));
+      expect(input.selectionStart).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("removes its listeners when the modal closes", async () => {
+    const remove = vi.spyOn(document, "removeEventListener");
+    const { user } = await renderOpen();
+
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    await user.click(screen.getByRole("button", { name: "Add skill" }));
+    await user.keyboard("a");
+
+    expect(remove).toHaveBeenCalledWith("keydown", expect.any(Function), true);
+    remove.mockRestore();
   });
 
   it("enables the submit button only while the form is valid and changed", async () => {

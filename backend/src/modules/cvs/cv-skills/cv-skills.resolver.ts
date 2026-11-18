@@ -8,7 +8,7 @@ import { RemoveCvSkillsInput } from "./dto/remove-cv-skills.input";
 import { UpdateCvSkillInput } from "./dto/update-cv-skill.input";
 import { AvailableCvSkill } from "./models/available-cv-skill";
 import { CvSkill } from "./models/cv-skill";
-import { requireUser } from "../require-user";
+import { requireUser } from "../../../common/auth";
 
 /** Reading needs a session; adding, changing and removing also need a verified email (D16). */
 @Resolver(() => CvSkill)

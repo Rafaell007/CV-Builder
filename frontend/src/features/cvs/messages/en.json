@@ -131,6 +131,8 @@
       "title": "Add skill",
       "close": "Close",
       "skill": "Skill",
+      "mastery": "Skill mastery",
+      "noMastery": "No mastery",
       "submit": "Add",
       "cancel": "Cancel",
       "loading": "Loading skills",
@@ -301,6 +303,50 @@
       "success": {
         "title": "Project removed",
         "text": "{name} was removed from the CV."
+      }
+    }
+  },
+  "preview": {
+    "document": "CV preview",
+    "states": {
+      "loading": "Loading CV preview",
+      "unauthorized": "You are not authorized to access this CV",
+      "error": "Failed to load CV preview",
+      "retry": "Retry"
+    },
+    "skillsTable": {
+      "caption": "Professional skills",
+      "columns": {
+        "skills": "Skills",
+        "experience": "Experience in Years",
+        "lastUsed": "Last Used"
+      },
+      "notAvailable": "{column}: not available",
+      "empty": "No skills added"
+    },
+    "sections": {
+      "general": {
+        "title": "General information",
+        "education": "Education",
+        "languages": "Language proficiency",
+        "levelNative": "Native",
+        "domains": "Domains"
+      },
+      "summary": {
+        "title": "Summary"
+      },
+      "professionalSkills": {
+        "title": "Professional skills"
+      },
+      "skills": {
+        "title": "Skills"
+      },
+      "projects": {
+        "title": "Projects",
+        "roles": "Project roles",
+        "period": "Period",
+        "responsibilities": "Responsibilities",
+        "environment": "Environment"
       }
     }
   }

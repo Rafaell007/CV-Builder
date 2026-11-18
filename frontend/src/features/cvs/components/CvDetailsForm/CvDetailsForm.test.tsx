@@ -88,13 +88,15 @@ describe("CvDetailsForm", () => {
 
   it("shows the loading state while the request runs and sends only one request", async () => {
     // One mock: a second request would find no mock and the form would show the general error.
-    const { user } = setup({ mocks: [{ ...updateCvMock(input), delay: 50 }] });
+    // 500 ms and a check right after the first click: with 50 ms the answer could arrive before the check
+    // when the full test run keeps the machine busy.
+    const { user } = setup({ mocks: [{ ...updateCvMock(input), delay: 500 }] });
     await user.type(screen.getByRole("textbox", { name: "Name" }), " 2");
 
     await user.click(updateButton());
-    await user.click(updateButton());
-
     expect(updateButton()).toHaveAttribute("aria-busy", "true");
+
+    await user.click(updateButton());
     expect(await screen.findByText("CV updated")).toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });

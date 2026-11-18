@@ -1,6 +1,6 @@
-import { UnauthorizedException, UseGuards } from "@nestjs/common";
+import { UseGuards } from "@nestjs/common";
 import { Args, Mutation, Resolver } from "@nestjs/graphql";
-import { CurrentUser } from "../../../common/auth";
+import { CurrentUser, requireUser } from "../../../common/auth";
 import type { AuthUser } from "../../../common/auth";
 import { GqlThrottlerGuard } from "../../../common/throttling";
 import { VerifyEmailInput } from "./dto/verify-email.input";
@@ -27,10 +27,4 @@ export class VerificationResolver {
     await this.verification.resendCode(requireUser(user).id);
     return true;
   }
-}
-
-// The global guard has already refused anonymous calls; this keeps the type honest.
-function requireUser(user: AuthUser | undefined): AuthUser {
-  if (user === undefined) throw new UnauthorizedException("Sign in to continue");
-  return user;
 }

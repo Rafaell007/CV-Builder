@@ -298,6 +298,14 @@ Header and content:
 - Message: "This doesn't seem to be the page you were looking for. Let's get you back on track." Two lines, break after "looking for." (see Decisions).
 - Button: "Go back" in the Button style, uppercase.
 
+### Settings (1440 › SETTINGS, 768px Tablet › SETTINGS; light / dark)
+
+- Form column: 852 wide, centred in the content area (1440: left 193 in the 1240 content; 768: fills the content, 664 wide with the usual 24 padding). Top 72 in the content area. Same column as the CV Details form.
+- Order and positions (column-relative top / height): Theme select 0 / 48, Language select 84 / 48, "Change password" 168 / 24, Password 216 / 48, New Password 300 / 48, Confirm Password 384 / 48, CHANGE 468 / 48.
+- Gaps: fields 36 apart; Language → heading 36; heading → Password 24; Confirm Password → CHANGE 36.
+- "Change password": Body style (400 · 16 · 24 · 0.15), text main (#2E2E2E / #F5F5F7).
+- CHANGE: primary button 160×48, radius 40, right-aligned in the column (disabled fill #AEAEAE, as the Button disabled state).
+
 ### Icons
 
 No icon names in the file, but every glyph matches Google Material Icons by size and position: more-vert (4×16 at 10,4), visibility (22×15 at 1,4.5), search (17.49 at 3,3), chevron-right (7.41×12 at 8.59,6). We use Material Icons paths (Apache 2.0).
@@ -396,3 +404,5 @@ Predictions for KAN-82 (2026-11-06): not drawn, or drawn inconsistently; chosen 
 Highlighted breadcrumb in dark (2026-11-09): Figma draws #C63031 on #2E2E2E, 2.5:1. Dark uses #E9B0B0 (`--color-primary-text`), as error text does; light keeps #C63031 (5.0:1).
 
 Avatar initial in dark (2026-11-06): Figma draws #2E2E2E on #C63031, 2.5:1. The initial uses #F5F5F7 in both themes (5.0:1).
+
+Settings (2026-11-16): the "Change password" text is at left 2 in 1440 light but 0 in dark and on 768; read as an artefact, it starts at 0. On 768 the CHANGE button keeps the desktop left 692, outside the 664 column; read as an artefact, it stays right-aligned in the column as on 1440.

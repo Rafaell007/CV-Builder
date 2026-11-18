@@ -1,7 +1,7 @@
 import { Args, Query, Resolver } from "@nestjs/graphql";
 import { CurrentUser } from "../../../common/auth";
 import type { AuthUser } from "../../../common/auth";
-import { requireUser } from "../require-user";
+import { requireUser } from "../../../common/auth";
 import { CvPreviewService } from "./cv-preview.service";
 import { CvPreviewArgs } from "./dto/cv-preview.args";
 import { CvPreview } from "./models/cv-preview";

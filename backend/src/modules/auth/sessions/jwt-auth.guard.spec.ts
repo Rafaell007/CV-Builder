@@ -28,14 +28,14 @@ const USER: AuthUser = { id: "user-1", role: Role.USER, isVerified: true };
 
 function setup(options: {
   cookie?: string | undefined;
-  userId?: string | undefined;
+  claims?: { userId: string; tokenVersion: number } | undefined;
   user?: AuthUser | undefined;
 }) {
   const cookies = {
     readAccessToken: jest.fn().mockReturnValue(options.cookie),
   } as unknown as jest.Mocked<SessionCookiesService>;
   const tokens = {
-    verifyAccessToken: jest.fn().mockResolvedValue(options.userId),
+    verifyAccessToken: jest.fn().mockResolvedValue(options.claims),
   } as unknown as jest.Mocked<TokenService>;
   const authService = {
     findAuthUser: jest.fn().mockResolvedValue(options.user),
@@ -54,7 +54,11 @@ function setup(options: {
 
 describe("JwtAuthGuard", () => {
   it("puts the user on the request when the access token is valid", async () => {
-    const { run, request } = setup({ cookie: "jwt", userId: "user-1", user: USER });
+    const { run, request } = setup({
+      cookie: "jwt",
+      claims: { userId: "user-1", tokenVersion: 0 },
+      user: USER,
+    });
 
     await expect(run(ProtectedResolver, ProtectedResolver.prototype.list)).resolves.toBe(true);
 
@@ -70,7 +74,7 @@ describe("JwtAuthGuard", () => {
   });
 
   it("answers UNAUTHENTICATED when the token is invalid or expired", async () => {
-    const { run, authService } = setup({ cookie: "bad", userId: undefined });
+    const { run, authService } = setup({ cookie: "bad", claims: undefined });
 
     await expect(run(ProtectedResolver, ProtectedResolver.prototype.list)).rejects.toThrow(
       UnauthorizedException,
@@ -79,11 +83,28 @@ describe("JwtAuthGuard", () => {
   });
 
   it("answers UNAUTHENTICATED when the user no longer exists", async () => {
-    const { run } = setup({ cookie: "jwt", userId: "deleted", user: undefined });
+    const { run } = setup({
+      cookie: "jwt",
+      claims: { userId: "deleted", tokenVersion: 0 },
+      user: undefined,
+    });
 
     await expect(run(ProtectedResolver, ProtectedResolver.prototype.list)).rejects.toThrow(
       UnauthorizedException,
     );
+  });
+
+  it("looks the user up by id and token version, so a token from before a password change finds no one", async () => {
+    const { run, authService } = setup({
+      cookie: "jwt",
+      claims: { userId: "user-1", tokenVersion: 2 },
+      user: undefined,
+    });
+
+    await expect(run(ProtectedResolver, ProtectedResolver.prototype.list)).rejects.toThrow(
+      UnauthorizedException,
+    );
+    expect(authService.findAuthUser).toHaveBeenCalledWith("user-1", 2);
   });
 
   it("lets a @Public() handler through without a session, and leaves request.user empty", async () => {
@@ -101,7 +122,11 @@ describe("JwtAuthGuard", () => {
   });
 
   it("still identifies the user on a @Public() handler when the token is valid", async () => {
-    const { run, request } = setup({ cookie: "jwt", userId: "user-1", user: USER });
+    const { run, request } = setup({
+      cookie: "jwt",
+      claims: { userId: "user-1", tokenVersion: 0 },
+      user: USER,
+    });
 
     await run(MixedResolver, MixedResolver.prototype.open);
 
