@@ -8,13 +8,12 @@ import {
   SearchField,
   type PageStateLabels,
 } from "@/shared/components";
-import { useListState } from "@/shared/lists";
+import { toListVariables, useListState } from "@/shared/lists";
 import { CreateProjectModal } from "./components/CreateProjectModal";
 import { DeleteProjectModal } from "./components/DeleteProjectModal";
 import { ProjectsTable } from "./components/ProjectsTable";
 import { UpdateProjectModal } from "./components/UpdateProjectModal";
 import { DEFAULT_PROJECTS_SORT, SEARCH_MAX_LENGTH } from "./projects.constants";
-import { toProjectsVariables } from "./utils";
 import { useCreateProjectForm } from "./useCreateProjectForm";
 import { useDeleteProject } from "./useDeleteProject";
 import { useProjects } from "./useProjects";
@@ -28,7 +27,7 @@ import styles from "./Projects.module.css";
 export function Projects() {
   const t = useTranslations("projects");
   const list = useListState(DEFAULT_PROJECTS_SORT);
-  const variables = toProjectsVariables(list);
+  const variables = toListVariables(list);
   const { projects, total, loading, failed, retry } = useProjects(variables);
 
   const creation = useCreateProjectForm();

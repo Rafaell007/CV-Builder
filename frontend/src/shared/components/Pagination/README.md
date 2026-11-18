@@ -10,7 +10,7 @@ Page buttons for a backend list: previous, next, page numbers and `…` for hidd
 
 ## Known issues
 
-- **Two constants hold the number 10** (frontend `DEFAULT_PAGE_SIZE` and backend `DEFAULT_PAGE_SIZE`). They must stay equal. If one changes, change the other and the tests of `toProjectsVariables` and `list-inputs.spec.ts`.
+- **Two constants hold the number 10** (frontend `DEFAULT_PAGE_SIZE` and backend `DEFAULT_PAGE_SIZE`). They must stay equal. If one changes, change the other and the tests of `toListVariables` (`shared/lists`) and `list-inputs.spec.ts`.
 - **English texts only.** The defaults of `labels` are English (S0.6 i18n was missing). Pages must pass translated `labels`. The arrows `‹` and `›` are fixed characters and have the translated `aria-label`.
 - **Out-of-range page.** If `page` is bigger than the page count (for example after a delete on the last page), the component shows the last page as current but does not call `onPageChange`. The page must correct its own state, or the list query asks for an empty page.
 - **No page-size selector and no "go to page" field.** They are not in the designs, so they are not built.
