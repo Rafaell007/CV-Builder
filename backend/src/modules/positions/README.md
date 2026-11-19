@@ -12,6 +12,7 @@ The global catalog of positions (page 26). A user can be assigned one position. 
   - `CONFLICT` "Position cannot be deleted because it is currently in use" when a user still has the position. There is no count check first: the `Restrict` foreign key on `User.positionId` refuses the delete (`P2003`) and the service maps it (D18).
   - `NOT_FOUND` "Position not found" for an unknown id (`P2025`). `BAD_USER_INPUT` for an id that is not a UUID.
 - **Authorization:** `@Roles(Role.ADMIN)` on `PositionsResolver`.
+- **Note (deploy):** migration `20261117154613_case_insensitive_catalog_names` changes `name` to `citext` and rebuilds the unique index. It fails if the database already holds two names that differ only in letter case (for example "developer" and "Developer"). Before `prisma migrate deploy` on a database with real data, check with `SELECT lower(name), count(*) FROM "Position" GROUP BY 1 HAVING count(*) > 1;` and rename or merge the duplicates. `CREATE EXTENSION citext` needs the database owner (citext is a trusted extension from PostgreSQL 13).
 - **Same shape as:** the [Departments module](../departments/README.md). A fix in one usually belongs in both.
 - **Tests:** `*.spec.ts` next to the code; `backend/test/positions/positions.int-spec.ts` runs every operation over HTTP against the test database.
 - **Docs:** [positions page](../../../../docs/pages/26-positions-page.md) · [PLAN.md D18, D35](../../../../PLAN.md)
