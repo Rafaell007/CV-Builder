@@ -99,6 +99,8 @@ test.describe("User CVs tab, as an admin", () => {
     await page.getByRole("button", { name: `Actions for ${name}` }).click();
     await page.getByRole("menuitem", { name: "Delete" }).click();
     await confirmDialog(page).getByRole("button", { name: "Cancel" }).click();
+    // Wait until the modal is gone: a click on the row menu while it closes is lost (flaky in a full run, KAN-121).
+    await expect(confirmDialog(page)).toBeHidden();
     await expect(page.getByText(name, { exact: true })).toBeVisible();
 
     await page.getByRole("button", { name: `Actions for ${name}` }).click();
