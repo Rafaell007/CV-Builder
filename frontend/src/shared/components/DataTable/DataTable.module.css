@@ -101,6 +101,24 @@
   border-bottom: 1px solid var(--color-border);
 }
 
+/* Actions column (Figma): 74 wide around the 40×40 kebab on desktop, 56 on tablet. 17px is off-grid, kept exact. */
+.actionsCell {
+  composes: controlCell;
+  padding-inline: 17px;
+}
+
+.actionsHeadCell {
+  composes: controlHeadCell;
+  padding-inline: 17px;
+}
+
+@media (max-width: 1023px) {
+  .actionsCell,
+  .actionsHeadCell {
+    padding-inline: var(--space-2);
+  }
+}
+
 .messageCell {
   padding: var(--space-8) var(--space-4);
   text-align: center;
