@@ -2,7 +2,7 @@
 
 import type { ErrorLike, OperationVariables, TypedDocumentNode } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import type { ListPage } from "../lists.types";
+import type { PagedResult } from "../lists.types";
 
 export type UsePagedListResult<TItem> = {
   /** The rows of the current page, as the backend returned them. */
@@ -25,7 +25,7 @@ export type UsePagedListResult<TItem> = {
 export function usePagedList<TData, TVariables extends OperationVariables, TItem>(
   query: TypedDocumentNode<TData, TVariables>,
   variables: TVariables,
-  selectPage: (data: TData) => ListPage<TItem>,
+  selectPage: (data: TData) => PagedResult<TItem>,
 ): UsePagedListResult<TItem> {
   // notifyOnNetworkStatusChange: `loading` is true again during a retry, so the page shows the skeleton.
   const { data, previousData, loading, error, refetch } = useQuery(query, {

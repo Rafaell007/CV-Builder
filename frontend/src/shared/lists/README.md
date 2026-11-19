@@ -12,7 +12,7 @@ Nothing here filters or sorts in the frontend.
   (`DEFAULT_PAGE_SIZE` in `common/pagination`) and the frontend `DEFAULT_PAGE_SIZE` (`Pagination`) are both 10, and a
   test checks the size that is sent.
 - `usePagedList(query, variables, selectPage)`: sends a list query and returns `items`, `total`, `loading`, `failed`
-  and `retry`. `selectPage` picks `{ items, total }` out of the result (`ListPage`), for example
+  and `retry`. `selectPage` picks `{ items, total }` out of the result (`PagedResult`), for example
   `(data) => data.projects`. `failed` hides the list, so a failed request never looks like an empty list. `total`
   keeps the last value while the next page loads, so the page buttons do not jump. `retry` sends the same request.
   A feature hook wraps it and names the rows (`useProjects` returns `projects`).

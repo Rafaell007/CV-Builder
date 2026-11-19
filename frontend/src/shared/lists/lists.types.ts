@@ -15,7 +15,7 @@ export interface ListVariables {
 }
 
 /** The part of a list query result that a list page needs: the rows of one page and the number of rows on all pages. */
-export interface ListPage<TItem> {
+export interface PagedResult<TItem> {
   items: readonly TItem[];
   total: number;
 }

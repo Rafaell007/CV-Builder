@@ -50,7 +50,7 @@
   margin-top: var(--space-6);
 }
 
-/* Tablet (keep 1023.98px in sync with the AppShell): search 276 wide, the button is the plus icon only (58×40). */
+/* Tablet (keep 1023.98px in sync with DESKTOP_MIN_WIDTH): search 276 wide, the button is the plus icon only (58×40). */
 @media (max-width: 1023.98px) {
   .toolbar {
     padding-right: 0;

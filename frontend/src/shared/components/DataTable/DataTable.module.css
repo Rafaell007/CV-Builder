@@ -112,7 +112,7 @@
   padding-inline: 17px;
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1023.98px) {
   .actionsCell,
   .actionsHeadCell {
     padding-inline: var(--space-2);
