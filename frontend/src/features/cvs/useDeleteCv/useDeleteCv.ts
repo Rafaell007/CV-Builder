@@ -6,7 +6,7 @@ import { useRef, useState } from "react";
 import { useToast } from "@/shared/components";
 import { CvsDocument, DeleteCvDocument } from "@/shared/graphql";
 import type { CvListItem } from "../cvs.types";
-import { toDeleteCvFailure } from "../utils";
+import { toDeleteCvFailure, withScope } from "../utils";
 
 export type UseDeleteCvOptions = {
   /** The page the list shows now (starts at 1). */
@@ -63,7 +63,7 @@ export function useDeleteCv({
     const wasLastRowOfPage = rowsOnPage === 1 && page > 1;
     try {
       await deleteCv({
-        variables: { id: cv.id, ...(userId === undefined ? {} : { userId }) },
+        variables: { id: cv.id, ...withScope(userId) },
         update: (cache) => {
           const id = cache.identify(cv);
           if (id === undefined) return;

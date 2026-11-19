@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { CreateCvInput, UpdateCvInput } from "@/shared/graphql";
 import { MAX_DESCRIPTION_LENGTH, MAX_EDUCATION_LENGTH, MAX_NAME_LENGTH } from "../cvs.constants";
 import type { CvFormValues, CvListItem } from "../cvs.types";
+import { withScope } from "./cvs.utils";
 
 /** The translated texts of the validation messages (page 20, Create CV Validation). */
 export interface CvFormMessages {
@@ -46,7 +47,7 @@ export function toCreateCvInput(values: CvFormValues, userId?: string): CreateCv
     name: values.name,
     education: values.education,
     description: values.description,
-    ...(userId === undefined ? {} : { userId }),
+    ...withScope(userId),
   };
 }
 
@@ -73,6 +74,6 @@ export function toUpdateCvInput(
     name: values.name,
     education: values.education,
     description: values.description,
-    ...(userId === undefined ? {} : { userId }),
+    ...withScope(userId),
   };
 }

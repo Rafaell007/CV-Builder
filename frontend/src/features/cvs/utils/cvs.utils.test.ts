@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_CVS_SORT } from "../cvs.constants";
-import { toCvReturnPath, toCvsVariables, toCvTabPath, toUserCvsPath } from "./cvs.utils";
+import {
+  toActiveTabHref,
+  toCvOpenPath,
+  toCvReturnPath,
+  toCvsVariables,
+  toCvTabLinks,
+  toCvTabPath,
+  toUserCvsPath,
+  withScope,
+} from "./cvs.utils";
 
 const state = { search: "", sort: DEFAULT_CVS_SORT, page: 1 };
 
@@ -78,5 +87,57 @@ describe("toCvTabPath", () => {
     expect(toCvTabPath("12", "skills")).toBe("/cvs/12/skills");
     expect(toCvTabPath("12", "projects")).toBe("/cvs/12/projects");
     expect(toCvTabPath("12", "preview")).toBe("/cvs/12/preview");
+  });
+});
+
+describe("withScope", () => {
+  it("returns the employee when it is given", () => {
+    expect(withScope("10")).toEqual({ userId: "10" });
+  });
+
+  it("returns an object without the key when there is no employee", () => {
+    expect(withScope()).toEqual({});
+    expect("userId" in withScope(undefined)).toBe(false);
+  });
+});
+
+describe("toCvOpenPath", () => {
+  it("opens the Preview tab", () => {
+    expect(toCvOpenPath("12")).toBe("/cvs/12/preview");
+  });
+
+  it("remembers the User CVs tab of the employee", () => {
+    expect(toCvOpenPath("12", "10")).toBe(
+      `/cvs/12/preview?from=${encodeURIComponent("/users/10/cvs")}`,
+    );
+  });
+});
+
+describe("toCvTabLinks", () => {
+  it("gives every tab a path without a query and a link that keeps from", () => {
+    const links = toCvTabLinks("12", "/users/10/cvs");
+
+    expect(links.map((link) => link.tab)).toEqual(["details", "skills", "projects", "preview"]);
+    expect(links[1]).toEqual({
+      tab: "skills",
+      path: "/cvs/12/skills",
+      href: `/cvs/12/skills?from=${encodeURIComponent("/users/10/cvs")}`,
+    });
+  });
+
+  it("gives the same path and link when there is no from", () => {
+    expect(toCvTabLinks("12").every((link) => link.path === link.href)).toBe(true);
+  });
+});
+
+describe("toActiveTabHref", () => {
+  it("keeps the pathname when there is no from", () => {
+    expect(toActiveTabHref("/cvs/12/skills")).toBe("/cvs/12/skills");
+  });
+
+  it("adds the same query as the tab links, so Tabs can match them", () => {
+    expect(toActiveTabHref("/cvs/12/skills", "/users/10/cvs")).toBe(
+      toCvTabLinks("12", "/users/10/cvs")[1]!.href,
+    );
   });
 });

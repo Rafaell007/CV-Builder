@@ -1,4 +1,14 @@
-export { toCvReturnPath, toCvsVariables, toCvTabPath, toUserCvsPath } from "./cvs.utils";
+export {
+  toActiveTabHref,
+  toCvOpenPath,
+  toCvReturnPath,
+  toCvsVariables,
+  toCvTabLinks,
+  toCvTabPath,
+  toUserCvsPath,
+  withScope,
+  type CvTabLink,
+} from "./cvs.utils";
 export {
   cvFormSchema,
   toCreateCvInput,
