@@ -44,7 +44,7 @@ export function Cvs({ userId, onView }: CvsProps) {
   const { cvs, total, loading, failed, retry } = useCvs(variables);
   const { user, isAdmin, loading: userLoading } = useCurrentUser();
 
-  const creation = useCreateCvForm();
+  const creation = useCreateCvForm(userId);
   const editing = useUpdateCvForm();
   const deletion = useDeleteCv({
     page: list.page,
@@ -67,7 +67,8 @@ export function Cvs({ userId, onView }: CvsProps) {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.title}>{t("title")}</h1>
+      {/* In the User CVs tab the page header already has the h1. */}
+      {userId === undefined && <h1 className={styles.title}>{t("title")}</h1>}
       {/* Outside the error branch below: an error must not remove the typed search (the field is uncontrolled). */}
       <div className={styles.toolbar}>
         <SearchField

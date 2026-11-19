@@ -37,12 +37,16 @@ export function cvFormSchema(messages: CvFormMessages): z.ZodType<CvFormValues, 
   });
 }
 
-/** The `createCv` input. `userId` is left out: the backend uses the signed-in user as the owner. */
-export function toCreateCvInput(values: CvFormValues): CreateCvInput {
+/**
+ * The `createCv` input. `userId` is sent only for the User CVs tab (the owner comes from the page, never from
+ * the form); without it the backend uses the signed-in user as the owner and only an admin may send it.
+ */
+export function toCreateCvInput(values: CvFormValues, userId?: string): CreateCvInput {
   return {
     name: values.name,
     education: values.education,
     description: values.description,
+    ...(userId === undefined ? {} : { userId }),
   };
 }
 

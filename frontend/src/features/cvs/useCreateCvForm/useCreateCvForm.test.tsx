@@ -9,10 +9,10 @@ import { useCreateCvForm } from "./useCreateCvForm";
 const fakeEvent = { preventDefault: () => undefined, persist: () => undefined };
 
 // renderWithProviders renders elements; this small component lets the hook run inside the same providers.
-function setup(options: RenderWithProvidersOptions) {
+function setup(options: RenderWithProvidersOptions, userId?: string) {
   let current!: ReturnType<typeof useCreateCvForm>;
   function Probe(): ReactNode {
-    current = useCreateCvForm();
+    current = useCreateCvForm(userId);
     return null;
   }
   renderWithProviders(<Probe />, options);
@@ -48,5 +48,23 @@ describe("useCreateCvForm", () => {
     expect(result().failed).toBe(false);
     expect(result().isOpen).toBe(false);
     expect(await screen.findByText("CV created")).toBeInTheDocument();
+  });
+
+  it("sends the owner given by the page (the User CVs tab)", async () => {
+    // The mock matches only a request with userId "10": any other input finds no mock and fails.
+    const { result } = setup({ mocks: [createCvMock({ ...createInput, userId: "10" })] }, "10");
+    act(() => {
+      result().open();
+      result().form.setValue("name", createInput.name);
+      result().form.setValue("education", createInput.education);
+      result().form.setValue("description", createInput.description);
+    });
+
+    await act(async () => {
+      await result().submit(fakeEvent as unknown as BaseSyntheticEvent);
+    });
+
+    expect(result().failed).toBe(false);
+    expect(result().isOpen).toBe(false);
   });
 });

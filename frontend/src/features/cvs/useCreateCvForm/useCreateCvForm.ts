@@ -14,8 +14,9 @@ const EMPTY_VALUES: CvFormValues = { name: "", education: "", description: "" };
  * The Create CV flow: the open state of the modal and the request. The form itself is `useCvForm`. It is
  * empty each time the modal opens. A failed request keeps every typed value and shows the error inside the
  * modal. Only a successful request closes the modal.
+ * `userId` is the owner of the new CV on the User CVs tab. It comes from the page, not from the form.
  */
-export function useCreateCvForm() {
+export function useCreateCvForm(userId?: string) {
   const t = useTranslations("cvs.create");
   const toast = useToast();
   const { create } = useCreateCv();
@@ -29,7 +30,7 @@ export function useCreateCvForm() {
 
   async function send(values: CvFormValues) {
     try {
-      await create(toCreateCvInput(values));
+      await create(toCreateCvInput(values, userId));
       setIsOpen(false);
       toast.success({
         title: t("success.title"),
