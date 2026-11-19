@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { CSSProperties } from "react";
 import { expect, fn } from "storybook/test";
 import { DataTable, type DataTableColumn } from "../DataTable";
 import { PageHeader } from "../PageHeader";
@@ -89,6 +90,36 @@ export const Tablet: Story = {
   play: async ({ canvas }) => {
     const button = canvas.getByRole("button", { name: "Create department" });
     await expect(button.getBoundingClientRect().width).toBe(58);
+  },
+};
+
+/** The CVs page in Figma: the icon and text centred with an 8px gap, the button 120 from the right edge. */
+export const CentredCreateButton: Story = {
+  args: { createLabel: "Create CV" },
+  decorators: [
+    (Story) => (
+      <div
+        // React's CSSProperties has no keys for custom properties, hence the cast.
+        style={
+          {
+            "--list-page-create-justify": "center",
+            "--list-page-create-gap": "8px",
+            "--list-page-toolbar-padding-right": "120px",
+          } as CSSProperties
+        }
+      >
+        <Story />
+      </div>
+    ),
+  ],
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole("button", { name: "Create CV" });
+    const toolbar = button.parentElement!;
+    await expect(getComputedStyle(button).justifyContent).toBe("center");
+    await expect(getComputedStyle(button).columnGap).toBe("8px");
+    await expect(toolbar.getBoundingClientRect().right - button.getBoundingClientRect().right).toBe(
+      120,
+    );
   },
 };
 

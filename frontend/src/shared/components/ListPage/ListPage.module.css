@@ -2,7 +2,10 @@
 
 /*
  * Sticky under the 56px PageHeader of the route, page background so the scrolled list does not show through.
- * A page with more sticky bars above (the user tabs: 56 header + 56 tabs) sets --list-page-toolbar-top to 112px.
+ * A page can set these variables on an ancestor where its Figma frame differs (defaults: Projects, Departments, Positions):
+ * - --list-page-toolbar-top: more sticky bars above (the user tabs: 56 header + 56 tabs) → 112px.
+ * - --list-page-toolbar-padding-right: the create button's distance to the right edge (desktop only; 768 is flush).
+ * - --list-page-create-justify and --list-page-create-gap: where the plus icon and the text sit in the button.
  */
 .toolbar {
   position: sticky;
@@ -15,7 +18,7 @@
   box-sizing: border-box;
   height: var(--space-14);
   /* Search at left 20, the create button 20 from the right edge (off the 4px grid, kept exact). */
-  padding: 0 20px;
+  padding: 0 var(--list-page-toolbar-padding-right, 20px) 0 20px;
   background: var(--color-bg);
 }
 
@@ -29,8 +32,8 @@
  * Two classes, so these win over the Button's own size whatever order the stylesheets load in.
  */
 .toolbar .createButton {
-  justify-content: flex-start;
-  gap: var(--space-4);
+  justify-content: var(--list-page-create-justify, flex-start);
+  gap: var(--list-page-create-gap, var(--space-4));
   min-width: 220px;
   height: var(--space-10);
   padding: 0 var(--space-3);

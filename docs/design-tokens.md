@@ -228,7 +228,7 @@ Read on 2026-11-18 for KAN-96 (Properties panel; Dev Mode is locked). Shared `Li
 
 - Top bar: the App shell header (56, sticky, page background), the page name as the breadcrumb (Body style, #626262 / #AEAEAE) at 16 / 20.
 - Toolbar: 56 high, directly under the top bar, sticky, page background. Search field 320×40 at top 8, left 20 (768: 276 wide).
-- Create button: the Text Button (no fill, no border, text #C63031, uppercase Button style) at 220×40, radius 40, 20 from the right edge, top 8. Plus icon 24 box (14×14 glyph, #C63031) at left 12, text at left 52 (icon → text 16). 768: plus icon only, 58×40, flush right (left 606 in the 664 column).
+- Create button: the Text Button (no fill, no border, text #C63031, uppercase Button style) at 220×40, radius 40, 20 from the right edge, top 8. Plus icon 24 box (14×14 glyph, #C63031) at left 12, text at left 52 (icon → text 16). CVs and User CVs: icon and text centred (icon 56, text 88, icon → text 8); CVs page 120 from the right edge (re-read 2026-11-19). 768: plus icon only, 58×40, flush right (left 606 in the 664 column).
 - Table: directly under the toolbar; header 58, rows 73, cell text at left 16; the actions column (74 wide) holds a 40×40 kebab; the row and header lines run under the actions column too. 10 rows on a page (D19).
 - Sort arrow: 12×12 arrow glyph in an 18×18 box, #626262 / #AEAEAE, drawn pointing up next to every sortable header, none marked as sorted.
 - Not drawn: the page buttons, the open row menu, the empty / loading / error states, hover / pressed / disabled of the create button.
@@ -423,7 +423,7 @@ List pages (2026-11-18, KAN-96): drawn inconsistently; chosen by us.
 - Offsets of 1–4px between light and dark are ignored (main height 888 / 900, header Name cell 1190 / 1116, create text at 48 in light Departments but 52 everywhere else, tablet columns 606 / 58 and 608 / 56, kebab at 9 / 8). The 768 title sits at 13, 25 or 0 and the light 768 Projects search at 0: both use 20, as on 1440.
 - Page buttons (not drawn): centred, 24 under the list.
 - Sort arrow (Material "arrow_upward", `--color-sort-icon`): Figma draws no sorted state, so it is always fully visible, with no hover change. It points down for DESC and up otherwise; `aria-sort` on the header cell tells screen readers. Text → arrow 4 (`--space-1`), not measured.
-- Create button content: Departments, Positions and Projects draw the icon and text at the left (icon 12, text 48 or 52); CVs centres them (icon 56, text 88, gap 8). One rule on every list page: left, icon 12, text 52.
+- Create button content (changed 2026-11-19, "Figma first"): Departments, Positions and Projects draw the icon and text at the left (icon 12, text 52; 48 in light Departments is an artefact); the CVs page and the User CVs tab centre them (icon 56, text 88, gap 8). Each page follows its own frame. The right edge: 20 everywhere, but 120 on the CVs page (1440, both themes); built as drawn. `ListPage` CSS variables carry the differences.
 - 768: the CVs toolbar has no fill; a sticky bar needs one, so it keeps the page background. Dark 768 widths 2px off (666 / 664, search 278 / 276), the User CVs tab bars at left 22 and 37, and its dark top bar without fill: read as artefacts, laid out as on the other pages.
 
 Settings (2026-11-16): the "Change password" text is at left 2 in 1440 light but 0 in dark and on 768; read as an artefact, it starts at 0. On 768 the CHANGE button keeps the desktop left 692, outside the 664 column; read as an artefact, it stays right-aligned in the column as on 1440.
