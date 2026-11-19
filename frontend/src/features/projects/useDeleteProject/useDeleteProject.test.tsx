@@ -73,7 +73,7 @@ describe("useDeleteProject", () => {
     expect(screen.queryByText("Could not delete the project")).not.toBeInTheDocument();
   });
 
-  it("closes and shows the backend message when a business rule refuses the delete", async () => {
+  it("closes and shows the translated in-use text, not the backend message, for a CONFLICT", async () => {
     const { result } = setup({
       mocks: [deleteProjectRefusedMock(blog.id, { message: "The project is used in 2 CVs" })],
     });
@@ -86,7 +86,10 @@ describe("useDeleteProject", () => {
 
     expect(deleted).toBe(false);
     expect(result().project).toBeNull();
-    expect(await screen.findByText("The project is used in 2 CVs")).toBeInTheDocument();
+    expect(
+      await screen.findByText("This project cannot be deleted because it is used in a CV."),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("The project is used in 2 CVs")).not.toBeInTheDocument();
   });
 
   it("shows the friendly text for an error code that is not CONFLICT", async () => {

@@ -58,7 +58,7 @@ export function useDeleteProject(): UseDeleteProjectResult {
       setProject(null);
       toast.error({
         title: t("failedTitle"),
-        description: toDeleteProjectFailure(error) ?? t("failedText"),
+        description: toDeleteProjectFailure(error) === "inUse" ? t("inUseText") : t("failedText"),
       });
       return false;
     } finally {

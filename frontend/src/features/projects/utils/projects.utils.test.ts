@@ -6,10 +6,10 @@ describe("toDeleteProjectFailure", () => {
   const graphQlError = (code: string, message: string) =>
     new CombinedGraphQLErrors({ errors: [{ message, extensions: { code } }] });
 
-  it("returns the message of a CONFLICT error, so the user reads the business rule", () => {
+  it("returns inUse for a CONFLICT error (a CV uses the project)", () => {
     const error = graphQlError("CONFLICT", "The project is used in 2 CVs");
 
-    expect(toDeleteProjectFailure(error)).toBe("The project is used in 2 CVs");
+    expect(toDeleteProjectFailure(error)).toBe("inUse");
   });
 
   it("returns nothing for another GraphQL error, so the caller shows a friendly text", () => {

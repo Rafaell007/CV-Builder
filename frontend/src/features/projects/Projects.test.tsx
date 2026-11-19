@@ -476,7 +476,7 @@ describe("Projects", () => {
       expect(screen.queryByText("Could not delete the project")).not.toBeInTheDocument();
     });
 
-    it("shows the business-rule error of the backend and keeps the row (AC-33, AC-35, AC-37)", async () => {
+    it("shows the translated in-use text and keeps the row (AC-33, AC-35, AC-37)", async () => {
       const { user } = renderWithProviders(<Projects />, {
         mocks: [
           projectsMock([blog, sales]),
@@ -490,7 +490,9 @@ describe("Projects", () => {
       // The modal closes, so a keyboard user can reach the error toast (see the Toast README).
       await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
       expect(await screen.findByText("Could not delete the project")).toBeInTheDocument();
-      expect(screen.getByText("The project is used in 2 CVs")).toBeInTheDocument();
+      expect(
+        screen.getByText("This project cannot be deleted because it is used in a CV."),
+      ).toBeInTheDocument();
       expect(names()).toEqual(["Blog", "Cloud Sales Management"]);
     });
 

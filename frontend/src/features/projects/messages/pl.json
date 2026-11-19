@@ -22,7 +22,8 @@
     "confirm": "Potwierdź",
     "cancel": "Anuluj",
     "failedTitle": "Nie udało się usunąć projektu",
-    "failedText": "Coś poszło nie tak. Spróbuj ponownie."
+    "failedText": "Coś poszło nie tak. Spróbuj ponownie.",
+    "inUseText": "Nie można usunąć tego projektu, ponieważ jest używany w CV."
   },
   "search": {
     "label": "Szukaj projektów",
