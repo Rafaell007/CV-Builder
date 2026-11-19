@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import {
-  Button,
+  ListPage,
   PageState,
   Pagination,
   SearchField,
@@ -10,16 +10,16 @@ import {
 } from "@/shared/components";
 import { useCurrentUser } from "@/shared/currentUser";
 import { useRouter } from "@/shared/i18n";
+import { useListState } from "@/shared/lists";
 import { CreateCvModal } from "./components/CreateCvModal";
 import { CvsTable } from "./components/CvsTable";
 import { DeleteCvModal } from "./components/DeleteCvModal";
 import { UpdateCvModal } from "./components/UpdateCvModal";
-import { SEARCH_MAX_LENGTH } from "./cvs.constants";
+import { DEFAULT_CVS_SORT, SEARCH_MAX_LENGTH } from "./cvs.constants";
 import type { CvListItem } from "./cvs.types";
 import { toCvTabPath, toCvsVariables } from "./utils";
 import { useCreateCvForm } from "./useCreateCvForm";
 import { useCvs } from "./useCvs";
-import { useCvsListState } from "./useCvsListState";
 import { useDeleteCv } from "./useDeleteCv";
 import { useUpdateCvForm } from "./useUpdateCvForm";
 import styles from "./Cvs.module.css";
@@ -32,14 +32,14 @@ export interface CvsProps {
 }
 
 /**
- * Content of the `/cvs` page: search, the sortable list of CVs and the page buttons,
- * with the loading, empty, no results and error states. The backend searches, sorts, cuts the pages
+ * Content of the `/cvs` page under its `PageHeader`: the shared `ListPage` with search, the sortable list of CVs and
+ * the page buttons, with the loading, empty, no results and error states. The backend searches, sorts, cuts the pages
  * and decides which CVs the user may see.
  */
 export function Cvs({ userId, onView }: CvsProps) {
   const t = useTranslations("cvs");
   const router = useRouter();
-  const list = useCvsListState();
+  const list = useListState(DEFAULT_CVS_SORT);
   const variables = toCvsVariables(list, userId);
   const { cvs, total, loading, failed, retry } = useCvs(variables);
   const { user, isAdmin, loading: userLoading } = useCurrentUser();
@@ -66,52 +66,54 @@ export function Cvs({ userId, onView }: CvsProps) {
   const emptyKind = hasNoCvsYet ? "empty" : "no-results";
 
   return (
-    <div className={styles.page}>
-      <h1 className={styles.title}>{t("title")}</h1>
-      {/* Outside the error branch below: an error must not remove the typed search (the field is uncontrolled). */}
-      <div className={styles.toolbar}>
-        <SearchField
-          label={t("search.label")}
-          placeholder={t("search.placeholder")}
-          maxLength={SEARCH_MAX_LENGTH}
-          defaultValue={list.search}
-          onSearch={list.setSearch}
-        />
-        <Button onClick={creation.open}>{t("button")}</Button>
-      </div>
-      {failed && !loading ? (
-        <PageState kind="error" labels={stateLabels} onRetry={retry} />
-      ) : (
-        <>
-          <CvsTable
-            cvs={cvs}
-            sort={list.sort}
-            onSortChange={list.setSort}
-            onView={onView ?? ((cv) => router.push(toCvTabPath(cv.id, "preview")))}
-            onEdit={editing.open}
-            onDelete={deletion.askToDelete}
-            loading={loading}
-            loadingContent={<PageState kind="loading" labels={stateLabels} />}
-            // The role decides the text, so wait for the user: no flash of the wrong text.
-            emptyContent={
-              <PageState kind={userLoading ? "loading" : emptyKind} labels={stateLabels} />
-            }
+    // The classes only set the ListPage CSS variables where the Figma CVs frames differ (see Cvs.module.css).
+    <div className={`${styles.page} ${userId === undefined ? styles.allCvs : ""}`}>
+      <ListPage
+        search={
+          <SearchField
+            label={t("search.label")}
+            placeholder={t("search.placeholder")}
+            maxLength={SEARCH_MAX_LENGTH}
+            defaultValue={list.search}
+            onSearch={list.setSearch}
           />
-          <div className={styles.pagination}>
-            <Pagination
-              page={list.page}
-              total={total}
-              onPageChange={list.setPage}
-              labels={{
-                navigation: t("pagination.navigation"),
-                previous: t("pagination.previous"),
-                next: t("pagination.next"),
-                page: (number) => t("pagination.page", { number }),
-              }}
-            />
-          </div>
-        </>
-      )}
+        }
+        createLabel={t("button")}
+        onCreate={creation.open}
+        error={
+          failed && !loading ? (
+            <PageState kind="error" labels={stateLabels} onRetry={retry} />
+          ) : undefined
+        }
+        pagination={
+          <Pagination
+            page={list.page}
+            total={total}
+            onPageChange={list.setPage}
+            labels={{
+              navigation: t("pagination.navigation"),
+              previous: t("pagination.previous"),
+              next: t("pagination.next"),
+              page: (number) => t("pagination.page", { number }),
+            }}
+          />
+        }
+      >
+        <CvsTable
+          cvs={cvs}
+          sort={list.sort}
+          onSortChange={list.setSort}
+          onView={onView ?? ((cv) => router.push(toCvTabPath(cv.id, "preview")))}
+          onEdit={editing.open}
+          onDelete={deletion.askToDelete}
+          loading={loading}
+          loadingContent={<PageState kind="loading" labels={stateLabels} />}
+          // The role decides the text, so wait for the user: no flash of the wrong text.
+          emptyContent={
+            <PageState kind={userLoading ? "loading" : emptyKind} labels={stateLabels} />
+          }
+        />
+      </ListPage>
       <CreateCvModal creation={creation} />
       <UpdateCvModal update={editing} />
       <DeleteCvModal
