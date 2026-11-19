@@ -29,6 +29,7 @@
     "empty": "You have no CVs yet",
     "noResults": "No CVs found",
     "error": "Failed to load CVs",
+    "forbidden": "You are not authorized to access this page",
     "retry": "Retry"
   },
   "form": {

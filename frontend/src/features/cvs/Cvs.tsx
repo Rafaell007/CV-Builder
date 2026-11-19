@@ -16,7 +16,7 @@ import { DeleteCvModal } from "./components/DeleteCvModal";
 import { UpdateCvModal } from "./components/UpdateCvModal";
 import { SEARCH_MAX_LENGTH } from "./cvs.constants";
 import type { CvListItem } from "./cvs.types";
-import { toCvTabPath, toCvsVariables, toUserCvsPath } from "./utils";
+import { toCvOpenPath, toCvsVariables, withScope } from "./utils";
 import { useCreateCvForm } from "./useCreateCvForm";
 import { useCvs } from "./useCvs";
 import { useCvsListState } from "./useCvsListState";
@@ -41,7 +41,7 @@ export function Cvs({ userId, onView }: CvsProps) {
   const router = useRouter();
   const list = useCvsListState();
   const variables = toCvsVariables(list, userId);
-  const { cvs, total, loading, failed, retry } = useCvs(variables);
+  const { cvs, total, loading, failed, forbidden, retry } = useCvs(variables);
   const { user, isAdmin, loading: userLoading } = useCurrentUser();
 
   const creation = useCreateCvForm(userId);
@@ -50,12 +50,8 @@ export function Cvs({ userId, onView }: CvsProps) {
     page: list.page,
     rowsOnPage: cvs.length,
     onPageChange: list.setPage,
-    // exactOptionalPropertyTypes: the key is left out when there is no employee.
-    ...(userId === undefined ? {} : { userId }),
+    ...withScope(userId),
   });
-
-  // A CV opened from the User CVs tab remembers the tab, so the CV page can lead back to the same employee.
-  const returnPath = userId === undefined ? undefined : toUserCvsPath(userId);
 
   const stateLabels: PageStateLabels = {
     loading: t("states.loading"),
@@ -86,14 +82,19 @@ export function Cvs({ userId, onView }: CvsProps) {
         <Button onClick={creation.open}>{t("button")}</Button>
       </div>
       {failed && !loading ? (
-        <PageState kind="error" labels={stateLabels} onRetry={retry} />
+        <PageState
+          kind="error"
+          labels={{ ...stateLabels, error: forbidden ? t("states.forbidden") : stateLabels.error }}
+          // Retry cannot help when the role is not allowed.
+          {...(forbidden ? {} : { onRetry: retry })}
+        />
       ) : (
         <>
           <CvsTable
             cvs={cvs}
             sort={list.sort}
             onSortChange={list.setSort}
-            onView={onView ?? ((cv) => router.push(toCvTabPath(cv.id, "preview", returnPath)))}
+            onView={onView ?? ((cv) => router.push(toCvOpenPath(cv.id, userId)))}
             onEdit={editing.open}
             onDelete={deletion.askToDelete}
             loading={loading}
