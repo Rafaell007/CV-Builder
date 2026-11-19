@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@apollo/client/react";
+import { useLocale } from "next-intl";
 import { CvPreviewDocument } from "@/shared/graphql";
 import type { CvPreviewData } from "../cvs.types";
 import { toCvLoadFailure } from "../utils";
@@ -19,11 +20,13 @@ export type UseCvPreviewResult = {
 
 /** Loads the CV preview with the `CvPreview` query. The backend decides who may see it, so the page never checks the owner itself. */
 export function useCvPreview(cvId: string): UseCvPreviewResult {
+  // The backend writes the open period (`Till now` / `obecnie`) in the language of the page. A new language is a new request.
+  const locale = useLocale();
   // network-only: the backend builds the preview from the details, skills and projects, so a copy in the cache is
   // old after any change on the other tabs. The page always asks again when it opens.
   // notifyOnNetworkStatusChange: `loading` is true again during a retry, so the page shows the skeleton.
   const { data, loading, error, refetch } = useQuery(CvPreviewDocument, {
-    variables: { cvId },
+    variables: { cvId, locale },
     fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
   });
