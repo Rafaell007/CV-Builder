@@ -43,7 +43,7 @@ test.describe("smoke flow: sign in, create a CV, add a skill and a project, prev
     await expect(page).toHaveURL(/\/en\/cvs\/[^/]+\/preview$/);
     const cvUrl = page.url().replace(/\/preview$/, "");
 
-    // 4. Add a skill. The admin has Communication in the seed.
+    // 4. Add a skill. The admin has Communication in the seed (backend/prisma/seed/users.data.ts).
     await page.goto(`${cvUrl}/skills`);
     await expect(page.getByRole("button", { name: "ADD SKILL" })).toBeEnabled();
     await page.getByRole("button", { name: "ADD SKILL" }).click();
@@ -55,7 +55,7 @@ test.describe("smoke flow: sign in, create a CV, add a skill and a project, prev
     await skillDialog.getByRole("button", { name: "Add", exact: true }).click();
     await expect(page.getByText("Skill added", { exact: true })).toBeVisible();
 
-    // 5. Add a project from the catalog (Healthcare, 2021-03-01 to 2022-02-28).
+    // 5. Add a project from the catalog (backend/prisma/seed/projects.data.ts). If the seed changes, update the names here.
     await page.goto(`${cvUrl}/projects`);
     await expect(page.getByRole("button", { name: "ADD PROJECT" })).toBeEnabled();
     await page.getByRole("button", { name: "ADD PROJECT" }).click();
