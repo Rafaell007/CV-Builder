@@ -44,11 +44,16 @@ export const Desktop: Story = {
   play: expectListShown,
 };
 
-/** The same list on a 768px tablet screen. */
+/** The same list on a 768px tablet screen: the Employee column is hidden, as in Figma. */
 export const Tablet: Story = {
   globals: tablet,
   parameters: { apollo: { mocks: [fakeBackendMock(sampleCvs)] } },
-  play: expectListShown,
+  play: async ({ canvas }) => {
+    await expect(await canvas.findByText("Frontend Developer")).toBeInTheDocument();
+    await expect(canvas.getByText(frontendCv.description)).toBeInTheDocument();
+    await expect(canvas.queryByRole("columnheader", { name: /Employee/ })).toBeNull();
+    await expect(canvas.queryByText("anna.kowalska@example.com")).toBeNull();
+  },
 };
 
 /** 35 CVs make 4 pages of 10 rows: the page buttons show, and a click on a page asks the backend for it. */
