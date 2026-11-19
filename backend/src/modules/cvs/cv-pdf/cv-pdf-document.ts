@@ -1,9 +1,10 @@
 import type { Content, ContentText, TableCell, TDocumentDefinitions } from "pdfmake/interfaces";
+import { DEFAULT_CV_LOCALE } from "../cv-locale";
+import type { CvLocale } from "../cv-locale";
 import type { CvPreview } from "../cv-preview/models/cv-preview";
-import { formatPeriod } from "../cv-preview/calculations";
 import type { CvPreviewSkillGroup } from "../cv-preview/models/cv-preview-skill-group";
-import { DEFAULT_PDF_LOCALE, pdfLabels } from "./cv-pdf-labels";
-import type { PdfLabels, PdfLocale } from "./cv-pdf-labels";
+import { pdfLabels } from "./cv-pdf-labels";
+import type { PdfLabels } from "./cv-pdf-labels";
 
 const EN_DASH = "–";
 const FONT = "Roboto";
@@ -91,9 +92,7 @@ function projects(preview: CvPreview, labels: PdfLabels): Content[] {
     if (project.roles.length > 0) {
       lines.push({ text: [{ text: `${labels.role}: `, bold: true }, project.roles.join(", ")] });
     }
-    // The period is built here from the dates, so "Till now" is in the language of the PDF.
-    const period = formatPeriod(project.startDate, project.endDate, labels.present);
-    lines.push({ text: [{ text: `${labels.period}: `, bold: true }, period] });
+    lines.push({ text: [{ text: `${labels.period}: `, bold: true }, project.period] });
     if (project.responsibilities !== null && project.responsibilities !== "") {
       lines.push({
         text: [{ text: `${labels.responsibilities}: `, bold: true }, project.responsibilities],
@@ -150,7 +149,7 @@ function skillsTable(groups: CvPreviewSkillGroup[], labels: PdfLabels): Content[
  */
 export function buildCvPdfDefinition(
   preview: CvPreview,
-  locale: PdfLocale = DEFAULT_PDF_LOCALE,
+  locale: CvLocale = DEFAULT_CV_LOCALE,
 ): TDocumentDefinitions {
   const labels = pdfLabels(locale);
   return {

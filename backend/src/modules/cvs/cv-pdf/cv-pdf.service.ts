@@ -1,10 +1,10 @@
 import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import type { AuthUser } from "../../../common/auth";
+import { DEFAULT_CV_LOCALE } from "../cv-locale";
+import type { CvLocale } from "../cv-locale";
 import { CvPreviewService } from "../cv-preview/cv-preview.service";
 import { buildCvPdfDefinition } from "./cv-pdf-document";
 import { toPdfFileName } from "./cv-pdf-file-name";
-import { DEFAULT_PDF_LOCALE } from "./cv-pdf-labels";
-import type { PdfLocale } from "./cv-pdf-labels";
 import { CvPdfRenderer } from "./cv-pdf-renderer";
 import type { CvPdf } from "./models/cv-pdf";
 
@@ -23,13 +23,9 @@ export class CvPdfService {
     private readonly renderer: CvPdfRenderer,
   ) {}
 
-  async export(
-    user: AuthUser,
-    cvId: string,
-    locale: PdfLocale = DEFAULT_PDF_LOCALE,
-  ): Promise<CvPdf> {
+  async export(user: AuthUser, cvId: string, locale: CvLocale = DEFAULT_CV_LOCALE): Promise<CvPdf> {
     // Errors of this call (NOT_FOUND, FORBIDDEN) pass on unchanged. Only the PDF step is wrapped below.
-    const preview = await this.preview.get(user, cvId);
+    const preview = await this.preview.get(user, cvId, locale);
 
     try {
       const bytes = await this.renderer.render(buildCvPdfDefinition(preview, locale));

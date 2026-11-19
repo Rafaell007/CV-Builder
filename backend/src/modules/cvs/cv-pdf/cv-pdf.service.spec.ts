@@ -50,12 +50,15 @@ describe("CvPdfService.export", () => {
     const textOfCall = (call: number) => JSON.stringify(renderer.render.mock.calls[call]?.[0]);
     expect(textOfCall(0)).toContain("Podsumowanie");
     expect(textOfCall(1)).toContain("Summary");
+    // The preview is asked in the same language, so the period text matches the PDF language.
+    expect(preview.get).toHaveBeenNthCalledWith(1, USER, "cv-1", "pl");
+    expect(preview.get).toHaveBeenNthCalledWith(2, USER, "cv-1", "en");
   });
 
   it("reads the data with the access check of the preview, for the same user and CV (AC-30)", async () => {
     await service.export(USER, "cv-1");
 
-    expect(preview.get).toHaveBeenCalledWith(USER, "cv-1");
+    expect(preview.get).toHaveBeenCalledWith(USER, "cv-1", "en");
   });
 
   it("makes no PDF when the CV may not be read (AC-49)", async () => {

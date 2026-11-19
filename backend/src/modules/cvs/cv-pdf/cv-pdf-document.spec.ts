@@ -92,7 +92,11 @@ describe("buildCvPdfDefinition", () => {
   });
 
   it("prints the fixed texts in Polish and keeps the content of the CV as written", () => {
-    const text = JSON.stringify(buildCvPdfDefinition(preview(), "pl").content);
+    // The period text comes from the preview, which the service asks for in the same language.
+    const polish = preview({
+      projects: [{ ...preview().projects[0]!, period: "01.2023 – obecnie" }],
+    });
+    const text = JSON.stringify(buildCvPdfDefinition(polish, "pl").content);
 
     for (const label of [
       "Informacje ogólne",

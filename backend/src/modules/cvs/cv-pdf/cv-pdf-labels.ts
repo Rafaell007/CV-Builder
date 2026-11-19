@@ -1,9 +1,6 @@
-/** The languages of the PDF. They are the languages of the frontend (`en`, `pl`). */
-export const PDF_LOCALES = ["en", "pl"] as const;
-export type PdfLocale = (typeof PDF_LOCALES)[number];
-export const DEFAULT_PDF_LOCALE: PdfLocale = "en";
+import type { CvLocale } from "../cv-locale";
 
-/** Every fixed text of the PDF. The content of the CV (names, descriptions, skills) is never translated. */
+/** Every fixed text of the PDF (the open-period word is in `cv-locale.ts`, because the preview uses it too). The content of the CV (names, descriptions, skills) is never translated. */
 export interface PdfLabels {
   generalInformation: string;
   education: string;
@@ -16,8 +13,6 @@ export interface PdfLabels {
   projects: string;
   role: string;
   period: string;
-  /** The end of a period when the project has no end date. */
-  present: string;
   responsibilities: string;
   environment: string;
   professionalSkills: string;
@@ -28,7 +23,7 @@ export interface PdfLabels {
 }
 
 // The Polish texts follow the preview page (`frontend/src/features/cvs/messages/pl.json`, `cvs.preview`).
-const LABELS: Record<PdfLocale, PdfLabels> = {
+const LABELS: Record<CvLocale, PdfLabels> = {
   en: {
     generalInformation: "General information",
     education: "Education",
@@ -40,7 +35,6 @@ const LABELS: Record<PdfLocale, PdfLabels> = {
     projects: "Projects",
     role: "Role",
     period: "Period",
-    present: "Till now",
     responsibilities: "Responsibilities",
     environment: "Environment",
     professionalSkills: "Professional skills",
@@ -60,7 +54,6 @@ const LABELS: Record<PdfLocale, PdfLabels> = {
     projects: "Projekty",
     role: "Rola",
     period: "Okres",
-    present: "obecnie",
     responsibilities: "Obowiązki",
     environment: "Środowisko",
     professionalSkills: "Umiejętności zawodowe",
@@ -71,6 +64,6 @@ const LABELS: Record<PdfLocale, PdfLabels> = {
   },
 };
 
-export function pdfLabels(locale: PdfLocale): PdfLabels {
+export function pdfLabels(locale: CvLocale): PdfLabels {
   return LABELS[locale];
 }
