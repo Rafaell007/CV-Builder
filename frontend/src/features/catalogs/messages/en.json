@@ -1,0 +1,146 @@
+{
+  "departments": {
+    "button": "CREATE DEPARTMENT",
+    "table": "Departments list",
+    "columns": {
+      "name": "Name"
+    },
+    "actions": {
+      "column": "Actions",
+      "menu": "Actions for {name}",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "search": {
+      "label": "Search departments",
+      "placeholder": "Search"
+    },
+    "pagination": {
+      "navigation": "Departments pagination",
+      "previous": "Previous page",
+      "next": "Next page",
+      "page": "Page {number}"
+    },
+    "states": {
+      "loading": "Loading departments",
+      "empty": "No departments found",
+      "noResults": "No departments found",
+      "error": "Something went wrong. Please try again later",
+      "retry": "Retry"
+    },
+    "create": {
+      "title": "Create department",
+      "close": "Close",
+      "submit": "Create",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Department created",
+        "text": "{name} was added to the departments."
+      }
+    },
+    "update": {
+      "title": "Update department",
+      "close": "Close",
+      "submit": "Update",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Department updated",
+        "text": "{name} was saved."
+      }
+    },
+    "delete": {
+      "title": "Delete department",
+      "message": "Are you sure you want to delete department <strong>{name}</strong>?",
+      "close": "Close",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "failedTitle": "Could not delete the department",
+      "failedText": "Something went wrong. Please try again.",
+      "inUseText": "Department cannot be deleted because it is currently in use"
+    },
+    "form": {
+      "fields": {
+        "name": "Department"
+      },
+      "errors": {
+        "nameRequired": "Department name is required",
+        "nameTooLong": "Department name must not exceed 100 characters",
+        "nameTaken": "Department already exists",
+        "serverInvalid": "The server did not accept this value",
+        "failed": "Something went wrong. Please try again later"
+      }
+    }
+  },
+  "positions": {
+    "button": "CREATE POSITION",
+    "table": "Positions list",
+    "columns": {
+      "name": "Name"
+    },
+    "actions": {
+      "column": "Actions",
+      "menu": "Actions for {name}",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "search": {
+      "label": "Search positions",
+      "placeholder": "Search"
+    },
+    "pagination": {
+      "navigation": "Positions pagination",
+      "previous": "Previous page",
+      "next": "Next page",
+      "page": "Page {number}"
+    },
+    "states": {
+      "loading": "Loading positions",
+      "empty": "No positions found",
+      "noResults": "No positions found",
+      "error": "Something went wrong. Please try again later",
+      "retry": "Retry"
+    },
+    "create": {
+      "title": "Create position",
+      "close": "Close",
+      "submit": "Create",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Position created",
+        "text": "{name} was added to the positions."
+      }
+    },
+    "update": {
+      "title": "Update position",
+      "close": "Close",
+      "submit": "Update",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Position updated",
+        "text": "{name} was saved."
+      }
+    },
+    "delete": {
+      "title": "Delete position",
+      "message": "Are you sure you want to delete position <strong>{name}</strong>?",
+      "close": "Close",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "failedTitle": "Could not delete the position",
+      "failedText": "Something went wrong. Please try again.",
+      "inUseText": "Position cannot be deleted because it is currently in use"
+    },
+    "form": {
+      "fields": {
+        "name": "Position"
+      },
+      "errors": {
+        "nameRequired": "Position name is required",
+        "nameTooLong": "Position name must not exceed 100 characters",
+        "nameTaken": "Position already exists",
+        "serverInvalid": "The server did not accept this value",
+        "failed": "Something went wrong. Please try again later"
+      }
+    }
+  }
+}

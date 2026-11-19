@@ -1,5 +1,6 @@
 import type { Locale } from "next-intl";
 import type appShell from "@/features/app-shell/messages/en.json";
+import type catalogs from "@/features/catalogs/messages/en.json";
 import type cvs from "@/features/cvs/messages/en.json";
 import type deviceError from "@/features/device-error/messages/en.json";
 import type forgotPassword from "@/features/forgot-password/messages/en.json";
@@ -18,6 +19,7 @@ import type common from "@/shared/i18n/messages/en.json";
 // English is the reference: every other language must have the same keys (checked by typecheck and the test).
 export type Messages = {
   appShell: typeof appShell;
+  catalogs: typeof catalogs;
   common: typeof common;
   cvs: typeof cvs;
   deviceError: typeof deviceError;
@@ -38,6 +40,7 @@ export type Messages = {
 const loaders: Record<Locale, () => Promise<Messages>> = {
   en: async () => ({
     appShell: (await import("@/features/app-shell/messages/en.json")).default,
+    catalogs: (await import("@/features/catalogs/messages/en.json")).default,
     common: (await import("@/shared/i18n/messages/en.json")).default,
     cvs: (await import("@/features/cvs/messages/en.json")).default,
     deviceError: (await import("@/features/device-error/messages/en.json")).default,
@@ -54,6 +57,7 @@ const loaders: Record<Locale, () => Promise<Messages>> = {
   }),
   pl: async () => ({
     appShell: (await import("@/features/app-shell/messages/pl.json")).default,
+    catalogs: (await import("@/features/catalogs/messages/pl.json")).default,
     common: (await import("@/shared/i18n/messages/pl.json")).default,
     cvs: (await import("@/features/cvs/messages/pl.json")).default,
     deviceError: (await import("@/features/device-error/messages/pl.json")).default,
