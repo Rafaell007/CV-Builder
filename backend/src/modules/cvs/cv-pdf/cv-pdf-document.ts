@@ -1,0 +1,155 @@
+import type { Content, ContentText, TableCell, TDocumentDefinitions } from "pdfmake/interfaces";
+import type { CvPreview } from "../cv-preview/models/cv-preview";
+import type { CvPreviewSkillGroup } from "../cv-preview/models/cv-preview-skill-group";
+
+const EN_DASH = "–";
+const FONT = "Roboto";
+const COLOR_MUTED = "#555555";
+const COLOR_LINE = "#bbbbbb";
+
+const SECTION_TITLE: Omit<ContentText, "text"> = {
+  fontSize: 13,
+  bold: true,
+  margin: [0, 14, 0, 4],
+};
+const PART_TITLE: Omit<ContentText, "text"> = {
+  fontSize: 10,
+  bold: true,
+  color: COLOR_MUTED,
+  margin: [0, 6, 0, 2],
+};
+
+/** `NATIVE` is the only level that is a word. The levels A1 to C2 are printed as they are. */
+function proficiencyLabel(proficiency: string): string {
+  return proficiency === "NATIVE" ? "Native" : proficiency;
+}
+
+function yearCell(value: number | null): string {
+  return value === null ? EN_DASH : String(value);
+}
+
+/** A titled part is left out when it has no lines, like the preview page does. */
+function part(title: string, lines: string[]): Content[] {
+  if (lines.length === 0) return [];
+  return [{ text: title, ...PART_TITLE }, { ul: lines }];
+}
+
+function header(preview: CvPreview): Content[] {
+  const content: Content[] = [];
+  if (preview.fullName !== null) content.push({ text: preview.fullName, fontSize: 20, bold: true });
+  if (preview.position !== null) {
+    content.push({ text: preview.position, fontSize: 12, color: COLOR_MUTED });
+  }
+  return content;
+}
+
+function general(preview: CvPreview): Content[] {
+  const education = preview.education === "" ? [] : [preview.education];
+  const languages = preview.languages.map(
+    ({ name, proficiency }) => `${name} — ${proficiencyLabel(proficiency)}`,
+  );
+  const parts = [
+    ...part("Education", education),
+    ...part("Language proficiency", languages),
+    ...part("Domains", preview.domains),
+  ];
+  if (parts.length === 0) return [];
+  return [{ text: "General information", ...SECTION_TITLE }, ...parts];
+}
+
+function summary(preview: CvPreview): Content[] {
+  return [
+    { text: "Summary", ...SECTION_TITLE },
+    { text: preview.name, bold: true },
+    ...(preview.description === "" ? [] : [{ text: preview.description, margin: [0, 2, 0, 0] }]),
+  ] as Content[];
+}
+
+/** Skill names per category. A category without skills is left out. */
+function skills(groups: CvPreviewSkillGroup[]): Content[] {
+  const filled = groups.filter((group) => group.skills.length > 0);
+  if (filled.length === 0) return [];
+  return [
+    { text: "Skills", ...SECTION_TITLE },
+    ...filled.map(({ category, skills: list }): Content => ({
+      text: [{ text: `${category}: `, bold: true }, list.map((skill) => skill.name).join(", ")],
+      margin: [0, 0, 0, 2],
+    })),
+  ];
+}
+
+function projects(preview: CvPreview): Content[] {
+  if (preview.projects.length === 0) return [];
+  const blocks = preview.projects.map((project): Content => {
+    const lines: Content[] = [
+      { text: project.name, bold: true, fontSize: 11 },
+      { text: project.description, margin: [0, 1, 0, 0] },
+    ];
+    if (project.roles.length > 0) {
+      lines.push({ text: [{ text: "Role: ", bold: true }, project.roles.join(", ")] });
+    }
+    lines.push({ text: [{ text: "Period: ", bold: true }, project.period] });
+    if (project.responsibilities !== null && project.responsibilities !== "") {
+      lines.push({ text: [{ text: "Responsibilities: ", bold: true }, project.responsibilities] });
+    }
+    if (project.environment.length > 0) {
+      lines.push({
+        text: [{ text: "Environment: ", bold: true }, project.environment.join(", ")],
+      });
+    }
+    return { stack: lines, margin: [0, 0, 0, 8], unbreakable: true };
+  });
+  return [{ text: "Projects", ...SECTION_TITLE }, ...blocks];
+}
+
+/** One header row, then the rows of each category. The category cell spans the rows of its skills. */
+function skillsTable(groups: CvPreviewSkillGroup[]): Content[] {
+  const filled = groups.filter((group) => group.skills.length > 0);
+  if (filled.length === 0) return [];
+  const head: TableCell[] = ["Skills Category", "Skill", "Experience in Years", "Last Used"].map(
+    (text) => ({ text, bold: true, fillColor: "#eeeeee" }),
+  );
+  const body: TableCell[][] = [head];
+  for (const { category, skills: list } of filled) {
+    list.forEach((skill, index) => {
+      body.push([
+        index === 0 ? { text: category, rowSpan: list.length, bold: true } : {},
+        skill.name,
+        { text: yearCell(skill.experienceYears), alignment: "right" },
+        { text: yearCell(skill.lastUsedYear), alignment: "right" },
+      ]);
+    });
+  }
+  return [
+    { text: "Professional skills", ...SECTION_TITLE },
+    {
+      table: { headerRows: 1, widths: ["*", "*", "auto", "auto"], body },
+      layout: {
+        hLineColor: () => COLOR_LINE,
+        vLineColor: () => COLOR_LINE,
+      },
+    },
+  ];
+}
+
+/**
+ * The PDF of a CV as a pdfmake document. It takes the same `CvPreview` object as the preview page,
+ * so the years, the periods and the domains are the values of the backend calculation and are
+ * not calculated again here (AC-21). The texts are in English: the backend has no translations.
+ */
+export function buildCvPdfDefinition(preview: CvPreview): TDocumentDefinitions {
+  return {
+    info: { title: preview.name },
+    pageSize: "A4",
+    pageMargins: [40, 40, 40, 40],
+    defaultStyle: { font: FONT, fontSize: 10 },
+    content: [
+      ...header(preview),
+      ...general(preview),
+      ...summary(preview),
+      ...skills(preview.skillGroups),
+      ...projects(preview),
+      ...skillsTable(preview.skillGroups),
+    ],
+  };
+}
