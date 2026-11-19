@@ -43,6 +43,15 @@ describe("CvPdfService.export", () => {
     });
   });
 
+  it("makes the PDF in the given language, English without one", async () => {
+    await service.export(USER, "cv-1", "pl");
+    await service.export(USER, "cv-1");
+
+    const textOfCall = (call: number) => JSON.stringify(renderer.render.mock.calls[call]?.[0]);
+    expect(textOfCall(0)).toContain("Podsumowanie");
+    expect(textOfCall(1)).toContain("Summary");
+  });
+
   it("reads the data with the access check of the preview, for the same user and CV (AC-30)", async () => {
     await service.export(USER, "cv-1");
 

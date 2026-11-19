@@ -21,7 +21,15 @@ describe("CvPdfResolver", () => {
 
     await expect(resolver.exportCvPdf(USER, { cvId: "cv-1" })).resolves.toBe(PDF);
 
-    expect(service.export).toHaveBeenCalledWith(USER, "cv-1");
+    expect(service.export).toHaveBeenCalledWith(USER, "cv-1", undefined);
+  });
+
+  it("passes the language of the PDF to the service", async () => {
+    const { resolver, service } = setup();
+
+    await resolver.exportCvPdf(USER, { cvId: "cv-1", locale: "pl" });
+
+    expect(service.export).toHaveBeenCalledWith(USER, "cv-1", "pl");
   });
 
   it("refuses a call without a user", () => {

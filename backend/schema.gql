@@ -260,7 +260,7 @@ type Query {
   cvSkills(cvId: ID!): [CvSkill!]!
   cvs(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput, userId: ID): CvPage!
   departments(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): DepartmentPage!
-  exportCvPdf(cvId: ID!): CvPdf!
+  exportCvPdf(cvId: ID!, locale: String): CvPdf!
   health: Health!
   me: SessionUser
   positions(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): PositionPage!

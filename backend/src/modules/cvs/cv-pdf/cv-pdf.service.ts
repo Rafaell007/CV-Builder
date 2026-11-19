@@ -3,6 +3,8 @@ import type { AuthUser } from "../../../common/auth";
 import { CvPreviewService } from "../cv-preview/cv-preview.service";
 import { buildCvPdfDefinition } from "./cv-pdf-document";
 import { toPdfFileName } from "./cv-pdf-file-name";
+import { DEFAULT_PDF_LOCALE } from "./cv-pdf-labels";
+import type { PdfLocale } from "./cv-pdf-labels";
 import { CvPdfRenderer } from "./cv-pdf-renderer";
 import type { CvPdf } from "./models/cv-pdf";
 
@@ -21,12 +23,16 @@ export class CvPdfService {
     private readonly renderer: CvPdfRenderer,
   ) {}
 
-  async export(user: AuthUser, cvId: string): Promise<CvPdf> {
+  async export(
+    user: AuthUser,
+    cvId: string,
+    locale: PdfLocale = DEFAULT_PDF_LOCALE,
+  ): Promise<CvPdf> {
     // Errors of this call (NOT_FOUND, FORBIDDEN) pass on unchanged. Only the PDF step is wrapped below.
     const preview = await this.preview.get(user, cvId);
 
     try {
-      const bytes = await this.renderer.render(buildCvPdfDefinition(preview));
+      const bytes = await this.renderer.render(buildCvPdfDefinition(preview, locale));
       return { fileName: toPdfFileName(preview.name), base64: bytes.toString("base64") };
     } catch (error) {
       // The details go to the log only. The client gets a message without internal information.

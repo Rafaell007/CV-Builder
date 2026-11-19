@@ -6,7 +6,9 @@ import { createUser } from "../support/create-user";
 import { graphqlRequest, toCookiePair } from "../support/graphql-request";
 
 const SIGN_IN = `mutation ($input: SignInInput!) { signIn(input: $input) { id } }`;
-const EXPORT = `query ($cvId: ID!) { exportCvPdf(cvId: $cvId) { fileName base64 } }`;
+const EXPORT = `query ($cvId: ID!, $locale: String) {
+  exportCvPdf(cvId: $cvId, locale: $locale) { fileName base64 }
+}`;
 
 const MISSING_ID = "00000000-0000-4000-8000-000000000000";
 
@@ -30,8 +32,11 @@ describe("cv pdf export", () => {
     return { id: user.id, cookie: toCookiePair(access ?? "") };
   }
 
-  function call(who: Who | null, cvId: string) {
-    return graphqlRequest(app, EXPORT, { cookies: who ? [who.cookie] : [], variables: { cvId } });
+  function call(who: Who | null, cvId: string, locale?: string) {
+    return graphqlRequest(app, EXPORT, {
+      cookies: who ? [who.cookie] : [],
+      variables: { cvId, locale },
+    });
   }
 
   beforeAll(async () => {
@@ -95,6 +100,21 @@ describe("cv pdf export", () => {
     const bytes = Buffer.from(pdf.base64, "base64");
     expect(bytes.subarray(0, 5).toString("latin1")).toBe("%PDF-");
     expect(bytes.length).toBeGreaterThan(1000);
+  });
+
+  it("makes a Polish PDF with the same file name when the language is pl", async () => {
+    const { body } = await call(ann, annCv, "pl");
+
+    expect(body.errors).toBeUndefined();
+    const pdf = body.data?.["exportCvPdf"] as { fileName: string; base64: string };
+    expect(pdf.fileName).toBe("разработчик-frontend.pdf");
+    expect(Buffer.from(pdf.base64, "base64").subarray(0, 5).toString("latin1")).toBe("%PDF-");
+  });
+
+  it("answers BAD_USER_INPUT for a language that the PDF does not have", async () => {
+    const { body } = await call(ann, annCv, "de");
+
+    expect(body.errors?.[0]?.extensions.code).toBe("BAD_USER_INPUT");
   });
 
   it("lets an admin export the CV of another user", async () => {

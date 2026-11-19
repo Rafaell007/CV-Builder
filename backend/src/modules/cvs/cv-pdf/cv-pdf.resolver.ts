@@ -14,8 +14,8 @@ export class CvPdfResolver {
   @Query(() => CvPdf)
   exportCvPdf(
     @CurrentUser() user: AuthUser | undefined,
-    @Args() { cvId }: CvPdfArgs,
+    @Args() { cvId, locale }: CvPdfArgs,
   ): Promise<CvPdf> {
-    return this.service.export(requireUser(user), cvId);
+    return this.service.export(requireUser(user), cvId, locale);
   }
 }
