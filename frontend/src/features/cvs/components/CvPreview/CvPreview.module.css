@@ -1,10 +1,15 @@
+/* Holds the one width of the Preview tab. The EXPORT PDF bar and the document read it. */
+.page {
+  --cv-preview-width: 852px;
+}
+
 /* The CV sits on the page background, as in Figma. The width keeps lines readable next to the app navigation. */
 .document {
   display: flex;
   flex-direction: column;
   gap: var(--space-10);
   box-sizing: border-box;
-  max-width: 852px;
+  max-width: var(--cv-preview-width);
   margin: 0 auto;
   padding: var(--space-6) 0;
   color: var(--color-text);

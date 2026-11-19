@@ -12,10 +12,7 @@ import { useExportCvPdf } from "./useExportCvPdf";
 
 // The download itself needs a real browser. The test checks what the hook gives to it.
 const saveFile = vi.hoisted(() => vi.fn());
-vi.mock("../utils", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../utils")>()),
-  saveFile,
-}));
+vi.mock("../useSaveFile", () => ({ useSaveFile: () => saveFile }));
 
 const CV_ID = "cv-1";
 

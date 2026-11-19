@@ -5,7 +5,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { useToast } from "@/shared/components";
 import { ExportCvPdfDocument } from "@/shared/graphql";
-import { base64ToPdfBlob, saveFile, toCvLoadFailure } from "../utils";
+import { useSaveFile } from "../useSaveFile";
+import { base64ToPdfBlob, toCvLoadFailure } from "../utils";
 
 export type UseExportCvPdfResult = {
   /** The PDF is being made. The button shows its spinner and a second request cannot start. */
@@ -25,16 +26,18 @@ export function useExportCvPdf(cvId: string): UseExportCvPdfResult {
   const t = useTranslations("cvs.preview.export");
   const toast = useToast();
   const client = useApolloClient();
+  const saveFile = useSaveFile();
   // The PDF has its fixed texts (section titles, column names) in the language of the page.
   const locale = useLocale();
   const [exporting, setExporting] = useState(false);
 
-  // A ref changes at once, `exporting` only after the next render: two clicks in the same tick cannot both pass.
-  const sending = useRef(false);
+  // `exporting` is for the screen and changes after the next render. This ref changes at once, so two clicks in
+  // the same tick cannot both start a request.
+  const inFlight = useRef(false);
 
   async function exportPdf(): Promise<void> {
-    if (sending.current) return;
-    sending.current = true;
+    if (inFlight.current) return;
+    inFlight.current = true;
     setExporting(true);
     try {
       const { data } = await client.query({
@@ -51,7 +54,7 @@ export function useExportCvPdf(cvId: string): UseExportCvPdfResult {
         description: t(reason === "failed" ? "failedText" : reason),
       });
     } finally {
-      sending.current = false;
+      inFlight.current = false;
       setExporting(false);
     }
   }

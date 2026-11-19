@@ -1,8 +1,10 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import type { ReactNode } from "react";
 import { PageState, type PageStateLabels } from "@/shared/components";
 import { useCvPreview } from "../../useCvPreview";
+import { useExportCvPdf } from "../../useExportCvPdf";
 import styles from "./CvPreview.module.css";
 import { CvPreviewExport } from "./CvPreviewExport";
 import { CvPreviewGeneral } from "./CvPreviewGeneral";
@@ -20,11 +22,13 @@ export interface CvPreviewProps {
  * The content of the Preview tab (PLAN S7.5, KAN-160): the CV as a printable document, with the loading, error
  * (Retry), and unauthorized states. All data comes from the backend, which also decides who may see the CV.
  * The page `h1` (the CV name) is in `CvLayout`, so the document starts with `h2` headings. Above the document is the
- * EXPORT PDF action (S7.6, KAN-119), disabled while there is no preview data.
+ * EXPORT PDF action (S7.6, KAN-119), disabled while there is no preview data. The export (`useExportCvPdf`) runs
+ * here, in the container, and `CvPreviewExport` only gets its state as props.
  */
 export function CvPreview({ cvId }: CvPreviewProps) {
   const t = useTranslations("cvs.preview");
   const { preview, loading, failed, unauthorized, retry } = useCvPreview(cvId);
+  const { exporting, exportPdf } = useExportCvPdf(cvId);
 
   const stateLabels: Partial<PageStateLabels> = {
     loading: t("states.loading"),
@@ -32,40 +36,17 @@ export function CvPreview({ cvId }: CvPreviewProps) {
     retry: t("states.retry"),
   };
 
-  // EXPORT PDF is on the page in every state, and disabled until the preview data is there (AC-26, AC-48).
-  const exportAction = <CvPreviewExport cvId={cvId} disabled={!preview} />;
+  function content(): ReactNode {
+    if (loading && !preview) return <PageState kind="loading" labels={stateLabels} />;
+    // No Retry here: the CV is missing or not allowed, and asking again gives the same answer. No CV data is shown.
+    if (unauthorized) {
+      return <PageState kind="error" labels={{ error: t("states.unauthorized") }} />;
+    }
+    if (failed) return <PageState kind="error" labels={stateLabels} onRetry={retry} />;
+    // `cvPreview` is non-null in the schema, so after loading and without a failure the data is there.
+    if (!preview) return null;
 
-  if (loading && !preview) {
     return (
-      <>
-        {exportAction}
-        <PageState kind="loading" labels={stateLabels} />
-      </>
-    );
-  }
-  // No Retry here: the CV is missing or not allowed, and asking again gives the same answer. No CV data is shown.
-  if (unauthorized) {
-    return (
-      <>
-        {exportAction}
-        <PageState kind="error" labels={{ error: t("states.unauthorized") }} />
-      </>
-    );
-  }
-  if (failed) {
-    return (
-      <>
-        {exportAction}
-        <PageState kind="error" labels={stateLabels} onRetry={retry} />
-      </>
-    );
-  }
-  // `cvPreview` is non-null in the schema, so after loading and without a failure the data is there.
-  if (!preview) return null;
-
-  return (
-    <>
-      {exportAction}
       <article className={styles.document} aria-label={t("document")}>
         <CvPreviewHeader fullName={preview.fullName} position={preview.position} />
         <div className={styles.overview}>
@@ -89,6 +70,18 @@ export function CvPreview({ cvId }: CvPreviewProps) {
           <CvPreviewSkillsTable skillGroups={preview.skillGroups} />
         </section>
       </article>
-    </>
+    );
+  }
+
+  // EXPORT PDF is on the page in every state, and disabled until the preview data is there (AC-26, AC-48).
+  return (
+    <div className={styles.page}>
+      <CvPreviewExport
+        disabled={!preview}
+        exporting={exporting}
+        onExport={() => void exportPdf()}
+      />
+      {content()}
+    </div>
   );
 }
