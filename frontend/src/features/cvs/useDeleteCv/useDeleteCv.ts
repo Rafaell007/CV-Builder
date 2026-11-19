@@ -15,6 +15,8 @@ export type UseDeleteCvOptions = {
   rowsOnPage: number;
   /** Called with the new page when a delete leaves the current page empty. */
   onPageChange: (page: number) => void;
+  /** The employee of the User CVs tab. It is sent with the request, so the backend rejects a CV of another employee. */
+  userId?: string;
 };
 
 export type UseDeleteCvResult = {
@@ -42,6 +44,7 @@ export function useDeleteCv({
   page,
   rowsOnPage,
   onPageChange,
+  userId,
 }: UseDeleteCvOptions): UseDeleteCvResult {
   const t = useTranslations("cvs.delete");
   const toast = useToast();
@@ -60,7 +63,7 @@ export function useDeleteCv({
     const wasLastRowOfPage = rowsOnPage === 1 && page > 1;
     try {
       await deleteCv({
-        variables: { id: cv.id },
+        variables: { id: cv.id, ...(userId === undefined ? {} : { userId }) },
         update: (cache) => {
           const id = cache.identify(cv);
           if (id === undefined) return;

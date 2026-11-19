@@ -97,6 +97,14 @@ describe("toCvFormValues", () => {
 });
 
 describe("toUpdateCvInput", () => {
+  it("adds the employee of the page as the scope, not the owner of the row", () => {
+    expect(toUpdateCvInput({ ...cv, userId: "other" }, valid, "10")).toEqual({
+      id: "7",
+      ...valid,
+      userId: "10",
+    });
+  });
+
   it("adds the id of the CV to the form values", () => {
     expect(toUpdateCvInput(cv, { ...valid, name: "New" })).toEqual({
       id: "7",

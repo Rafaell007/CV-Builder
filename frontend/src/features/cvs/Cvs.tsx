@@ -45,11 +45,13 @@ export function Cvs({ userId, onView }: CvsProps) {
   const { user, isAdmin, loading: userLoading } = useCurrentUser();
 
   const creation = useCreateCvForm(userId);
-  const editing = useUpdateCvForm();
+  const editing = useUpdateCvForm(userId);
   const deletion = useDeleteCv({
     page: list.page,
     rowsOnPage: cvs.length,
     onPageChange: list.setPage,
+    // exactOptionalPropertyTypes: the key is left out when there is no employee.
+    ...(userId === undefined ? {} : { userId }),
   });
 
   const stateLabels: PageStateLabels = {

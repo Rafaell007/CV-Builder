@@ -64,6 +64,19 @@ describe("useDeleteCv", () => {
     expect(result().cv).toBeNull();
   });
 
+  it("sends the employee of the User CVs tab with the request", async () => {
+    // The mock matches only a request with userId "user-1": a request without it finds no mock and fails.
+    const { result } = setup({ mocks: [deleteCvMock(cv.id, "user-1")] }, { userId: "user-1" });
+    act(() => result().askToDelete(cv));
+
+    let deleted = false;
+    await act(async () => {
+      deleted = await result().confirm();
+    });
+
+    expect(deleted).toBe(true);
+  });
+
   it("sends one request when confirm is called twice in the same tick", async () => {
     // One delete mock: a second request would find no mock and show an error toast.
     const slowDelete = { ...deleteCvMock(cv.id), delay: 20 };

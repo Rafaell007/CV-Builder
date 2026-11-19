@@ -59,12 +59,20 @@ export function toCvFormValues(cv: CvListItem): CvFormValues {
   };
 }
 
-/** The `updateCv` input: the id of the CV and the checked form values. */
-export function toUpdateCvInput(cv: CvListItem, values: CvFormValues): UpdateCvInput {
+/**
+ * The `updateCv` input: the id of the CV and the checked form values. `userId` is the employee of the User CVs
+ * tab (from the page, not from the row): the backend then rejects a CV of another employee. It never changes the owner.
+ */
+export function toUpdateCvInput(
+  cv: CvListItem,
+  values: CvFormValues,
+  userId?: string,
+): UpdateCvInput {
   return {
     id: cv.id,
     name: values.name,
     education: values.education,
     description: values.description,
+    ...(userId === undefined ? {} : { userId }),
   };
 }
