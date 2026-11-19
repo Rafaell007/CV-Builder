@@ -80,27 +80,31 @@ test.describe("User CVs tab, as an admin", () => {
     await expect(page).toHaveURL(new RegExp(`/users/${userId}/cvs$`));
   });
 
-  test("Edit saves the new name, Delete asks first and Confirm removes the CV", async ({
-    page,
-  }) => {
+  test("Edit saves the new name for the CV of this employee", async ({ page }) => {
     const renamed = `${PREFIX} renamed`;
 
     await page.getByRole("button", { name: `Actions for ${PREFIX} user1 1` }).click();
     await page.getByRole("menuitem", { name: "Edit" }).click();
     await dialog(page).getByRole("textbox", { name: "Name" }).fill(renamed);
     await dialog(page).getByRole("button", { name: "Save" }).click();
+
     await expect(dialog(page)).toBeHidden();
     await expect(page.getByText(renamed, { exact: true })).toBeVisible();
+  });
 
-    await page.getByRole("button", { name: `Actions for ${renamed}` }).click();
+  // A separate test: the toast of an update would cover the row menu of the next step.
+  test("Delete asks first, Cancel keeps the CV and Confirm removes it", async ({ page }) => {
+    const name = `${PREFIX} user1 1`;
+
+    await page.getByRole("button", { name: `Actions for ${name}` }).click();
     await page.getByRole("menuitem", { name: "Delete" }).click();
     await confirmDialog(page).getByRole("button", { name: "Cancel" }).click();
-    await expect(page.getByText(renamed, { exact: true })).toBeVisible();
+    await expect(page.getByText(name, { exact: true })).toBeVisible();
 
-    await page.getByRole("button", { name: `Actions for ${renamed}` }).click();
+    await page.getByRole("button", { name: `Actions for ${name}` }).click();
     await page.getByRole("menuitem", { name: "Delete" }).click();
     await confirmDialog(page).getByRole("button", { name: "Confirm" }).click();
-    await expect(page.getByText(renamed, { exact: true })).toHaveCount(0);
+    await expect(page.getByText(name, { exact: true })).toHaveCount(0);
   });
 
   test("the server rejects Edit and Delete of a CV of another employee than the tab's", async ({
@@ -130,11 +134,44 @@ test.describe("User CVs tab, as an admin", () => {
     await expect(page.getByText("Must not be saved")).toHaveCount(0);
   });
 
-  test("View opens the CV Preview page of the CV", async ({ page }) => {
+  test("View opens the CV, keeps the employee in its tabs and the CVs breadcrumb returns to the tab", async ({
+    page,
+  }) => {
     await page.getByRole("button", { name: `Actions for ${PREFIX} user1 1` }).click();
     await page.getByRole("menuitem", { name: "View" }).click();
 
-    await expect(page).toHaveURL(/\/cvs\/[^/]+\/preview$/);
+    await expect(page).toHaveURL(/\/cvs\/[^/]+\/preview\?from=%2Fusers%2F[^/]+%2Fcvs$/);
+    const cvTabs = page.getByRole("navigation", { name: "CV sections" });
+    await cvTabs.getByRole("link", { name: "Details" }).click();
+    await expect(page).toHaveURL(/\/cvs\/[^/]+\/details\?from=%2Fusers%2F[^/]+%2Fcvs$/);
+    await expect(cvTabs.getByRole("link", { name: "Details" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+
+    await page
+      .getByRole("navigation", { name: "Breadcrumbs" })
+      .getByRole("link", { name: "CVs" })
+      .click();
+
+    await expect(page).toHaveURL(`/en/users/${userId}/cvs`);
+    await expect(tabs(page).getByRole("link", { name: "CVs" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+  });
+
+  test("a return address to another site is ignored on the CV page", async ({ page }) => {
+    await page.getByRole("button", { name: `Actions for ${PREFIX} user1 1` }).click();
+    await page.getByRole("menuitem", { name: "View" }).click();
+    await expect(page).toHaveURL(/\/preview\?from=/);
+    const cvId = /\/cvs\/([^/]+)\/preview/.exec(page.url())?.[1] ?? "";
+
+    await page.goto(`/en/cvs/${cvId}/preview?from=https%3A%2F%2Fevil.example%2Fusers%2F1%2Fcvs`);
+
+    await expect(
+      page.getByRole("navigation", { name: "Breadcrumbs" }).getByRole("link", { name: "CVs" }),
+    ).toHaveAttribute("href", "/en/cvs");
   });
 });
 
