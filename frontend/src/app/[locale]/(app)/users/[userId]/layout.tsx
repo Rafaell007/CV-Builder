@@ -3,8 +3,14 @@ import { UserLayout } from "@/features/user-details";
 
 type UserRouteParams = LayoutProps<"/[locale]/users/[userId]">["params"];
 
-// Reading the params is runtime data: Next.js needs it inside Suspense, or the build fails while prerendering.
-async function UserShell({ params, children }: { params: UserRouteParams; children: ReactNode }) {
+// Only reads userId from the params and passes it on. Reading the params is runtime data: Next.js needs it inside Suspense, or the build fails while prerendering.
+async function UserLayoutWithUserId({
+  params,
+  children,
+}: {
+  params: UserRouteParams;
+  children: ReactNode;
+}) {
   const { userId } = await params;
 
   return <UserLayout userId={userId}>{children}</UserLayout>;
@@ -17,7 +23,7 @@ export default function UserRouteLayout({
 }: LayoutProps<"/[locale]/users/[userId]">) {
   return (
     <Suspense>
-      <UserShell params={params}>{children}</UserShell>
+      <UserLayoutWithUserId params={params}>{children}</UserLayoutWithUserId>
     </Suspense>
   );
 }

@@ -3,8 +3,8 @@ import { UserCvs } from "@/features/user-details";
 
 type UserCvsParams = PageProps<"/[locale]/users/[userId]/cvs">["params"];
 
-// Reading the params is runtime data: Next.js needs it inside Suspense, or the build fails while prerendering.
-async function UserCvsRoute({ params }: { params: UserCvsParams }) {
+// Only reads userId from the params and passes it on. Reading the params is runtime data: Next.js needs it inside Suspense, or the build fails while prerendering.
+async function UserCvsWithUserId({ params }: { params: UserCvsParams }) {
   const { userId } = await params;
 
   return <UserCvs userId={userId} />;
@@ -13,7 +13,7 @@ async function UserCvsRoute({ params }: { params: UserCvsParams }) {
 export default function UserCvsPage({ params }: PageProps<"/[locale]/users/[userId]/cvs">) {
   return (
     <Suspense>
-      <UserCvsRoute params={params} />
+      <UserCvsWithUserId params={params} />
     </Suspense>
   );
 }
