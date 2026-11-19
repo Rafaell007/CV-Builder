@@ -1,0 +1,7 @@
+# Creates one position. Admin only (backend). CONFLICT when the name is taken (case-insensitive, backend README).
+mutation CreatePosition($input: CreatePositionInput!) {
+  createPosition(input: $input) {
+    id
+    name
+  }
+}

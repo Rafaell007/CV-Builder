@@ -1,0 +1,7 @@
+# Renames one department. Admin only (backend). CONFLICT when another department has the name; its own name is allowed.
+mutation UpdateDepartment($input: UpdateDepartmentInput!) {
+  updateDepartment(input: $input) {
+    id
+    name
+  }
+}

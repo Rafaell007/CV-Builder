@@ -1,0 +1,4 @@
+# Deletes one department. Admin only (backend). CONFLICT when another record still uses the department.
+mutation DeleteDepartment($id: ID!) {
+  deleteDepartment(id: $id)
+}

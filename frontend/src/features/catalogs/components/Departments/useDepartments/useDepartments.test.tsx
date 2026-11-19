@@ -30,10 +30,7 @@ describe("useDepartments", () => {
     expect(result().loading).toBe(true);
     await waitFor(() => expect(result().loading).toBe(false));
 
-    expect(result().departments.map((department) => department.name)).toEqual([
-      "Engineering",
-      "Finance",
-    ]);
+    expect(result().items.map((department) => department.name)).toEqual(["Engineering", "Finance"]);
     expect(result().failed).toBe(false);
   });
 
@@ -51,7 +48,7 @@ describe("useDepartments", () => {
 
     await waitFor(() => expect(result().loading).toBe(false));
 
-    expect(result().departments).toEqual([finance]);
+    expect(result().items).toEqual([finance]);
     expect(result().total).toBe(11);
   });
 
@@ -60,7 +57,7 @@ describe("useDepartments", () => {
 
     await waitFor(() => expect(result().failed).toBe(true));
 
-    expect(result().departments).toEqual([]);
+    expect(result().items).toEqual([]);
   });
 
   it("loads the departments again on retry", async () => {
@@ -72,6 +69,6 @@ describe("useDepartments", () => {
     act(() => result().retry());
 
     await waitFor(() => expect(result().failed).toBe(false));
-    expect(result().departments).toHaveLength(1);
+    expect(result().items).toHaveLength(1);
   });
 });
