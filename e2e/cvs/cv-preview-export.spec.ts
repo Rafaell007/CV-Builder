@@ -37,6 +37,16 @@ test.describe("CV Preview page, EXPORT PDF", () => {
     await expect(exportButton(page)).toBeEnabled();
   });
 
+  test("on the Polish page the button is Polish and the PDF downloads too", async ({ page }) => {
+    await page.goto(`/pl/cvs/${cvId}/preview`);
+    const download = page.waitForEvent("download");
+
+    await page.getByRole("button", { name: "EKSPORTUJ PDF" }).click();
+
+    // The file name does not depend on the language.
+    expect((await download).suggestedFilename()).toBe("e2e-export-user-1.pdf");
+  });
+
   test("shows an error and keeps the preview when the PDF cannot be made (AC-47)", async ({
     page,
   }) => {
