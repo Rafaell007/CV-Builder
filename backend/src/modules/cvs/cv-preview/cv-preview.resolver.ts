@@ -14,8 +14,8 @@ export class CvPreviewResolver {
   @Query(() => CvPreview)
   cvPreview(
     @CurrentUser() user: AuthUser | undefined,
-    @Args() { cvId }: CvPreviewArgs,
+    @Args() { cvId, locale }: CvPreviewArgs,
   ): Promise<CvPreview> {
-    return this.service.get(requireUser(user), cvId);
+    return this.service.get(requireUser(user), cvId, locale);
   }
 }

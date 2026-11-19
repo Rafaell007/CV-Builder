@@ -263,6 +263,22 @@ describe("CvPreviewService.get", () => {
     });
   });
 
+  it("writes the open period in the language that was asked for", async () => {
+    prisma.cvProject.findMany.mockResolvedValue([
+      projectRow({ endDate: null }),
+      projectRow({ startDate: new Date("2020-02-01T00:00:00.000Z") }),
+    ]);
+
+    const polish = await service.get(USER, "cv-1", "pl");
+    const english = await service.get(USER, "cv-1", "en");
+
+    expect(polish.projects.map((project) => project.period)).toEqual([
+      "01.2023 – obecnie",
+      "02.2020 – 06.2024",
+    ]);
+    expect(english.projects[0]?.period).toBe("01.2023 – Till now");
+  });
+
   it("answers not found when the CV or the owner is gone after the check", async () => {
     prisma.cv.findUnique.mockResolvedValue(null);
 

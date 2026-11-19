@@ -21,7 +21,15 @@ describe("CvPreviewResolver", () => {
 
     await expect(resolver.cvPreview(USER, { cvId: "cv-1" })).resolves.toBe(PREVIEW);
 
-    expect(service.get).toHaveBeenCalledWith(USER, "cv-1");
+    expect(service.get).toHaveBeenCalledWith(USER, "cv-1", undefined);
+  });
+
+  it("passes the language to the service", async () => {
+    const { resolver, service } = setup();
+
+    await resolver.cvPreview(USER, { cvId: "cv-1", locale: "pl" });
+
+    expect(service.get).toHaveBeenCalledWith(USER, "cv-1", "pl");
   });
 
   it("refuses a call without a user", () => {
