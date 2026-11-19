@@ -11,7 +11,9 @@ import type { AvailableCvSkill } from "./models/available-cv-skill";
 import type { CvSkill } from "./models/cv-skill";
 
 const WITH_CATEGORY = {
-  skill: { select: { id: true, name: true, category: { select: { id: true, name: true } } } },
+  skill: {
+    select: { id: true, name: true, category: { select: { id: true, name: true, type: true } } },
+  },
 } satisfies Prisma.CvSkillInclude;
 
 // Categories first, as the page groups by them; the id keeps the order stable when names are equal.
@@ -53,7 +55,13 @@ export class CvSkillsService {
       where: { userId: ownerId, skill: { cvSkills: { none: { cvId } } } },
       select: {
         mastery: true,
-        skill: { select: { id: true, name: true, category: { select: { id: true, name: true } } } },
+        skill: {
+          select: {
+            id: true,
+            name: true,
+            category: { select: { id: true, name: true, type: true } },
+          },
+        },
       },
       orderBy: [
         { skill: { category: { name: "asc" } } },
