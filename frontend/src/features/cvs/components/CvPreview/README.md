@@ -17,7 +17,7 @@ The document sections (KAN-158) are presentational: props in, JSX out. No data f
 
 ## CvPreviewExport (S7.6, KAN-119)
 
-`CvPreviewExport({ cvId, disabled })`: the EXPORT PDF button. It calls `useExportCvPdf(cvId)`. Import it from `./CvPreviewExport`. Text: `cvs.preview.export` (`en`, `pl`).
+`CvPreviewExport({ disabled, exporting, onExport })`: the EXPORT PDF button. It is representational. `CvPreview` calls `useExportCvPdf(cvId)` and passes the state down. Import it from `./CvPreviewExport`. Text: `cvs.preview.export` (`en`, `pl`). The width of the bar and of the document is one CSS variable, `--cv-preview-width`, set on `.page` in `CvPreview.module.css`.
 
 - The button shows the shared spinner while the PDF is made (`aria-busy`), stays focusable and ignores a second click (AC-27, AC-28). A hidden `role="status"` text (`Generating the PDF`) tells screen readers about the running export.
 - `disabled` is true when `useCvPreview` has no data. No request starts then (AC-26, AC-48).
@@ -25,7 +25,7 @@ The document sections (KAN-158) are presentational: props in, JSX out. No data f
 - **The button is not in the shared `PageHeader`.** The spec says "in the page header", but `PageHeader` has no place for actions and is used by every page. The button is in a bar above the document, at the right edge of the sheet. Move it if `PageHeader` gets an actions slot.
 - **The PDF follows the language of the page.** The hook sends `locale`, and the backend prints the section titles and column names in `en` or `pl`. The CV content is not translated. The period of a project also follows the language: `useCvPreview` sends `locale`, and the backend writes `Till now` (`en`) or `obecnie` (`pl`), the same text as in the PDF. See `backend/src/modules/cvs/README.md`.
 - **No print layout.** The first plan said a CSS `@media print` rule would come with S7.6. It was not made, because the PDF is made by the backend and the page is not printed.
-- Tests: `CvPreviewExport.test.tsx`, `useExportCvPdf.test.tsx`, `utils/downloadPdf.test.ts`. The download itself needs a real browser, so the unit tests replace `saveFile`. `e2e/cvs/cv-preview-export.spec.ts` checks the real download and its file name.
+- Tests: `CvPreviewExport.test.tsx` (props only), the export flow in `CvPreview.test.tsx` and `useExportCvPdf.test.tsx`, `useSaveFile.test.ts`, `utils/cvPdf.utils.test.ts`. The download itself needs a real browser, so the unit tests replace `useSaveFile`. `e2e/cvs/cv-preview-export.spec.ts` checks the real download and its file name.
 - Not done: layout check against Figma (the position and the look of the button) and a keyboard check by a person.
 
 ## CvPreviewSkillsTable (KAN-159)
