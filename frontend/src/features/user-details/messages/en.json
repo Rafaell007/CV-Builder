@@ -1,0 +1,9 @@
+{
+  "tabs": {
+    "label": "Employee sections",
+    "profile": "Profile",
+    "skills": "Skills",
+    "languages": "Languages",
+    "cvs": "CVs"
+  }
+}

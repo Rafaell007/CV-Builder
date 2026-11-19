@@ -7,8 +7,8 @@ import { graphqlRequest, toCookiePair } from "../support/graphql-request";
 import type { GraphQLBody } from "../support/graphql-request";
 
 const SIGN_IN = `mutation ($input: SignInInput!) { signIn(input: $input) { id } }`;
-const PREVIEW = `query ($cvId: ID!) {
-  cvPreview(cvId: $cvId) {
+const PREVIEW = `query ($cvId: ID!, $locale: String) {
+  cvPreview(cvId: $cvId, locale: $locale) {
     cvId name education description fullName position domains
     languages { name proficiency }
     skillGroups { category skills { name mastery experienceYears lastUsedYear } }
@@ -79,12 +79,15 @@ describe("cv preview", () => {
     return { id: user.id, cookie: toCookiePair(access ?? "") };
   }
 
-  function call(who: Who | null, cvId: string) {
-    return graphqlRequest(app, PREVIEW, { cookies: who ? [who.cookie] : [], variables: { cvId } });
+  function call(who: Who | null, cvId: string, locale?: string) {
+    return graphqlRequest(app, PREVIEW, {
+      cookies: who ? [who.cookie] : [],
+      variables: { cvId, locale },
+    });
   }
 
-  async function preview(who: Who, cvId: string): Promise<Preview> {
-    const { body } = await call(who, cvId);
+  async function preview(who: Who, cvId: string, locale?: string): Promise<Preview> {
+    const { body } = await call(who, cvId, locale);
     expect(body.errors).toBeUndefined();
     return body.data?.["cvPreview"] as Preview;
   }
@@ -432,6 +435,20 @@ describe("cv preview", () => {
       expect(period("Old Bank")).toBe(`01.${YEAR - 1} – 03.${YEAR - 1}`);
       expect(period("Web Shop")).toBe(`01.${YEAR - 3} – Till now`);
       expect(result.projects.find((project) => project.name === "Web Shop")?.endDate).toBeNull();
+    });
+
+    it("writes the open period in Polish when the language is pl, and rejects an unknown language", async () => {
+      const result = await preview(ann, annCv, "pl");
+      const { body } = await call(ann, annCv, "de");
+
+      expect(result.projects.find((p) => p.name === "Web Shop")?.period).toBe(
+        `01.${YEAR - 3} – obecnie`,
+      );
+      // A finished project does not change.
+      expect(result.projects.find((p) => p.name === "Bank App")?.period).toBe(
+        `01.${YEAR - 4} – 06.${YEAR - 2}`,
+      );
+      expect(errorOf(body)?.extensions.code).toBe("BAD_USER_INPUT");
     });
 
     it("orders the projects with the newest start date first", async () => {

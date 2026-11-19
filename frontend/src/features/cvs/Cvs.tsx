@@ -17,7 +17,7 @@ import { DeleteCvModal } from "./components/DeleteCvModal";
 import { UpdateCvModal } from "./components/UpdateCvModal";
 import { DEFAULT_CVS_SORT, SEARCH_MAX_LENGTH } from "./cvs.constants";
 import type { CvListItem } from "./cvs.types";
-import { toCvTabPath, toCvsVariables } from "./utils";
+import { toCvOpenPath, toCvsVariables, withScope } from "./utils";
 import { useCreateCvForm } from "./useCreateCvForm";
 import { useCvs } from "./useCvs";
 import { useDeleteCv } from "./useDeleteCv";
@@ -41,15 +41,16 @@ export function Cvs({ userId, onView }: CvsProps) {
   const router = useRouter();
   const list = useListState(DEFAULT_CVS_SORT);
   const variables = toCvsVariables(list, userId);
-  const { cvs, total, loading, failed, retry } = useCvs(variables);
+  const { cvs, total, loading, failed, forbidden, retry } = useCvs(variables);
   const { user, isAdmin, loading: userLoading } = useCurrentUser();
 
-  const creation = useCreateCvForm();
-  const editing = useUpdateCvForm();
+  const creation = useCreateCvForm(userId);
+  const editing = useUpdateCvForm(userId);
   const deletion = useDeleteCv({
     page: list.page,
     rowsOnPage: cvs.length,
     onPageChange: list.setPage,
+    ...withScope(userId),
   });
 
   const stateLabels: PageStateLabels = {
@@ -82,7 +83,15 @@ export function Cvs({ userId, onView }: CvsProps) {
         onCreate={creation.open}
         error={
           failed && !loading ? (
-            <PageState kind="error" labels={stateLabels} onRetry={retry} />
+            <PageState
+              kind="error"
+              labels={{
+                ...stateLabels,
+                error: forbidden ? t("states.forbidden") : stateLabels.error,
+              }}
+              // Retry cannot help when the role is not allowed.
+              {...(forbidden ? {} : { onRetry: retry })}
+            />
           ) : undefined
         }
         pagination={
@@ -103,7 +112,7 @@ export function Cvs({ userId, onView }: CvsProps) {
           cvs={cvs}
           sort={list.sort}
           onSortChange={list.setSort}
-          onView={onView ?? ((cv) => router.push(toCvTabPath(cv.id, "preview")))}
+          onView={onView ?? ((cv) => router.push(toCvOpenPath(cv.id, userId)))}
           onEdit={editing.open}
           onDelete={deletion.askToDelete}
           loading={loading}

@@ -83,7 +83,7 @@ describe("CvPreviewService.get", () => {
   it("checks access first and loads nothing when the check refuses", async () => {
     cvs.assertAccessible.mockRejectedValue(new NotFoundException("CV not found"));
 
-    const error = await rejection(service.get(USER, "cv-1"));
+    const error = await rejection(service.get(USER, "cv-1", "en"));
 
     expect(error).toBeInstanceOf(NotFoundException);
     expect(cvs.assertAccessible).toHaveBeenCalledWith(USER, "cv-1");
@@ -94,7 +94,7 @@ describe("CvPreviewService.get", () => {
   });
 
   it("loads only data of this CV and of its owner", async () => {
-    await service.get(USER, "cv-1");
+    await service.get(USER, "cv-1", "en");
 
     expect(prisma.cv.findUnique).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: "cv-1" } }),
@@ -114,7 +114,7 @@ describe("CvPreviewService.get", () => {
   });
 
   it("returns the CV data, the owner name, the position and the languages", async () => {
-    const preview = await service.get(USER, "cv-1");
+    const preview = await service.get(USER, "cv-1", "en");
 
     expect(preview).toMatchObject({
       cvId: "cv-1",
@@ -135,7 +135,7 @@ describe("CvPreviewService.get", () => {
       owner({ firstName: null, lastName: null, position: null }),
     );
 
-    const preview = await service.get(USER, "cv-1");
+    const preview = await service.get(USER, "cv-1", "en");
 
     expect(preview.fullName).toBeNull();
     expect(preview.position).toBeNull();
@@ -143,10 +143,10 @@ describe("CvPreviewService.get", () => {
 
   it("uses the one name that exists without extra spaces", async () => {
     prisma.user.findUnique.mockResolvedValue(owner({ firstName: "Anna", lastName: null }));
-    expect((await service.get(USER, "cv-1")).fullName).toBe("Anna");
+    expect((await service.get(USER, "cv-1", "en")).fullName).toBe("Anna");
 
     prisma.user.findUnique.mockResolvedValue(owner({ firstName: null, lastName: "Nowak" }));
-    expect((await service.get(USER, "cv-1")).fullName).toBe("Nowak");
+    expect((await service.get(USER, "cv-1", "en")).fullName).toBe("Nowak");
   });
 
   it("groups skills by category and creates no empty groups", async () => {
@@ -156,7 +156,7 @@ describe("CvPreviewService.get", () => {
       skillRow("s-nest", "NestJS", "Backend"),
     ]);
 
-    const { skillGroups } = await service.get(USER, "cv-1");
+    const { skillGroups } = await service.get(USER, "cv-1", "en");
 
     expect(skillGroups.map((group) => group.category)).toEqual(["Frontend", "Backend"]);
     expect(skillGroups[0]?.skills.map((skill) => skill.name)).toEqual(["React", "Vue"]);
@@ -164,7 +164,7 @@ describe("CvPreviewService.get", () => {
   });
 
   it("asks the database for skills sorted by category and name", async () => {
-    await service.get(USER, "cv-1");
+    await service.get(USER, "cv-1", "en");
 
     expect(prisma.cvSkill.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -187,7 +187,7 @@ describe("CvPreviewService.get", () => {
       }),
     ]);
 
-    const { skillGroups } = await service.get(USER, "cv-1");
+    const { skillGroups } = await service.get(USER, "cv-1", "en");
 
     // Earliest start 2021-03-01 to 2026-11-13 is 5 full years; the latest end is 2024.
     expect(skillGroups[0]?.skills[0]).toMatchObject({
@@ -201,7 +201,7 @@ describe("CvPreviewService.get", () => {
     prisma.cvSkill.findMany.mockResolvedValue([skillRow("s-react", "React", "Frontend")]);
     prisma.cvProject.findMany.mockResolvedValue([projectRow({ endDate: null })]);
 
-    const { skillGroups } = await service.get(USER, "cv-1");
+    const { skillGroups } = await service.get(USER, "cv-1", "en");
 
     expect(skillGroups[0]?.skills[0]?.lastUsedYear).toBe(2026);
   });
@@ -210,7 +210,7 @@ describe("CvPreviewService.get", () => {
     prisma.cvSkill.findMany.mockResolvedValue([skillRow("s-go", "Go", "Backend")]);
     prisma.cvProject.findMany.mockResolvedValue([projectRow()]);
 
-    const { skillGroups } = await service.get(USER, "cv-1");
+    const { skillGroups } = await service.get(USER, "cv-1", "en");
 
     expect(skillGroups[0]?.skills[0]).toMatchObject({ experienceYears: null, lastUsedYear: null });
   });
@@ -223,7 +223,7 @@ describe("CvPreviewService.get", () => {
       projectRow({ project: { ...other, domain: "Finance" } }),
     ]);
 
-    const { domains } = await service.get(USER, "cv-1");
+    const { domains } = await service.get(USER, "cv-1", "en");
 
     expect(domains).toEqual(["Retail", "Finance"]);
   });
@@ -231,7 +231,7 @@ describe("CvPreviewService.get", () => {
   it("builds the project with environment, roles, period and dates", async () => {
     prisma.cvProject.findMany.mockResolvedValue([projectRow()]);
 
-    const { projects } = await service.get(USER, "cv-1");
+    const { projects } = await service.get(USER, "cv-1", "en");
 
     expect(projects).toEqual([
       {
@@ -253,7 +253,7 @@ describe("CvPreviewService.get", () => {
       projectRow({ roles: [], endDate: null, responsibilities: null }),
     ]);
 
-    const { projects } = await service.get(USER, "cv-1");
+    const { projects } = await service.get(USER, "cv-1", "en");
 
     expect(projects[0]).toMatchObject({
       roles: [],
@@ -263,9 +263,25 @@ describe("CvPreviewService.get", () => {
     });
   });
 
+  it("writes the open period in the language that was asked for", async () => {
+    prisma.cvProject.findMany.mockResolvedValue([
+      projectRow({ endDate: null }),
+      projectRow({ startDate: new Date("2020-02-01T00:00:00.000Z") }),
+    ]);
+
+    const polish = await service.get(USER, "cv-1", "pl");
+    const english = await service.get(USER, "cv-1", "en");
+
+    expect(polish.projects.map((project) => project.period)).toEqual([
+      "01.2023 – obecnie",
+      "02.2020 – 06.2024",
+    ]);
+    expect(english.projects[0]?.period).toBe("01.2023 – Till now");
+  });
+
   it("answers not found when the CV or the owner is gone after the check", async () => {
     prisma.cv.findUnique.mockResolvedValue(null);
 
-    expect(await rejection(service.get(USER, "cv-1"))).toBeInstanceOf(NotFoundException);
+    expect(await rejection(service.get(USER, "cv-1", "en"))).toBeInstanceOf(NotFoundException);
   });
 });

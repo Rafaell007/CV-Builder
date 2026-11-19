@@ -102,9 +102,20 @@ describe("CvsService.list", () => {
   });
 
   it("lets an admin filter by user", async () => {
+    prisma.user.findUnique.mockResolvedValue({ id: "user-2" });
+
     await service.list(ADMIN, args({ userId: "user-2" }));
 
     expect(whereOfList()).toEqual({ userId: "user-2" });
+  });
+
+  it("answers NOT_FOUND when an admin selects an employee that does not exist", async () => {
+    prisma.user.findUnique.mockResolvedValue(null);
+
+    expect(await rejection(service.list(ADMIN, args({ userId: "missing" })))).toBeInstanceOf(
+      NotFoundException,
+    );
+    expect(prisma.cv.findMany).not.toHaveBeenCalled();
   });
 
   it("searches the name only for a user, case-insensitive, inside their own CVs", async () => {
@@ -257,12 +268,12 @@ describe("CvsService.create", () => {
     expect(prisma.user.findUnique).not.toHaveBeenCalled();
   });
 
-  it("reports a field error when the named owner does not exist", async () => {
+  it("answers NOT_FOUND when the named owner does not exist", async () => {
     prisma.user.findUnique.mockResolvedValue(null);
 
-    await expect(service.create(ADMIN, { ...input, userId: "missing" })).rejects.toMatchObject({
-      fieldErrors: [{ field: "userId", messages: ["User not found"] }],
-    });
+    expect(await rejection(service.create(ADMIN, { ...input, userId: "missing" }))).toBeInstanceOf(
+      NotFoundException,
+    );
     expect(prisma.cv.create).not.toHaveBeenCalled();
   });
 });
@@ -305,6 +316,39 @@ describe("CvsService.update", () => {
     prisma.cv.update.mockRejectedValue(missingRecordError());
 
     expect(await rejection(service.update(USER, input))).toBeInstanceOf(NotFoundException);
+  });
+
+  describe("with the employee of the User CVs tab", () => {
+    it("lets an admin update a CV of that employee and never writes the user id", async () => {
+      prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-2" }));
+      prisma.cv.update.mockResolvedValue(storedCv({ userId: "user-2" }));
+
+      await service.update(ADMIN, { ...input, userId: "user-2" });
+
+      expect(prisma.cv.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: { name: "Changed", education: "PhD", description: "New" },
+        }),
+      );
+    });
+
+    it("answers NOT_FOUND for the CV of another employee, also for an admin", async () => {
+      prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-3" }));
+
+      expect(await rejection(service.update(ADMIN, { ...input, userId: "user-2" }))).toBeInstanceOf(
+        NotFoundException,
+      );
+      expect(prisma.cv.update).not.toHaveBeenCalled();
+    });
+
+    it("treats a null user id as no scope", async () => {
+      prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-2" }));
+      prisma.cv.update.mockResolvedValue(storedCv({ userId: "user-2" }));
+
+      await service.update(ADMIN, { ...input, userId: null as unknown as string });
+
+      expect(prisma.cv.update).toHaveBeenCalled();
+    });
   });
 });
 
@@ -349,5 +393,34 @@ describe("CvsService.delete", () => {
     prisma.cv.delete.mockRejectedValue(failure);
 
     expect(await rejection(service.delete(USER, "cv-1"))).toBe(failure);
+  });
+
+  describe("with the employee of the User CVs tab", () => {
+    it("lets an admin delete a CV of that employee", async () => {
+      prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-2" }));
+      prisma.cv.delete.mockResolvedValue(storedCv({ userId: "user-2" }));
+
+      await service.delete(ADMIN, "cv-1", "user-2");
+
+      expect(prisma.cv.delete).toHaveBeenCalled();
+    });
+
+    it("answers NOT_FOUND for the CV of another employee, also for an admin", async () => {
+      prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-3" }));
+
+      expect(await rejection(service.delete(ADMIN, "cv-1", "user-2"))).toBeInstanceOf(
+        NotFoundException,
+      );
+      expect(prisma.cv.delete).not.toHaveBeenCalled();
+    });
+
+    it("answers NOT_FOUND when the employee does not exist", async () => {
+      prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-2" }));
+
+      expect(await rejection(service.delete(ADMIN, "cv-1", "missing"))).toBeInstanceOf(
+        NotFoundException,
+      );
+      expect(prisma.cv.delete).not.toHaveBeenCalled();
+    });
   });
 });

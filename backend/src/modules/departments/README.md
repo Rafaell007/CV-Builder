@@ -12,6 +12,7 @@ The global catalog of departments (page 25). A user can be assigned one departme
   - `CONFLICT` "Department cannot be deleted because it is currently in use" when a user still has the department. There is no count check first: the `Restrict` foreign key on `User.departmentId` refuses the delete (`P2003`) and the service maps it (D18).
   - `NOT_FOUND` "Department not found" for an unknown id (`P2025`). `BAD_USER_INPUT` for an id that is not a UUID.
 - **Authorization:** `@Roles(Role.ADMIN)` on `DepartmentsResolver`.
+- **Note (deploy):** migration `20261117154613_case_insensitive_catalog_names` changes `name` to `citext` and rebuilds the unique index. It fails if the database already holds two names that differ only in letter case (for example "engineering" and "Engineering"). Before `prisma migrate deploy` on a database with real data, check with `SELECT lower(name), count(*) FROM "Department" GROUP BY 1 HAVING count(*) > 1;` and rename or merge the duplicates. `CREATE EXTENSION citext` needs the database owner (citext is a trusted extension from PostgreSQL 13).
 - **Same shape as:** the [Positions module](../positions/README.md). A fix in one usually belongs in both.
 - **Tests:** `*.spec.ts` next to the code; `backend/test/departments/departments.int-spec.ts` runs every operation over HTTP against the test database.
 - **Docs:** [departments page](../../../../docs/pages/25-departments-page.md) · [PLAN.md D18, D35](../../../../PLAN.md)

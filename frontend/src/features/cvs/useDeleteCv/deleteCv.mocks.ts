@@ -14,8 +14,11 @@ export const cvToDelete: CvListItem = {
 };
 
 /** MockedProvider response of `deleteCv` for the CV with this id. */
-export const deleteCvMock = (id: string): MockLink.MockedResponse => ({
-  request: { query: DeleteCvDocument, variables: { id } },
+export const deleteCvMock = (id: string, userId?: string): MockLink.MockedResponse => ({
+  request: {
+    query: DeleteCvDocument,
+    variables: userId === undefined ? { id } : { id, userId },
+  },
   result: { data: { deleteCv: { __typename: "Cv", id } } },
 });
 

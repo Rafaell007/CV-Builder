@@ -1,6 +1,6 @@
 "use client";
 
-import type { OperationVariables, TypedDocumentNode } from "@apollo/client";
+import type { ErrorLike, OperationVariables, TypedDocumentNode } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import type { ListPage } from "../lists.types";
 
@@ -12,6 +12,8 @@ export type UsePagedListResult<TItem> = {
   loading: boolean;
   /** True when the request failed. The list is then not shown, so a failure never looks like an empty list. */
   failed: boolean;
+  /** The error of the failed request (`undefined` otherwise), for a page that tells failures apart, e.g. `FORBIDDEN`. */
+  error: ErrorLike | undefined;
   /** Sends the failed request again, with the same search, sort and page. */
   retry: () => void;
 };
@@ -38,6 +40,7 @@ export function usePagedList<TData, TVariables extends OperationVariables, TItem
     total: lastData === undefined ? 0 : selectPage(lastData).total,
     loading,
     failed: error !== undefined,
+    error,
     // The error is already in the hook state, so the rejected promise of refetch needs no second handler.
     retry: () => void refetch().catch(() => undefined),
   };

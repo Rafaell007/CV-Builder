@@ -15,8 +15,9 @@ const EMPTY_VALUES: CvFormValues = { name: "", education: "", description: "" };
  * The Update CV flow: the CV that is being edited, the open state of the modal and the request. The form
  * itself is `useCvForm`. `open(cv)` fills it with the current data of that CV. A failed request keeps every
  * typed value and shows the error inside the modal. Only a successful request closes the modal.
+ * `userId` is the employee of the User CVs tab. It comes from the page and is sent as the scope of the update.
  */
-export function useUpdateCvForm() {
+export function useUpdateCvForm(userId?: string) {
   const t = useTranslations("cvs.update");
   const toast = useToast();
   const { update } = useUpdateCv();
@@ -34,7 +35,7 @@ export function useUpdateCvForm() {
   async function send(values: CvFormValues) {
     if (!cv) return;
     try {
-      await update(toUpdateCvInput(cv, values));
+      await update(toUpdateCvInput(cv, values, userId));
       setIsOpen(false);
       toast.success({
         title: t("success.title"),

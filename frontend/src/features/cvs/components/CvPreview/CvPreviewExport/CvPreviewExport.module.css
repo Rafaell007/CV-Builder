@@ -1,0 +1,15 @@
+/* The action sits at the right edge of the document column, above the sheet (the page header of the Preview tab).
+   --cv-preview-width is set by CvPreview (.page), so the bar and the document have the same width. */
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  box-sizing: border-box;
+  max-width: var(--cv-preview-width);
+  margin: 0 auto;
+  padding-top: var(--space-4);
+}
+
+/* Read by screen readers, not shown. */
+.status {
+  composes: visuallyHidden from "../../../../../shared/styles/visuallyHidden.module.css";
+}

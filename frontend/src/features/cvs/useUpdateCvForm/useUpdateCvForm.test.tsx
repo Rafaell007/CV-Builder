@@ -9,10 +9,10 @@ import { useUpdateCvForm } from "./useUpdateCvForm";
 const fakeEvent = { preventDefault: () => undefined, persist: () => undefined };
 
 // renderWithProviders renders elements; this small component lets the hook run inside the same providers.
-function setup(options: RenderWithProvidersOptions) {
+function setup(options: RenderWithProvidersOptions, userId?: string) {
   let current!: ReturnType<typeof useUpdateCvForm>;
   function Probe(): ReactNode {
-    current = useUpdateCvForm();
+    current = useUpdateCvForm(userId);
     return null;
   }
   renderWithProviders(<Probe />, options);
@@ -57,5 +57,21 @@ describe("useUpdateCvForm", () => {
     expect(result().failed).toBe(false);
     expect(result().isOpen).toBe(false);
     expect(await screen.findByText("CV updated")).toBeInTheDocument();
+  });
+
+  it("sends the employee of the User CVs tab, not the owner of the row", async () => {
+    // The mock matches only a request with userId "10" (the page); the row belongs to user "3".
+    const { result } = setup({ mocks: [updateCvMock({ ...input, userId: "10" })] }, "10");
+    act(() => {
+      result().open(backendCv);
+      result().form.setValue("name", "Backend CV 2", { shouldDirty: true });
+    });
+
+    await act(async () => {
+      await result().submit(fakeEvent as unknown as BaseSyntheticEvent);
+    });
+
+    expect(result().failed).toBe(false);
+    expect(result().isOpen).toBe(false);
   });
 });

@@ -12,6 +12,7 @@ import type resetPassword from "@/features/reset-password/messages/en.json";
 import type settings from "@/features/settings/messages/en.json";
 import type signIn from "@/features/sign-in/messages/en.json";
 import type signUp from "@/features/sign-up/messages/en.json";
+import type userDetails from "@/features/user-details/messages/en.json";
 import type verifyEmail from "@/features/verify-email/messages/en.json";
 import type common from "@/shared/i18n/messages/en.json";
 
@@ -32,6 +33,7 @@ export type Messages = {
   settings: typeof settings;
   signIn: typeof signIn;
   signUp: typeof signUp;
+  userDetails: typeof userDetails;
   verifyEmail: typeof verifyEmail;
 };
 
@@ -53,6 +55,7 @@ const loaders: Record<Locale, () => Promise<Messages>> = {
     settings: (await import("@/features/settings/messages/en.json")).default,
     signIn: (await import("@/features/sign-in/messages/en.json")).default,
     signUp: (await import("@/features/sign-up/messages/en.json")).default,
+    userDetails: (await import("@/features/user-details/messages/en.json")).default,
     verifyEmail: (await import("@/features/verify-email/messages/en.json")).default,
   }),
   pl: async () => ({
@@ -70,6 +73,7 @@ const loaders: Record<Locale, () => Promise<Messages>> = {
     settings: (await import("@/features/settings/messages/pl.json")).default,
     signIn: (await import("@/features/sign-in/messages/pl.json")).default,
     signUp: (await import("@/features/sign-up/messages/pl.json")).default,
+    userDetails: (await import("@/features/user-details/messages/pl.json")).default,
     verifyEmail: (await import("@/features/verify-email/messages/pl.json")).default,
   }),
 };

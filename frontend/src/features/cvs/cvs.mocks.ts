@@ -142,3 +142,12 @@ export const meMock = (role: "ADMIN" | "USER" = "USER"): MockLink.MockedResponse
     },
   },
 });
+
+/** The `Cvs` query refused with a GraphQL error code, for example `FORBIDDEN` or `NOT_FOUND` (unknown employee). */
+export const cvsRefusedMock = (
+  code: string,
+  variables: CvsQueryVariables = defaultVariables,
+): MockLink.MockedResponse => ({
+  request: { query: CvsDocument, variables },
+  result: { errors: [{ message: "Refused", extensions: { code } }] },
+});

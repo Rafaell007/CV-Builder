@@ -517,9 +517,9 @@ Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE 
 - [ ] **S7.2 CV Details** — FE `/cvs/[cvId]` layout, tabs, breadcrumbs; details form (dirty-check UPDATE); BE `updateCv`. AC per cv-details.
 - [ ] **S7.3 CV Skills** — BE `cvs/skills` (only the owner's skills, no duplicates, mastery per CV); FE reuses `features/skills`. AC per cv-skills.
 - [ ] **S7.4 CV Projects** — BE `cvs/projects` (dates within project, ≥ 1 role); FE add / update modal with read-only project fields. AC per cv-projects. Depends on S5.5. BE done (KAN-115, S7.4a), FE pending; the catalog query for non-admin users is still open (see `backend/src/modules/cvs/README.md`).
-- [ ] **S7.5 CV Preview** — BE `cvPreview` aggregate (experience years, last used, unique domains); FE preview layout. AC per cv-preview. FE preview tab done (KAN-118), PDF export is S7.6.
-- [ ] **S7.6 Export PDF** (Should) — BE `exportCvPdf` (D12); FE EXPORT PDF action, file name from CV name, disabled when no data. AC per cv-preview.
-- [ ] **S7.7 User CVs tab** — FE reuses the CVs list filtered by user; create assigns to that user. AC per user-cvs. Depends on S7.1, S6.2.
+- [x] **S7.5 CV Preview** — BE `cvPreview` aggregate (experience years, last used, unique domains); FE preview layout. AC per cv-preview. FE preview tab done (KAN-118), PDF export is S7.6.
+- [x] **S7.6 Export PDF** (Should) — BE `exportCvPdf` (D12); FE EXPORT PDF action, file name from CV name, disabled when no data. AC per cv-preview. Done (KAN-119): query `exportCvPdf(cvId)` returns `fileName` and `base64`; the fixed PDF texts and the open project period of the preview and the PDF follow the page language (`locale` `en` or `pl` on `cvPreview` and `exportCvPdf`); the button is above the document, not in `PageHeader`. `exportCvPdf` has the rate limit of D23 and a 5 MB size limit on the PDF.
+- [x] **S7.7 User CVs tab** — FE reuses the CVs list filtered by user; create assigns to that user. AC per user-cvs. Depends on S7.1, S6.2. Done (KAN-120) with a minimal `features/user-details` shell (tabs, admin-only CVs tab); the full User Details page is S6.2. `updateCv` and `deleteCv` take an optional `userId` (the employee of the tab); a CV of another employee answers `NOT_FOUND` (contract change, agreed with Rafal).
 
 ### Phase 8 — Quality and delivery
 

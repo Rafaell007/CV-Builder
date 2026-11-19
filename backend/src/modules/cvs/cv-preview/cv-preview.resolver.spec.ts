@@ -19,15 +19,25 @@ describe("CvPreviewResolver", () => {
   it("passes the signed-in user and the CV id to the service", async () => {
     const { resolver, service } = setup();
 
-    await expect(resolver.cvPreview(USER, { cvId: "cv-1" })).resolves.toBe(PREVIEW);
+    await expect(resolver.cvPreview(USER, { cvId: "cv-1", locale: "en" })).resolves.toBe(PREVIEW);
 
-    expect(service.get).toHaveBeenCalledWith(USER, "cv-1");
+    expect(service.get).toHaveBeenCalledWith(USER, "cv-1", "en");
+  });
+
+  it("passes the language to the service", async () => {
+    const { resolver, service } = setup();
+
+    await resolver.cvPreview(USER, { cvId: "cv-1", locale: "pl" });
+
+    expect(service.get).toHaveBeenCalledWith(USER, "cv-1", "pl");
   });
 
   it("refuses a call without a user", () => {
     const { resolver, service } = setup();
 
-    expect(() => resolver.cvPreview(undefined, { cvId: "cv-1" })).toThrow(UnauthorizedException);
+    expect(() => resolver.cvPreview(undefined, { cvId: "cv-1", locale: "en" })).toThrow(
+      UnauthorizedException,
+    );
     expect(service.get).not.toHaveBeenCalled();
   });
 

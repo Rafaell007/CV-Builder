@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { CreateCvInput, UpdateCvInput } from "@/shared/graphql";
 import { MAX_DESCRIPTION_LENGTH, MAX_EDUCATION_LENGTH, MAX_NAME_LENGTH } from "../cvs.constants";
 import type { CvFormValues, CvListItem } from "../cvs.types";
+import { withScope } from "./cvs.utils";
 
 /** The translated texts of the validation messages (page 20, Create CV Validation). */
 export interface CvFormMessages {
@@ -37,12 +38,16 @@ export function cvFormSchema(messages: CvFormMessages): z.ZodType<CvFormValues, 
   });
 }
 
-/** The `createCv` input. `userId` is left out: the backend uses the signed-in user as the owner. */
-export function toCreateCvInput(values: CvFormValues): CreateCvInput {
+/**
+ * The `createCv` input. `userId` is sent only for the User CVs tab (the owner comes from the page, never from
+ * the form); without it the backend uses the signed-in user as the owner and only an admin may send it.
+ */
+export function toCreateCvInput(values: CvFormValues, userId?: string): CreateCvInput {
   return {
     name: values.name,
     education: values.education,
     description: values.description,
+    ...withScope(userId),
   };
 }
 
@@ -55,12 +60,20 @@ export function toCvFormValues(cv: CvListItem): CvFormValues {
   };
 }
 
-/** The `updateCv` input: the id of the CV and the checked form values. */
-export function toUpdateCvInput(cv: CvListItem, values: CvFormValues): UpdateCvInput {
+/**
+ * The `updateCv` input: the id of the CV and the checked form values. `userId` is the employee of the User CVs
+ * tab (from the page, not from the row): the backend then rejects a CV of another employee. It never changes the owner.
+ */
+export function toUpdateCvInput(
+  cv: CvListItem,
+  values: CvFormValues,
+  userId?: string,
+): UpdateCvInput {
   return {
     id: cv.id,
     name: values.name,
     education: values.education,
     description: values.description,
+    ...withScope(userId),
   };
 }

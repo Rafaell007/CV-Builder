@@ -1,6 +1,5 @@
 import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import type { AuthUser } from "../../common/auth";
-import { ValidationFailedException } from "../../common/errors";
 import { resolveSort, toSkipTake } from "../../common/pagination";
 import type { Prisma } from "../../generated/prisma/client";
 import { Role } from "../../generated/prisma/enums";
@@ -27,6 +26,8 @@ export class CvsService {
   async list(user: AuthUser, { search, sort, page, userId }: CvsArgs): Promise<CvPage> {
     const isAdmin = user.role === Role.ADMIN;
     if (!isAdmin && userId !== undefined && userId !== user.id) throw forbiddenCv();
+    // An admin who selects an employee that does not exist gets NOT_FOUND, not an empty list.
+    if (isAdmin && userId !== undefined) await this.assertUserExists(userId);
 
     const { field, direction } = resolveSort(sort, SORT_FIELDS, {
       field: "name",
@@ -59,21 +60,19 @@ export class CvsService {
     const ownerId = userId ?? user.id;
     if (ownerId !== user.id) {
       if (user.role !== Role.ADMIN) throw forbiddenCv();
-      const owner = await this.prisma.user.findUnique({
-        where: { id: ownerId },
-        select: { id: true },
-      });
-      if (owner === null) {
-        throw new ValidationFailedException([{ field: "userId", messages: ["User not found"] }]);
-      }
+      await this.assertUserExists(ownerId);
     }
     return toCv(
       await this.prisma.cv.create({ data: { ...data, userId: ownerId }, ...CV_WITH_OWNER }),
     );
   }
 
-  async update(user: AuthUser, { id, ...data }: UpdateCvInput): Promise<Cv> {
-    await this.findAccessible(user, id);
+  /**
+   * `userId` is the employee of the User CVs tab (an optional scope, never the new owner and never written):
+   * a CV of another employee answers NOT_FOUND. It is taken out of `data` so it cannot change the owner.
+   */
+  async update(user: AuthUser, { id, userId, ...data }: UpdateCvInput): Promise<Cv> {
+    await this.findInScope(user, id, userId);
     return toCv(
       await this.prisma.cv
         .update({ where: { id }, data, ...CV_WITH_OWNER })
@@ -81,11 +80,18 @@ export class CvsService {
     );
   }
 
-  async delete(user: AuthUser, id: string): Promise<Cv> {
-    await this.findAccessible(user, id);
+  /** `userId`: the employee of the User CVs tab; a CV of another employee answers NOT_FOUND (see `update`). */
+  async delete(user: AuthUser, id: string, userId?: string): Promise<Cv> {
+    await this.findInScope(user, id, userId);
     return toCv(
       await this.prisma.cv.delete({ where: { id }, ...CV_WITH_OWNER }).catch(rethrowMissingCv),
     );
+  }
+
+  /** Throws NOT_FOUND when no user has this id. */
+  private async assertUserExists(id: string): Promise<void> {
+    const found = await this.prisma.user.findUnique({ where: { id }, select: { id: true } });
+    if (found === null) throw new NotFoundException("User not found");
   }
 
   /**
@@ -96,6 +102,21 @@ export class CvsService {
   async assertAccessible(user: AuthUser, id: string): Promise<{ ownerId: string }> {
     const { userId } = await this.findAccessible(user, id);
     return { ownerId: userId };
+  }
+
+  /**
+   * The CV, if the user may use it and, when a scope user is given, if it belongs to that user. Another
+   * employee's CV answers NOT_FOUND like a missing one, so the tab cannot be used to reach a CV by its id.
+   * An empty scope (not sent, or null) means no extra rule.
+   */
+  private async findInScope(
+    user: AuthUser,
+    id: string,
+    scopeUserId?: string,
+  ): Promise<CvWithOwner> {
+    const cv = await this.findAccessible(user, id);
+    if (scopeUserId && cv.userId !== scopeUserId) throw new NotFoundException("CV not found");
+    return cv;
   }
 
   /**

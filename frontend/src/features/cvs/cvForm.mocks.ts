@@ -106,3 +106,12 @@ export const updateCvNetworkErrorMock = (input: UpdateCvInput): MockLink.MockedR
   request: { query: UpdateCvDocument, variables: { input } },
   error: new Error("Failed to fetch"),
 });
+
+/** `createCv` refused with a code and no field errors, for example `NOT_FOUND` for an unknown employee. */
+export const createCvRefusedMock = (
+  input: CreateCvInput,
+  code = "NOT_FOUND",
+): MockLink.MockedResponse => ({
+  request: { query: CreateCvDocument, variables: { input } },
+  result: { errors: [{ message: "User not found", extensions: { code } }] },
+});

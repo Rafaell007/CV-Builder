@@ -14,7 +14,7 @@ const LIST = `query ($search: String, $sort: SortInput, $page: PageInput!, $user
 const GET = `query ($id: ID!) { cv(id: $id) { ${CV_FIELDS} } }`;
 const CREATE = `mutation ($input: CreateCvInput!) { createCv(input: $input) { ${CV_FIELDS} } }`;
 const UPDATE = `mutation ($input: UpdateCvInput!) { updateCv(input: $input) { ${CV_FIELDS} } }`;
-const DELETE = `mutation ($id: ID!) { deleteCv(id: $id) { id name } }`;
+const DELETE = `mutation ($id: ID!, $userId: ID) { deleteCv(id: $id, userId: $userId) { id name } }`;
 
 const PAGE = { number: 1, size: 10 };
 const NEW_CV = { name: "New CV", education: "BSc", description: "About me" };
@@ -100,6 +100,12 @@ describe("cvs", () => {
       const result = await list(admin, { userId: ben.id });
 
       expect(result.names).toEqual(["Ben Backend"]);
+    });
+
+    it("answers NOT_FOUND when an admin selects an employee that does not exist", async () => {
+      const { body } = await call(admin, LIST, { page: PAGE, userId: MISSING_ID });
+
+      expect(errorOf(body)?.extensions.code).toBe("NOT_FOUND");
     });
 
     it("refuses a user who asks for the CVs of another user", async () => {
@@ -220,13 +226,10 @@ describe("cvs", () => {
       });
     });
 
-    it("reports a field error when the named owner does not exist", async () => {
+    it("answers NOT_FOUND when the named owner does not exist", async () => {
       const { body } = await call(admin, CREATE, { input: { ...NEW_CV, userId: MISSING_ID } });
 
-      expect(errorOf(body)?.extensions).toMatchObject({
-        code: "BAD_USER_INPUT",
-        fieldErrors: [{ field: "userId" }],
-      });
+      expect(errorOf(body)?.extensions.code).toBe("NOT_FOUND");
     });
 
     it("validates the fields on the server", async () => {
@@ -292,6 +295,44 @@ describe("cvs", () => {
       expect(body.data?.["updateCv"]).toMatchObject({ id: benCvId, userId: ben.id, ...changes });
     });
 
+    it("lets an admin update a CV of the selected employee and keeps the owner (User CVs tab)", async () => {
+      const { body } = await call(admin, UPDATE, {
+        input: { id: benCvId, userId: ben.id, ...changes },
+      });
+
+      expect(body.data?.["updateCv"]).toMatchObject({ id: benCvId, userId: ben.id, ...changes });
+    });
+
+    it("rejects an admin who names another employee than the owner of the CV", async () => {
+      // Earlier tests of this file may have renamed the CV, so compare with the stored row, not a fixed name.
+      const before = await prisma.cv.findUniqueOrThrow({ where: { id: benCvId } });
+
+      const { body } = await call(admin, UPDATE, {
+        input: { id: benCvId, userId: ann.id, ...changes, name: "Must not be saved" },
+      });
+
+      expect(errorOf(body)?.extensions.code).toBe("NOT_FOUND");
+      const stored = await prisma.cv.findUniqueOrThrow({ where: { id: benCvId } });
+      expect(stored).toEqual(before);
+      expect(stored.userId).toBe(ben.id);
+    });
+
+    it("rejects an employee that does not exist", async () => {
+      const { body } = await call(admin, UPDATE, {
+        input: { id: benCvId, userId: MISSING_ID, ...changes },
+      });
+
+      expect(errorOf(body)?.extensions.code).toBe("NOT_FOUND");
+    });
+
+    it("rejects a user id that is not a UUID", async () => {
+      const { body } = await call(admin, UPDATE, {
+        input: { id: benCvId, userId: "not-a-uuid", ...changes },
+      });
+
+      expect(errorOf(body)?.extensions.code).toBe("BAD_USER_INPUT");
+    });
+
     it("validates the fields on the server", async () => {
       const { body } = await call(ann, UPDATE, { input: { id: annCvId, ...changes, name: "" } });
 
@@ -330,6 +371,28 @@ describe("cvs", () => {
       await call(admin, DELETE, { id: cv.id });
 
       expect(await prisma.cv.findUnique({ where: { id: cv.id } })).toBeNull();
+    });
+
+    it("lets an admin delete a CV of the selected employee (User CVs tab)", async () => {
+      const cv = await prisma.cv.create({ data: { userId: ben.id, ...NEW_CV } });
+
+      await call(admin, DELETE, { id: cv.id, userId: ben.id });
+
+      expect(await prisma.cv.findUnique({ where: { id: cv.id } })).toBeNull();
+    });
+
+    it("rejects an admin who names another employee than the owner of the CV", async () => {
+      const { body } = await call(admin, DELETE, { id: benCvId, userId: ann.id });
+
+      expect(errorOf(body)?.extensions.code).toBe("NOT_FOUND");
+      expect(await prisma.cv.findUnique({ where: { id: benCvId } })).not.toBeNull();
+    });
+
+    it("rejects an employee that does not exist and keeps the CV", async () => {
+      const { body } = await call(admin, DELETE, { id: benCvId, userId: MISSING_ID });
+
+      expect(errorOf(body)?.extensions.code).toBe("NOT_FOUND");
+      expect(await prisma.cv.findUnique({ where: { id: benCvId } })).not.toBeNull();
     });
 
     it("answers NOT_FOUND for a CV that is already gone", async () => {
