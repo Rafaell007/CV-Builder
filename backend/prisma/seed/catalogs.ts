@@ -54,7 +54,9 @@ export async function seedCatalogs(db: Db): Promise<Catalogs> {
         db.skill.upsert({ where: { name }, update: {}, create: { name, categoryId } }),
       ),
     );
-    skillRows.forEach((row) => skills.set(row.name, row.id));
+    // Keyed by the seed's own name: with citext (D35) the upsert also matches a stored name in other
+    // letter case, so `row.name` can differ from the name the later seed steps look up.
+    category.skills.forEach((name, index) => skills.set(name, skillRows[index]!.id));
   }
 
   return { departments, positions, roles, skills, languages };

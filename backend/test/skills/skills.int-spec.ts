@@ -261,13 +261,13 @@ describe("skills", () => {
 
       await expect(
         prisma.skill.create({ data: { name: "react", categoryId: frontend.id } }),
-      ).rejects.toThrow();
+      ).rejects.toMatchObject({ code: "P2002" });
     });
 
     it("refuses a name longer than 100 characters, even without the service", async () => {
       await expect(
         prisma.skill.create({ data: { name: "a".repeat(101), categoryId: frontend.id } }),
-      ).rejects.toThrow();
+      ).rejects.toThrow(/Skill_name_length_check/);
     });
   });
 
