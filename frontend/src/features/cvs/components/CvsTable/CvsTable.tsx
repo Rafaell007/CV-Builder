@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { DataTable, Menu, type DataTableColumn, type SortState } from "@/shared/components";
+import { DESKTOP_MIN_WIDTH } from "@/shared/constants";
 import { CV_SORT_FIELDS } from "../../cvs.constants";
 import type { CvListItem } from "../../cvs.types";
 import { CvDescription } from "./CvDescription";
@@ -23,8 +24,9 @@ export interface CvsTableProps {
 }
 
 /**
- * The CVs as a table: name, education and employee (the owner email), and the description in a line under each row
- * (cut after three lines on a tablet; a click on it shows all of it and does not open the CV).
+ * The CVs as a table: name, education and employee (the owner email; hidden on a tablet, as in Figma), and the
+ * description in a line under each row (cut after three lines on a tablet; a click on it shows all of it and does
+ * not open the CV).
  * Only Name sorts, on the backend; the table never sorts the rows it holds.
  * A click on a row opens the CV, like View in the row menu.
  */
@@ -56,6 +58,7 @@ export function CvsTable({
     {
       id: "employee",
       header: t("columns.employee"),
+      hideBelow: DESKTOP_MIN_WIDTH,
       cell: (cv) => <span className={styles.text}>{cv.ownerEmail}</span>,
     },
   ];

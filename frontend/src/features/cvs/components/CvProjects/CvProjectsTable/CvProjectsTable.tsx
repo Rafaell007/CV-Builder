@@ -1,8 +1,9 @@
 import { useLocale, useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { DataTable, Menu, type DataTableColumn, type SortState } from "@/shared/components";
+import { DESKTOP_MIN_WIDTH } from "@/shared/constants";
 import { formatCalendarDate } from "@/shared/utils";
-import { CV_PROJECT_SORT_FIELDS, CV_PROJECTS_DESKTOP_MIN_WIDTH } from "../cvProjects.constants";
+import { CV_PROJECT_SORT_FIELDS } from "../cvProjects.constants";
 import type { CvProjectItem } from "../cvProjects.types";
 import styles from "./CvProjectsTable.module.css";
 
@@ -60,7 +61,7 @@ export function CvProjectsTable({
     {
       id: "domain",
       header: t("columns.domain"),
-      hideBelow: CV_PROJECTS_DESKTOP_MIN_WIDTH,
+      hideBelow: DESKTOP_MIN_WIDTH,
       cell: (item) => <span className={styles.text}>{item.project.domain}</span>,
     },
     {
