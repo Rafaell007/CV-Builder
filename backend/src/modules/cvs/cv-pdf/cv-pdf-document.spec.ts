@@ -43,12 +43,12 @@ function preview(overrides: Partial<CvPreview> = {}): CvPreview {
 
 /** All text of the document in one string, so a test can look for a value. */
 function textOf(preview: CvPreview): string {
-  return JSON.stringify(buildCvPdfDefinition(preview).content);
+  return JSON.stringify(buildCvPdfDefinition(preview, "en").content);
 }
 
 describe("buildCvPdfDefinition", () => {
   it("uses the CV name as the title of the file and Roboto as the font", () => {
-    const definition = buildCvPdfDefinition(preview());
+    const definition = buildCvPdfDefinition(preview(), "en");
 
     expect(definition.info?.title).toBe("Main CV");
     expect(definition.defaultStyle).toMatchObject({ font: "Roboto" });
@@ -126,7 +126,7 @@ describe("buildCvPdfDefinition", () => {
   });
 
   it("builds the skills table with the years and an en dash for a missing value", () => {
-    const definition = buildCvPdfDefinition(preview());
+    const definition = buildCvPdfDefinition(preview(), "en");
 
     const table = (definition.content as { table?: { body: unknown[][] } }[]).find(
       (item) => item.table !== undefined,
@@ -182,6 +182,7 @@ describe("buildCvPdfDefinition", () => {
     expect(() =>
       buildCvPdfDefinition(
         preview({ languages: [], domains: [], skillGroups: [], projects: [], description: "" }),
+        "en",
       ),
     ).not.toThrow();
   });

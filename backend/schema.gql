@@ -255,12 +255,12 @@ type ProjectRole {
 type Query {
   availableCvSkills(cvId: ID!): [AvailableCvSkill!]!
   cv(id: ID!): Cv!
-  cvPreview(cvId: ID!, locale: String): CvPreview!
+  cvPreview(cvId: ID!, locale: String = "en"): CvPreview!
   cvProjects(cvId: ID!, search: String, sort: SortInput): [CvProject!]!
   cvSkills(cvId: ID!): [CvSkill!]!
   cvs(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput, userId: ID): CvPage!
   departments(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): DepartmentPage!
-  exportCvPdf(cvId: ID!, locale: String): CvPdf!
+  exportCvPdf(cvId: ID!, locale: String = "en"): CvPdf!
   health: Health!
   me: SessionUser
   positions(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): PositionPage!

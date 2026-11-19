@@ -1,7 +1,7 @@
 import type { Content, ContentText, TableCell, TDocumentDefinitions } from "pdfmake/interfaces";
-import { DEFAULT_CV_LOCALE } from "../cv-locale";
 import type { CvLocale } from "../cv-locale";
 import type { CvPreview } from "../cv-preview/models/cv-preview";
+import { Proficiency } from "../cv-preview/models/proficiency.enum";
 import type { CvPreviewSkillGroup } from "../cv-preview/models/cv-preview-skill-group";
 import { pdfLabels } from "./cv-pdf-labels";
 import type { PdfLabels } from "./cv-pdf-labels";
@@ -24,8 +24,8 @@ const PART_TITLE: Omit<ContentText, "text"> = {
 };
 
 /** `NATIVE` is the only level that is a word. The levels A1 to C2 are printed as they are. */
-function proficiencyLabel(proficiency: string, labels: PdfLabels): string {
-  return proficiency === "NATIVE" ? labels.levelNative : proficiency;
+function proficiencyLabel(proficiency: Proficiency, labels: PdfLabels): string {
+  return proficiency === Proficiency.NATIVE ? labels.levelNative : proficiency;
 }
 
 function yearCell(value: number | null): string {
@@ -147,10 +147,7 @@ function skillsTable(groups: CvPreviewSkillGroup[], labels: PdfLabels): Content[
  * not calculated again here (AC-21). The fixed texts (section titles, column names, "Till now") are in
  * the given language, English by default. The content of the CV is printed as it was written.
  */
-export function buildCvPdfDefinition(
-  preview: CvPreview,
-  locale: CvLocale = DEFAULT_CV_LOCALE,
-): TDocumentDefinitions {
+export function buildCvPdfDefinition(preview: CvPreview, locale: CvLocale): TDocumentDefinitions {
   const labels = pdfLabels(locale);
   return {
     info: { title: preview.name },

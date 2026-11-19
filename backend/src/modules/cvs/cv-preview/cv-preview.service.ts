@@ -3,7 +3,7 @@ import type { AuthUser } from "../../../common/auth";
 import { Clock } from "../../../common/clock";
 import { Prisma } from "../../../generated/prisma/client";
 import { PrismaService } from "../../../prisma/prisma.service";
-import { DEFAULT_CV_LOCALE, OPEN_PERIOD_WORDS } from "../cv-locale";
+import { OPEN_PERIOD_WORDS } from "../cv-locale";
 import type { CvLocale } from "../cv-locale";
 import { CvsService } from "../cvs.service";
 import { experienceYears, formatPeriod, lastUsedYear, uniqueDomains } from "./calculations";
@@ -66,11 +66,7 @@ export class CvPreviewService {
     private readonly clock: Clock,
   ) {}
 
-  async get(
-    user: AuthUser,
-    cvId: string,
-    locale: CvLocale = DEFAULT_CV_LOCALE,
-  ): Promise<CvPreview> {
+  async get(user: AuthUser, cvId: string, locale: CvLocale): Promise<CvPreview> {
     // Nothing is loaded before this check passes.
     const { ownerId } = await this.cvs.assertAccessible(user, cvId);
 
