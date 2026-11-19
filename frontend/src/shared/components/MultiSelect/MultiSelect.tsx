@@ -55,6 +55,7 @@ export function MultiSelect({
     selectedOptions,
     getToggleButtonProps,
     onToggleKeyDown,
+    onToggleKeyUp,
     getMenuProps,
     getItemProps,
     removeOption,
@@ -90,6 +91,7 @@ export function MultiSelect({
           {...getToggleButtonProps({
             ...controlProps,
             onKeyDown: onToggleKeyDown,
+            onKeyUp: onToggleKeyUp,
             disabled,
             "aria-disabled": disabled || undefined,
             tabIndex: disabled ? -1 : 0,
@@ -122,23 +124,24 @@ export function MultiSelect({
             ))}
           </div>
         )}
-        {/* Always rendered (Downshift needs the menu element); hidden while closed */}
+        {/* Always rendered (Downshift needs the menu element); hidden while closed. The rows stay in the page too:
+            removing them while Tab leaves the open list makes the Radix focus trap of a Modal move the focus to the
+            dialog (it sees a removed node while nothing is focused), so Tab never reaches the next control. */}
         <ul {...getMenuProps()} hidden={!isOpen} className={styles.list}>
-          {isOpen &&
-            options.map((option, index) => {
-              const selected = value.includes(option.value);
-              return (
-                <li
-                  key={option.value}
-                  {...getItemProps({ item: option, index, "aria-selected": selected })}
-                  data-highlighted={highlightedIndex === index || undefined}
-                  className={styles.option}
-                >
-                  <CheckboxMark checked={selected} />
-                  <span className={styles.optionText}>{option.label}</span>
-                </li>
-              );
-            })}
+          {options.map((option, index) => {
+            const selected = value.includes(option.value);
+            return (
+              <li
+                key={option.value}
+                {...getItemProps({ item: option, index, "aria-selected": selected })}
+                data-highlighted={highlightedIndex === index || undefined}
+                className={styles.option}
+              >
+                <CheckboxMark checked={selected} />
+                <span className={styles.optionText}>{option.label}</span>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </Field>

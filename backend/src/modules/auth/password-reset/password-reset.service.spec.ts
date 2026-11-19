@@ -193,9 +193,13 @@ describe("PasswordResetService", () => {
         where: { id: "token-1", usedAt: null },
         data: { usedAt: NOW },
       });
-      const { data } = tx.user.update.mock.calls[0]?.[0] as { data: { passwordHash: string } };
+      const { data } = tx.user.update.mock.calls[0]?.[0] as {
+        data: { passwordHash: string; tokenVersion: unknown };
+      };
       expect(data.passwordHash).not.toContain("new-password-1");
       expect(await verifyPassword(data.passwordHash, "new-password-1")).toBe(true);
+      // a new token version makes every access token issued before the reset stop working
+      expect(data.tokenVersion).toEqual({ increment: 1 });
       expect(tx.passwordResetToken.deleteMany).toHaveBeenCalledWith({
         where: { userId: "user-1", id: { not: "token-1" } },
       });

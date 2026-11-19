@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_CVS_SORT } from "../cvs.constants";
-import { toCvDetailsPath, toCvsVariables, toCvTabPath } from "./cvs.utils";
+import { toCvsVariables, toCvTabPath } from "./cvs.utils";
 
 const state = { search: "", sort: DEFAULT_CVS_SORT, page: 1 };
 
@@ -33,12 +33,6 @@ describe("toCvsVariables", () => {
 
   it("sends the user id when it is given", () => {
     expect(toCvsVariables(state, "7").userId).toBe("7");
-  });
-});
-
-describe("toCvDetailsPath", () => {
-  it("points to the details page of the CV", () => {
-    expect(toCvDetailsPath("12")).toBe("/cvs/12/details");
   });
 });
 

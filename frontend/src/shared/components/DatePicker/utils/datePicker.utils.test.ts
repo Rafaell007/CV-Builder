@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyListPick, getStepStart, stepSelection } from "./datePicker.utils";
+import { applyListPick, getStepStart, stepSelection, widenLimitsForList } from "./datePicker.utils";
 
 describe("stepSelection", () => {
   it("moves one month and keeps the day", () => {
@@ -101,5 +101,34 @@ describe("getStepStart", () => {
 
   it("is the 1st of the shown month when that is not today's month", () => {
     expect(getStepStart(null, new Date(2024, 5, 18), today)).toEqual(new Date(2024, 5, 1));
+  });
+});
+
+describe("widenLimitsForList", () => {
+  const limits = { minDate: new Date(2022, 2, 16), maxDate: new Date(2023, 5, 30) };
+
+  it("keeps the real limits in the day view", () => {
+    expect(widenLimitsForList("day", limits)).toEqual(limits);
+  });
+
+  it("widens to whole months in the month list", () => {
+    expect(widenLimitsForList("month", limits)).toEqual({
+      minDate: new Date(2022, 2, 1),
+      maxDate: new Date(2023, 5, 30, 23, 59, 59, 999),
+    });
+  });
+
+  it("widens to whole years in the year list, so the arrow keys can reach every allowed year", () => {
+    expect(widenLimitsForList("year", limits)).toEqual({
+      minDate: new Date(2022, 0, 1),
+      maxDate: new Date(2023, 11, 31, 23, 59, 59, 999),
+    });
+  });
+
+  it("leaves an open side open", () => {
+    expect(widenLimitsForList("year", { minDate: undefined, maxDate: limits.maxDate })).toEqual({
+      minDate: undefined,
+      maxDate: new Date(2023, 11, 31, 23, 59, 59, 999),
+    });
   });
 });

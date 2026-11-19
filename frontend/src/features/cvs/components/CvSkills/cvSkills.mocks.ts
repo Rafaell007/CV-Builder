@@ -99,19 +99,26 @@ export const availableCvSkillsNetworkErrorMock = (cvId = CV_ID): MockLink.Mocked
   error: new Error("Failed to fetch"),
 });
 
-/** MockedProvider response of `addCvSkill`. The backend copies the owner's level when no mastery is sent. */
+/**
+ * MockedProvider response of `addCvSkill`. The backend copies the owner's level when no mastery is sent. With a
+ * `mastery`, the request must carry it and the answer has it.
+ */
 export const addCvSkillMock = (
   skill: AvailableCvSkillItem,
   cvId = CV_ID,
+  mastery?: CvSkillMastery,
 ): MockLink.MockedResponse => ({
-  request: { query: AddCvSkillDocument, variables: { input: { cvId, skillId: skill.id } } },
+  request: {
+    query: AddCvSkillDocument,
+    variables: { input: { cvId, skillId: skill.id, ...(mastery && { mastery }) } },
+  },
   result: {
     data: {
       addCvSkill: cvSkill({
         id: "link-new",
         skillId: skill.id,
         name: skill.name,
-        mastery: skill.mastery,
+        mastery: mastery ?? skill.mastery,
         category: skill.category,
       }),
     },

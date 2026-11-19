@@ -1,5 +1,8 @@
 /* The search field is 320px wide in Figma (as on the CVs page); ADD PROJECT sits at the right end. */
 .toolbar {
+  /* The search field gets the same 2px focus border as the fields of the modals (Field README, GitHub issue 89) */
+  --field-focus-extra: 1px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;

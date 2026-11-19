@@ -327,6 +327,22 @@ Requirements:
 - The selected skill must have a valid skill identifier
 - The frontend must not allow arbitrary skill identifiers to be submitted
 
+
+### Skill mastery
+
+Select field
+
+Label:
+
+`Skill mastery`
+
+Requirements:
+
+- Optional (Figma shows the field in the Add skill modal; Figma takes precedence over this document)
+- Values: Beginner, Elementary, Intermediate, Advanced, Expert
+- When no value is chosen, the skill is added without a mastery and the backend sets the level
+- When a value is chosen, it is sent with the skill
+
 ---
 
 

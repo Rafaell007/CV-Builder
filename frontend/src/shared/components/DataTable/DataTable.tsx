@@ -151,7 +151,7 @@ export function DataTable<Row>({
         <thead>
           <tr>
             {selectable && (
-              <th scope="col" className={styles.controlCell}>
+              <th scope="col" className={styles.controlHeadCell}>
                 <Checkbox.Root
                   className={styles.checkbox}
                   checked={getSelectAllState(pageIds, selectedIds)}
@@ -179,7 +179,7 @@ export function DataTable<Row>({
               ),
             )}
             {renderRowActions && (
-              <th scope="col" className={styles.controlCell}>
+              <th scope="col" className={styles.controlHeadCell}>
                 <span className={styles.visuallyHidden}>{text.actions}</span>
               </th>
             )}

@@ -1,21 +1,33 @@
 import { useTranslations } from "next-intl";
 import { FormModal, Select } from "@/shared/components";
+import { MASTERY_LEVELS } from "../cvSkills.constants";
 import type { UseAddCvSkillResult } from "../useAddCvSkill";
+import { useMasteryLabel } from "../useMasteryLabel";
 import styles from "./AddCvSkillModal.module.css";
+
+// Radix Select does not allow an option with the value "", so the "No mastery" option uses this value and the
+// modal turns it back into "" (nothing chosen) before it reaches the flow.
+const NO_MASTERY = "NONE";
 
 export interface AddCvSkillModalProps {
   /** The state of the add flow: open state, options, chosen skill, submit and the errors. */
   adding: UseAddCvSkillResult;
 }
 
-/** The Add skill modal: one Skill field with the skills of the CV owner, ADD and CANCEL (page 22, Add Skill). */
+/**
+ * The Add skill modal: the Skill field with the skills of the CV owner, the optional Skill mastery field, ADD and
+ * CANCEL. The doc of page 22 lists only Skill, but Figma shows the mastery and Figma wins (agreed with Rafal).
+ */
 export function AddCvSkillModal({ adding }: AddCvSkillModalProps) {
   const t = useTranslations("cvs.skills.add");
+  const masteryLabel = useMasteryLabel();
   const {
     isOpen,
     setOpen,
     skillId,
     select,
+    mastery,
+    selectMastery,
     submit,
     pending,
     options,
@@ -52,6 +64,22 @@ export function AddCvSkillModal({ adding }: AddCvSkillModalProps) {
         disabled={optionsLoading || optionsFailed || noneLeft}
         error={fieldError}
         required
+      />
+      <Select
+        label={t("mastery")}
+        options={[
+          { value: NO_MASTERY, label: t("noMastery") },
+          ...MASTERY_LEVELS.map(({ level }) => ({ value: level, label: masteryLabel(level) })),
+        ]}
+        value={mastery}
+        onValueChange={(value) => {
+          if (value === NO_MASTERY) {
+            selectMastery("");
+            return;
+          }
+          const next = MASTERY_LEVELS.find(({ level }) => level === value);
+          if (next) selectMastery(next.level);
+        }}
       />
       {optionsLoading && (
         <p role="status" className={styles.status}>

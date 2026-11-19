@@ -38,6 +38,10 @@
   --color-text-secondary: var(--palette-grey-500);
   --color-text-placeholder: var(--palette-grey-300);
   --color-border: var(--palette-grey-400);
+  /* Thin lines between the skill rows of the CV Preview: #AEAEAE in light and dark (Figma frame 41) */
+  --color-cv-divider: var(--palette-grey-400);
+  /* Red text of the CV Preview (project name, skill category): the exact Figma red #C63031 in light and dark. On the dark page it is 2.5:1, below 4.5:1: the design decides (KAN-160). */
+  --color-cv-accent: var(--palette-red);
   --color-input-border: var(--palette-grey-400);
   --color-input-border-hover: var(--palette-grey-500);
   --color-input-border-focus: var(--palette-grey-500);

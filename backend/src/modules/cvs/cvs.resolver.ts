@@ -8,7 +8,7 @@ import { CvsArgs } from "./dto/cvs.args";
 import { UpdateCvInput } from "./dto/update-cv.input";
 import { Cv } from "./models/cv";
 import { CvPage } from "./models/cv-page";
-import { requireUser } from "./require-user";
+import { requireUser } from "../../common/auth";
 
 /** Reading needs a session; creating, changing and deleting also need a verified email (D16). */
 @Resolver(() => Cv)
