@@ -53,6 +53,11 @@ input CreateProjectInput {
   startDate: DateTime!
 }
 
+input CreateSkillInput {
+  categoryId: ID!
+  name: String!
+}
+
 type Cv {
   createdAt: DateTime!
   description: String!
@@ -183,10 +188,12 @@ type Mutation {
   createDepartment(input: CreateDepartmentInput!): Department!
   createPosition(input: CreatePositionInput!): Position!
   createProject(input: CreateProjectInput!): Project!
+  createSkill(input: CreateSkillInput!): Skill!
   deleteCv(id: ID!, userId: ID): Cv!
   deleteDepartment(id: ID!): Boolean!
   deletePosition(id: ID!): Boolean!
   deleteProject(id: ID!): Boolean!
+  deleteSkill(id: ID!): Boolean!
   forgotPassword(input: ForgotPasswordInput!): Boolean!
   refresh: Boolean!
   removeCvProjects(input: RemoveCvProjectsInput!): Boolean!
@@ -202,6 +209,7 @@ type Mutation {
   updateDepartment(input: UpdateDepartmentInput!): Department!
   updatePosition(input: UpdatePositionInput!): Position!
   updateProject(input: UpdateProjectInput!): Project!
+  updateSkill(input: UpdateSkillInput!): Skill!
   verifyEmail(input: VerifyEmailInput!): SessionUser!
 }
 
@@ -266,6 +274,8 @@ type Query {
   positions(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): PositionPage!
   projectRoles: [ProjectRole!]!
   projects(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): ProjectPage!
+  skillCatalog(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): SkillPage!
+  skillCategories: [SkillCategory!]!
   skills: [EnvironmentSkill!]!
 }
 
@@ -308,9 +318,21 @@ input SignUpInput {
   password: String!
 }
 
+type Skill {
+  category: SkillCategory!
+  id: ID!
+  name: String!
+}
+
 type SkillCategory {
   id: ID!
   name: String!
+  type: String!
+}
+
+type SkillPage {
+  items: [Skill!]!
+  total: Int!
 }
 
 enum SortDirection {
@@ -362,6 +384,12 @@ input UpdateProjectInput {
   id: ID!
   name: String!
   startDate: DateTime!
+}
+
+input UpdateSkillInput {
+  categoryId: ID!
+  id: ID!
+  name: String!
 }
 
 input VerifyEmailInput {
