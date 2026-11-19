@@ -10,23 +10,28 @@ export const exportCvPdfSample = {
   base64: btoa("%PDF-1.7 mock"),
 };
 
-/** MockedProvider response of the `ExportCvPdf` query for the CV with this id. */
+/** MockedProvider response of the `ExportCvPdf` query for the CV with this id. `locale` is the language of the page (English at first). */
 export const exportCvPdfMock = (
   cvId: string,
   pdf: typeof exportCvPdfSample = exportCvPdfSample,
+  locale = "en",
 ): MockLink.MockedResponse => ({
-  request: { query: ExportCvPdfDocument, variables: { cvId } },
+  request: { query: ExportCvPdfDocument, variables: { cvId, locale } },
   result: { data: { exportCvPdf: pdf } },
 });
 
 /** The backend answers the `ExportCvPdf` query with a GraphQL error code, e.g. `NOT_FOUND` or `INTERNAL_SERVER_ERROR`. */
-export const exportCvPdfCodeErrorMock = (cvId: string, code: string): MockLink.MockedResponse => ({
-  request: { query: ExportCvPdfDocument, variables: { cvId } },
+export const exportCvPdfCodeErrorMock = (
+  cvId: string,
+  code: string,
+  locale = "en",
+): MockLink.MockedResponse => ({
+  request: { query: ExportCvPdfDocument, variables: { cvId, locale } },
   result: { errors: [{ message: code, extensions: { code } }] },
 });
 
 /** The `ExportCvPdf` query fails like a network error (no GraphQL error code). */
-export const exportCvPdfErrorMock = (cvId: string): MockLink.MockedResponse => ({
-  request: { query: ExportCvPdfDocument, variables: { cvId } },
+export const exportCvPdfErrorMock = (cvId: string, locale = "en"): MockLink.MockedResponse => ({
+  request: { query: ExportCvPdfDocument, variables: { cvId, locale } },
   error: new Error("Failed to fetch"),
 });

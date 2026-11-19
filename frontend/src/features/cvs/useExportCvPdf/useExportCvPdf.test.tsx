@@ -59,6 +59,15 @@ describe("useExportCvPdf", () => {
     expect(await file.text()).toBe("%PDF-1.7 mock");
   });
 
+  it("asks for the PDF in the language of the page", async () => {
+    // The mock matches only the variables with locale pl, so a request in English would find no mock.
+    const { result } = setup({ mocks: [exportCvPdfMock(CV_ID, undefined, "pl")], locale: "pl" });
+
+    await act(() => result().exportPdf());
+
+    expect(saveFile).toHaveBeenCalledTimes(1);
+  });
+
   it("sends one request when the button is used twice at once (AC-28)", async () => {
     // One mock only: a second request would find no mock and fail.
     const { result } = setup({ mocks: [exportCvPdfMock(CV_ID)] });

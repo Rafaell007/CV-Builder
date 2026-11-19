@@ -1,8 +1,9 @@
 # The PDF of a CV, made by the backend from the same data as the CV Preview. The backend checks access like for the
 # preview: a user gets only their own CV, an admin any CV. Someone else's CV answers NOT_FOUND, the same as a missing
 # one. `base64` is the PDF file as base64 text, `fileName` is made from the CV name (docs/pages/24-cv-preview-page.md).
-query ExportCvPdf($cvId: ID!) {
-  exportCvPdf(cvId: $cvId) {
+# `locale` is the language of the fixed texts in the PDF (`en` or `pl`), the language of the page.
+query ExportCvPdf($cvId: ID!, $locale: String) {
+  exportCvPdf(cvId: $cvId, locale: $locale) {
     fileName
     base64
   }

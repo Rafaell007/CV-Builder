@@ -1,7 +1,7 @@
 "use client";
 
 import { useApolloClient } from "@apollo/client/react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { useToast } from "@/shared/components";
 import { ExportCvPdfDocument } from "@/shared/graphql";
@@ -25,6 +25,8 @@ export function useExportCvPdf(cvId: string): UseExportCvPdfResult {
   const t = useTranslations("cvs.preview.export");
   const toast = useToast();
   const client = useApolloClient();
+  // The PDF has its fixed texts (section titles, column names) in the language of the page.
+  const locale = useLocale();
   const [exporting, setExporting] = useState(false);
 
   // A ref changes at once, `exporting` only after the next render: two clicks in the same tick cannot both pass.
@@ -37,7 +39,7 @@ export function useExportCvPdf(cvId: string): UseExportCvPdfResult {
     try {
       const { data } = await client.query({
         query: ExportCvPdfDocument,
-        variables: { cvId },
+        variables: { cvId, locale },
         fetchPolicy: "no-cache",
       });
       if (!data) throw new Error("The answer has no PDF");
