@@ -306,6 +306,39 @@ describe("CvsService.update", () => {
 
     expect(await rejection(service.update(USER, input))).toBeInstanceOf(NotFoundException);
   });
+
+  describe("with the employee of the User CVs tab", () => {
+    it("lets an admin update a CV of that employee and never writes the user id", async () => {
+      prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-2" }));
+      prisma.cv.update.mockResolvedValue(storedCv({ userId: "user-2" }));
+
+      await service.update(ADMIN, { ...input, userId: "user-2" });
+
+      expect(prisma.cv.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: { name: "Changed", education: "PhD", description: "New" },
+        }),
+      );
+    });
+
+    it("answers NOT_FOUND for the CV of another employee, also for an admin", async () => {
+      prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-3" }));
+
+      expect(await rejection(service.update(ADMIN, { ...input, userId: "user-2" }))).toBeInstanceOf(
+        NotFoundException,
+      );
+      expect(prisma.cv.update).not.toHaveBeenCalled();
+    });
+
+    it("treats a null user id as no scope", async () => {
+      prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-2" }));
+      prisma.cv.update.mockResolvedValue(storedCv({ userId: "user-2" }));
+
+      await service.update(ADMIN, { ...input, userId: null as unknown as string });
+
+      expect(prisma.cv.update).toHaveBeenCalled();
+    });
+  });
 });
 
 describe("CvsService.delete", () => {
@@ -349,5 +382,25 @@ describe("CvsService.delete", () => {
     prisma.cv.delete.mockRejectedValue(failure);
 
     expect(await rejection(service.delete(USER, "cv-1"))).toBe(failure);
+  });
+
+  describe("with the employee of the User CVs tab", () => {
+    it("lets an admin delete a CV of that employee", async () => {
+      prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-2" }));
+      prisma.cv.delete.mockResolvedValue(storedCv({ userId: "user-2" }));
+
+      await service.delete(ADMIN, "cv-1", "user-2");
+
+      expect(prisma.cv.delete).toHaveBeenCalled();
+    });
+
+    it("answers NOT_FOUND for the CV of another employee, also for an admin", async () => {
+      prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-3" }));
+
+      expect(await rejection(service.delete(ADMIN, "cv-1", "user-2"))).toBeInstanceOf(
+        NotFoundException,
+      );
+      expect(prisma.cv.delete).not.toHaveBeenCalled();
+    });
   });
 });

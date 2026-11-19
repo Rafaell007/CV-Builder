@@ -183,7 +183,7 @@ type Mutation {
   createDepartment(input: CreateDepartmentInput!): Department!
   createPosition(input: CreatePositionInput!): Position!
   createProject(input: CreateProjectInput!): Project!
-  deleteCv(id: ID!): Cv!
+  deleteCv(id: ID!, userId: ID): Cv!
   deleteDepartment(id: ID!): Boolean!
   deletePosition(id: ID!): Boolean!
   deleteProject(id: ID!): Boolean!
@@ -328,6 +328,7 @@ input UpdateCvInput {
   education: String!
   id: ID!
   name: String!
+  userId: ID
 }
 
 input UpdateCvProjectInput {

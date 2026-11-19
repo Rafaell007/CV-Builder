@@ -72,8 +72,12 @@ export class CvsService {
     );
   }
 
-  async update(user: AuthUser, { id, ...data }: UpdateCvInput): Promise<Cv> {
-    await this.findAccessible(user, id);
+  /**
+   * `userId` is the employee of the User CVs tab (an optional scope, never the new owner and never written):
+   * a CV of another employee answers NOT_FOUND. It is taken out of `data` so it cannot change the owner.
+   */
+  async update(user: AuthUser, { id, userId, ...data }: UpdateCvInput): Promise<Cv> {
+    await this.findInScope(user, id, userId);
     return toCv(
       await this.prisma.cv
         .update({ where: { id }, data, ...CV_WITH_OWNER })
@@ -81,8 +85,9 @@ export class CvsService {
     );
   }
 
-  async delete(user: AuthUser, id: string): Promise<Cv> {
-    await this.findAccessible(user, id);
+  /** `userId`: the employee of the User CVs tab; a CV of another employee answers NOT_FOUND (see `update`). */
+  async delete(user: AuthUser, id: string, userId?: string): Promise<Cv> {
+    await this.findInScope(user, id, userId);
     return toCv(
       await this.prisma.cv.delete({ where: { id }, ...CV_WITH_OWNER }).catch(rethrowMissingCv),
     );
@@ -96,6 +101,21 @@ export class CvsService {
   async assertAccessible(user: AuthUser, id: string): Promise<{ ownerId: string }> {
     const { userId } = await this.findAccessible(user, id);
     return { ownerId: userId };
+  }
+
+  /**
+   * The CV, if the user may use it and, when a scope user is given, if it belongs to that user. Another
+   * employee's CV answers NOT_FOUND like a missing one, so the tab cannot be used to reach a CV by its id.
+   * An empty scope (not sent, or null) means no extra rule.
+   */
+  private async findInScope(
+    user: AuthUser,
+    id: string,
+    scopeUserId?: string,
+  ): Promise<CvWithOwner> {
+    const cv = await this.findAccessible(user, id);
+    if (scopeUserId && cv.userId !== scopeUserId) throw new NotFoundException("CV not found");
+    return cv;
   }
 
   /**
