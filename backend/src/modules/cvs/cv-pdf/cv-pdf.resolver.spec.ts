@@ -1,6 +1,7 @@
 import { UnauthorizedException } from "@nestjs/common";
 import type { AuthUser } from "../../../common/auth";
 import { VERIFIED_KEY } from "../../../common/auth/decorators";
+import { GqlThrottlerGuard } from "../../../common/throttling";
 import { Role } from "../../../generated/prisma/enums";
 import { CvPdfResolver } from "./cv-pdf.resolver";
 import type { CvPdfService } from "./cv-pdf.service";
@@ -19,9 +20,9 @@ describe("CvPdfResolver", () => {
   it("passes the signed-in user and the CV id to the service", async () => {
     const { resolver, service } = setup();
 
-    await expect(resolver.exportCvPdf(USER, { cvId: "cv-1" })).resolves.toBe(PDF);
+    await expect(resolver.exportCvPdf(USER, { cvId: "cv-1", locale: "en" })).resolves.toBe(PDF);
 
-    expect(service.export).toHaveBeenCalledWith(USER, "cv-1", undefined);
+    expect(service.export).toHaveBeenCalledWith(USER, "cv-1", "en");
   });
 
   it("passes the language of the PDF to the service", async () => {
@@ -35,8 +36,19 @@ describe("CvPdfResolver", () => {
   it("refuses a call without a user", () => {
     const { resolver, service } = setup();
 
-    expect(() => resolver.exportCvPdf(undefined, { cvId: "cv-1" })).toThrow(UnauthorizedException);
+    expect(() => resolver.exportCvPdf(undefined, { cvId: "cv-1", locale: "en" })).toThrow(
+      UnauthorizedException,
+    );
     expect(service.export).not.toHaveBeenCalled();
+  });
+
+  it("has the rate limit, because a PDF costs much CPU", () => {
+    const guards: unknown[] = Reflect.getMetadata(
+      "__guards__",
+      CvPdfResolver.prototype.exportCvPdf,
+    );
+
+    expect(guards).toContain(GqlThrottlerGuard);
   });
 
   it("does not need a verified email, because it only reads", () => {

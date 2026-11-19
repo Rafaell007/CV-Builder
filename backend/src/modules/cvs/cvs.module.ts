@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { ThrottlingModule } from "../../common/throttling";
 import { CvPdfRenderer } from "./cv-pdf/cv-pdf-renderer";
 import { CvPdfResolver } from "./cv-pdf/cv-pdf.resolver";
 import { CvPdfService } from "./cv-pdf/cv-pdf.service";
@@ -12,6 +13,7 @@ import { CvsResolver } from "./cvs.resolver";
 import { CvsService } from "./cvs.service";
 
 @Module({
+  imports: [ThrottlingModule], // the rate limit of `exportCvPdf`
   providers: [
     CvsResolver,
     CvsService,
