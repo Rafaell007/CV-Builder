@@ -371,6 +371,19 @@ describe("Cvs", () => {
       expect(push).toHaveBeenCalledExactlyOnceWith("/cvs/2/preview");
     });
 
+    it("opens the CV Preview page with the User CVs tab to return to, when the list is of one user", async () => {
+      const { user } = renderWithProviders(<Cvs userId="10" />, {
+        mocks: [cvsMock([frontendCv], { variables: variablesFor({ userId: "10" }) })],
+      });
+
+      await user.click(
+        await screen.findByRole("button", { name: "Actions for Frontend Developer" }),
+      );
+      await user.click(screen.getByRole("menuitem", { name: "View" }));
+
+      expect(push).toHaveBeenCalledExactlyOnceWith("/cvs/1/preview?from=%2Fusers%2F10%2Fcvs");
+    });
+
     it("opens the right dialog for each row menu item", async () => {
       const onView = vi.fn();
       const { user } = renderWithProviders(<Cvs onView={onView} />, {

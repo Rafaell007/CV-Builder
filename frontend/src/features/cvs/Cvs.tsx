@@ -16,7 +16,7 @@ import { DeleteCvModal } from "./components/DeleteCvModal";
 import { UpdateCvModal } from "./components/UpdateCvModal";
 import { SEARCH_MAX_LENGTH } from "./cvs.constants";
 import type { CvListItem } from "./cvs.types";
-import { toCvTabPath, toCvsVariables } from "./utils";
+import { toCvTabPath, toCvsVariables, toUserCvsPath } from "./utils";
 import { useCreateCvForm } from "./useCreateCvForm";
 import { useCvs } from "./useCvs";
 import { useCvsListState } from "./useCvsListState";
@@ -54,6 +54,9 @@ export function Cvs({ userId, onView }: CvsProps) {
     ...(userId === undefined ? {} : { userId }),
   });
 
+  // A CV opened from the User CVs tab remembers the tab, so the CV page can lead back to the same employee.
+  const returnPath = userId === undefined ? undefined : toUserCvsPath(userId);
+
   const stateLabels: PageStateLabels = {
     loading: t("states.loading"),
     empty: t("states.empty"),
@@ -90,7 +93,7 @@ export function Cvs({ userId, onView }: CvsProps) {
             cvs={cvs}
             sort={list.sort}
             onSortChange={list.setSort}
-            onView={onView ?? ((cv) => router.push(toCvTabPath(cv.id, "preview")))}
+            onView={onView ?? ((cv) => router.push(toCvTabPath(cv.id, "preview", returnPath)))}
             onEdit={editing.open}
             onDelete={deletion.askToDelete}
             loading={loading}

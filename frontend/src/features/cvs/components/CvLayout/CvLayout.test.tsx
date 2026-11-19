@@ -5,7 +5,12 @@ import { frontendCv } from "../../cvs.mocks";
 import { cvCodeErrorMock, cvMock, cvNetworkErrorMock } from "../../useCv/cv.mocks";
 import { CvLayout } from "./CvLayout";
 
-const route = vi.hoisted(() => ({ pathname: "/cvs/1/details" }));
+const route = vi.hoisted(() => ({ pathname: "/cvs/1/details", search: "" }));
+
+vi.mock("next/navigation", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("next/navigation")>()),
+  useSearchParams: () => new URLSearchParams(route.search),
+}));
 
 vi.mock("@/shared/i18n", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/shared/i18n")>()),
@@ -26,6 +31,7 @@ const breadcrumbs = () => screen.getByRole("navigation", { name: "Breadcrumbs" }
 describe("CvLayout", () => {
   beforeEach(() => {
     route.pathname = "/cvs/1/details";
+    route.search = "";
   });
 
   it("shows the loading state and the tabs while the CV loads", () => {
@@ -68,6 +74,50 @@ describe("CvLayout", () => {
     ]);
     expect(tabs.getByRole("link", { name: "Skills" })).toHaveAttribute("href", "/en/cvs/1/skills");
     expect(tabs.getByRole("link", { name: "Details" })).toHaveAttribute("aria-current", "page");
+  });
+
+  describe("a CV opened from the User CVs tab (from in the address)", () => {
+    const from = "%2Fusers%2F10%2Fcvs";
+
+    it("leads the CVs breadcrumb back to that tab and keeps it in the links of the tabs", async () => {
+      route.pathname = "/cvs/1/preview";
+      route.search = `from=${from}`;
+      setup({ mocks: [cvMock(frontendCv)] });
+      await screen.findByText("Tab page");
+
+      expect(within(breadcrumbs()).getByRole("link", { name: "CVs" })).toHaveAttribute(
+        "href",
+        "/en/users/10/cvs",
+      );
+      const tabs = within(screen.getByRole("navigation", { name: "CV sections" }));
+      expect(tabs.getByRole("link", { name: "Skills" })).toHaveAttribute(
+        "href",
+        `/en/cvs/1/skills?from=${from}`,
+      );
+      // The active tab is still found, although the links have a query.
+      expect(tabs.getByRole("link", { name: "Preview" })).toHaveAttribute("aria-current", "page");
+      expect(within(breadcrumbs()).getByText("Preview")).toHaveAttribute("aria-current", "page");
+    });
+
+    it.each([
+      ["another site", "https%3A%2F%2Fevil.example%2Fusers%2F10%2Fcvs"],
+      ["another page", "%2Fskills"],
+      ["a path with extra parts", "%2Fusers%2F10%2Fcvs%2Fextra"],
+    ])("ignores %s and leads back to the CVs page", async (_name, value) => {
+      route.search = `from=${value}`;
+      setup({ mocks: [cvMock(frontendCv)] });
+      await screen.findByText("Tab page");
+
+      expect(within(breadcrumbs()).getByRole("link", { name: "CVs" })).toHaveAttribute(
+        "href",
+        "/en/cvs",
+      );
+      const tabs = within(screen.getByRole("navigation", { name: "CV sections" }));
+      expect(tabs.getByRole("link", { name: "Skills" })).toHaveAttribute(
+        "href",
+        "/en/cvs/1/skills",
+      );
+    });
   });
 
   it("marks the tab of the route and names it in the breadcrumbs", async () => {
