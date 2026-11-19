@@ -1,6 +1,9 @@
 import type { Content, ContentText, TableCell, TDocumentDefinitions } from "pdfmake/interfaces";
 import type { CvPreview } from "../cv-preview/models/cv-preview";
+import { formatPeriod } from "../cv-preview/calculations";
 import type { CvPreviewSkillGroup } from "../cv-preview/models/cv-preview-skill-group";
+import { DEFAULT_PDF_LOCALE, pdfLabels } from "./cv-pdf-labels";
+import type { PdfLabels, PdfLocale } from "./cv-pdf-labels";
 
 const EN_DASH = "–";
 const FONT = "Roboto";
@@ -20,8 +23,8 @@ const PART_TITLE: Omit<ContentText, "text"> = {
 };
 
 /** `NATIVE` is the only level that is a word. The levels A1 to C2 are printed as they are. */
-function proficiencyLabel(proficiency: string): string {
-  return proficiency === "NATIVE" ? "Native" : proficiency;
+function proficiencyLabel(proficiency: string, labels: PdfLabels): string {
+  return proficiency === "NATIVE" ? labels.levelNative : proficiency;
 }
 
 function yearCell(value: number | null): string {
@@ -43,34 +46,34 @@ function header(preview: CvPreview): Content[] {
   return content;
 }
 
-function general(preview: CvPreview): Content[] {
+function general(preview: CvPreview, labels: PdfLabels): Content[] {
   const education = preview.education === "" ? [] : [preview.education];
   const languages = preview.languages.map(
-    ({ name, proficiency }) => `${name} — ${proficiencyLabel(proficiency)}`,
+    ({ name, proficiency }) => `${name} — ${proficiencyLabel(proficiency, labels)}`,
   );
   const parts = [
-    ...part("Education", education),
-    ...part("Language proficiency", languages),
-    ...part("Domains", preview.domains),
+    ...part(labels.education, education),
+    ...part(labels.languages, languages),
+    ...part(labels.domains, preview.domains),
   ];
   if (parts.length === 0) return [];
-  return [{ text: "General information", ...SECTION_TITLE }, ...parts];
+  return [{ text: labels.generalInformation, ...SECTION_TITLE }, ...parts];
 }
 
-function summary(preview: CvPreview): Content[] {
+function summary(preview: CvPreview, labels: PdfLabels): Content[] {
   return [
-    { text: "Summary", ...SECTION_TITLE },
+    { text: labels.summary, ...SECTION_TITLE },
     { text: preview.name, bold: true },
     ...(preview.description === "" ? [] : [{ text: preview.description, margin: [0, 2, 0, 0] }]),
   ] as Content[];
 }
 
 /** Skill names per category. A category without skills is left out. */
-function skills(groups: CvPreviewSkillGroup[]): Content[] {
+function skills(groups: CvPreviewSkillGroup[], labels: PdfLabels): Content[] {
   const filled = groups.filter((group) => group.skills.length > 0);
   if (filled.length === 0) return [];
   return [
-    { text: "Skills", ...SECTION_TITLE },
+    { text: labels.skills, ...SECTION_TITLE },
     ...filled.map(({ category, skills: list }): Content => ({
       text: [{ text: `${category}: `, bold: true }, list.map((skill) => skill.name).join(", ")],
       margin: [0, 0, 0, 2],
@@ -78,7 +81,7 @@ function skills(groups: CvPreviewSkillGroup[]): Content[] {
   ];
 }
 
-function projects(preview: CvPreview): Content[] {
+function projects(preview: CvPreview, labels: PdfLabels): Content[] {
   if (preview.projects.length === 0) return [];
   const blocks = preview.projects.map((project): Content => {
     const lines: Content[] = [
@@ -86,29 +89,36 @@ function projects(preview: CvPreview): Content[] {
       { text: project.description, margin: [0, 1, 0, 0] },
     ];
     if (project.roles.length > 0) {
-      lines.push({ text: [{ text: "Role: ", bold: true }, project.roles.join(", ")] });
+      lines.push({ text: [{ text: `${labels.role}: `, bold: true }, project.roles.join(", ")] });
     }
-    lines.push({ text: [{ text: "Period: ", bold: true }, project.period] });
+    // The period is built here from the dates, so "Till now" is in the language of the PDF.
+    const period = formatPeriod(project.startDate, project.endDate, labels.present);
+    lines.push({ text: [{ text: `${labels.period}: `, bold: true }, period] });
     if (project.responsibilities !== null && project.responsibilities !== "") {
-      lines.push({ text: [{ text: "Responsibilities: ", bold: true }, project.responsibilities] });
+      lines.push({
+        text: [{ text: `${labels.responsibilities}: `, bold: true }, project.responsibilities],
+      });
     }
     if (project.environment.length > 0) {
       lines.push({
-        text: [{ text: "Environment: ", bold: true }, project.environment.join(", ")],
+        text: [{ text: `${labels.environment}: `, bold: true }, project.environment.join(", ")],
       });
     }
     return { stack: lines, margin: [0, 0, 0, 8], unbreakable: true };
   });
-  return [{ text: "Projects", ...SECTION_TITLE }, ...blocks];
+  return [{ text: labels.projects, ...SECTION_TITLE }, ...blocks];
 }
 
 /** One header row, then the rows of each category. The category cell spans the rows of its skills. */
-function skillsTable(groups: CvPreviewSkillGroup[]): Content[] {
+function skillsTable(groups: CvPreviewSkillGroup[], labels: PdfLabels): Content[] {
   const filled = groups.filter((group) => group.skills.length > 0);
   if (filled.length === 0) return [];
-  const head: TableCell[] = ["Skills Category", "Skill", "Experience in Years", "Last Used"].map(
-    (text) => ({ text, bold: true, fillColor: "#eeeeee" }),
-  );
+  const head: TableCell[] = [
+    labels.columnCategory,
+    labels.columnSkill,
+    labels.columnExperience,
+    labels.columnLastUsed,
+  ].map((text) => ({ text, bold: true, fillColor: "#eeeeee" }));
   const body: TableCell[][] = [head];
   for (const { category, skills: list } of filled) {
     list.forEach((skill, index) => {
@@ -121,7 +131,7 @@ function skillsTable(groups: CvPreviewSkillGroup[]): Content[] {
     });
   }
   return [
-    { text: "Professional skills", ...SECTION_TITLE },
+    { text: labels.professionalSkills, ...SECTION_TITLE },
     {
       table: { headerRows: 1, widths: ["*", "*", "auto", "auto"], body },
       layout: {
@@ -135,9 +145,14 @@ function skillsTable(groups: CvPreviewSkillGroup[]): Content[] {
 /**
  * The PDF of a CV as a pdfmake document. It takes the same `CvPreview` object as the preview page,
  * so the years, the periods and the domains are the values of the backend calculation and are
- * not calculated again here (AC-21). The texts are in English: the backend has no translations.
+ * not calculated again here (AC-21). The fixed texts (section titles, column names, "Till now") are in
+ * the given language, English by default. The content of the CV is printed as it was written.
  */
-export function buildCvPdfDefinition(preview: CvPreview): TDocumentDefinitions {
+export function buildCvPdfDefinition(
+  preview: CvPreview,
+  locale: PdfLocale = DEFAULT_PDF_LOCALE,
+): TDocumentDefinitions {
+  const labels = pdfLabels(locale);
   return {
     info: { title: preview.name },
     pageSize: "A4",
@@ -145,11 +160,11 @@ export function buildCvPdfDefinition(preview: CvPreview): TDocumentDefinitions {
     defaultStyle: { font: FONT, fontSize: 10 },
     content: [
       ...header(preview),
-      ...general(preview),
-      ...summary(preview),
-      ...skills(preview.skillGroups),
-      ...projects(preview),
-      ...skillsTable(preview.skillGroups),
+      ...general(preview, labels),
+      ...summary(preview, labels),
+      ...skills(preview.skillGroups, labels),
+      ...projects(preview, labels),
+      ...skillsTable(preview.skillGroups, labels),
     ],
   };
 }

@@ -76,6 +76,51 @@ describe("buildCvPdfDefinition", () => {
     }
   });
 
+  it("prints the fixed texts in English by default", () => {
+    const text = textOf(preview());
+
+    for (const label of [
+      "General information",
+      "Summary",
+      "Projects",
+      "Professional skills",
+      "Experience in Years",
+      "Period: ",
+    ]) {
+      expect(text).toContain(label);
+    }
+  });
+
+  it("prints the fixed texts in Polish and keeps the content of the CV as written", () => {
+    const text = JSON.stringify(buildCvPdfDefinition(preview(), "pl").content);
+
+    for (const label of [
+      "Informacje ogólne",
+      "Wykształcenie",
+      "Znajomość języków",
+      "Branże",
+      "Podsumowanie",
+      "Umiejętności",
+      "Projekty",
+      "Okres: ",
+      "Obowiązki: ",
+      "Środowisko: ",
+      "Umiejętności zawodowe",
+      "Doświadczenie w latach",
+      "Ostatnio używana",
+      "Polish — Ojczysty",
+      "01.2023 – obecnie",
+    ]) {
+      expect(text).toContain(label);
+    }
+    // The content is not translated.
+    for (const content of ["Anna Nowak", "MSc Computer Science", "Built the UI", "English — C1"]) {
+      expect(text).toContain(content);
+    }
+    expect(text).not.toContain("Till now");
+    expect(text).not.toContain("General information");
+  });
+
   it("builds the skills table with the years and an en dash for a missing value", () => {
     const definition = buildCvPdfDefinition(preview());
 
