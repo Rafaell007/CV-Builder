@@ -1,0 +1,11 @@
+# One page of the position catalog. Admin only (backend). The backend searches the name, sorts and cuts the page,
+# so the frontend never filters or sorts the loaded rows (docs/pages/26-positions-page.md).
+query Positions($page: PageInput!, $search: String, $sort: SortInput) {
+  positions(page: $page, search: $search, sort: $sort) {
+    items {
+      id
+      name
+    }
+    total
+  }
+}

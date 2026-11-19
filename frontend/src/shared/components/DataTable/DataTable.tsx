@@ -121,7 +121,7 @@ export function DataTable<Row>({
             ))}
             {renderRowActions && (
               <td
-                className={styles.controlCell}
+                className={styles.actionsCell}
                 onClick={stopPropagation}
                 onKeyDown={stopPropagation}
               >
@@ -179,7 +179,7 @@ export function DataTable<Row>({
               ),
             )}
             {renderRowActions && (
-              <th scope="col" className={styles.controlHeadCell}>
+              <th scope="col" className={styles.actionsHeadCell}>
                 <span className={styles.visuallyHidden}>{text.actions}</span>
               </th>
             )}

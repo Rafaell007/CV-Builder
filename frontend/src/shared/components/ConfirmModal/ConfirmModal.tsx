@@ -13,6 +13,8 @@ export interface ConfirmModalProps {
   title: string;
   /** E.g. "Are you sure you want to remove <strong>3 skills</strong>?"; the caller marks the highlighted part. */
   message: ReactNode;
+  /** An error of the last request, shown under the message while the modal stays open (e.g. "in use"). */
+  error?: string | null;
   closeLabel: string;
   confirmLabel: string;
   cancelLabel: string;
@@ -32,6 +34,7 @@ export function ConfirmModal({
   onOpenChange,
   title,
   message,
+  error,
   closeLabel,
   confirmLabel,
   cancelLabel,
@@ -62,6 +65,11 @@ export function ConfirmModal({
             </AlertDialog.Cancel>
           </div>
           <AlertDialog.Description className={styles.message}>{message}</AlertDialog.Description>
+          {error ? (
+            <p role="alert" className={styles.error}>
+              {error}
+            </p>
+          ) : null}
           <div className={styles.footer}>
             <AlertDialog.Cancel asChild>
               <Button variant="secondary">{cancelLabel}</Button>

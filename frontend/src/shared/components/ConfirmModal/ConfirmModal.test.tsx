@@ -120,4 +120,24 @@ describe("ConfirmModal", () => {
 
     expect(screen.getByRole("alertdialog")).toBeInTheDocument();
   });
+
+  it("shows the error under the message as an alert, and nothing without an error", () => {
+    const props = {
+      open: true,
+      onOpenChange: vi.fn(),
+      title: "Remove skills",
+      message: "Are you sure?",
+      closeLabel: "Close",
+      confirmLabel: "Confirm",
+      cancelLabel: "Cancel",
+      onConfirm: vi.fn(),
+      isPending: false,
+    };
+    const { rerender } = renderWithProviders(<ConfirmModal {...props} />);
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+
+    rerender(<ConfirmModal {...props} error="Still in use" />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Still in use");
+  });
 });

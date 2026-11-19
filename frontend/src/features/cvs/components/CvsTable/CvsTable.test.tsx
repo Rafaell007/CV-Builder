@@ -37,6 +37,20 @@ describe("CvsTable", () => {
     expect(within(row).getByText("anna.kowalska@example.com")).toBeInTheDocument();
   });
 
+  it("hides the Employee column below the desktop width, as the Figma tablet frame", () => {
+    const original = window.innerWidth;
+    window.innerWidth = 1023;
+    try {
+      render();
+
+      const headers = screen.getAllByRole("columnheader").map((header) => header.textContent);
+      expect(headers).toEqual(["Name", "Education", "Actions"]);
+      expect(screen.queryByText("anna.kowalska@example.com")).not.toBeInTheDocument();
+    } finally {
+      window.innerWidth = original;
+    }
+  });
+
   it("shows the description in the detail line under the row, not in a column", () => {
     render();
 

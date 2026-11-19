@@ -1,5 +1,4 @@
 {
-  "title": "Projects",
   "button": "CREATE PROJECT",
   "table": "Projects list",
   "columns": {
@@ -23,7 +22,8 @@
     "confirm": "Confirm",
     "cancel": "Cancel",
     "failedTitle": "Could not delete the project",
-    "failedText": "Something went wrong. Please try again."
+    "failedText": "Something went wrong. Please try again.",
+    "inUseText": "This project cannot be deleted because it is used in a CV."
   },
   "search": {
     "label": "Search projects",

@@ -1,0 +1,4 @@
+# Deletes one position. Admin only (backend). CONFLICT when another record still uses the position.
+mutation DeletePosition($id: ID!) {
+  deletePosition(id: $id)
+}

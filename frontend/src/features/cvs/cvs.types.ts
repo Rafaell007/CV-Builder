@@ -1,4 +1,3 @@
-import type { SortState } from "@/shared/components";
 import type { CvPreviewQuery, CvQuery, CvsQuery } from "@/shared/graphql";
 import type { CV_TABS } from "./cvs.constants";
 
@@ -10,13 +9,6 @@ export type CvDetailsData = CvQuery["cv"];
 
 /** The whole CV of the CV Preview page, as the `CvPreview` query returns it. */
 export type CvPreviewData = CvPreviewQuery["cvPreview"];
-
-/** What the user chose for the list: the search text, the sort (the Name column ascending at the start) and the page (starts at 1). */
-export interface CvsListState {
-  search: string;
-  sort: SortState;
-  page: number;
-}
 
 /** What the CV form (Create and Update) holds while the user types. */
 export interface CvFormValues {

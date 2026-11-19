@@ -1,8 +1,9 @@
 import { useLocale, useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { DataTable, Menu, type DataTableColumn, type SortState } from "@/shared/components";
+import { DESKTOP_MIN_WIDTH } from "@/shared/constants";
 import { formatCalendarDate } from "@/shared/utils";
-import { PROJECT_SORT_FIELDS, PROJECTS_DESKTOP_MIN_WIDTH } from "../../projects.constants";
+import { PROJECT_SORT_FIELDS } from "../../projects.constants";
 import type { ProjectListItem } from "../../projects.types";
 import { EnvironmentTags } from "./EnvironmentTags";
 import { ProjectDescription } from "./ProjectDescription";
@@ -61,7 +62,7 @@ export function ProjectsTable({
     {
       id: "domain",
       header: t("columns.domain"),
-      hideBelow: PROJECTS_DESKTOP_MIN_WIDTH,
+      hideBelow: DESKTOP_MIN_WIDTH,
       cell: (project) => project.domain,
     },
     {

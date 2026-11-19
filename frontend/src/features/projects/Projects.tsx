@@ -2,33 +2,31 @@
 
 import { useTranslations } from "next-intl";
 import {
-  Button,
+  ListPage,
   PageState,
   Pagination,
   SearchField,
   type PageStateLabels,
 } from "@/shared/components";
+import { toListVariables, useListState } from "@/shared/lists";
 import { CreateProjectModal } from "./components/CreateProjectModal";
 import { DeleteProjectModal } from "./components/DeleteProjectModal";
 import { ProjectsTable } from "./components/ProjectsTable";
 import { UpdateProjectModal } from "./components/UpdateProjectModal";
-import { SEARCH_MAX_LENGTH } from "./projects.constants";
-import { toProjectsVariables } from "./utils";
+import { DEFAULT_PROJECTS_SORT, SEARCH_MAX_LENGTH } from "./projects.constants";
 import { useCreateProjectForm } from "./useCreateProjectForm";
 import { useDeleteProject } from "./useDeleteProject";
 import { useProjects } from "./useProjects";
-import { useProjectsListState } from "./useProjectsListState";
 import { useUpdateProjectForm } from "./useUpdateProjectForm";
-import styles from "./Projects.module.css";
 
 /**
- * Content of the `/admin/projects` page: search, the sortable list of projects and the page buttons,
- * with the loading, empty, no results and error states. The backend searches, sorts and cuts the pages.
+ * Content of the `/admin/projects` page under its `PageHeader`: the shared `ListPage` with search, the sortable list of projects and the
+ * page buttons, with the loading, empty, no results and error states. The backend searches, sorts and cuts the pages.
  */
 export function Projects() {
   const t = useTranslations("projects");
-  const list = useProjectsListState();
-  const variables = toProjectsVariables(list);
+  const list = useListState(DEFAULT_PROJECTS_SORT);
+  const variables = toListVariables(list);
   const { projects, total, loading, failed, retry } = useProjects(variables);
 
   const creation = useCreateProjectForm();
@@ -54,48 +52,49 @@ export function Projects() {
   const emptyKind = variables.search === undefined ? "empty" : "no-results";
 
   return (
-    <div className={styles.page}>
-      <h1 className={styles.title}>{t("title")}</h1>
-      {/* Outside the error branch below: an error must not remove the typed search (the field is uncontrolled). */}
-      <div className={styles.toolbar}>
-        <SearchField
-          label={t("search.label")}
-          placeholder={t("search.placeholder")}
-          maxLength={SEARCH_MAX_LENGTH}
-          defaultValue={list.search}
-          onSearch={list.setSearch}
-        />
-        <Button onClick={creation.open}>{t("button")}</Button>
-      </div>
-      {failed && !loading ? (
-        <PageState kind="error" labels={stateLabels} onRetry={retry} />
-      ) : (
-        <>
-          <ProjectsTable
-            projects={projects}
-            sort={list.sort}
-            onSortChange={list.setSort}
-            onEdit={editing.open}
-            onDelete={deletion.askToDelete}
-            loading={loading}
-            loadingContent={<PageState kind="loading" labels={stateLabels} />}
-            emptyContent={<PageState kind={emptyKind} labels={stateLabels} />}
+    <>
+      <ListPage
+        search={
+          <SearchField
+            label={t("search.label")}
+            placeholder={t("search.placeholder")}
+            maxLength={SEARCH_MAX_LENGTH}
+            defaultValue={list.search}
+            onSearch={list.setSearch}
           />
-          <div className={styles.pagination}>
-            <Pagination
-              page={list.page}
-              total={total}
-              onPageChange={list.setPage}
-              labels={{
-                navigation: t("pagination.navigation"),
-                previous: t("pagination.previous"),
-                next: t("pagination.next"),
-                page: (number) => t("pagination.page", { number }),
-              }}
-            />
-          </div>
-        </>
-      )}
+        }
+        createLabel={t("button")}
+        onCreate={creation.open}
+        error={
+          failed && !loading ? (
+            <PageState kind="error" labels={stateLabels} onRetry={retry} />
+          ) : undefined
+        }
+        pagination={
+          <Pagination
+            page={list.page}
+            total={total}
+            onPageChange={list.setPage}
+            labels={{
+              navigation: t("pagination.navigation"),
+              previous: t("pagination.previous"),
+              next: t("pagination.next"),
+              page: (number) => t("pagination.page", { number }),
+            }}
+          />
+        }
+      >
+        <ProjectsTable
+          projects={projects}
+          sort={list.sort}
+          onSortChange={list.setSort}
+          onEdit={editing.open}
+          onDelete={deletion.askToDelete}
+          loading={loading}
+          loadingContent={<PageState kind="loading" labels={stateLabels} />}
+          emptyContent={<PageState kind={emptyKind} labels={stateLabels} />}
+        />
+      </ListPage>
       <CreateProjectModal creation={creation} />
       <UpdateProjectModal update={editing} />
       <DeleteProjectModal
@@ -104,6 +103,6 @@ export function Projects() {
         onConfirm={() => void handleConfirmDelete()}
         onCancel={deletion.cancel}
       />
-    </div>
+    </>
   );
 }

@@ -2,6 +2,7 @@
 // https://github.com/google/material-design-icons. Figma's glyphs match them (docs/design-tokens.md › Icons).
 export type { IconProps } from "./icons.types";
 export { AddIcon } from "./AddIcon";
+export { ArrowUpwardIcon } from "./ArrowUpwardIcon";
 export { CalendarTodayIcon } from "./CalendarTodayIcon";
 export { ChevronLeftIcon } from "./ChevronLeftIcon";
 export { ChevronRightIcon } from "./ChevronRightIcon";

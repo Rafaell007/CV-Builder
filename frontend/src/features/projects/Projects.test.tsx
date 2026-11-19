@@ -28,10 +28,9 @@ const names = () =>
     .map((row) => within(row).getAllByRole("cell")[0]!.querySelector("span")?.textContent);
 
 describe("Projects", () => {
-  it("shows the title and a loading state while the projects load", () => {
+  it("shows a loading state while the projects load", () => {
     renderWithProviders(<Projects />, { mocks: [projectsMock([blog])] });
 
-    expect(screen.getByRole("heading", { name: "Projects" })).toBeInTheDocument();
     expect(screen.getByRole("status", { name: "Loading projects" })).toBeInTheDocument();
     // The structure of the list stays visible while loading.
     expect(screen.getByRole("table", { name: "Projects list" })).toBeInTheDocument();
@@ -75,7 +74,7 @@ describe("Projects", () => {
   it("shows the texts in Polish", async () => {
     renderWithProviders(<Projects />, { locale: "pl", mocks: [projectsMock([])] });
 
-    expect(screen.getByRole("heading", { name: "Projekty" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "UTWÓRZ PROJEKT" })).toBeInTheDocument();
     expect(await screen.findByText("Nie znaleziono projektów")).toBeInTheDocument();
   });
 
@@ -477,7 +476,7 @@ describe("Projects", () => {
       expect(screen.queryByText("Could not delete the project")).not.toBeInTheDocument();
     });
 
-    it("shows the business-rule error of the backend and keeps the row (AC-33, AC-35, AC-37)", async () => {
+    it("shows the translated in-use text and keeps the row (AC-33, AC-35, AC-37)", async () => {
       const { user } = renderWithProviders(<Projects />, {
         mocks: [
           projectsMock([blog, sales]),
@@ -491,7 +490,9 @@ describe("Projects", () => {
       // The modal closes, so a keyboard user can reach the error toast (see the Toast README).
       await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
       expect(await screen.findByText("Could not delete the project")).toBeInTheDocument();
-      expect(screen.getByText("The project is used in 2 CVs")).toBeInTheDocument();
+      expect(
+        screen.getByText("This project cannot be deleted because it is used in a CV."),
+      ).toBeInTheDocument();
       expect(names()).toEqual(["Blog", "Cloud Sales Management"]);
     });
 

@@ -49,14 +49,35 @@ async function waitForHeaderSort(header: string, direction: "ascending" | "desce
 }
 
 describe("Cvs", () => {
-  it("shows the title, CREATE CV and a loading state while the CVs load", () => {
+  // The title is the route's PageHeader, not part of Cvs.
+  it("shows CREATE CV and a loading state while the CVs load", () => {
     renderWithProviders(<Cvs />, { mocks: [cvsMock([frontendCv])] });
 
-    expect(screen.getByRole("heading", { name: "CVs" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "CREATE CV" })).toBeInTheDocument();
     expect(screen.getByRole("status", { name: "Loading CVs" })).toBeInTheDocument();
     // The structure of the list stays visible while loading.
     expect(screen.getByRole("table", { name: "CVs list" })).toBeInTheDocument();
+  });
+
+  // jsdom has no layout, so only the classes are checked; the pixels are checked in the ListPage story.
+  describe("Figma layout of the create button", () => {
+    const frame = () =>
+      screen.getByRole("button", { name: "CREATE CV" }).closest("[class*='page']");
+
+    it("centres the button content and moves the button 120 from the edge on /cvs", () => {
+      renderWithProviders(<Cvs />, { mocks: [cvsMock([frontendCv])] });
+
+      expect(frame()?.className).toMatch(/allCvs/);
+    });
+
+    it("keeps the default distance on the list of one user (the User CVs tab)", () => {
+      renderWithProviders(<Cvs userId="10" />, {
+        mocks: [cvsMock([frontendCv], { variables: variablesFor({ userId: "10" }) })],
+      });
+
+      expect(frame()).not.toBeNull();
+      expect(frame()?.className).not.toMatch(/allCvs/);
+    });
   });
 
   it("shows the CVs of the backend", async () => {
@@ -132,7 +153,6 @@ describe("Cvs", () => {
   it("shows the texts in Polish", async () => {
     renderWithProviders(<Cvs />, { locale: "pl", mocks: [meMock("USER"), cvsMock([])] });
 
-    expect(screen.getByRole("heading", { name: "CV" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "UTWÓRZ CV" })).toBeInTheDocument();
     expect(await screen.findByText("Nie masz jeszcze żadnych CV")).toBeInTheDocument();
   });

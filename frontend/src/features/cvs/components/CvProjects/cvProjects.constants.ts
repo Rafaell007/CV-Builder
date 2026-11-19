@@ -27,9 +27,3 @@ export const MAX_ROLES = 50;
  * more projects needs a search field in the modal; the page doc has none, so this is the first page only.
  */
 export const CATALOG_PAGE = { number: 1, size: 100 } as const;
-
-/**
- * Tablet screens are narrower than this many pixels. The Domain column is hidden below it (`DataTable`
- * `hideBelow`), like in the Projects table. Own choice: the repo has no breakpoint token yet.
- */
-export const CV_PROJECTS_DESKTOP_MIN_WIDTH = 1024;

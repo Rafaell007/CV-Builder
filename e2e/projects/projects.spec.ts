@@ -380,9 +380,7 @@ test.describe("projects page, create, update and delete", () => {
     await expect(row(page, name)).toHaveCount(1);
   });
 
-  test("shows the backend message and keeps the row when a CV uses the project", async ({
-    page,
-  }) => {
+  test("shows the in-use text and keeps the row when a CV uses the project", async ({ page }) => {
     // The seed uses Banking Portal in two CVs (backend/prisma/seed/cvs.data.ts).
     await openRowMenu(page, "Banking Portal", "Delete");
     await confirmDialog(page).getByRole("button", { name: "Confirm" }).click();
@@ -390,7 +388,9 @@ test.describe("projects page, create, update and delete", () => {
     await expect(confirmDialog(page)).toBeHidden();
     // Radix adds a second, hidden copy of the toast text for screen readers: match the visible title exactly.
     await expect(page.getByText("Could not delete the project", { exact: true })).toBeVisible();
-    await expect(page.getByText(/^The project is used in \d+ CVs?$/)).toBeVisible();
+    await expect(
+      page.getByText("This project cannot be deleted because it is used in a CV.", { exact: true }),
+    ).toBeVisible();
     await expect(row(page, "Banking Portal")).toHaveCount(1);
   });
 });
