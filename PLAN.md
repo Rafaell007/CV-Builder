@@ -164,6 +164,7 @@ Same stack and setup order as the other intern team (D2).
 | D32 | 2026-11-03 | Language in the URL: every route lives under `app/[locale]/` (`/en/users`, `/pl/users`), next-intl `localePrefix: "always"`. The proxy sends a path without a language to the one saved in the `locale` cookie (1 year), else the browser language (Accept-Language) if supported, else `en`; visiting a language saves it. Pages read the locale with `next/root-params` and are prerendered per language | next-intl default and the documented way to keep static rendering with Cache Components; reading the cookie on the server would make every route dynamic (D5) ([routing](https://next-intl.dev/docs/routing/configuration), [root params](https://next-intl.dev/blog/nextjs-root-params)) |
 | D33 | 2026-11-03 | Password rule at sign-up: 8 to 128 characters with at least one letter and one digit. Sign-in keeps 6 to 128, so older and seed accounts still work. Reset and change password (S3.8, S4.4) use the sign-up rule | Sign-up page "password policy defined by the application" (AC-6 said only 6); a stricter rule was agreed in the PR review |
 | D34 | 2026-11-05 | Date fields: no clear button; the user deletes the text by hand. An empty End Date is shown as "Till now" in lists (the preview says "Present"). Date format: `en` MM/dd/yyyy, `pl` dd.MM.yyyy; the week starts on Sunday. A typed text that is not a date gives the same error as an empty date | Page 23 design shows 08/21/2023 and "Till now"; no clear control is drawn; the date picker holds `null` for both an empty and an invalid text |
+| D35 | 2026-11-17 | Department and position names are unique without regard to letter case and extra spaces: the input trims them and turns each run of whitespace into one space (`NormalizeSpaces`), and the column is `citext` with a `CHECK` for the 100-character limit. The name keeps the letter case the admin typed; sort and duplicate check ignore it. Other catalogs (skills, skill categories, languages, project roles, projects) still only trim; they get the same rule when they are next changed | Docs ask to normalise names and reject duplicates; "Engineering" and "engineering" next to each other split users. `citext` makes the unique index, equality and sort case-insensitive in the database, so no race between a check and the insert |
 
 ### 2.4 Open decisions
 
@@ -357,13 +358,13 @@ Checked against `docs/pages/10` to `27` in S2.1a. Conventions:
 - Ids are UUIDs (`@db.Uuid`). `createdAt` and `updatedAt` exist on every model except `Avatar` (`updatedAt` only) and the three token models (`createdAt` only). "Member since" in the UI is `User.createdAt`.
 - Dates are stored as date or timestamp columns, never as formatted strings.
 - Limits are `VarChar(n)`; the docs state them only where listed below, the rest default to 100 (names) and `Text` (long text).
-- Unique names are normalised (trimmed) in the service; the unique constraint is the backstop.
+- Unique names are normalised (trimmed) in the service; the unique constraint is the backstop. Department and position names also collapse inner spaces and are unique without regard to letter case (`citext`, D35).
 
 | Model | Fields | Rules |
 |---|---|---|
 | User | id, email unique (≤ 255), passwordHash, role `ADMIN`/`USER`, isVerified, firstName? (≤ 100), lastName? (≤ 100), departmentId?, positionId?, createdAt, updatedAt | delete cascades (D13). Sign-up takes only email + password (8 to 128 characters with a letter and a digit, D33); admin create takes email + password too; names, department and position are required by the profile update, not by the database |
 | Avatar | userId (PK), data (bytes), mimeType, updatedAt | ≤ 5 MB, PNG/JPG/JPEG/GIF (D11) |
-| Department · Position | id, name unique (≤ 100), createdAt, updatedAt | delete blocked when used |
+| Department · Position | id, name unique without regard to case (`citext`, ≤ 100 by `CHECK`, D35), createdAt, updatedAt | delete blocked when used |
 | SkillCategory | id, name unique (≤ 100), type (short text), createdAt, updatedAt | seeded; a skill's type comes from its category and is not stored on `Skill` (page 17); delete blocked while it has skills |
 | Skill | id, name unique (≤ 100), categoryId, createdAt, updatedAt | delete blocked when used (D18) |
 | UserSkill | id, userId + skillId unique, mastery `BEGINNER` `ELEMENTARY` `INTERMEDIATE` `ADVANCED` `EXPERT`, createdAt, updatedAt | removing it removes it from the user's CVs (D13) |

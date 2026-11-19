@@ -36,6 +36,14 @@ input CreateCvInput {
   userId: ID
 }
 
+input CreateDepartmentInput {
+  name: String!
+}
+
+input CreatePositionInput {
+  name: String!
+}
+
 input CreateProjectInput {
   description: String!
   domain: String!
@@ -131,6 +139,16 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Department {
+  id: ID!
+  name: String!
+}
+
+type DepartmentPage {
+  items: [Department!]!
+  total: Int!
+}
+
 type EnvironmentSkill {
   id: ID!
   name: String!
@@ -157,8 +175,12 @@ type Mutation {
   addCvSkill(input: AddCvSkillInput!): CvSkill!
   changePassword(input: ChangePasswordInput!): Boolean!
   createCv(input: CreateCvInput!): Cv!
+  createDepartment(input: CreateDepartmentInput!): Department!
+  createPosition(input: CreatePositionInput!): Position!
   createProject(input: CreateProjectInput!): Project!
   deleteCv(id: ID!): Cv!
+  deleteDepartment(id: ID!): Boolean!
+  deletePosition(id: ID!): Boolean!
   deleteProject(id: ID!): Boolean!
   forgotPassword(input: ForgotPasswordInput!): Boolean!
   refresh: Boolean!
@@ -172,6 +194,8 @@ type Mutation {
   updateCv(input: UpdateCvInput!): Cv!
   updateCvProject(input: UpdateCvProjectInput!): CvProject!
   updateCvSkill(input: UpdateCvSkillInput!): CvSkill!
+  updateDepartment(input: UpdateDepartmentInput!): Department!
+  updatePosition(input: UpdatePositionInput!): Position!
   updateProject(input: UpdateProjectInput!): Project!
   verifyEmail(input: VerifyEmailInput!): SessionUser!
 }
@@ -179,6 +203,16 @@ type Mutation {
 input PageInput {
   number: Int! = 1
   size: Int! = 10
+}
+
+type Position {
+  id: ID!
+  name: String!
+}
+
+type PositionPage {
+  items: [Position!]!
+  total: Int!
 }
 
 enum Proficiency {
@@ -220,8 +254,10 @@ type Query {
   cvProjects(cvId: ID!, search: String, sort: SortInput): [CvProject!]!
   cvSkills(cvId: ID!): [CvSkill!]!
   cvs(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput, userId: ID): CvPage!
+  departments(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): DepartmentPage!
   health: Health!
   me: SessionUser
+  positions(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): PositionPage!
   projectRoles: [ProjectRole!]!
   projects(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): ProjectPage!
   skills: [EnvironmentSkill!]!
@@ -299,6 +335,16 @@ input UpdateCvProjectInput {
 input UpdateCvSkillInput {
   id: ID!
   mastery: Mastery!
+}
+
+input UpdateDepartmentInput {
+  id: ID!
+  name: String!
+}
+
+input UpdatePositionInput {
+  id: ID!
+  name: String!
 }
 
 input UpdateProjectInput {
