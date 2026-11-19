@@ -2,7 +2,7 @@
 
 List, read, create, change and delete CVs. A user works with their own CVs. An admin works with all CVs (D10).
 
-- **Folders:** CV projects live in `cv-projects/`, CV skills in `cv-skills/` and the CV preview in `cv-preview/` (each has resolver, service, `dto/`, `models/`, specs).
+- **Folders:** CV projects live in `cv-projects/`, CV skills in `cv-skills/` the CV preview in `cv-preview/` and the PDF export in `cv-pdf/` (each has resolver, service, `dto/`, `models/`, specs).
 - **GraphQL:**
   - `cvs(search, sort, page, userId)` returns `{ items, total }`. `cv(id)` returns one CV.
   - `createCv(input)`, `updateCv(input)` and `deleteCv(id)` return the CV. `deleteCv` returns the CV that it removed.
@@ -77,6 +77,20 @@ The read model of the CV preview page, in `cv-preview/`: `cv-preview.service.ts`
 - **Proficiency enum:** the Prisma enum is registered for GraphQL in `cv-preview/models/proficiency.enum.ts`, because the CV preview is the first type that uses it. If a languages module registers it later, merge the two registrations. Registering the same name twice breaks the schema.
 - **Tests:** specs next to the code (`cv-preview.service.spec.ts`, `cv-preview.resolver.spec.ts` and one spec per calculation). `backend/test/cvs/cv-preview.int-spec.ts` runs over HTTP against the test database. It takes the years from the real current date, because the test app uses the system clock.
 - **Docs:** [CV preview page](../../../../docs/pages/24-cv-preview-page.md) · [PLAN.md](../../../../PLAN.md)
+
+## CV PDF export (S7.6a, KAN-119)
+
+The PDF of a CV, in `cv-pdf/`: `cv-pdf.service.ts`, `cv-pdf.resolver.ts`, `cv-pdf-document.ts` (the content), `cv-pdf-renderer.ts` (pdfmake and the fonts), `cv-pdf-file-name.ts`, `dto/`, `models/` and specs.
+
+- **GraphQL:** `exportCvPdf(cvId)` returns `CvPdf { fileName base64 }`. It is a query, because it changes no data. The client decodes the base64 text and saves the file. A download endpoint was not made, to keep one transport and the same session check as the other CV reads.
+- **Same data as the preview (AC-21):** the service calls `CvPreviewService.get` and builds the document from that object. The years, periods and domains are not calculated again. The call also does the access check (owner or admin, else `NOT_FOUND`), and no PDF is made before it passes (AC-30, AC-49).
+- **Content:** the sections of the preview page: header, general information, summary, skills, projects and the Professional skills table. Empty parts are left out, like on the page. A missing year shows an en dash. The texts are in English, because the backend has no translations. The page shows Polish texts for a Polish user, so the PDF can differ in the labels only.
+- **File name:** made from the CV name: lower case, words joined with `-`, accents removed, Cyrillic letters kept, `cv.pdf` when nothing is left (AC-22).
+- **Fonts:** Roboto (Latin and Cyrillic) from the `fonts/Roboto` folder of the `pdfmake` package. No font file is stored in this repository. If a pdfmake update moves the folder, `cv-pdf-renderer.spec.ts` fails.
+- **Safety:** the renderer allows pdfmake to read local files only from the font folder, and allows no URL. Text of a CV cannot make the server read a file or call an address.
+- **Errors:** a failure in the PDF step is logged with the details and the client gets `The PDF could not be generated` only (AC-47).
+- **Tests:** specs next to the code. `cv-pdf-renderer.spec.ts` makes a real PDF with Cyrillic text. `backend/test/cvs/cv-pdf.int-spec.ts` runs over HTTP against the test database.
+- **Docs:** [CV preview page, Export PDF](../../../../docs/pages/24-cv-preview-page.md) · [PLAN.md S7.6](../../../../PLAN.md)
 
 ## Things to note
 
