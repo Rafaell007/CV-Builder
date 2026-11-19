@@ -1,0 +1,11 @@
+# One page of the department catalog. Admin only (backend). The backend searches the name, sorts and cuts the page,
+# so the frontend never filters or sorts the loaded rows (docs/pages/25-departments-page.md).
+query Departments($page: PageInput!, $search: String, $sort: SortInput) {
+  departments(page: $page, search: $search, sort: $sort) {
+    items {
+      id
+      name
+    }
+    total
+  }
+}
