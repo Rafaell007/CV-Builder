@@ -268,7 +268,7 @@ describe("Departments", () => {
   describe("update", () => {
     async function openEdit(user: User, name = "Engineering") {
       await openRowAction(user, name, "Edit");
-      return screen.findByRole("dialog", { name: "Update department" });
+      return screen.findByRole("dialog", { name: "Edit department" });
     }
 
     it("opens the form filled with the name of the row (AC-20, AC-21)", async () => {
@@ -280,7 +280,7 @@ describe("Departments", () => {
 
       expect(within(dialog).getByRole("textbox", { name: "Department" })).toHaveValue("Finance");
       // Nothing changed yet.
-      expect(within(dialog).getByRole("button", { name: "Update" })).toBeDisabled();
+      expect(within(dialog).getByRole("button", { name: "Save" })).toBeDisabled();
     });
 
     it("saves the new name for the id of the row and shows it after the reload (AC-22)", async () => {
@@ -296,7 +296,7 @@ describe("Departments", () => {
 
       await user.clear(field);
       await user.type(field, "R&D");
-      await user.click(within(dialog).getByRole("button", { name: "Update" }));
+      await user.click(within(dialog).getByRole("button", { name: "Save" }));
 
       await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
       expect(await screen.findByText("R&D was saved.")).toBeInTheDocument();
@@ -315,7 +315,7 @@ describe("Departments", () => {
 
       await user.clear(field);
       await user.type(field, "Finance");
-      await user.click(within(dialog).getByRole("button", { name: "Update" }));
+      await user.click(within(dialog).getByRole("button", { name: "Save" }));
 
       expect(await within(dialog).findByText("Department already exists")).toBeInTheDocument();
       expect(field).toHaveValue("Finance");
@@ -329,7 +329,7 @@ describe("Departments", () => {
       await user.click(await screen.findByRole("button", { name: "Akcje dla działu Engineering" }));
       await user.click(screen.getByRole("menuitem", { name: "Edytuj" }));
 
-      const dialog = await screen.findByRole("dialog", { name: "Aktualizuj dział" });
+      const dialog = await screen.findByRole("dialog", { name: "Edytuj dział" });
       expect(within(dialog).getByRole("textbox", { name: "Dział" })).toHaveValue("Engineering");
     });
   });
@@ -395,7 +395,7 @@ describe("Departments", () => {
       expect(screen.queryByText("Could not delete the department")).not.toBeInTheDocument();
     });
 
-    it("shows the translated in-use text in a toast and keeps the row for a CONFLICT (AC-27)", async () => {
+    it("shows the translated in-use text inside the open modal and keeps the row for a CONFLICT (AC-27)", async () => {
       const { user } = renderWithProviders(<Departments />, {
         mocks: [
           departmentsMock([engineering, finance]),
@@ -407,10 +407,16 @@ describe("Departments", () => {
       await user.click(within(dialog).getByRole("button", { name: "Confirm" }));
 
       expect(
-        await screen.findByText("Department cannot be deleted because it is currently in use"),
+        await within(dialog).findByText(
+          "Department cannot be deleted because it is currently in use",
+        ),
       ).toBeInTheDocument();
       expect(screen.queryByText("Used by 3 users")).not.toBeInTheDocument();
-      expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+      expect(dialog).toBeInTheDocument();
+      expect(within(dialog).getByRole("alert")).toHaveTextContent(
+        "Department cannot be deleted because it is currently in use",
+      );
+      await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
       expect(names()).toEqual(["Engineering", "Finance"]);
     });
 

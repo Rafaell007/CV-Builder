@@ -80,12 +80,12 @@ describe("Positions", () => {
     });
     await user.click(await screen.findByRole("button", { name: "Actions for Designer" }));
     await user.click(screen.getByRole("menuitem", { name: "Edit" }));
-    const dialog = await screen.findByRole("dialog", { name: "Update position" });
+    const dialog = await screen.findByRole("dialog", { name: "Edit position" });
     const field = within(dialog).getByRole("textbox", { name: "Position" });
 
     await user.clear(field);
     await user.type(field, "UX Designer");
-    await user.click(within(dialog).getByRole("button", { name: "Update" }));
+    await user.click(within(dialog).getByRole("button", { name: "Save" }));
 
     expect(await screen.findByText("UX Designer was saved.")).toBeInTheDocument();
     await waitFor(() => expect(names()).toEqual(["UX Designer"]));
@@ -122,6 +122,10 @@ describe("Positions", () => {
     expect(
       await screen.findByText("Position cannot be deleted because it is currently in use"),
     ).toBeInTheDocument();
+    // The rows are behind the open modal (hidden for assistive tech): close it with Cancel first.
+    await user.click(
+      within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Cancel" }),
+    );
     expect(names()).toEqual(["Designer"]);
   });
 });
