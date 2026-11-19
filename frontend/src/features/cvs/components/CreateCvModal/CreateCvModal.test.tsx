@@ -6,6 +6,7 @@ import {
   createCvInvalidMock,
   createCvMock,
   createCvNetworkErrorMock,
+  createCvRefusedMock,
   createInput,
 } from "../../cvForm.mocks";
 import { useCreateCvForm } from "../../useCreateCvForm";
@@ -117,6 +118,20 @@ describe("CreateCvModal", () => {
     expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue("Frontend CV");
     expect(screen.getByRole("textbox", { name: "Description" })).toHaveValue("React and CSS");
     expect(screen.getByRole("button", { name: "Create" })).toBeEnabled();
+  });
+
+  it("shows the general message and keeps the values when the employee is not found (NOT_FOUND)", async () => {
+    const { user, dialog } = await open({ mocks: [createCvRefusedMock(createInput)] });
+    await fill(user);
+
+    await user.click(within(dialog).getByRole("button", { name: "Create" }));
+
+    expect(await within(dialog).findByRole("alert")).toHaveTextContent(
+      "Something went wrong. Please try again later",
+    );
+    expect(screen.getByRole("dialog", { name: "Create CV" })).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue("Frontend CV");
+    expect(screen.getByRole("textbox", { name: "Education" })).toHaveValue(createInput.education);
   });
 
   it("shows a field error from the backend under its field and keeps the values", async () => {

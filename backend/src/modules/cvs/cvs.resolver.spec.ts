@@ -32,13 +32,13 @@ describe("CvsResolver", () => {
     await resolver.cv(USER, "cv-1");
     await resolver.createCv(USER, input);
     await resolver.updateCv(USER, update);
-    await resolver.deleteCv(USER, "cv-1");
+    await resolver.deleteCv(USER, "cv-1", "user-2");
 
     expect(service.list).toHaveBeenCalledWith(USER, args);
     expect(service.get).toHaveBeenCalledWith(USER, "cv-1");
     expect(service.create).toHaveBeenCalledWith(USER, input);
     expect(service.update).toHaveBeenCalledWith(USER, update);
-    expect(service.delete).toHaveBeenCalledWith(USER, "cv-1");
+    expect(service.delete).toHaveBeenCalledWith(USER, "cv-1", "user-2");
   });
 
   it("refuses a call without a user", () => {

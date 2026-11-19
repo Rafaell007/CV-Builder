@@ -6,6 +6,7 @@ import {
   backendCv,
   cvsErrorMock,
   cvsMock,
+  cvsRefusedMock,
   dataCv,
   fakeBackendMock,
   frontendCv,
@@ -97,6 +98,24 @@ describe("Cvs", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("Failed to load CVs");
     expect(screen.queryByText("You have no CVs yet")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
+  });
+
+  it("shows the authorization text and no Retry when the backend answers FORBIDDEN", async () => {
+    renderWithProviders(<Cvs />, { mocks: [cvsRefusedMock("FORBIDDEN")] });
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "You are not authorized to access this page",
+    );
+    expect(screen.queryByRole("button", { name: "Retry" })).not.toBeInTheDocument();
+  });
+
+  it("shows the error state, not an empty list, when the employee is not found (NOT_FOUND)", async () => {
+    renderWithProviders(<Cvs userId="gone" />, {
+      mocks: [cvsRefusedMock("NOT_FOUND", variablesFor({ userId: "gone" }))],
+    });
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Failed to load CVs");
+    expect(screen.queryByText("No CVs found")).not.toBeInTheDocument();
   });
 
   it("shows the CVs after Retry succeeds", async () => {
@@ -369,6 +388,19 @@ describe("Cvs", () => {
       await user.click(screen.getByRole("menuitem", { name: "View" }));
 
       expect(push).toHaveBeenCalledExactlyOnceWith("/cvs/2/preview");
+    });
+
+    it("opens the CV Preview page with the User CVs tab to return to, when the list is of one user", async () => {
+      const { user } = renderWithProviders(<Cvs userId="10" />, {
+        mocks: [cvsMock([frontendCv], { variables: variablesFor({ userId: "10" }) })],
+      });
+
+      await user.click(
+        await screen.findByRole("button", { name: "Actions for Frontend Developer" }),
+      );
+      await user.click(screen.getByRole("menuitem", { name: "View" }));
+
+      expect(push).toHaveBeenCalledExactlyOnceWith("/cvs/1/preview?from=%2Fusers%2F10%2Fcvs");
     });
 
     it("opens the right dialog for each row menu item", async () => {

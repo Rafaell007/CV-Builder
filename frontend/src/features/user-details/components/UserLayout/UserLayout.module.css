@@ -1,0 +1,8 @@
+/* The 4px top padding keeps the focus ring of a tab (2px outline + 2px offset) out from under the sticky header. */
+.page {
+  padding: var(--space-1) var(--space-4) var(--space-6);
+}
+
+.content {
+  padding-top: var(--space-6);
+}

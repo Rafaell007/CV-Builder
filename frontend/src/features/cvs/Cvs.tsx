@@ -16,7 +16,7 @@ import { DeleteCvModal } from "./components/DeleteCvModal";
 import { UpdateCvModal } from "./components/UpdateCvModal";
 import { SEARCH_MAX_LENGTH } from "./cvs.constants";
 import type { CvListItem } from "./cvs.types";
-import { toCvTabPath, toCvsVariables } from "./utils";
+import { toCvOpenPath, toCvsVariables, withScope } from "./utils";
 import { useCreateCvForm } from "./useCreateCvForm";
 import { useCvs } from "./useCvs";
 import { useCvsListState } from "./useCvsListState";
@@ -41,15 +41,16 @@ export function Cvs({ userId, onView }: CvsProps) {
   const router = useRouter();
   const list = useCvsListState();
   const variables = toCvsVariables(list, userId);
-  const { cvs, total, loading, failed, retry } = useCvs(variables);
+  const { cvs, total, loading, failed, forbidden, retry } = useCvs(variables);
   const { user, isAdmin, loading: userLoading } = useCurrentUser();
 
-  const creation = useCreateCvForm();
-  const editing = useUpdateCvForm();
+  const creation = useCreateCvForm(userId);
+  const editing = useUpdateCvForm(userId);
   const deletion = useDeleteCv({
     page: list.page,
     rowsOnPage: cvs.length,
     onPageChange: list.setPage,
+    ...withScope(userId),
   });
 
   const stateLabels: PageStateLabels = {
@@ -67,7 +68,8 @@ export function Cvs({ userId, onView }: CvsProps) {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.title}>{t("title")}</h1>
+      {/* In the User CVs tab the page header already has the h1. */}
+      {userId === undefined && <h1 className={styles.title}>{t("title")}</h1>}
       {/* Outside the error branch below: an error must not remove the typed search (the field is uncontrolled). */}
       <div className={styles.toolbar}>
         <SearchField
@@ -80,14 +82,19 @@ export function Cvs({ userId, onView }: CvsProps) {
         <Button onClick={creation.open}>{t("button")}</Button>
       </div>
       {failed && !loading ? (
-        <PageState kind="error" labels={stateLabels} onRetry={retry} />
+        <PageState
+          kind="error"
+          labels={{ ...stateLabels, error: forbidden ? t("states.forbidden") : stateLabels.error }}
+          // Retry cannot help when the role is not allowed.
+          {...(forbidden ? {} : { onRetry: retry })}
+        />
       ) : (
         <>
           <CvsTable
             cvs={cvs}
             sort={list.sort}
             onSortChange={list.setSort}
-            onView={onView ?? ((cv) => router.push(toCvTabPath(cv.id, "preview")))}
+            onView={onView ?? ((cv) => router.push(toCvOpenPath(cv.id, userId)))}
             onEdit={editing.open}
             onDelete={deletion.askToDelete}
             loading={loading}

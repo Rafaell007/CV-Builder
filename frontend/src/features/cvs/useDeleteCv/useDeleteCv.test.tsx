@@ -1,3 +1,4 @@
+import { useApolloClient } from "@apollo/client/react";
 import { act, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -18,12 +19,15 @@ function setup(
 ) {
   const onPageChange = vi.fn();
   let current!: ReturnType<typeof useDeleteCv>;
+  const refetch = vi.fn();
   function Probe(): ReactNode {
+    // Replaces the method for this test: the real one needs an active query.
+    useApolloClient().refetchQueries = refetch;
     current = useDeleteCv({ page: 1, rowsOnPage: 10, ...list, onPageChange });
     return null;
   }
   renderWithProviders(<Probe />, options);
-  return { result: () => current, onPageChange };
+  return { result: () => current, onPageChange, refetch };
 }
 
 const cv = cvToDelete;
@@ -62,6 +66,19 @@ describe("useDeleteCv", () => {
 
     expect(deleted).toBe(true);
     expect(result().cv).toBeNull();
+  });
+
+  it("sends the employee of the User CVs tab with the request", async () => {
+    // The mock matches only a request with userId "user-1": a request without it finds no mock and fails.
+    const { result } = setup({ mocks: [deleteCvMock(cv.id, "user-1")] }, { userId: "user-1" });
+    act(() => result().askToDelete(cv));
+
+    let deleted = false;
+    await act(async () => {
+      deleted = await result().confirm();
+    });
+
+    expect(deleted).toBe(true);
   });
 
   it("sends one request when confirm is called twice in the same tick", async () => {
@@ -175,9 +192,32 @@ describe("useDeleteCv", () => {
     });
   });
 
-  // NOTE (KAN-112): waits for the list page. `confirm` calls `client.refetchQueries` after NOT_FOUND, and this test
-  // needs an active `Cvs` query to see that call. Fill it in when the hook is wired into the page: render the page
-  // with a `Cvs` mock twice (before and after the delete), delete a CV that answers NOT_FOUND, and expect the second
-  // `Cvs` request. Then replace `it.todo` with `it`. See README.delete.md, Notes.
-  it.todo("loads the Cvs list again when the CV was not found");
+  it("loads the Cvs list again, and shows the not found text, when the CV was not found", async () => {
+    const { result, refetch } = setup({ mocks: [deleteCvRefusedMock(cv.id)] });
+    act(() => result().askToDelete(cv));
+
+    let deleted = true;
+    await act(async () => {
+      deleted = await result().confirm();
+    });
+
+    expect(deleted).toBe(false);
+    expect(refetch).toHaveBeenCalledOnce();
+    expect(
+      await screen.findByText("This CV does not exist any more. The list was updated."),
+    ).toBeInTheDocument();
+  });
+
+  it("does not load the list again for FORBIDDEN", async () => {
+    const { result, refetch } = setup({
+      mocks: [deleteCvRefusedMock(cv.id, { code: "FORBIDDEN" })],
+    });
+    act(() => result().askToDelete(cv));
+
+    await act(async () => {
+      await result().confirm();
+    });
+
+    expect(refetch).not.toHaveBeenCalled();
+  });
 });

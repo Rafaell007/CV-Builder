@@ -1,5 +1,5 @@
 import { Field, ID, InputType } from "@nestjs/graphql";
-import { IsNotEmpty, IsString, IsUUID, MaxLength } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, IsUUID, MaxLength } from "class-validator";
 import { Trim } from "../../../common/validation";
 import { MAX_DESCRIPTION_LENGTH } from "./cv-fields";
 
@@ -9,6 +9,15 @@ export class UpdateCvInput {
   @Field(() => ID)
   @IsUUID()
   id!: string;
+
+  /**
+   * The employee of the open User CVs tab. It is a scope, not a new owner: when it is given and the CV
+   * belongs to another user, the answer is NOT_FOUND. It is never written to the CV.
+   */
+  @Field(() => ID, { nullable: true })
+  @IsOptional()
+  @IsUUID()
+  userId?: string;
 
   @Field()
   @Trim()

@@ -7,11 +7,11 @@ List, read, create, change and delete CVs. A user works with their own CVs. An a
   - `cvs(search, sort, page, userId)` returns `{ items, total }`. `cv(id)` returns one CV.
   - `createCv(input)`, `updateCv(input)` and `deleteCv(id)` return the CV. `deleteCv` returns the CV that it removed.
   - `Cv.ownerEmail` is the "Employee" column of the table.
-- **Own or all:** the service decides, not the client. A user always gets only their own CVs. An admin gets all CVs, and can narrow the list with `userId`. A user who sends the `userId` of another user gets `FORBIDDEN`.
-- **Search:** case-insensitive, by CV name. For an admin, also by the email of the owner. A user cannot search by email.
+- **Own or all:** the service decides, not the client. A user always gets only their own CVs. An admin gets all CVs, and can narrow the list with `userId`. A user who sends the `userId` of another user gets `FORBIDDEN`. If an admin sends a `userId` that does not exist, the answer is `NOT_FOUND`, not an empty list (User CVs page, AC-33).
+- **Search:** case-insensitive, by CV name. For an admin, also by the email of the owner. A user cannot search by email. This is a decided behaviour (decision of the team, KAN-120). It differs from the wording of AC-4 in the User CVs page document (search by name only) on purpose.
 - **Sort:** only `name` (`resolveSort` rejects all other fields). Equal names are ordered by `id`, so pages do not overlap. The default is `name` ascending.
 - **Page size:** the shared default of 10 (D19, `DEFAULT_PAGE_SIZE` in `common/pagination`). `cvs` has no own value since 2026-11-12. A client can still send another `size` (maximum 100).
-- **Owner:** `createCv` makes the signed-in user the owner. An admin can set `userId` to create a CV for another user. If that user does not exist, the answer is `BAD_USER_INPUT` with a field error on `userId`. `updateCv` cannot change the owner.
+- **Owner:** `createCv` makes the signed-in user the owner. An admin can set `userId` to create a CV for another user. If that user does not exist, the answer is `NOT_FOUND` ("User not found"), not a field error: the form has no `userId` field. `updateCv` cannot change the owner.
 - **Access errors:** a CV of another user gives `NOT_FOUND`, the same as a missing CV. A user cannot find out which ids exist. An id that is not a UUID gives `BAD_USER_INPUT`.
 - **Verified only (D16):** `createCv`, `updateCv` and `deleteCv` use `@Verified()`. Reading needs only a session.
 - **Validation:** name and education are required and have at most 255 characters. Description is required and has at most 2000 characters (the database column has no limit, the API sets one). Text is trimmed first, with the shared `Trim` decorator. The messages are the ones of the page docs (`Name is required`).
@@ -95,6 +95,12 @@ The PDF of a CV, in `cv-pdf/`: `cv-pdf.service.ts`, `cv-pdf.resolver.ts`, `cv-pd
 - **Docs:** [CV preview page, Export PDF](../../../../docs/pages/24-cv-preview-page.md) · [PLAN.md S7.6](../../../../PLAN.md)
 
 ## Things to note
+
+- **Contract (for the frontend, KAN-120, agreed with Rafal):** `UpdateCvInput` has an optional `userId: ID` and `deleteCv` has an optional argument `userId: ID`. It is the employee of the User CVs tab, a scope and never a new owner: when it is given and the CV belongs to another user, the answer is `NOT_FOUND`, also for an Admin (AC-35, AC-36). `update` takes it out of the data before the write, so it cannot change the owner (a test checks this). Without it nothing changes, so `/cvs` and older clients work as before. Nothing was removed. The frontend must run `codegen`.
+- **Decided (KAN-120):** for an Admin, `cvs(search)` also matches the owner email. The User CVs page document (AC-4) says search by name only. The user decided that the email match is correct. With `userId` set it changes nothing visible (one owner). Do not remove it as a "gap".
+- **Contract (KAN-120, error codes):** `cvs` with an unknown `userId` (admin) and `createCv` with an unknown `userId` now answer `NOT_FOUND`. `createCv` answered `BAD_USER_INPUT` with a field error on `userId` before. `schema.gql` did not change.
+- **Known gap (KAN-120, AC-12):** the query `cv(id)` has no `userId` scope. An admin can read a CV of any employee by id, also from the page of another employee. `updateCv` and `deleteCv` have the scope. To close the gap, add an optional `userId` argument to `cv`. This changes `schema.gql`, so agree it with Rafal first. Not done.
+- **Known weak point (KAN-120):** the ownership check of the scope is opt-in. `findInScope` skips it when `userId` is not sent, so a client that forgets `userId` can change or delete a CV of any employee (an admin only, and the plan accepts it). To harden it: make `userId` required for the User CVs tab calls, or add a separate scoped mutation for the tab. Both change the contract.
 
 - **Contract (for the frontend, KAN-114):** `schema.gql` gained `CvSkill`, `AvailableCvSkill`, `SkillCategory`, `Mastery`, `AddCvSkillInput`, `UpdateCvSkillInput`, `RemoveCvSkillsInput`, `cvSkills`, `availableCvSkills`, `addCvSkill`, `updateCvSkill` and `removeCvSkills`. Nothing was removed. The frontend must run `codegen`.
 - **Open (KAN-107):** the skills of a user (`UserSkill`) have no API yet. `availableCvSkills` reads the table directly, so it works now. When KAN-107 adds a user skills service, `CvSkillsService` can call it instead.

@@ -29,6 +29,7 @@
     "empty": "Nie masz jeszcze żadnych CV",
     "noResults": "Nie znaleziono CV",
     "error": "Nie udało się wczytać CV",
+    "forbidden": "Nie masz uprawnień do tej strony",
     "retry": "Spróbuj ponownie"
   },
   "form": {

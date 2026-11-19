@@ -84,6 +84,10 @@ describe("toCreateCvInput", () => {
   it("sends the three fields and no owner", () => {
     expect(toCreateCvInput(valid)).toEqual(valid);
   });
+
+  it("adds the owner when the page gives one (the User CVs tab)", () => {
+    expect(toCreateCvInput(valid, "10")).toEqual({ ...valid, userId: "10" });
+  });
 });
 
 describe("toCvFormValues", () => {
@@ -93,6 +97,14 @@ describe("toCvFormValues", () => {
 });
 
 describe("toUpdateCvInput", () => {
+  it("adds the employee of the page as the scope, not the owner of the row", () => {
+    expect(toUpdateCvInput({ ...cv, userId: "other" }, valid, "10")).toEqual({
+      id: "7",
+      ...valid,
+      userId: "10",
+    });
+  });
+
   it("adds the id of the CV to the form values", () => {
     expect(toUpdateCvInput(cv, { ...valid, name: "New" })).toEqual({
       id: "7",
