@@ -1,4 +1,7 @@
 import { Module } from "@nestjs/common";
+import { CvPdfRenderer } from "./cv-pdf/cv-pdf-renderer";
+import { CvPdfResolver } from "./cv-pdf/cv-pdf.resolver";
+import { CvPdfService } from "./cv-pdf/cv-pdf.service";
 import { CvPreviewResolver } from "./cv-preview/cv-preview.resolver";
 import { CvPreviewService } from "./cv-preview/cv-preview.service";
 import { CvProjectsResolver } from "./cv-projects/cv-projects.resolver";
@@ -18,6 +21,9 @@ import { CvsService } from "./cvs.service";
     CvSkillsService,
     CvPreviewResolver,
     CvPreviewService,
+    CvPdfResolver,
+    CvPdfService,
+    CvPdfRenderer,
   ],
 })
 export class CvsModule {}

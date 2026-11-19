@@ -69,6 +69,11 @@ type CvPage {
   total: Int!
 }
 
+type CvPdf {
+  base64: String!
+  fileName: String!
+}
+
 type CvPreview {
   cvId: ID!
   description: String!
@@ -255,6 +260,7 @@ type Query {
   cvSkills(cvId: ID!): [CvSkill!]!
   cvs(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput, userId: ID): CvPage!
   departments(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): DepartmentPage!
+  exportCvPdf(cvId: ID!): CvPdf!
   health: Health!
   me: SessionUser
   positions(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): PositionPage!
