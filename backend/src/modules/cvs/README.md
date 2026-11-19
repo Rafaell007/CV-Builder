@@ -96,6 +96,9 @@ The PDF of a CV, in `cv-pdf/`: `cv-pdf.service.ts`, `cv-pdf.resolver.ts`, `cv-pd
 
 ## Things to note
 
+- **Contract (for the frontend, KAN-120, agreed with Rafal):** `UpdateCvInput` has an optional `userId: ID` and `deleteCv` has an optional argument `userId: ID`. It is the employee of the User CVs tab, a scope and never a new owner: when it is given and the CV belongs to another user, the answer is `NOT_FOUND`, also for an Admin (AC-35, AC-36). `update` takes it out of the data before the write, so it cannot change the owner (a test checks this). Without it nothing changes, so `/cvs` and older clients work as before. Nothing was removed. The frontend must run `codegen`.
+- **Open (KAN-120):** for an Admin, `cvs(search)` also matches the owner email. The User CVs page document says search by name only. With `userId` set it changes nothing visible (one owner), but the rule differs from the page document.
+
 - **Contract (for the frontend, KAN-114):** `schema.gql` gained `CvSkill`, `AvailableCvSkill`, `SkillCategory`, `Mastery`, `AddCvSkillInput`, `UpdateCvSkillInput`, `RemoveCvSkillsInput`, `cvSkills`, `availableCvSkills`, `addCvSkill`, `updateCvSkill` and `removeCvSkills`. Nothing was removed. The frontend must run `codegen`.
 - **Open (KAN-107):** the skills of a user (`UserSkill`) have no API yet. `availableCvSkills` reads the table directly, so it works now. When KAN-107 adds a user skills service, `CvSkillsService` can call it instead.
 - **Open (mastery in the Add modal):** the page doc shows only the Skill field in the Add modal. The mutation takes an optional `mastery` and copies the owner's level when it is missing. If the team wants the Add modal to show a level, the contract already supports it.
