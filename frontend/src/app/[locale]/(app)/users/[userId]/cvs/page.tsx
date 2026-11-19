@@ -1,16 +1,19 @@
-import { useTranslations } from "next-intl";
-import { PageHeader } from "@/shared/components/PageHeader";
+import { Suspense } from "react";
+import { UserCvs } from "@/features/user-details";
 
-// Placeholder (PLAN §6); the real page comes with its own step.
-export default function UserCvsPage() {
-  const t = useTranslations();
-  const title = t("appShell.nav.cvs");
+type UserCvsParams = PageProps<"/[locale]/users/[userId]/cvs">["params"];
 
+// Reading the params is runtime data: Next.js needs it inside Suspense, or the build fails while prerendering.
+async function UserCvsRoute({ params }: { params: UserCvsParams }) {
+  const { userId } = await params;
+
+  return <UserCvs userId={userId} />;
+}
+
+export default function UserCvsPage({ params }: PageProps<"/[locale]/users/[userId]/cvs">) {
   return (
-    <PageHeader
-      title={title}
-      breadcrumbs={[{ label: t("appShell.nav.employees"), href: "/users" }, { label: title }]}
-      breadcrumbsLabel={t("common.breadcrumbs")}
-    />
+    <Suspense>
+      <UserCvsRoute params={params} />
+    </Suspense>
   );
 }
