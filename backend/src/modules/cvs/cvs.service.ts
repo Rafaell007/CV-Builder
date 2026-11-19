@@ -1,6 +1,5 @@
 import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import type { AuthUser } from "../../common/auth";
-import { ValidationFailedException } from "../../common/errors";
 import { resolveSort, toSkipTake } from "../../common/pagination";
 import type { Prisma } from "../../generated/prisma/client";
 import { Role } from "../../generated/prisma/enums";
@@ -27,6 +26,8 @@ export class CvsService {
   async list(user: AuthUser, { search, sort, page, userId }: CvsArgs): Promise<CvPage> {
     const isAdmin = user.role === Role.ADMIN;
     if (!isAdmin && userId !== undefined && userId !== user.id) throw forbiddenCv();
+    // An admin who selects an employee that does not exist gets NOT_FOUND, not an empty list.
+    if (isAdmin && userId !== undefined) await this.assertUserExists(userId);
 
     const { field, direction } = resolveSort(sort, SORT_FIELDS, {
       field: "name",
@@ -59,13 +60,7 @@ export class CvsService {
     const ownerId = userId ?? user.id;
     if (ownerId !== user.id) {
       if (user.role !== Role.ADMIN) throw forbiddenCv();
-      const owner = await this.prisma.user.findUnique({
-        where: { id: ownerId },
-        select: { id: true },
-      });
-      if (owner === null) {
-        throw new ValidationFailedException([{ field: "userId", messages: ["User not found"] }]);
-      }
+      await this.assertUserExists(ownerId);
     }
     return toCv(
       await this.prisma.cv.create({ data: { ...data, userId: ownerId }, ...CV_WITH_OWNER }),
@@ -91,6 +86,12 @@ export class CvsService {
     return toCv(
       await this.prisma.cv.delete({ where: { id }, ...CV_WITH_OWNER }).catch(rethrowMissingCv),
     );
+  }
+
+  /** Throws NOT_FOUND when no user has this id. */
+  private async assertUserExists(id: string): Promise<void> {
+    const found = await this.prisma.user.findUnique({ where: { id }, select: { id: true } });
+    if (found === null) throw new NotFoundException("User not found");
   }
 
   /**
