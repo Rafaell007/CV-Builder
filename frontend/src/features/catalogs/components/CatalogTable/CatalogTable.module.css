@@ -1,0 +1,4 @@
+/* A long name without spaces still wraps inside its cell. */
+.name {
+  overflow-wrap: anywhere;
+}

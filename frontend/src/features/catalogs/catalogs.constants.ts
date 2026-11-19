@@ -10,3 +10,9 @@ export const DEFAULT_CATALOG_SORT: SortState = {
   field: CATALOG_SORT_FIELDS.name,
   direction: "ASC",
 };
+
+/** The longest department or position name: the page form and the backend allow 100 characters. */
+export const MAX_CATALOG_NAME_LENGTH = 100;
+
+/** The backend accepts a search of 100 characters at most. */
+export const CATALOG_SEARCH_MAX_LENGTH = 100;
