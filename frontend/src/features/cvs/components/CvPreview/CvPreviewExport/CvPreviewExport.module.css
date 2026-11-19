@@ -1,0 +1,14 @@
+/* The action sits at the right edge of the document column, above the sheet (the page header of the Preview tab). */
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  box-sizing: border-box;
+  max-width: 852px;
+  margin: 0 auto;
+  padding-top: var(--space-4);
+}
+
+/* Read by screen readers, not shown. */
+.status {
+  composes: visuallyHidden from "../../../../../shared/styles/visuallyHidden.module.css";
+}

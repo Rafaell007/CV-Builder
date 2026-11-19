@@ -35,7 +35,18 @@ describe("CvPreview", () => {
     expect(screen.getByText("Banking Portal")).toBeInTheDocument();
     // The page h1 belongs to CvLayout, so the document adds none.
     expect(screen.queryByRole("heading", { level: 1 })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /pdf/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "EXPORT PDF" })).toBeEnabled();
+  });
+
+  it("disables EXPORT PDF while loading, after an error and without access (AC-26, AC-48)", async () => {
+    const loading = renderWithProviders(<CvPreview cvId={CV_ID} />, { mocks: [cvPreviewMock()] });
+    expect(screen.getByRole("button", { name: "EXPORT PDF" })).toBeDisabled();
+    await screen.findByText("Anna Kowalska");
+    loading.unmount();
+
+    renderWithProviders(<CvPreview cvId={CV_ID} />, { mocks: [cvPreviewErrorMock(CV_ID)] });
+    await screen.findByText("Failed to load CV preview");
+    expect(screen.getByRole("button", { name: "EXPORT PDF" })).toBeDisabled();
   });
 
   it("shows the error and loads again after Retry (AC-46)", async () => {
