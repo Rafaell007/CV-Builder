@@ -42,3 +42,11 @@
   composes: footer from "../Modal/Modal.module.css";
   --modal-footer-gap: 44px;
 }
+
+/* The error of the last request, 16 below the message */
+.error {
+  margin: 16px 0 0;
+  color: var(--color-error-text);
+  font: var(--text-body);
+  letter-spacing: var(--text-body-ls);
+}

@@ -8,6 +8,8 @@ export interface DeleteCatalogItemModalProps {
   namespace: CatalogNamespace;
   /** The item to delete. The modal is open while this is set. */
   item: CatalogItem | null;
+  /** The reason the delete failed (the item is in use). Shown inside the modal, which stays open. */
+  error?: string | null;
   /** True while the request runs: CONFIRM shows its loading state and cannot send a second request. */
   pending: boolean;
   onConfirm: () => void;
@@ -19,6 +21,7 @@ export interface DeleteCatalogItemModalProps {
 export function DeleteCatalogItemModal({
   namespace,
   item,
+  error = null,
   pending,
   onConfirm,
   onCancel,
@@ -43,6 +46,7 @@ export function DeleteCatalogItemModal({
       confirmLabel={t("delete.confirm")}
       cancelLabel={t("delete.cancel")}
       onConfirm={onConfirm}
+      error={error}
       isPending={pending}
     />
   );

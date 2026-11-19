@@ -18,7 +18,14 @@ export function useUpdateCatalogItemForm(
 ) {
   const t = useTranslations(namespace);
   const toast = useToast();
-  const { form, failed, reset, showError, submit: submitForm } = useCatalogNameForm(namespace);
+  const {
+    form,
+    failed,
+    hasChanged,
+    reset,
+    showError,
+    submit: submitForm,
+  } = useCatalogNameForm(namespace);
   // The item stays set while the modal fades out, so the request still has its id.
   const [item, setItem] = useState<CatalogItem | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -48,7 +55,7 @@ export function useUpdateCatalogItemForm(
     return submitForm(event, send);
   }
 
-  return { form, failed, isOpen, open, setOpen: setIsOpen, submit };
+  return { form, failed, hasChanged, isOpen, open, setOpen: setIsOpen, submit };
 }
 
 export type UseUpdateCatalogItemFormResult = ReturnType<typeof useUpdateCatalogItemForm>;

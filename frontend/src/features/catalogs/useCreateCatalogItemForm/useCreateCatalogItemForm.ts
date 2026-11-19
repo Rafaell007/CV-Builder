@@ -18,7 +18,14 @@ export function useCreateCatalogItemForm(
 ) {
   const t = useTranslations(namespace);
   const toast = useToast();
-  const { form, failed, reset, showError, submit: submitForm } = useCatalogNameForm(namespace);
+  const {
+    form,
+    failed,
+    hasChanged,
+    reset,
+    showError,
+    submit: submitForm,
+  } = useCatalogNameForm(namespace);
   const [isOpen, setIsOpen] = useState(false);
 
   function open() {
@@ -44,7 +51,7 @@ export function useCreateCatalogItemForm(
     return submitForm(event, send);
   }
 
-  return { form, failed, isOpen, open, setOpen: setIsOpen, submit };
+  return { form, failed, hasChanged, isOpen, open, setOpen: setIsOpen, submit };
 }
 
 export type UseCreateCatalogItemFormResult = ReturnType<typeof useCreateCatalogItemForm>;

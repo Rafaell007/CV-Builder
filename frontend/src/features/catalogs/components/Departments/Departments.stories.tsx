@@ -152,18 +152,18 @@ export const CreateDepartmentNameTaken: Story = {
   },
 };
 
-/** Edit opens the modal filled with the name of the row; UPDATE stays disabled until the name changes. */
+/** Edit opens the modal filled with the name of the row; SAVE stays disabled until the name changes. */
 export const UpdateDepartment: Story = {
   parameters: { apollo: { mocks: [fakeBackendMock(sample)] } },
   play: async ({ canvas }) => {
     await userEvent.click(await canvas.findByRole("button", { name: "Actions for Finance" }));
     await userEvent.click(await body.findByRole("menuitem", { name: "Edit" }));
-    const dialog = await body.findByRole("dialog", { name: "Update department" });
+    const dialog = await body.findByRole("dialog", { name: "Edit department" });
 
     await expect(within(dialog).getByRole("textbox", { name: "Department" })).toHaveValue(
       "Finance",
     );
-    await expect(within(dialog).getByRole("button", { name: "Update" })).toBeDisabled();
+    await expect(within(dialog).getByRole("button", { name: "Save" })).toBeDisabled();
   },
 };
 
@@ -180,7 +180,7 @@ export const DeleteDepartment: Story = {
   },
 };
 
-/** A department in use: the modal closes and an error toast tells why; the row stays. */
+/** A department in use: the modal stays open and shows why inside it; the row stays. */
 export const DeleteDepartmentInUse: Story = {
   parameters: {
     apollo: { mocks: [fakeBackendMock(sample), deleteDepartmentRefusedMock(finance.id)] },

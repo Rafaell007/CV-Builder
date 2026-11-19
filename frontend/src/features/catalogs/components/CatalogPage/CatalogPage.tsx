@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import {
   ListPage,
   PageState,
@@ -44,12 +45,19 @@ export function CatalogPage({
   const t = useTranslations(namespace);
   const { items, total, loading, failed, retry } = query;
 
+  // The page the user left by deleting its only row: while the list still shows it, that empty page is a pass-through,
+  // not a result. Derived from `list.page`, so it ends by itself when the page changes.
+  const [leavingPage, setLeavingPage] = useState<number | null>(null);
+  const isLeavingPage = leavingPage === list.page;
+
   async function handleConfirmDelete() {
     // Read before the request: the item leaves the list while it runs.
     const wasLastRowOfPage = items.length === 1 && list.page > 1;
+    if (wasLastRowOfPage) setLeavingPage(list.page);
     const deleted = await deletion.confirm();
     // The same page would now be empty, so go back one page.
     if (deleted && wasLastRowOfPage) list.setPage(list.page - 1);
+    else setLeavingPage(null);
   }
 
   const stateLabels: PageStateLabels = {
@@ -102,7 +110,7 @@ export function CatalogPage({
           onSortChange={list.setSort}
           onEdit={editing.open}
           onDelete={deletion.askToDelete}
-          loading={loading}
+          loading={loading || (isLeavingPage && items.length === 0)}
           loadingContent={<PageState kind="loading" labels={stateLabels} />}
           emptyContent={<PageState kind={emptyKind} labels={stateLabels} />}
         />
@@ -112,6 +120,7 @@ export function CatalogPage({
       <DeleteCatalogItemModal
         namespace={namespace}
         item={deletion.item}
+        error={deletion.error}
         pending={deletion.pending}
         onConfirm={() => void handleConfirmDelete()}
         onCancel={deletion.cancel}

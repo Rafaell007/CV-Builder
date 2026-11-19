@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useMemo, useRef, useState, type BaseSyntheticEvent } from "react";
+import { useWatch } from "react-hook-form";
 import { applyServerFieldErrors, useZodForm } from "@/shared/forms";
 import type { CatalogNameFormValues, CatalogNamespace } from "../catalogs.types";
 import { catalogNameSchema, isCatalogConflict } from "../utils";
@@ -16,6 +17,8 @@ const EMPTY_VALUES: CatalogNameFormValues = { name: "" };
 export function useCatalogNameForm(namespace: CatalogNamespace) {
   const t = useTranslations(namespace);
   const [failed, setFailed] = useState(false);
+  // The trimmed name the form started with: a save is only worth sending when the trimmed name differs from it.
+  const [original, setOriginal] = useState("");
 
   // A ref changes at once: two submits in the same tick cannot both pass.
   const sending = useRef(false);
@@ -32,9 +35,14 @@ export function useCatalogNameForm(namespace: CatalogNamespace) {
     defaultValues: EMPTY_VALUES,
   });
 
+  const typedName = useWatch({ control: form.control, name: "name" });
+  /** True when the trimmed name differs from the one the form started with. "Foo" to "Foo " is not a change. */
+  const hasChanged = typedName.trim() !== original;
+
   /** Fills the form with `name` (it becomes the new "unchanged" state) and clears the general error. */
   function reset(name: string) {
     form.reset({ name });
+    setOriginal(name.trim());
     setFailed(false);
   }
 
@@ -73,7 +81,7 @@ export function useCatalogNameForm(namespace: CatalogNamespace) {
     }
   }
 
-  return { form, failed, reset, showError, submit };
+  return { form, failed, hasChanged, reset, showError, submit };
 }
 
 export type UseCatalogNameFormResult = ReturnType<typeof useCatalogNameForm>;

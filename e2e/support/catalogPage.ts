@@ -185,7 +185,7 @@ export function describeCatalogPage(c: CatalogPageCase): void {
       await openRowMenu(page, name, "Edit");
       await expect(field(page)).toHaveValue(name);
       await field(page).fill(renamed);
-      await dialog(page).getByRole("button", { name: "Update" }).click();
+      await dialog(page).getByRole("button", { name: "Save" }).click();
 
       await expect(dialog(page)).toBeHidden();
       await expect(page.getByText(`${c.singular} updated`, { exact: true })).toBeVisible();
@@ -208,20 +208,21 @@ export function describeCatalogPage(c: CatalogPageCase): void {
       await expect(page.getByText(`No ${c.title.toLowerCase()} found`)).toBeVisible();
     });
 
-    test(`shows the in-use text and keeps the row when a user has the ${lower}`, async ({
+    test(`shows the in-use text inside the modal and keeps the row when a user has the ${lower}`, async ({
       page,
     }) => {
       await find(page, c.inUse);
       await openRowMenu(page, c.inUse, "Delete");
       await confirmDialog(page).getByRole("button", { name: "Confirm" }).click();
 
+      // The modal stays open and shows the reason inside; CONFIRM and CANCEL still work.
+      await expect(confirmDialog(page).getByRole("alert")).toHaveText(
+        `${c.singular} cannot be deleted because it is currently in use`,
+      );
+      await expect(confirmDialog(page).getByRole("button", { name: "Confirm" })).toBeEnabled();
+      await confirmDialog(page).getByRole("button", { name: "Cancel" }).click();
+
       await expect(confirmDialog(page)).toBeHidden();
-      // Radix adds a second, hidden copy of the toast text for screen readers: match the visible text exactly.
-      await expect(
-        page.getByText(`${c.singular} cannot be deleted because it is currently in use`, {
-          exact: true,
-        }),
-      ).toBeVisible();
       await expect(row(page, c.inUse)).toHaveCount(1);
     });
   });

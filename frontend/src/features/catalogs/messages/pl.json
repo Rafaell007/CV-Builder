@@ -39,9 +39,9 @@
       }
     },
     "update": {
-      "title": "Aktualizuj dział",
+      "title": "Edytuj dział",
       "close": "Zamknij",
-      "submit": "Aktualizuj",
+      "submit": "Zapisz",
       "cancel": "Anuluj",
       "success": {
         "title": "Dział zaktualizowany",
@@ -111,9 +111,9 @@
       }
     },
     "update": {
-      "title": "Aktualizuj stanowisko",
+      "title": "Edytuj stanowisko",
       "close": "Zamknij",
-      "submit": "Aktualizuj",
+      "submit": "Zapisz",
       "cancel": "Anuluj",
       "success": {
         "title": "Stanowisko zaktualizowane",

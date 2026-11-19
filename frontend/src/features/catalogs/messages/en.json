@@ -39,9 +39,9 @@
       }
     },
     "update": {
-      "title": "Update department",
+      "title": "Edit department",
       "close": "Close",
-      "submit": "Update",
+      "submit": "Save",
       "cancel": "Cancel",
       "success": {
         "title": "Department updated",
@@ -111,9 +111,9 @@
       }
     },
     "update": {
-      "title": "Update position",
+      "title": "Edit position",
       "close": "Close",
-      "submit": "Update",
+      "submit": "Save",
       "cancel": "Cancel",
       "success": {
         "title": "Position updated",

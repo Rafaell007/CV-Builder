@@ -9,6 +9,8 @@ import { isCatalogConflict } from "../utils";
 export type UseDeleteCatalogItemResult = {
   /** The item the user chose to delete. The modal is open while this is set. */
   item: CatalogItem | null;
+  /** The reason the last request failed when the modal stays open (the item is in use), shown inside the modal. `null` otherwise. */
+  error: string | null;
   /** True while the request runs. */
   pending: boolean;
   /** Opens the confirmation for this item. */
@@ -21,9 +23,10 @@ export type UseDeleteCatalogItemResult = {
 
 /**
  * State of the delete flow of a catalog: which item waits for confirmation, and the request. On success the modal
- * closes. On failure the modal closes too and an error toast shows the reason (`CONFLICT` = the item is in use): a
- * toast stays behind an open modal where a keyboard user cannot reach it (see the Toast README). The table keeps its
- * search, sort and page. `remove` sends the request of the catalog for the id and rejects with its error.
+ * closes. When the item is in use (`CONFLICT`) the modal stays open and shows the reason inside (`error`); CONFIRM and
+ * CANCEL still work. Any other failure closes the modal and shows an error toast (a toast stays behind an open modal
+ * where a keyboard user cannot reach it, see the Toast README). The table keeps its search, sort and page.
+ * `remove` sends the request of the catalog for the id and rejects with its error.
  */
 export function useDeleteCatalogItem(
   namespace: CatalogNamespace,
@@ -32,6 +35,7 @@ export function useDeleteCatalogItem(
   const t = useTranslations(namespace);
   const toast = useToast();
   const [item, setItem] = useState<CatalogItem | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
   // A ref changes at once, state only after the next render: two calls in the same tick cannot both pass.
@@ -41,16 +45,19 @@ export function useDeleteCatalogItem(
     if (item === null || sending.current) return false;
     sending.current = true;
     setPending(true);
+    setError(null);
     try {
       await remove(item.id);
       setItem(null);
       return true;
-    } catch (error) {
-      setItem(null);
-      toast.error({
-        title: t("delete.failedTitle"),
-        description: isCatalogConflict(error) ? t("delete.inUseText") : t("delete.failedText"),
-      });
+    } catch (failure) {
+      if (isCatalogConflict(failure)) {
+        // The modal stays open: the user reads the reason there and can cancel or try again.
+        setError(t("delete.inUseText"));
+      } else {
+        setItem(null);
+        toast.error({ title: t("delete.failedTitle"), description: t("delete.failedText") });
+      }
       return false;
     } finally {
       sending.current = false;
@@ -60,9 +67,16 @@ export function useDeleteCatalogItem(
 
   return {
     item,
+    error,
     pending,
-    askToDelete: setItem,
-    cancel: () => setItem(null),
+    askToDelete: (chosen) => {
+      setError(null);
+      setItem(chosen);
+    },
+    cancel: () => {
+      setError(null);
+      setItem(null);
+    },
     confirm,
   };
 }
