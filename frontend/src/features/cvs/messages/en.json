@@ -308,6 +308,14 @@
   },
   "preview": {
     "document": "CV preview",
+    "export": {
+      "label": "EXPORT PDF",
+      "generating": "Generating the PDF",
+      "failedTitle": "Could not export the PDF",
+      "failedText": "Something went wrong. Please try again.",
+      "notFound": "This CV does not exist, or you cannot open it.",
+      "forbidden": "You are not allowed to export this CV."
+    },
     "states": {
       "loading": "Loading CV preview",
       "unauthorized": "You are not authorized to access this CV",

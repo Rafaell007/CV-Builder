@@ -40,6 +40,16 @@ describe("useCvPreview", () => {
     expect(result().unauthorized).toBe(false);
   });
 
+  it("asks in the language of the page", async () => {
+    // The mock matches only the variables with locale pl, so a request in English would find no mock.
+    const { result } = setup({ mocks: [cvPreviewMock(cvPreviewSample, "pl")], locale: "pl" });
+
+    await waitFor(() => expect(result().loading).toBe(false));
+
+    expect(result().preview?.cvId).toBe(cvId);
+    expect(result().failed).toBe(false);
+  });
+
   it("reports failed for a network error, and returns no preview", async () => {
     const { result } = setup({ mocks: [cvPreviewErrorMock(cvId)] });
 

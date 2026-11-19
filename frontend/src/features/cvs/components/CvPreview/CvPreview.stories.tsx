@@ -85,6 +85,8 @@ export const Unauthorized: Story = {
 
 export const Polish: Story = {
   globals: { locale: "pl" },
+  // The page asks in its own language, so the mock is for locale pl.
+  parameters: { apollo: { mocks: [cvPreviewMock(undefined, "pl")] } },
   play: async ({ canvas }) => {
     await expect(await canvas.findByRole("table", { name: "Umiejętności zawodowe" })).toBeVisible();
   },

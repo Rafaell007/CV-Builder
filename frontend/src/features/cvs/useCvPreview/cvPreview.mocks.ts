@@ -173,26 +173,31 @@ export const cvPreviewFigmaSample: CvPreviewData = {
   ],
 };
 
-/** MockedProvider response of the `CvPreview` query for the CV with this id. */
+/** MockedProvider response of the `CvPreview` query for the CV with this id. `locale` is the language of the page (English at first). */
 export const cvPreviewMock = (
   preview: CvPreviewData = cvPreviewSample,
+  locale = "en",
 ): MockLink.MockedResponse => ({
-  request: { query: CvPreviewDocument, variables: { cvId: preview.cvId } },
+  request: { query: CvPreviewDocument, variables: { cvId: preview.cvId, locale } },
   result: { data: { cvPreview: preview } },
 });
 
 /** The backend answers the `CvPreview` query with a GraphQL error code, e.g. `NOT_FOUND` or `FORBIDDEN`. */
-export const cvPreviewCodeErrorMock = (cvId: string, code: string): MockLink.MockedResponse => ({
-  request: { query: CvPreviewDocument, variables: { cvId } },
+export const cvPreviewCodeErrorMock = (
+  cvId: string,
+  code: string,
+  locale = "en",
+): MockLink.MockedResponse => ({
+  request: { query: CvPreviewDocument, variables: { cvId, locale } },
   result: { errors: [{ message: code, extensions: { code } }] },
 });
 
 /** The `CvPreview` query is refused with `FORBIDDEN`. */
-export const cvPreviewForbiddenMock = (cvId: string): MockLink.MockedResponse =>
-  cvPreviewCodeErrorMock(cvId, "FORBIDDEN");
+export const cvPreviewForbiddenMock = (cvId: string, locale = "en"): MockLink.MockedResponse =>
+  cvPreviewCodeErrorMock(cvId, "FORBIDDEN", locale);
 
 /** The `CvPreview` query fails like a network error (no GraphQL error code). */
-export const cvPreviewErrorMock = (cvId: string): MockLink.MockedResponse => ({
-  request: { query: CvPreviewDocument, variables: { cvId } },
+export const cvPreviewErrorMock = (cvId: string, locale = "en"): MockLink.MockedResponse => ({
+  request: { query: CvPreviewDocument, variables: { cvId, locale } },
   error: new Error("Failed to fetch"),
 });

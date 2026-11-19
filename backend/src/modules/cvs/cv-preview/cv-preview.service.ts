@@ -3,6 +3,8 @@ import type { AuthUser } from "../../../common/auth";
 import { Clock } from "../../../common/clock";
 import { Prisma } from "../../../generated/prisma/client";
 import { PrismaService } from "../../../prisma/prisma.service";
+import { OPEN_PERIOD_WORDS } from "../cv-locale";
+import type { CvLocale } from "../cv-locale";
 import { CvsService } from "../cvs.service";
 import { experienceYears, formatPeriod, lastUsedYear, uniqueDomains } from "./calculations";
 import type { PreviewProject } from "./calculations";
@@ -64,7 +66,7 @@ export class CvPreviewService {
     private readonly clock: Clock,
   ) {}
 
-  async get(user: AuthUser, cvId: string): Promise<CvPreview> {
+  async get(user: AuthUser, cvId: string, locale: CvLocale): Promise<CvPreview> {
     // Nothing is loaded before this check passes.
     const { ownerId } = await this.cvs.assertAccessible(user, cvId);
 
@@ -104,7 +106,7 @@ export class CvPreviewService {
       languages: toLanguages(owner),
       domains: uniqueDomains(previewProjects),
       skillGroups: toSkillGroups(skillRows, previewProjects, now),
-      projects: projectRows.map(toProject),
+      projects: projectRows.map((row) => toProject(row, locale)),
     };
   }
 }
@@ -153,7 +155,7 @@ function toPreviewProject(row: CvProjectRow): PreviewProject {
   };
 }
 
-function toProject(row: CvProjectRow): CvPreviewProject {
+function toProject(row: CvProjectRow, locale: CvLocale): CvPreviewProject {
   const { project } = row;
   return {
     name: project.name,
@@ -161,7 +163,7 @@ function toProject(row: CvProjectRow): CvPreviewProject {
     domain: project.domain,
     environment: project.skills.map(({ skill }) => skill.name),
     roles: row.roles.map(({ role }) => role.name),
-    period: formatPeriod(row.startDate, row.endDate),
+    period: formatPeriod(row.startDate, row.endDate, OPEN_PERIOD_WORDS[locale]),
     startDate: row.startDate,
     endDate: row.endDate,
     responsibilities: row.responsibilities,

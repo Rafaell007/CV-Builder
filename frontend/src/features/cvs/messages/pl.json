@@ -308,6 +308,14 @@
   },
   "preview": {
     "document": "Podgląd CV",
+    "export": {
+      "label": "EKSPORTUJ PDF",
+      "generating": "Generowanie pliku PDF",
+      "failedTitle": "Nie udało się wyeksportować pliku PDF",
+      "failedText": "Coś poszło nie tak. Spróbuj ponownie.",
+      "notFound": "To CV nie istnieje albo nie możesz go otworzyć.",
+      "forbidden": "Nie masz uprawnień do eksportu tego CV."
+    },
     "states": {
       "loading": "Ładowanie podglądu CV",
       "unauthorized": "Nie masz uprawnień do tego CV",
