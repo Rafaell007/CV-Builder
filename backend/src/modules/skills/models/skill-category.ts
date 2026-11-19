@@ -8,4 +8,8 @@ export class SkillCategory {
 
   @Field()
   name!: string;
+
+  /** For example Programming technologies. It is the type of every skill in this category (page 17). */
+  @Field()
+  type!: string;
 }
