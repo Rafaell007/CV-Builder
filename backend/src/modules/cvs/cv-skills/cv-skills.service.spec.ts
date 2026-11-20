@@ -184,6 +184,20 @@ describe("CvSkillsService.add", () => {
     });
   });
 
+  it("reads the skill and its category back with the new link", async () => {
+    await service.add(USER, { cvId: "cv-1", skillId: "skill-1" });
+
+    expect(firstCall<{ include: unknown }>(prisma.cvSkill.create).include).toEqual({
+      skill: {
+        select: {
+          id: true,
+          name: true,
+          category: { select: { id: true, name: true, type: true } },
+        },
+      },
+    });
+  });
+
   it("uses the mastery from the request when one is sent", async () => {
     await service.add(USER, { cvId: "cv-1", skillId: "skill-1", mastery: Mastery.EXPERT });
 
