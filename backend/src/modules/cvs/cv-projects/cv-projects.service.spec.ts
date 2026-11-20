@@ -377,6 +377,16 @@ describe("CvProjectsService.add", () => {
     expect(await rejection(service.add(USER, addInput()))).toBeInstanceOf(NotFoundException);
   });
 
+  it("says why the parallel change and the deleted CV are refused", async () => {
+    prisma.cvProject.create.mockRejectedValueOnce(databaseError("P2034"));
+    await expect(service.add(USER, addInput())).rejects.toThrow(
+      "The CV was changed at the same time. Try again",
+    );
+
+    prisma.cvProject.create.mockRejectedValueOnce(databaseError("P2003"));
+    await expect(service.add(USER, addInput())).rejects.toThrow("CV not found");
+  });
+
   it("passes on other database errors", async () => {
     const failure = new Error("connection lost");
     prisma.cvProject.create.mockRejectedValue(failure);
@@ -492,6 +502,14 @@ describe("CvProjectsService.update", () => {
     prisma.cvProject.update.mockRejectedValue(databaseError("P2025"));
 
     expect(await rejection(service.update(USER, updateInput()))).toBeInstanceOf(NotFoundException);
+  });
+
+  it("says CV project not found when the entry does not exist or is removed", async () => {
+    prisma.cvProject.findUnique.mockResolvedValueOnce(null);
+    await expect(service.update(USER, updateInput())).rejects.toThrow("CV project not found");
+
+    prisma.cvProject.update.mockRejectedValueOnce(databaseError("P2025"));
+    await expect(service.update(USER, updateInput())).rejects.toThrow("CV project not found");
   });
 
   it("answers CONFLICT when the database stops the transaction because of a parallel change", async () => {
