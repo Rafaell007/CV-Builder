@@ -193,9 +193,12 @@ describe("PasswordResetService", () => {
         where: { id: "token-1", usedAt: null },
         data: { usedAt: NOW },
       });
-      const { data } = tx.user.update.mock.calls[0]?.[0] as {
+      const { where, data } = tx.user.update.mock.calls[0]?.[0] as {
+        where: unknown;
         data: { passwordHash: string; tokenVersion: unknown };
       };
+      // the password of the owner of the token changes, never the password of another user
+      expect(where).toEqual({ id: "user-1" });
       expect(data.passwordHash).not.toContain("new-password-1");
       expect(await verifyPassword(data.passwordHash, "new-password-1")).toBe(true);
       // a new token version makes every access token issued before the reset stop working
