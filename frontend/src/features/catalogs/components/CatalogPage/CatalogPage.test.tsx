@@ -9,6 +9,7 @@ import type { CatalogItem } from "../../catalogs.types";
 import { useCreateCatalogItemForm } from "../../useCreateCatalogItemForm";
 import { useDeleteCatalogItem } from "../../useDeleteCatalogItem";
 import { useUpdateCatalogItemForm } from "../../useUpdateCatalogItemForm";
+import { NameFormModal } from "../NameFormModal";
 import { CatalogPage } from "./CatalogPage";
 
 const engineering: CatalogItem = { id: "1", name: "Engineering" };
@@ -55,9 +56,15 @@ function Harness({
       namespace="catalogs.departments"
       list={list}
       query={pagedQuery}
-      creation={creation}
-      editing={editing}
+      onCreate={creation.open}
+      onEdit={editing.open}
       deletion={deletion}
+      modals={
+        <>
+          <NameFormModal namespace={"catalogs.departments"} kind="create" nameForm={creation} />
+          <NameFormModal namespace={"catalogs.departments"} kind="update" nameForm={editing} />
+        </>
+      }
     />
   );
 }

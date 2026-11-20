@@ -12,6 +12,8 @@ export interface CatalogTableProps<T extends CatalogItem> {
   /** The backend sort. The table only shows it and reports a click on a header. */
   sort: SortState | undefined;
   onSortChange: (sort: SortState) => void;
+  /** More columns after Name (Skills: Type, Category). Departments and Positions have none. */
+  extraColumns?: DataTableColumn<T>[];
   /** Called with the item when the user selects Edit in its row menu. */
   onEdit: (item: T) => void;
   /** Called with the item when the user selects Delete in its row menu. */
@@ -27,6 +29,7 @@ export function CatalogTable<T extends CatalogItem>({
   items,
   sort,
   onSortChange,
+  extraColumns = [],
   onEdit,
   onDelete,
   loading,
@@ -42,6 +45,7 @@ export function CatalogTable<T extends CatalogItem>({
       sortField: CATALOG_SORT_FIELDS.name,
       cell: (item) => <span className={styles.name}>{item.name}</span>,
     },
+    ...extraColumns,
   ];
 
   return (
