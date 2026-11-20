@@ -1,4 +1,5 @@
 import { formatPeriod } from "./format-period";
+import { inTimeZoneUtcMinus11 } from "./time-zone.testing";
 
 describe("formatPeriod", () => {
   it("formats a finished project as MM.YYYY – MM.YYYY", () => {
@@ -29,6 +30,15 @@ describe("formatPeriod", () => {
     expect(
       formatPeriod(new Date("2024-01-05T00:00:00Z"), new Date("2024-09-30T00:00:00Z"), "Till now"),
     ).toBe("01.2024 – 09.2024");
+  });
+
+  it("shows the month and the year in UTC, whatever the time zone of the server", () => {
+    // In UTC-11 the moment 01.01.2025 00:00 UTC is still 31.12.2024, so local time would show 12.2024.
+    const period = inTimeZoneUtcMinus11(() =>
+      formatPeriod(new Date("2025-01-01T00:00:00Z"), new Date("2026-01-01T00:00:00Z"), "Till now"),
+    );
+
+    expect(period).toBe("01.2025 – 01.2026");
   });
 
   it("uses UTC, so the first day of a month stays in that month", () => {

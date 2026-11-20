@@ -26,6 +26,10 @@ describe("uniqueDomains", () => {
     ).toEqual(["IoT", "FinTech", "Healthcare"]);
   });
 
+  it("compares domains exactly: IoT and IoT with a space are two different domains", () => {
+    expect(uniqueDomains([projectIn("IoT"), projectIn("IoT ")])).toEqual(["IoT", "IoT "]);
+  });
+
   it("compares domains case-sensitive: IoT and iot are two different domains", () => {
     expect(uniqueDomains([projectIn("IoT"), projectIn("iot")])).toEqual(["IoT", "iot"]);
   });

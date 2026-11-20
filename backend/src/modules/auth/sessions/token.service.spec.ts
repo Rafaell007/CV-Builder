@@ -55,6 +55,15 @@ describe("TokenService", () => {
       ).resolves.toBeUndefined();
     });
 
+    it("rejects a token signed with another algorithm, even with the right secret", async () => {
+      const token = await new JwtService().signAsync(
+        { tokenVersion: 0 },
+        { subject: "user-1", secret: SECRETS.JWT_ACCESS_SECRET, algorithm: "HS512", expiresIn: 60 },
+      );
+
+      await expect(createService().verifyAccessToken(token)).resolves.toBeUndefined();
+    });
+
     it("rejects a token without a user id", async () => {
       const token = await new JwtService().signAsync(
         { tokenVersion: 0 },
@@ -83,7 +92,7 @@ describe("TokenService", () => {
       const service = createService();
       const first = service.createRefreshToken();
 
-      expect(first.length).toBeGreaterThanOrEqual(43); // 32 bytes in base64url
+      expect(first).toMatch(/^[A-Za-z0-9_-]{43}$/); // 32 bytes in base64url
       expect(first).not.toBe(service.createRefreshToken());
     });
 
@@ -93,6 +102,20 @@ describe("TokenService", () => {
 
       expect(service.hashRefreshToken(token)).toBe(service.hashRefreshToken(token));
       expect(service.hashRefreshToken(token)).not.toContain(token);
+    });
+
+    it("hashes different tokens to different values", () => {
+      const service = createService();
+
+      expect(service.hashRefreshToken("token-a")).not.toBe(service.hashRefreshToken("token-b"));
+    });
+
+    it("keeps the stored value stable: HMAC-SHA256 in hex", () => {
+      // Made outside this code with node:crypto, key = the refresh secret above, text = "t".
+      // A changed algorithm or encoding changes the value, and every stored refresh token stops matching.
+      expect(createService().hashRefreshToken("t")).toBe(
+        "c5fe36c418e18586b8caf53bd014a33f39748857845b85cd987ce1ee0fcbbc8e",
+      );
     });
 
     it("hashes differently with another refresh secret", () => {

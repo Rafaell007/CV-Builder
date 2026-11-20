@@ -52,6 +52,10 @@ describe("toCvReturnPath", () => {
     expect(toCvReturnPath("/users/3f2a-9c_1/cvs")).toBe("/users/3f2a-9c_1/cvs");
   });
 
+  it("keeps the path of a User CVs tab when the user id has upper-case letters", () => {
+    expect(toCvReturnPath("/users/AbC123/cvs")).toBe("/users/AbC123/cvs");
+  });
+
   it.each([
     ["nothing", null],
     ["an empty value", ""],
@@ -63,8 +67,16 @@ describe("toCvReturnPath", () => {
     ["a path with a query", "/users/10/cvs?x=1"],
     ["a path with a parent step", "/users/../admin/cvs"],
     ["a path with a new line", "/users/10/cvs\n"],
+    ["a path without a user id", "/users//cvs"],
   ])("drops %s", (_name, value) => {
     expect(toCvReturnPath(value)).toBeUndefined();
+  });
+
+  it("drops a value that is not a string, even when it turns into a valid path as text", () => {
+    const notText = { toString: () => "/users/10/cvs" } as unknown as string;
+
+    expect(toCvReturnPath(notText)).toBeUndefined();
+    expect(toCvReturnPath(undefined)).toBeUndefined();
   });
 });
 

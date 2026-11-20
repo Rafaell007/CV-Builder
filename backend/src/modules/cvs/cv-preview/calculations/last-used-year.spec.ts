@@ -1,5 +1,6 @@
 import { lastUsedYear } from "./last-used-year";
 import type { PreviewProject } from "./preview-project";
+import { inTimeZoneUtcMinus11 } from "./time-zone.testing";
 
 const NOW = new Date("2026-06-15T00:00:00Z");
 
@@ -47,6 +48,25 @@ describe("lastUsedYear", () => {
     const projects = [projectUsing(["java"], null), projectUsing(["react"], "2022-05-01")];
 
     expect(lastUsedYear("react", projects, NOW)).toBe(2022);
+  });
+
+  // In UTC-11 the moment 01.01.2025 00:00 UTC is still 31.12.2024, so local time would give 2024.
+  it("takes the end year in UTC, whatever the time zone of the server", () => {
+    const projects = [projectUsing(["react"], "2025-01-01")];
+
+    const year = inTimeZoneUtcMinus11(() => lastUsedYear("react", projects, NOW));
+
+    expect(year).toBe(2025);
+  });
+
+  it("takes the current year of an active project in UTC, whatever the time zone of the server", () => {
+    const projects = [projectUsing(["react"], null)];
+
+    const year = inTimeZoneUtcMinus11(() =>
+      lastUsedYear("react", projects, new Date("2026-01-01T00:00:00Z")),
+    );
+
+    expect(year).toBe(2026);
   });
 
   it("uses the end year at the year boundary", () => {
