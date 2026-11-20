@@ -12,6 +12,8 @@ node_modules
 
 # testing
 coverage
+# Vitest blob reports of one test shard (pnpm test:shard); the CI merge job reads them
+.vitest/
 test-results/
 playwright-report/
 blob-report/

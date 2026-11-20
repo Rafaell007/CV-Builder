@@ -10,6 +10,8 @@
     "typecheck": "pnpm codegen && next typegen && tsc --noEmit",
     "test": "pnpm codegen && vitest run",
     "test:cov": "pnpm codegen && vitest run --coverage",
+    "test:shard": "pnpm codegen && vitest run --coverage --reporter=blob --coverage.thresholds.lines=0 --coverage.thresholds.functions=0 --coverage.thresholds.branches=0 --coverage.thresholds.statements=0",
+    "test:merge": "pnpm codegen && vitest --merge-reports --coverage",
     "codegen": "graphql-codegen --config codegen.ts",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
