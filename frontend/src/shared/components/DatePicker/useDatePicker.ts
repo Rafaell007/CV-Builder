@@ -73,6 +73,19 @@ export function useDatePicker({
   const returnFocusToInput = () =>
     document.getElementById(controlId)?.focus({ preventScroll: true });
 
+  // Escape closes the calendar. react-datepicker may still move the focus to a day after returnFocusToInput; that day
+  // is removed with the calendar and the focus falls to <body> (seen only on the CI runner, KAN-164). When the
+  // calendar has closed after Escape and nothing holds the focus, the input gets it back.
+  const closedByEscape = useRef(false);
+  const restoreFocusAfterEscape = () => {
+    if (!closedByEscape.current) return;
+    closedByEscape.current = false;
+    // A timeout runs after react-datepicker's own focus timer
+    setTimeout(() => {
+      if (document.activeElement === document.body) returnFocusToInput();
+    }, 0);
+  };
+
   // react-datepicker keeps its own ref on the input; the caller gets the same element, found by its id.
   useElementByIdRef(ref, controlId);
 
@@ -89,12 +102,18 @@ export function useDatePicker({
   return {
     view,
     isCalendarOpen,
-    onCalendarOpen: () => setIsCalendarOpen(true),
+    onCalendarOpen: () => {
+      closedByEscape.current = false;
+      setIsCalendarOpen(true);
+    },
     // A focused date field does not open its calendar (Tab must pass over it): Enter or an arrow does, and the
     // focus moves into it. Enter is stopped here so it does not submit the form. A click opens it without this.
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
       const { key, target } = event;
-      if (key === "Escape" && isCalendarOpen) returnFocusToInput();
+      if (key === "Escape" && isCalendarOpen) {
+        closedByEscape.current = true;
+        returnFocusToInput();
+      }
       if (isCalendarOpen || !OPEN_KEYS.has(key)) return;
       if (!(target instanceof HTMLInputElement) || target.id !== controlId) return;
       event.preventDefault();
@@ -134,6 +153,7 @@ export function useDatePicker({
     // The calendar closes only after the year pick (closeCalendar), never by react-datepicker's own select rule.
     // The next opening starts on the days again.
     onCalendarClose: () => {
+      restoreFocusAfterEscape();
       focusPending.current = false;
       setView("day");
       setIsCalendarOpen(false);
