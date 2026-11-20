@@ -98,6 +98,7 @@ describe("CvsService.list", () => {
     const error = await rejection(service.list(USER, args({ userId: "user-2" })));
 
     expect(error).toBeInstanceOf(ForbiddenException);
+    expect((error as Error).message).toBe("You cannot access the CVs of other users");
     expect(prisma.cv.findMany).not.toHaveBeenCalled();
   });
 
@@ -213,7 +214,10 @@ describe("CvsService.get", () => {
   it("answers NOT_FOUND for the CV of another user", async () => {
     prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-2" }));
 
-    expect(await rejection(service.get(USER, "cv-1"))).toBeInstanceOf(NotFoundException);
+    const error = await rejection(service.get(USER, "cv-1"));
+
+    expect(error).toBeInstanceOf(NotFoundException);
+    expect((error as Error).message).toBe("CV not found");
   });
 
   it("answers NOT_FOUND for a missing CV", async () => {
@@ -366,9 +370,10 @@ describe("CvsService.update", () => {
     it("answers NOT_FOUND for the CV of another employee, also for an admin", async () => {
       prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-3" }));
 
-      expect(await rejection(service.update(ADMIN, { ...input, userId: "user-2" }))).toBeInstanceOf(
-        NotFoundException,
-      );
+      const error = await rejection(service.update(ADMIN, { ...input, userId: "user-2" }));
+
+      expect(error).toBeInstanceOf(NotFoundException);
+      expect((error as Error).message).toBe("CV not found");
       expect(prisma.cv.update).not.toHaveBeenCalled();
     });
 
