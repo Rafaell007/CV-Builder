@@ -288,6 +288,13 @@ describe("CvProjectsService.add", () => {
     });
   });
 
+  it("stores omitted responsibilities as no value", async () => {
+    await service.add(USER, addInput());
+
+    const { data } = firstCall<{ data: Record<string, unknown> }>(prisma.cvProject.create);
+    expect(data).toHaveProperty("responsibilities", null);
+  });
+
   it("runs in a serializable transaction", async () => {
     await service.add(USER, addInput());
 
@@ -425,6 +432,13 @@ describe("CvProjectsService.update", () => {
     expect(firstCall<{ data: unknown }>(prisma.cvProject.update).data).toMatchObject({
       responsibilities: null,
     });
+  });
+
+  it("stores omitted responsibilities as no value, not as unchanged", async () => {
+    await service.update(USER, updateInput());
+
+    const { data } = firstCall<{ data: Record<string, unknown> }>(prisma.cvProject.update);
+    expect(data).toHaveProperty("responsibilities", null);
   });
 
   it("rejects dates outside the project", async () => {
