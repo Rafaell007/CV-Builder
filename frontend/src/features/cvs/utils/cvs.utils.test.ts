@@ -63,6 +63,7 @@ describe("toCvReturnPath", () => {
     ["a path with a query", "/users/10/cvs?x=1"],
     ["a path with a parent step", "/users/../admin/cvs"],
     ["a path with a new line", "/users/10/cvs\n"],
+    ["a path without a user id", "/users//cvs"],
   ])("drops %s", (_name, value) => {
     expect(toCvReturnPath(value)).toBeUndefined();
   });
