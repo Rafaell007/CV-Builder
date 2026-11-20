@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Controller } from "react-hook-form";
-import { FormModal, Select, TextField } from "@/shared/components";
+import { Button, FormModal, Select, TextField } from "@/shared/components";
 import type { UseCreateSkillFormResult } from "../useCreateSkillForm";
 import type { UseSkillCategoriesResult } from "../useSkillCategories";
 import { categoryOptions, type CurrentSkillCategory } from "../utils";
@@ -73,12 +73,14 @@ export function SkillFormModal({
         )}
       />
       {categoriesFailed && (
-        <p role="alert" className={styles.error}>
-          {t("form.errors.categoriesFailed")}
-          <button type="button" className={styles.retry} onClick={categories.retry}>
+        <div className={styles.categoriesFailed}>
+          <p role="alert" className={styles.error}>
+            {t("form.errors.categoriesFailed")}
+          </p>
+          <Button variant="text" onClick={categories.retry}>
             {t("form.errors.categoriesRetry")}
-          </button>
-        </p>
+          </Button>
+        </div>
       )}
       {failed && (
         <p role="alert" className={styles.error}>
