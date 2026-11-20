@@ -172,9 +172,9 @@ describe("CvsService.list", () => {
     expect(call[0].orderBy).toEqual([{ name: "asc" }, { id: "asc" }]);
   });
 
-  it("rejects a sort field that is not allowed", async () => {
+  it.each(["userId", "id", "createdAt"])("rejects the sort field %s", async (field) => {
     await expect(
-      service.list(USER, args({ sort: { field: "userId", direction: SortDirection.ASC } })),
+      service.list(USER, args({ sort: { field, direction: SortDirection.ASC } })),
     ).rejects.toThrow();
 
     expect(prisma.cv.findMany).not.toHaveBeenCalled();
