@@ -76,6 +76,15 @@ describe("CvsService.list", () => {
     expect(result.items[0]).not.toHaveProperty("user");
   });
 
+  it("returns the total of the count, not the number of items on the page", async () => {
+    prisma.cv.count.mockResolvedValue(25);
+
+    const result = await service.list(USER, args());
+
+    expect(result.items).toHaveLength(1);
+    expect(result.total).toBe(25);
+  });
+
   it("limits a user to their own CVs", async () => {
     await service.list(USER, args());
 
