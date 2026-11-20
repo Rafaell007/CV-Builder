@@ -1,6 +1,6 @@
 import { createRef, useState } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { renderWithProviders, screen, within } from "@/shared/testing";
+import { renderWithProviders, screen, waitFor, within } from "@/shared/testing";
 import { DatePicker, type DatePickerProps } from "./DatePicker";
 import { DATE_PICKER_EXAMPLE_LABELS as LABELS } from "./datePicker.fixtures";
 
@@ -376,7 +376,8 @@ describe("DatePicker", () => {
 
     await user.keyboard("{Escape}");
     expect(screen.queryByRole("dialog", { name: "Choose a date" })).not.toBeInTheDocument();
-    expect(input).toHaveFocus();
+    // The focus returns to the input in two steps (useDatePicker and react-datepicker): on a busy CI runner it can land a moment late.
+    await waitFor(() => expect(input).toHaveFocus());
   });
 
   it("takes a typed date", async () => {

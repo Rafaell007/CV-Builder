@@ -16,10 +16,12 @@ import {
 
 const push = vi.fn();
 
-vi.mock("@/shared/i18n", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/shared/i18n")>()),
-  useRouter: () => ({ push }),
-}));
+vi.mock("@/shared/i18n", async (importOriginal) =>
+  (await import("@/shared/testing/withMockedRouter")).withMockedRouter(
+    await importOriginal<typeof import("@/shared/i18n")>(),
+    () => ({ push }),
+  ),
+);
 
 beforeEach(() => {
   push.mockClear();

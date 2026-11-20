@@ -9,9 +9,9 @@ import {
 import type { ReactNode } from "react";
 import { env } from "@/env";
 import { redirectToSignIn, refreshSession } from "@/shared/session";
-import { errorLink } from "./errorLink";
-import { networkErrorLink } from "./networkErrorLink";
-import { createSessionLink } from "./sessionLink";
+import { errorLink } from "../errorLink";
+import { networkErrorLink } from "../networkErrorLink";
+import { createSessionLink } from "../sessionLink";
 
 // The frontend's own /graphql, rewritten to the backend (PLAN D8): the browser sends its cookies itself.
 // Absolute, because this also runs once on the server while the page is rendered.

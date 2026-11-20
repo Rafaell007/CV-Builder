@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { routing } from "./src/shared/i18n/routing/routing";
 
-// Read here and not in src/server/env.ts: this config runs outside the app (PLAN §5.5).
+// Read here and not in src/server/env/env.ts: this config runs outside the app (PLAN §5.5).
 // Rewrites are resolved at build time, so `next build` needs it too.
 const backendUrl = process.env.BACKEND_URL;
 if (!backendUrl) throw new Error("Missing env variable: BACKEND_URL");

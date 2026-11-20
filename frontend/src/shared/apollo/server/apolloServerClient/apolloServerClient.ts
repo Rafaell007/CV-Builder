@@ -7,8 +7,8 @@ import {
 } from "@apollo/client-integration-nextjs";
 import { cookies } from "next/headers";
 import { serverEnv } from "@/server/env";
-import { createCookieLink } from "../cookieLink";
-import { errorLink } from "../errorLink";
+import { createCookieLink } from "../../cookieLink";
+import { errorLink } from "../../errorLink";
 
 // One client per request. It calls the backend directly (no rewrite needed on the server) and
 // forwards the user's cookies. Callers run per request: `await connection()` first, inside <Suspense>.

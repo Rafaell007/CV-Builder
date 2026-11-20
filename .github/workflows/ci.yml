@@ -63,10 +63,19 @@ jobs:
       - name: Build
         run: pnpm build
 
-  # Runs in parallel with the other jobs. The slowest one: the Storybook tests start Chromium.
-  frontend-tests:
+  # Runs in parallel with the other jobs. The frontend tests were the slowest job (up to 10 minutes on the 2 vCPUs of
+  # a runner), so Vitest splits them over 3 shards. Each shard writes a blob report; frontend-tests below merges
+  # the reports and checks the coverage thresholds on the whole code base.
+  frontend-test-shards:
+    name: frontend-test-shards (${{ matrix.shard }}/3)
     runs-on: ubuntu-latest
     timeout-minutes: 15
+
+    strategy:
+      # Let every shard finish, so one run shows all failing tests.
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
 
     env:
       NEXT_PUBLIC_APP_URL: http://localhost:3000
@@ -91,9 +100,63 @@ jobs:
 
       # The test script runs codegen first, so no separate codegen step.
       # A private-repo runner has 2 vCPUs and Vitest then starts only 1 worker by default, so the
-      # 73 unit test files ran one after another. Two workers halve the time of the step.
-      - name: Test
-        run: pnpm --filter @cv-builder/frontend test --maxWorkers=2
+      # unit test files ran one after another. Two workers halve the time of the step.
+      # A shard sees only a third of the code, so test:shard turns the 80 % thresholds off; the merge job checks them.
+      - name: Test shard ${{ matrix.shard }}/3
+        run: pnpm --filter @cv-builder/frontend test:shard --shard=${{ matrix.shard }}/3 --maxWorkers=2
+
+      - name: Upload blob report
+        uses: actions/upload-artifact@v5
+        if: ${{ !cancelled() }}
+        with:
+          name: frontend-blob-report-${{ matrix.shard }}
+          path: frontend/.vitest/blob/
+          # .vitest is a hidden folder, which upload-artifact skips by default.
+          include-hidden-files: true
+          retention-days: 1
+
+  # Merges the 3 blob reports and fails below the 80 % thresholds of vitest.config.mts (PLAN §11.5).
+  # Keeps the old job name, so a required status check named frontend-tests keeps working.
+  frontend-tests:
+    needs: frontend-test-shards
+    # Runs even when a shard failed. A skipped job counts as passed for a required check, so the first step fails it.
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      BACKEND_URL: http://localhost:4000
+
+    steps:
+      - name: Check that all shards passed
+        if: ${{ needs.frontend-test-shards.result != 'success' }}
+        run: |
+          echo "::error::A frontend test shard did not pass. See the frontend-test-shards jobs."
+          exit 1
+
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download blob reports
+        uses: actions/download-artifact@v5
+        with:
+          pattern: frontend-blob-report-*
+          merge-multiple: true
+          path: frontend/.vitest/blob/
+
+      # Does not run tests again: it reads the blobs, prints the result and checks the coverage thresholds.
+      - name: Merge reports and check coverage
+        run: pnpm --filter @cv-builder/frontend test:merge
 
   # Runs in parallel with the other jobs.
   backend-tests:
@@ -159,8 +222,9 @@ jobs:
             exit 1
           fi
 
-      - name: Unit tests
-        run: pnpm --filter @cv-builder/backend test
+      # test:cov runs the same tests and fails below the 80 % thresholds in package.json (PLAN §11.5).
+      - name: Unit tests with coverage
+        run: pnpm --filter @cv-builder/backend test:cov
 
       # Uses the Postgres service above; the global setup creates and migrates the cv_builder_test database.
       - name: Integration tests
