@@ -22,6 +22,8 @@ export function useUpdateSkill(): UseUpdateSkillResult {
   async function update(id: string, input: SkillInput): Promise<SkillListItem> {
     const { data } = await updateSkill({
       variables: { input: { id, ...input } },
+      // The Environment field of the project forms keeps every skill (`skills`); the next form loads the new name.
+      update: (cache) => void cache.evict({ id: "ROOT_QUERY", fieldName: "skills" }),
       refetchQueries: [SkillCatalogDocument],
     });
     // `useMutation` rejects on an error, so a missing result is not expected; fail loudly if it ever happens.

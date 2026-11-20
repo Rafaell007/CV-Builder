@@ -19,9 +19,10 @@ export function useDeleteSkill(): UseDeleteSkillResult {
     await deleteSkill({
       variables: { id },
       update: (cache) => {
+        // The Environment field of the project forms keeps every skill (`skills`); the next form loads them again.
+        cache.evict({ id: "ROOT_QUERY", fieldName: "skills" });
         const cacheId = cache.identify({ __typename: "Skill", id });
-        if (cacheId === undefined) return;
-        cache.evict({ id: cacheId });
+        if (cacheId !== undefined) cache.evict({ id: cacheId });
         cache.gc();
       },
       refetchQueries: [SkillCatalogDocument],
