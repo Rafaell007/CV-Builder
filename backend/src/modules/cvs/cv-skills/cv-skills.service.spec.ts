@@ -198,6 +198,9 @@ describe("CvSkillsService.add", () => {
     const error = await rejection(service.add(USER, { cvId: "cv-1", skillId: "skill-9" }));
 
     expect(error).toBeInstanceOf(ValidationFailedException);
+    expect((error as ValidationFailedException).fieldErrors).toEqual([
+      { field: "skillId", messages: ["Skill is not available for the owner of this CV"] },
+    ]);
     expect(prisma.cvSkill.create).not.toHaveBeenCalled();
   });
 
