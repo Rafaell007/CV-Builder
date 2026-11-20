@@ -64,10 +64,10 @@ jobs:
         run: pnpm build
 
   # Runs in parallel with the other jobs. The frontend tests were the slowest job (up to 10 minutes on the 2 vCPUs of
-  # a runner), so Vitest splits them over 3 shards. Each shard writes a blob report; frontend-tests below merges
+  # a runner), so Vitest splits them over 4 shards. Each shard writes a blob report; frontend-tests below merges
   # the reports and checks the coverage thresholds on the whole code base.
   frontend-test-shards:
-    name: frontend-test-shards (${{ matrix.shard }}/3)
+    name: frontend-test-shards (${{ matrix.shard }}/4)
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -75,7 +75,7 @@ jobs:
       # Let every shard finish, so one run shows all failing tests.
       fail-fast: false
       matrix:
-        shard: [1, 2, 3]
+        shard: [1, 2, 3, 4]
 
     env:
       NEXT_PUBLIC_APP_URL: http://localhost:3000
@@ -102,8 +102,8 @@ jobs:
       # A private-repo runner has 2 vCPUs and Vitest then starts only 1 worker by default, so the
       # unit test files ran one after another. Two workers halve the time of the step.
       # A shard sees only a third of the code, so test:shard turns the 80 % thresholds off; the merge job checks them.
-      - name: Test shard ${{ matrix.shard }}/3
-        run: pnpm --filter @cv-builder/frontend test:shard --shard=${{ matrix.shard }}/3 --maxWorkers=2
+      - name: Test shard ${{ matrix.shard }}/4
+        run: pnpm --filter @cv-builder/frontend test:shard --shard=${{ matrix.shard }}/4 --maxWorkers=2
 
       - name: Upload blob report
         uses: actions/upload-artifact@v5
@@ -115,7 +115,7 @@ jobs:
           include-hidden-files: true
           retention-days: 1
 
-  # Merges the 3 blob reports and fails below the 80 % thresholds of vitest.config.mts (PLAN §11.5).
+  # Merges the 4 blob reports and fails below the 80 % thresholds of vitest.config.mts (PLAN §11.5).
   # Keeps the old job name, so a required status check named frontend-tests keeps working.
   frontend-tests:
     needs: frontend-test-shards
