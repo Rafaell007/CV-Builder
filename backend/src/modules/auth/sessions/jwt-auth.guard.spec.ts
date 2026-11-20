@@ -73,6 +73,14 @@ describe("JwtAuthGuard", () => {
     );
   });
 
+  it("tells the client to sign in", async () => {
+    const { run } = setup({});
+
+    await expect(run(ProtectedResolver, ProtectedResolver.prototype.list)).rejects.toThrow(
+      "Sign in to continue",
+    );
+  });
+
   it("does not check a token when there is no cookie", async () => {
     const { run, tokens } = setup({});
 
