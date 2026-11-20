@@ -55,6 +55,15 @@ describe("TokenService", () => {
       ).resolves.toBeUndefined();
     });
 
+    it("rejects a token signed with another algorithm, even with the right secret", async () => {
+      const token = await new JwtService().signAsync(
+        { tokenVersion: 0 },
+        { subject: "user-1", secret: SECRETS.JWT_ACCESS_SECRET, algorithm: "HS512", expiresIn: 60 },
+      );
+
+      await expect(createService().verifyAccessToken(token)).resolves.toBeUndefined();
+    });
+
     it("rejects a token without a user id", async () => {
       const token = await new JwtService().signAsync(
         { tokenVersion: 0 },
