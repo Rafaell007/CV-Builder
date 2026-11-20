@@ -73,17 +73,21 @@ export function useDatePicker({
   const returnFocusToInput = () =>
     document.getElementById(controlId)?.focus({ preventScroll: true });
 
-  // Escape closes the calendar. react-datepicker may still move the focus to a day after returnFocusToInput; that day
-  // is removed with the calendar and the focus falls to <body> (seen only on the CI runner, KAN-164). When the
-  // calendar has closed after Escape and nothing holds the focus, the input gets it back.
+  // Escape closes the calendar. react-datepicker closes it with `setOpen(false)`, which blurs the input one animation
+  // frame later (`deferBlur`), after we gave the focus back (KAN-164). A fast machine checks the focus before that
+  // frame, a slow one after it, so the focus seemed to be lost only on the CI runner. When the calendar has closed
+  // after Escape and nothing holds the focus once that frame has run, the input gets it back.
   const closedByEscape = useRef(false);
   const restoreFocusAfterEscape = () => {
     if (!closedByEscape.current) return;
     closedByEscape.current = false;
-    // A timeout runs after react-datepicker's own focus timer
-    setTimeout(() => {
-      if (document.activeElement === document.body) returnFocusToInput();
-    }, 0);
+    // `deferBlur` is queued after this call (the close handler runs first), so it runs in the first frame.
+    // The second frame runs after it.
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        if (document.activeElement === document.body) returnFocusToInput();
+      }),
+    );
   };
 
   // react-datepicker keeps its own ref on the input; the caller gets the same element, found by its id.
