@@ -1,5 +1,6 @@
 import { experienceYears } from "./experience-years";
 import type { PreviewProject } from "./preview-project";
+import { inTimeZoneUtcMinus11 } from "./time-zone.testing";
 
 const NOW = new Date("2026-06-15T00:00:00Z");
 
@@ -100,6 +101,20 @@ describe("experienceYears", () => {
 
     expect(experienceYears("react", projects, new Date("2025-02-28T00:00:00Z"))).toBe(0);
     expect(experienceYears("react", projects, new Date("2025-03-01T00:00:00Z"))).toBe(1);
+  });
+
+  // In UTC-11 a start at noon UTC stays on its day, and `now` at midnight UTC is the day before.
+  // Local time would then miss the anniversary. One case for each part of the date, so the others cannot hide it.
+  it.each([
+    ["year", "2022-01-01T12:00:00Z", "2026-01-01T00:00:00Z"],
+    ["month", "2022-02-01T12:00:00Z", "2026-02-01T00:00:00Z"],
+    ["day", "2022-06-15T12:00:00Z", "2026-06-15T00:00:00Z"],
+  ])("counts the %s in UTC, whatever the time zone of the server", (_part, start, now) => {
+    const projects = [{ ...projectUsing(["react"], "2022-01-01"), startDate: new Date(start) }];
+
+    const years = inTimeZoneUtcMinus11(() => experienceYears("react", projects, new Date(now)));
+
+    expect(years).toBe(4);
   });
 
   it("counts the year on 29 February of a later leap year", () => {
