@@ -366,6 +366,14 @@ describe("CvProjectsService.update", () => {
     expect(prisma.cvProject.update).not.toHaveBeenCalled();
   });
 
+  it("looks up the CV of the entry with the id of the input", async () => {
+    await service.update(USER, updateInput());
+
+    expect(prisma.cvProject.findUnique.mock.calls[0]).toEqual([
+      { where: { id: "entry-1" }, select: { cvId: true } },
+    ]);
+  });
+
   it("answers NOT_FOUND for an entry that does not exist", async () => {
     prisma.cvProject.findUnique.mockResolvedValue(null);
 
