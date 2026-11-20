@@ -52,6 +52,10 @@ describe("toCvReturnPath", () => {
     expect(toCvReturnPath("/users/3f2a-9c_1/cvs")).toBe("/users/3f2a-9c_1/cvs");
   });
 
+  it("keeps the path of a User CVs tab when the user id has upper-case letters", () => {
+    expect(toCvReturnPath("/users/AbC123/cvs")).toBe("/users/AbC123/cvs");
+  });
+
   it.each([
     ["nothing", null],
     ["an empty value", ""],
