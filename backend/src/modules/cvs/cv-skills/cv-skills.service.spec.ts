@@ -222,6 +222,14 @@ describe("CvSkillsService.add", () => {
     );
   });
 
+  it("says in the message of the conflict that the skill is already in the CV", async () => {
+    prisma.cvSkill.create.mockRejectedValue(databaseError("P2002"));
+
+    await expect(service.add(USER, { cvId: "cv-1", skillId: "skill-1" })).rejects.toThrow(
+      "The skill is already in this CV",
+    );
+  });
+
   it("turns a CV that was deleted in between into NOT_FOUND", async () => {
     prisma.cvSkill.create.mockRejectedValue(databaseError("P2003"));
 
@@ -278,6 +286,14 @@ describe("CvSkillsService.update", () => {
       await rejection(service.update(USER, { id: "link-9", mastery: Mastery.EXPERT })),
     ).toBeInstanceOf(NotFoundException);
     expect(prisma.cvSkill.update).not.toHaveBeenCalled();
+  });
+
+  it("says in the message that the CV skill was not found", async () => {
+    prisma.cvSkill.findUnique.mockResolvedValue(null);
+
+    await expect(service.update(USER, { id: "link-9", mastery: Mastery.EXPERT })).rejects.toThrow(
+      "CV skill not found",
+    );
   });
 
   it("changes nothing when the CV of the link is not accessible", async () => {
