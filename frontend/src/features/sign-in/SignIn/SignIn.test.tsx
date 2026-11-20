@@ -33,6 +33,6 @@ describe("SignIn", () => {
   it("shows the page in Polish", () => {
     renderWithProviders(<SignIn />, { locale: "pl" });
 
-    expect(screen.getByRole("heading", { level: 1 })).not.toHaveTextContent("Welcome back");
+    expect(screen.getByRole("heading", { level: 1, name: "Witaj ponownie" })).toBeInTheDocument();
   });
 });

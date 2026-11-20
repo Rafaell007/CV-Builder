@@ -17,6 +17,8 @@ describe("ForgotPasswordPage", () => {
   it("shows the page in Polish", () => {
     renderWithProviders(<ForgotPasswordPage />, { locale: "pl" });
 
-    expect(screen.getByRole("heading", { level: 1 })).not.toHaveTextContent("Forgot password");
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Nie pamiętasz hasła" }),
+    ).toBeInTheDocument();
   });
 });

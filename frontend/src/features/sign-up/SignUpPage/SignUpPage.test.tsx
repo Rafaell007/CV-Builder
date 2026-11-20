@@ -32,6 +32,6 @@ describe("SignUpPage", () => {
   it("shows the page in Polish", () => {
     renderWithProviders(<SignUpPage />, { locale: "pl" });
 
-    expect(screen.getByRole("heading", { level: 1 })).not.toHaveTextContent("Sign up now");
+    expect(screen.getByRole("heading", { level: 1, name: "Zarejestruj się" })).toBeInTheDocument();
   });
 });
