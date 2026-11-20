@@ -276,6 +276,16 @@ describe("CvSkillsService.remove", () => {
     });
   });
 
+  it("deletes with the client of the transaction, not with the shared client", async () => {
+    const tx = { cvSkill: { deleteMany: jest.fn().mockResolvedValue({ count: 1 }) } };
+    transaction.mockImplementationOnce((work: (client: unknown) => Promise<unknown>) => work(tx));
+
+    await service.remove(USER, { cvId: "cv-1", ids: ["link-1"] });
+
+    expect(tx.cvSkill.deleteMany).toHaveBeenCalledTimes(1);
+    expect(prisma.cvSkill.deleteMany).not.toHaveBeenCalled();
+  });
+
   it("answers NOT_FOUND when one id is not in the CV", async () => {
     prisma.cvSkill.deleteMany.mockResolvedValue({ count: 1 });
 
