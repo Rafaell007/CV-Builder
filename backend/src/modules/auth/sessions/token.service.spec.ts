@@ -92,7 +92,7 @@ describe("TokenService", () => {
       const service = createService();
       const first = service.createRefreshToken();
 
-      expect(first.length).toBeGreaterThanOrEqual(43); // 32 bytes in base64url
+      expect(first).toMatch(/^[A-Za-z0-9_-]{43}$/); // 32 bytes in base64url
       expect(first).not.toBe(service.createRefreshToken());
     });
 
