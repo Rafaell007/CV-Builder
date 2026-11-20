@@ -185,9 +185,9 @@
       }
     },
     "update": {
-      "title": "Edytuj umiejętność",
+      "title": "Zaktualizuj umiejętność",
       "close": "Zamknij",
-      "submit": "Zapisz",
+      "submit": "Zaktualizuj",
       "cancel": "Anuluj",
       "success": {
         "title": "Umiejętność zaktualizowana",
@@ -206,7 +206,7 @@
     },
     "form": {
       "fields": {
-        "name": "Umiejętność",
+        "name": "Nazwa",
         "category": "Kategoria"
       },
       "errors": {

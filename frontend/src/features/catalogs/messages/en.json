@@ -185,9 +185,9 @@
       }
     },
     "update": {
-      "title": "Edit skill",
+      "title": "Update skill",
       "close": "Close",
-      "submit": "Save",
+      "submit": "Update",
       "cancel": "Cancel",
       "success": {
         "title": "Skill updated",
@@ -206,7 +206,7 @@
     },
     "form": {
       "fields": {
-        "name": "Skill",
+        "name": "Name",
         "category": "Category"
       },
       "errors": {
