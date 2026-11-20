@@ -3,13 +3,12 @@ import { renderWithProviders, screen } from "@/shared/testing";
 import { SignIn } from "./SignIn";
 
 // Only the router is replaced: the form hook reads it, and the test helpers need the rest of the module.
-vi.mock(import("@/shared/i18n"), async (importOriginal) => {
-  const actual = await importOriginal();
-  return {
-    ...actual,
-    useRouter: () => ({ replace: vi.fn() }) as unknown as ReturnType<typeof actual.useRouter>,
-  };
-});
+vi.mock(import("@/shared/i18n"), async (importOriginal) =>
+  (await import("@/shared/testing/withMockedRouter")).withMockedRouter(
+    await importOriginal(),
+    () => ({ replace: vi.fn() }),
+  ),
+);
 
 describe("SignIn", () => {
   it("shows the title, the subtitle and the sign in form", () => {
