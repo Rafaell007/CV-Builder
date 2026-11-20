@@ -139,7 +139,7 @@ Run from the repository root; each runs in every workspace that defines it.
 | Frontend stories | Storybook 10 + Vitest browser mode (Chromium) | `pnpm --filter @cv-builder/frontend test` | set up (theme sample) |
 | E2E | Playwright, seeded test database | `pnpm test:e2e` | set up (smoke test) |
 
-Coverage target: over 80 %. `test:cov` prints the report and fails below 80 % in each app: `pnpm --filter @cv-builder/backend test:cov` (threshold in the Jest config in `backend/package.json`) and `pnpm --filter @cv-builder/frontend test:cov` (threshold in `frontend/vitest.config.mts`; HTML report in `frontend/coverage/`). CI runs both `test:cov` scripts, so a pull request that drops an app below 80 % fails the build.
+Coverage target: over 80 %. `test:cov` prints the report and fails below 80 % in each app: `pnpm --filter @cv-builder/backend test:cov` (threshold in the Jest config in `backend/package.json`) and `pnpm --filter @cv-builder/frontend test:cov` (threshold in `frontend/vitest.config.mts`; HTML report in `frontend/coverage/`). CI runs the backend `test:cov` and the same frontend tests split over 3 shards (`frontend-test-shards`: `test:shard` writes a Vitest blob report, no threshold). The `frontend-tests` job merges the reports (`test:merge`) and checks the 80 % threshold on the whole frontend, so a pull request that drops an app below 80 % fails the build.
 
 Coverage on 2026-11-20 (unit tests; for the backend the integration tests are not counted):
 
