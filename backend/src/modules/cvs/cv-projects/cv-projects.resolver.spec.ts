@@ -67,6 +67,16 @@ describe("CvProjectsResolver", () => {
     expect(service.update).not.toHaveBeenCalled();
   });
 
+  it("passes on the error of the service when removing fails", async () => {
+    const { resolver, service } = setup();
+    const failure = new Error("remove failed");
+    service.remove.mockRejectedValue(failure);
+
+    await expect(resolver.removeCvProjects(USER, { cvId: "cv-1", ids: ["entry-1"] })).rejects.toBe(
+      failure,
+    );
+  });
+
   it("requires a verified email for the three mutations only (D16)", () => {
     const verified = (handler: unknown): unknown =>
       Reflect.getMetadata(VERIFIED_KEY, handler as object) as unknown;
