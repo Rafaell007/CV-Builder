@@ -450,6 +450,12 @@ describe("CvProjectsService.remove", () => {
     expect(prisma.cvProject.deleteMany).not.toHaveBeenCalled();
   });
 
+  it("checks the access to the CV that is named in the input", async () => {
+    await service.remove(USER, input);
+
+    expect(cvs.assertAccessible).toHaveBeenCalledWith(USER, "cv-1");
+  });
+
   it("deletes only the entries of the named CV", async () => {
     await service.remove(USER, input);
 
