@@ -182,6 +182,9 @@ describe("CvsService.get", () => {
     prisma.cv.findUnique.mockResolvedValue(storedCv());
 
     await expect(service.get(USER, "cv-1")).resolves.toMatchObject({ id: "cv-1" });
+    expect(prisma.cv.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: "cv-1" } }),
+    );
   });
 
   it("returns the CV of another user to an admin", async () => {
@@ -287,6 +290,9 @@ describe("CvsService.update", () => {
 
     await expect(service.update(USER, input)).resolves.toMatchObject({ name: "Changed" });
 
+    expect(prisma.cv.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: "cv-1" } }),
+    );
     expect(prisma.cv.update).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { id: "cv-1" },
@@ -359,6 +365,9 @@ describe("CvsService.delete", () => {
 
     await expect(service.delete(USER, "cv-1")).resolves.toMatchObject({ id: "cv-1" });
 
+    expect(prisma.cv.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: "cv-1" } }),
+    );
     expect(prisma.cv.delete).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: "cv-1" } }),
     );
