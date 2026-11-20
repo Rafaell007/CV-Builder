@@ -12,14 +12,20 @@ import { useSkillCategories, type UseSkillCategoriesResult } from "./useSkillCat
 function setup(options: RenderWithProvidersOptions) {
   let current!: UseSkillCategoriesResult;
   let enable!: () => void;
+  let disable!: () => void;
   function Probe(): ReactNode {
     const [enabled, setEnabled] = useState(false);
     enable = () => setEnabled(true);
+    disable = () => setEnabled(false);
     current = useSkillCategories(enabled);
     return null;
   }
   renderWithProviders(<Probe />, options);
-  return { result: () => current, enable: () => act(() => enable()) };
+  return {
+    result: () => current,
+    enable: () => act(() => enable()),
+    disable: () => act(() => disable()),
+  };
 }
 
 describe("useSkillCategories", () => {
@@ -30,6 +36,20 @@ describe("useSkillCategories", () => {
     enable();
 
     await expect.poll(() => result().categories).toEqual(sampleCategories);
+  });
+
+  it("keeps the categories after it is disabled again (the modal fades out)", async () => {
+    const { result, enable, disable } = setup({ mocks: [skillCategoriesMock()] });
+    enable();
+    await expect.poll(() => result().categories).toEqual(sampleCategories);
+
+    disable();
+    expect(result().categories).toEqual(sampleCategories);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(result().categories).toEqual(sampleCategories);
+
+    enable();
+    expect(result().categories).toEqual(sampleCategories);
   });
 
   it("reports a failed request, and retry sends it again", async () => {
