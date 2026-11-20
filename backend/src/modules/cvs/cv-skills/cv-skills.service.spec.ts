@@ -236,6 +236,13 @@ describe("CvSkillsService.add", () => {
 
     expect(await rejection(service.add(USER, { cvId: "cv-1", skillId: "skill-1" }))).toBe(failure);
   });
+
+  it("does not hide an error that is not from the database", async () => {
+    const failure = new Error("connection lost");
+    prisma.cvSkill.create.mockRejectedValue(failure);
+
+    expect(await rejection(service.add(USER, { cvId: "cv-1", skillId: "skill-1" }))).toBe(failure);
+  });
 });
 
 describe("CvSkillsService.update", () => {
