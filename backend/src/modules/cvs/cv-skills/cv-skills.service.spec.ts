@@ -139,6 +139,18 @@ describe("CvSkillsService.listAvailable", () => {
     });
   });
 
+  it("orders the available skills by category, then name, then id", async () => {
+    prisma.userSkill.findMany.mockResolvedValue([]);
+
+    await service.listAvailable(USER, "cv-1");
+
+    expect(firstCall<{ orderBy: unknown }>(prisma.userSkill.findMany).orderBy).toEqual([
+      { skill: { category: { name: "asc" } } },
+      { skill: { name: "asc" } },
+      { id: "asc" },
+    ]);
+  });
+
   it("uses the owner of the CV, also when an admin asks", async () => {
     prisma.userSkill.findMany.mockResolvedValue([]);
 
@@ -172,6 +184,20 @@ describe("CvSkillsService.add", () => {
     });
   });
 
+  it("reads the skill and its category back with the new link", async () => {
+    await service.add(USER, { cvId: "cv-1", skillId: "skill-1" });
+
+    expect(firstCall<{ include: unknown }>(prisma.cvSkill.create).include).toEqual({
+      skill: {
+        select: {
+          id: true,
+          name: true,
+          category: { select: { id: true, name: true, type: true } },
+        },
+      },
+    });
+  });
+
   it("uses the mastery from the request when one is sent", async () => {
     await service.add(USER, { cvId: "cv-1", skillId: "skill-1", mastery: Mastery.EXPERT });
 
@@ -186,6 +212,9 @@ describe("CvSkillsService.add", () => {
     const error = await rejection(service.add(USER, { cvId: "cv-1", skillId: "skill-9" }));
 
     expect(error).toBeInstanceOf(ValidationFailedException);
+    expect((error as ValidationFailedException).fieldErrors).toEqual([
+      { field: "skillId", messages: ["Skill is not available for the owner of this CV"] },
+    ]);
     expect(prisma.cvSkill.create).not.toHaveBeenCalled();
   });
 
@@ -207,6 +236,14 @@ describe("CvSkillsService.add", () => {
     );
   });
 
+  it("says in the message of the conflict that the skill is already in the CV", async () => {
+    prisma.cvSkill.create.mockRejectedValue(databaseError("P2002"));
+
+    await expect(service.add(USER, { cvId: "cv-1", skillId: "skill-1" })).rejects.toThrow(
+      "The skill is already in this CV",
+    );
+  });
+
   it("turns a CV that was deleted in between into NOT_FOUND", async () => {
     prisma.cvSkill.create.mockRejectedValue(databaseError("P2003"));
 
@@ -217,6 +254,13 @@ describe("CvSkillsService.add", () => {
 
   it("does not hide other database errors", async () => {
     const failure = databaseError("P1001");
+    prisma.cvSkill.create.mockRejectedValue(failure);
+
+    expect(await rejection(service.add(USER, { cvId: "cv-1", skillId: "skill-1" }))).toBe(failure);
+  });
+
+  it("does not hide an error that is not from the database", async () => {
+    const failure = new Error("connection lost");
     prisma.cvSkill.create.mockRejectedValue(failure);
 
     expect(await rejection(service.add(USER, { cvId: "cv-1", skillId: "skill-1" }))).toBe(failure);
@@ -234,6 +278,15 @@ describe("CvSkillsService.update", () => {
     });
   });
 
+  it("looks up the link by its id and reads only the CV id", async () => {
+    await service.update(USER, { id: "link-1", mastery: Mastery.EXPERT });
+
+    expect(prisma.cvSkill.findUnique).toHaveBeenCalledWith({
+      where: { id: "link-1" },
+      select: { cvId: true },
+    });
+  });
+
   it("finds the CV through the link and checks the access to it", async () => {
     await service.update(ADMIN, { id: "link-1", mastery: Mastery.EXPERT });
 
@@ -247,6 +300,14 @@ describe("CvSkillsService.update", () => {
       await rejection(service.update(USER, { id: "link-9", mastery: Mastery.EXPERT })),
     ).toBeInstanceOf(NotFoundException);
     expect(prisma.cvSkill.update).not.toHaveBeenCalled();
+  });
+
+  it("says in the message that the CV skill was not found", async () => {
+    prisma.cvSkill.findUnique.mockResolvedValue(null);
+
+    await expect(service.update(USER, { id: "link-9", mastery: Mastery.EXPERT })).rejects.toThrow(
+      "CV skill not found",
+    );
   });
 
   it("changes nothing when the CV of the link is not accessible", async () => {
@@ -274,6 +335,16 @@ describe("CvSkillsService.remove", () => {
     expect(prisma.cvSkill.deleteMany).toHaveBeenCalledWith({
       where: { id: { in: ["link-1"] }, cvId: "cv-1" },
     });
+  });
+
+  it("deletes with the client of the transaction, not with the shared client", async () => {
+    const tx = { cvSkill: { deleteMany: jest.fn().mockResolvedValue({ count: 1 }) } };
+    transaction.mockImplementationOnce((work: (client: unknown) => Promise<unknown>) => work(tx));
+
+    await service.remove(USER, { cvId: "cv-1", ids: ["link-1"] });
+
+    expect(tx.cvSkill.deleteMany).toHaveBeenCalledTimes(1);
+    expect(prisma.cvSkill.deleteMany).not.toHaveBeenCalled();
   });
 
   it("answers NOT_FOUND when one id is not in the CV", async () => {

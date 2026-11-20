@@ -137,6 +137,26 @@ describe("CvProjectsService.list", () => {
     expect(entry).not.toHaveProperty("project.skills");
   });
 
+  it("sorts the roles of every entry by the role name ascending", async () => {
+    await service.list(USER, { cvId: "cv-1" });
+
+    const { include } = firstCall<{ include: { roles: { orderBy: unknown } } }>(
+      prisma.cvProject.findMany,
+    );
+    expect(include.roles.orderBy).toEqual({ role: { name: "asc" } });
+  });
+
+  it("returns the entries in the order of the database", async () => {
+    prisma.cvProject.findMany.mockResolvedValue([
+      storedEntry({ id: "entry-1" }),
+      storedEntry({ id: "entry-2" }),
+    ]);
+
+    const entries = await service.list(USER, { cvId: "cv-1" });
+
+    expect(entries.map(({ id }) => id)).toEqual(["entry-1", "entry-2"]);
+  });
+
   it("checks the access to the CV first and reads nothing when it fails", async () => {
     cvs.assertAccessible.mockRejectedValue(new NotFoundException("CV not found"));
 
@@ -179,6 +199,18 @@ describe("CvProjectsService.list", () => {
 
     expect(firstCall<{ orderBy: unknown }>(prisma.cvProject.findMany).orderBy).toEqual([
       { project: { name: "asc" } },
+      { id: "asc" },
+    ]);
+  });
+
+  it("sorts by the project name descending", async () => {
+    await service.list(USER, {
+      cvId: "cv-1",
+      sort: { field: "name", direction: SortDirection.DESC },
+    });
+
+    expect(firstCall<{ orderBy: unknown }>(prisma.cvProject.findMany).orderBy).toEqual([
+      { project: { name: "desc" } },
       { id: "asc" },
     ]);
   });
@@ -256,6 +288,30 @@ describe("CvProjectsService.add", () => {
     });
   });
 
+  it("checks the access to the CV of the input, not to the project", async () => {
+    await service.add(USER, addInput({ cvId: "cv-7", projectId: "project-9" }));
+
+    expect(cvs.assertAccessible).toHaveBeenCalledWith(USER, "cv-7");
+    expect(cvs.assertAccessible).not.toHaveBeenCalledWith(USER, "project-9");
+  });
+
+  it("reads the dates of the project with the project id, not the CV id", async () => {
+    await service.add(USER, addInput({ cvId: "cv-7", projectId: "project-9" }));
+
+    expect(prisma.project.findUnique).toHaveBeenCalledWith({
+      where: { id: "project-9" },
+      select: { startDate: true, endDate: true },
+    });
+  });
+
+  it("asks the database for the project and the roles of the created entry", async () => {
+    await service.add(USER, addInput());
+
+    const { include } = firstCall<{ include: Record<string, unknown> }>(prisma.cvProject.create);
+    expect(include).toHaveProperty("project");
+    expect(include).toHaveProperty("roles");
+  });
+
   it("returns the created entry", async () => {
     await expect(service.add(USER, addInput())).resolves.toMatchObject({
       id: "entry-1",
@@ -270,6 +326,13 @@ describe("CvProjectsService.add", () => {
       endDate: null,
       responsibilities: null,
     });
+  });
+
+  it("stores omitted responsibilities as no value", async () => {
+    await service.add(USER, addInput());
+
+    const { data } = firstCall<{ data: Record<string, unknown> }>(prisma.cvProject.create);
+    expect(data).toHaveProperty("responsibilities", null);
   });
 
   it("runs in a serializable transaction", async () => {
@@ -342,8 +405,25 @@ describe("CvProjectsService.add", () => {
     expect(await rejection(service.add(USER, addInput()))).toBeInstanceOf(NotFoundException);
   });
 
+  it("says why the parallel change and the deleted CV are refused", async () => {
+    prisma.cvProject.create.mockRejectedValueOnce(databaseError("P2034"));
+    await expect(service.add(USER, addInput())).rejects.toThrow(
+      "The CV was changed at the same time. Try again",
+    );
+
+    prisma.cvProject.create.mockRejectedValueOnce(databaseError("P2003"));
+    await expect(service.add(USER, addInput())).rejects.toThrow("CV not found");
+  });
+
   it("passes on other database errors", async () => {
     const failure = new Error("connection lost");
+    prisma.cvProject.create.mockRejectedValue(failure);
+
+    expect(await rejection(service.add(USER, addInput()))).toBe(failure);
+  });
+
+  it("passes on a database error with an unknown code without changing it", async () => {
+    const failure = databaseError("P2999");
     prisma.cvProject.create.mockRejectedValue(failure);
 
     expect(await rejection(service.add(USER, addInput()))).toBe(failure);
@@ -357,6 +437,14 @@ describe("CvProjectsService.update", () => {
     expect(await rejection(service.update(USER, updateInput()))).toBeInstanceOf(NotFoundException);
     expect(cvs.assertAccessible).toHaveBeenCalledWith(USER, "cv-1");
     expect(prisma.cvProject.update).not.toHaveBeenCalled();
+  });
+
+  it("looks up the CV of the entry with the id of the input", async () => {
+    await service.update(USER, updateInput());
+
+    expect(prisma.cvProject.findUnique.mock.calls[0]).toEqual([
+      { where: { id: "entry-1" }, select: { cvId: true } },
+    ]);
   });
 
   it("answers NOT_FOUND for an entry that does not exist", async () => {
@@ -395,6 +483,21 @@ describe("CvProjectsService.update", () => {
     });
   });
 
+  it("stores empty responsibilities as no value", async () => {
+    await service.update(USER, updateInput({ responsibilities: "" }));
+
+    expect(firstCall<{ data: unknown }>(prisma.cvProject.update).data).toMatchObject({
+      responsibilities: null,
+    });
+  });
+
+  it("stores omitted responsibilities as no value, not as unchanged", async () => {
+    await service.update(USER, updateInput());
+
+    const { data } = firstCall<{ data: Record<string, unknown> }>(prisma.cvProject.update);
+    expect(data).toHaveProperty("responsibilities", null);
+  });
+
   it("rejects dates outside the project", async () => {
     await expect(
       service.update(USER, updateInput({ endDate: new Date("2027-02-01T00:00:00Z") })),
@@ -429,6 +532,14 @@ describe("CvProjectsService.update", () => {
     expect(await rejection(service.update(USER, updateInput()))).toBeInstanceOf(NotFoundException);
   });
 
+  it("says CV project not found when the entry does not exist or is removed", async () => {
+    prisma.cvProject.findUnique.mockResolvedValueOnce(null);
+    await expect(service.update(USER, updateInput())).rejects.toThrow("CV project not found");
+
+    prisma.cvProject.update.mockRejectedValueOnce(databaseError("P2025"));
+    await expect(service.update(USER, updateInput())).rejects.toThrow("CV project not found");
+  });
+
   it("answers CONFLICT when the database stops the transaction because of a parallel change", async () => {
     prisma.cvProject.update.mockRejectedValue(databaseError("P2034"));
 
@@ -448,6 +559,12 @@ describe("CvProjectsService.remove", () => {
 
     expect(await rejection(service.remove(USER, input))).toBeInstanceOf(NotFoundException);
     expect(prisma.cvProject.deleteMany).not.toHaveBeenCalled();
+  });
+
+  it("checks the access to the CV that is named in the input", async () => {
+    await service.remove(USER, input);
+
+    expect(cvs.assertAccessible).toHaveBeenCalledWith(USER, "cv-1");
   });
 
   it("deletes only the entries of the named CV", async () => {
