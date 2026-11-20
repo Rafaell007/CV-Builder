@@ -383,6 +383,13 @@ describe("CvProjectsService.add", () => {
 
     expect(await rejection(service.add(USER, addInput()))).toBe(failure);
   });
+
+  it("passes on a database error with an unknown code without changing it", async () => {
+    const failure = databaseError("P2999");
+    prisma.cvProject.create.mockRejectedValue(failure);
+
+    expect(await rejection(service.add(USER, addInput()))).toBe(failure);
+  });
 });
 
 describe("CvProjectsService.update", () => {
