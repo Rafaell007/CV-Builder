@@ -18,5 +18,5 @@ The `/admin/departments`, `/admin/positions` and `/admin/skills` pages (PLAN S5.
 ## Notes (PR review of KAN-98, 2026-11-20)
 
 - `Skills/SkillFormModal/SkillFormModal.module.css` has an `.error` rule that is the same as the one in `NameFormModal.module.css`. It is left as a copy on purpose: sharing it would make one modal import the style file of another. If a third modal needs it, move it to a shared component first.
-- The `.retry` button of the Category error ("Could not load the categories") has its own style (no padding, underlined). The shared `Button` has `variant="text"`, but it adds padding and a size, so it does not match this inline link. Check with the design before you replace it.
+- The Retry of the Category error ("Could not load the categories") is the shared `Button` with `variant="text"`, under the message (decided 2026-11-20). It is the standard pill button, so it is larger than a text link; the visible text is upper case, the accessible name stays "Retry".
 - `useSkillCategories(enabled)` uses `skip: !enabled`. In Apollo Client 4 the loaded categories stay available after `skip` turns true, so the Category select keeps its options while a modal fades out. `useSkillCategories.test.tsx` checks this. If an Apollo upgrade makes that test fail, the Create modal will show an empty Category field while it closes.
