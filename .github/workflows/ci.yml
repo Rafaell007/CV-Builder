@@ -92,8 +92,9 @@ jobs:
       # The test script runs codegen first, so no separate codegen step.
       # A private-repo runner has 2 vCPUs and Vitest then starts only 1 worker by default, so the
       # 73 unit test files ran one after another. Two workers halve the time of the step.
-      - name: Test
-        run: pnpm --filter @cv-builder/frontend test --maxWorkers=2
+      # test:cov runs the same tests and fails below the 80 % thresholds of vitest.config.mts (PLAN §11.5).
+      - name: Test with coverage
+        run: pnpm --filter @cv-builder/frontend test:cov --maxWorkers=2
 
   # Runs in parallel with the other jobs.
   backend-tests:
@@ -159,8 +160,9 @@ jobs:
             exit 1
           fi
 
-      - name: Unit tests
-        run: pnpm --filter @cv-builder/backend test
+      # test:cov runs the same tests and fails below the 80 % thresholds in package.json (PLAN §11.5).
+      - name: Unit tests with coverage
+        run: pnpm --filter @cv-builder/backend test:cov
 
       # Uses the Postgres service above; the global setup creates and migrates the cv_builder_test database.
       - name: Integration tests
