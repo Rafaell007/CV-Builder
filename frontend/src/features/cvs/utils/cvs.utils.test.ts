@@ -71,6 +71,13 @@ describe("toCvReturnPath", () => {
   ])("drops %s", (_name, value) => {
     expect(toCvReturnPath(value)).toBeUndefined();
   });
+
+  it("drops a value that is not a string, even when it turns into a valid path as text", () => {
+    const notText = { toString: () => "/users/10/cvs" } as unknown as string;
+
+    expect(toCvReturnPath(notText)).toBeUndefined();
+    expect(toCvReturnPath(undefined)).toBeUndefined();
+  });
 });
 
 describe("toCvTabPath", () => {
