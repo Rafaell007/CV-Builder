@@ -105,6 +105,7 @@ describe("CvsService.list", () => {
     await service.list(USER, args({ userId: USER.id }));
 
     expect(whereOfList()).toEqual({ userId: USER.id });
+    expect(prisma.user.findUnique).not.toHaveBeenCalled();
   });
 
   it("shows all CVs to an admin", async () => {
