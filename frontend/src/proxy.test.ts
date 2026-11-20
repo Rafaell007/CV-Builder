@@ -22,7 +22,9 @@ describe("proxy", () => {
 });
 
 describe("proxy matcher", () => {
-  // Next.js reads the pattern as a path-to-regexp string; anchored, it is also a plain regular expression.
+  // Next.js reads the pattern as a path-to-regexp string. The pattern is one custom group (a regular expression),
+  // so anchored it behaves as a plain regular expression. Keep it one group: other path-to-regexp syntax
+  // (named parameters, `:path*`) would not be covered by this test.
   const [pattern] = config.matcher;
   const matcher = new RegExp(`^${pattern}$`);
 
@@ -35,6 +37,12 @@ describe("proxy matcher", () => {
 
   it("runs for a page path with a dot, so the session check still sees it", () => {
     expect(matcher.test("/en/users/john.doe")).toBe(true);
+  });
+
+  // The pattern skips `api/` with a slash only, so the bare `/api` reaches the proxy (and gets a language prefix).
+  // This records the current behaviour: if `/api` must be skipped too, change the pattern and move it below.
+  it("runs for the bare path /api, which has no backend rewrite", () => {
+    expect(matcher.test("/api")).toBe(true);
   });
 
   it.each(["/graphql", "/graphql/upload", "/api/health"])(
