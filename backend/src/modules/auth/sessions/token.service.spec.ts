@@ -101,6 +101,14 @@ describe("TokenService", () => {
       expect(service.hashRefreshToken("token-a")).not.toBe(service.hashRefreshToken("token-b"));
     });
 
+    it("keeps the stored value stable: HMAC-SHA256 in hex", () => {
+      // Made outside this code with node:crypto, key = the refresh secret above, text = "t".
+      // A changed algorithm or encoding changes the value, and every stored refresh token stops matching.
+      expect(createService().hashRefreshToken("t")).toBe(
+        "c5fe36c418e18586b8caf53bd014a33f39748857845b85cd987ce1ee0fcbbc8e",
+      );
+    });
+
     it("hashes differently with another refresh secret", () => {
       const other = createService({ JWT_REFRESH_SECRET: "y".repeat(32) });
 
