@@ -51,6 +51,16 @@ describe("resolveCvProjectDates", () => {
     ).not.toThrow();
   });
 
+  it("accepts a start date on the last day of the project", () => {
+    expect(() => resolveCvProjectDates({ startDate: PROJECT.endDate }, PROJECT)).not.toThrow();
+  });
+
+  it("accepts an end date on the first day of the project", () => {
+    expect(() =>
+      resolveCvProjectDates({ startDate: PROJECT.startDate, endDate: PROJECT.startDate }, PROJECT),
+    ).not.toThrow();
+  });
+
   it("accepts a person who starts and ends on the same day", () => {
     const day = new Date("2026-05-05");
 
