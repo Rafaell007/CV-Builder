@@ -54,6 +54,29 @@ describe("CvProjectsResolver", () => {
     expect(service.remove).not.toHaveBeenCalled();
   });
 
+  it("refuses adding and changing without a user", () => {
+    const { resolver, service } = setup();
+
+    expect(() => resolver.addCvProject(undefined, {} as AddCvProjectInput)).toThrow(
+      UnauthorizedException,
+    );
+    expect(() => resolver.updateCvProject(undefined, {} as UpdateCvProjectInput)).toThrow(
+      UnauthorizedException,
+    );
+    expect(service.add).not.toHaveBeenCalled();
+    expect(service.update).not.toHaveBeenCalled();
+  });
+
+  it("passes on the error of the service when removing fails", async () => {
+    const { resolver, service } = setup();
+    const failure = new Error("remove failed");
+    service.remove.mockRejectedValue(failure);
+
+    await expect(resolver.removeCvProjects(USER, { cvId: "cv-1", ids: ["entry-1"] })).rejects.toBe(
+      failure,
+    );
+  });
+
   it("requires a verified email for the three mutations only (D16)", () => {
     const verified = (handler: unknown): unknown =>
       Reflect.getMetadata(VERIFIED_KEY, handler as object) as unknown;

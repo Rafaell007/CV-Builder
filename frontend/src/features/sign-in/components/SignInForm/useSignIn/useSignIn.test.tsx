@@ -9,14 +9,12 @@ import { useSignIn } from "./useSignIn";
 
 const replace = vi.fn();
 // Only the router is replaced: the test helpers need the rest of the module (routing).
-vi.mock(import("@/shared/i18n"), async (importOriginal) => {
-  const actual = await importOriginal();
-  // The code under test only calls replace.
-  return {
-    ...actual,
-    useRouter: () => ({ replace }) as unknown as ReturnType<typeof actual.useRouter>,
-  };
-});
+vi.mock(import("@/shared/i18n"), async (importOriginal) =>
+  (await import("@/shared/testing/withMockedRouter")).withMockedRouter(
+    await importOriginal(),
+    () => ({ replace }),
+  ),
+);
 
 const values = { email: "user@example.com", password: "secret1" };
 const user = {

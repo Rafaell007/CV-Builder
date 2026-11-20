@@ -12,6 +12,8 @@ Languages with [next-intl](https://next-intl.dev): `en` and `pl`, both fully tra
 
 The proxy and `shared/session` import `@/shared/i18n/routing` and `@/shared/i18n/utils` directly, not this entry: its navigation loads the request config (`next/root-params`), which the proxy cannot import.
 
+The request config is `src/i18n/request.ts`. next-intl finds it by that path, so it is not a folder, and its test `src/i18n/request.test.ts` stays beside it (an exception to the folder rule of `frontend/AGENTS.md`). The test checks that a known language gives its messages and an unknown one gives a 404.
+
 ## How a language change works
 
 1. `setLanguage("pl")` opens the same page under the new language: `/en/settings` → `/pl/settings`.

@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { AuthTabs } from "@/shared/components/AuthTabs";
-import { SignInForm } from "./components/SignInForm";
+import { SignInForm } from "../components/SignInForm";
 import styles from "./SignIn.module.css";
 
 // Not async and without hooks of its own, so it works in the Server Component page; the form is a Client Component.

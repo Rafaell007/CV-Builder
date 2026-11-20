@@ -9,8 +9,16 @@ describe("readCookie", () => {
     expect(readCookie("old_access_token=nope", "access_token")).toBeUndefined();
   });
 
+  it("does not match a cookie whose name only starts with the wanted name", () => {
+    expect(readCookie("access_tokenX", "access_token")).toBeUndefined();
+  });
+
   it("keeps an equals sign inside the value", () => {
     expect(readCookie("refresh_token=a=b", "refresh_token")).toBe("a=b");
+  });
+
+  it("ignores spaces around the value", () => {
+    expect(readCookie("a=b ;c=d", "a")).toBe("b");
   });
 
   it("decodes percent-encoded values", () => {

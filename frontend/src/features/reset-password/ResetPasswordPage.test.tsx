@@ -3,10 +3,12 @@ import { renderWithProviders, screen } from "@/shared/testing";
 import { ResetPasswordPage } from "./ResetPasswordPage";
 
 // The real router needs the Next.js app router, which tests do not have.
-vi.mock("@/shared/i18n", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/shared/i18n")>()),
-  useRouter: () => ({ push: vi.fn() }),
-}));
+vi.mock("@/shared/i18n", async (importOriginal) =>
+  (await import("@/shared/testing/withMockedRouter")).withMockedRouter(
+    await importOriginal<typeof import("@/shared/i18n")>(),
+    () => ({ push: vi.fn() }),
+  ),
+);
 
 describe("ResetPasswordPage", () => {
   it("shows the title, the subtitle and the form when the link has a token", () => {

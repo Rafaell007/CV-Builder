@@ -1,6 +1,6 @@
 import { createRef, useState } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { renderWithProviders, screen, within } from "@/shared/testing";
+import { renderWithProviders, screen, waitFor, within } from "@/shared/testing";
 import { DatePicker, type DatePickerProps } from "./DatePicker";
 import { DATE_PICKER_EXAMPLE_LABELS as LABELS } from "./datePicker.fixtures";
 
@@ -376,6 +376,22 @@ describe("DatePicker", () => {
 
     await user.keyboard("{Escape}");
     expect(screen.queryByRole("dialog", { name: "Choose a date" })).not.toBeInTheDocument();
+    // The focus is checked right after Escape. The next test waits for the frames that follow (see KAN-164).
+    await waitFor(() => expect(input).toHaveFocus());
+  });
+
+  it("keeps the focus in the input after Escape, also when the next frames have run", async () => {
+    // react-datepicker blurs the input one animation frame after it closes (`deferBlur`), after it has given the
+    // focus back to the input. A fast machine checks the focus before that frame, a slow CI runner after it (KAN-164).
+    // Waiting here makes the frame run on every machine.
+    const { user } = renderWithProviders(<TestDatePicker />);
+    const input = screen.getByRole("textbox", { name: "Start date" });
+
+    await user.tab();
+    await user.keyboard("{ArrowDown}");
+    await user.keyboard("{Escape}");
+    await new Promise((resolve) => setTimeout(resolve, 150));
+
     expect(input).toHaveFocus();
   });
 

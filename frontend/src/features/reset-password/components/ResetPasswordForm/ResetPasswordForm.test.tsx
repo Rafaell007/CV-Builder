@@ -6,10 +6,12 @@ import { ResetPasswordForm } from "./index";
 
 const push = vi.fn();
 // The real router needs the Next.js app router, which tests do not have. It adds the language itself.
-vi.mock("@/shared/i18n", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/shared/i18n")>()),
-  useRouter: () => ({ push }),
-}));
+vi.mock("@/shared/i18n", async (importOriginal) =>
+  (await import("@/shared/testing/withMockedRouter")).withMockedRouter(
+    await importOriginal<typeof import("@/shared/i18n")>(),
+    () => ({ push }),
+  ),
+);
 
 const TOKEN = "token-from-the-mail";
 const PASSWORD = "Password123!";

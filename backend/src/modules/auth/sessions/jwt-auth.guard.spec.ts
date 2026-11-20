@@ -73,6 +73,14 @@ describe("JwtAuthGuard", () => {
     );
   });
 
+  it("does not check a token when there is no cookie", async () => {
+    const { run, tokens } = setup({});
+
+    await run(ProtectedResolver, ProtectedResolver.prototype.list).catch(() => undefined);
+
+    expect(tokens.verifyAccessToken).not.toHaveBeenCalled();
+  });
+
   it("answers UNAUTHENTICATED when the token is invalid or expired", async () => {
     const { run, authService } = setup({ cookie: "bad", claims: undefined });
 

@@ -74,6 +74,18 @@ describe("CvsService.list", () => {
     expect(result.total).toBe(1);
     expect(result.items[0]).toMatchObject({ id: "cv-1", ownerEmail: "user1@example.com" });
     expect(result.items[0]).not.toHaveProperty("user");
+    expect(prisma.cv.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ include: { user: { select: { email: true } } } }),
+    );
+  });
+
+  it("returns the total of the count, not the number of items on the page", async () => {
+    prisma.cv.count.mockResolvedValue(25);
+
+    const result = await service.list(USER, args());
+
+    expect(result.items).toHaveLength(1);
+    expect(result.total).toBe(25);
   });
 
   it("limits a user to their own CVs", async () => {
@@ -86,6 +98,7 @@ describe("CvsService.list", () => {
     const error = await rejection(service.list(USER, args({ userId: "user-2" })));
 
     expect(error).toBeInstanceOf(ForbiddenException);
+    expect((error as Error).message).toBe("You cannot access the CVs of other users");
     expect(prisma.cv.findMany).not.toHaveBeenCalled();
   });
 
@@ -93,6 +106,7 @@ describe("CvsService.list", () => {
     await service.list(USER, args({ userId: USER.id }));
 
     expect(whereOfList()).toEqual({ userId: USER.id });
+    expect(prisma.user.findUnique).not.toHaveBeenCalled();
   });
 
   it("shows all CVs to an admin", async () => {
@@ -107,6 +121,10 @@ describe("CvsService.list", () => {
     await service.list(ADMIN, args({ userId: "user-2" }));
 
     expect(whereOfList()).toEqual({ userId: "user-2" });
+    expect(prisma.user.findUnique).toHaveBeenCalledWith({
+      where: { id: "user-2" },
+      select: { id: true },
+    });
   });
 
   it("answers NOT_FOUND when an admin selects an employee that does not exist", async () => {
@@ -156,9 +174,9 @@ describe("CvsService.list", () => {
     expect(call[0].orderBy).toEqual([{ name: "asc" }, { id: "asc" }]);
   });
 
-  it("rejects a sort field that is not allowed", async () => {
+  it.each(["userId", "id", "createdAt"])("rejects the sort field %s", async (field) => {
     await expect(
-      service.list(USER, args({ sort: { field: "userId", direction: SortDirection.ASC } })),
+      service.list(USER, args({ sort: { field, direction: SortDirection.ASC } })),
     ).rejects.toThrow();
 
     expect(prisma.cv.findMany).not.toHaveBeenCalled();
@@ -182,6 +200,9 @@ describe("CvsService.get", () => {
     prisma.cv.findUnique.mockResolvedValue(storedCv());
 
     await expect(service.get(USER, "cv-1")).resolves.toMatchObject({ id: "cv-1" });
+    expect(prisma.cv.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: "cv-1" } }),
+    );
   });
 
   it("returns the CV of another user to an admin", async () => {
@@ -193,7 +214,10 @@ describe("CvsService.get", () => {
   it("answers NOT_FOUND for the CV of another user", async () => {
     prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-2" }));
 
-    expect(await rejection(service.get(USER, "cv-1"))).toBeInstanceOf(NotFoundException);
+    const error = await rejection(service.get(USER, "cv-1"));
+
+    expect(error).toBeInstanceOf(NotFoundException);
+    expect((error as Error).message).toBe("CV not found");
   });
 
   it("answers NOT_FOUND for a missing CV", async () => {
@@ -238,7 +262,10 @@ describe("CvsService.create", () => {
     await service.create(USER, input);
 
     expect(prisma.cv.create).toHaveBeenCalledWith(
-      expect.objectContaining({ data: { ...input, userId: USER.id } }),
+      expect.objectContaining({
+        data: { ...input, userId: USER.id },
+        include: { user: { select: { email: true } } },
+      }),
     );
   });
 
@@ -254,6 +281,10 @@ describe("CvsService.create", () => {
 
     await service.create(ADMIN, { ...input, userId: "user-2" });
 
+    expect(prisma.user.findUnique).toHaveBeenCalledWith({
+      where: { id: "user-2" },
+      select: { id: true },
+    });
     expect(prisma.cv.create).toHaveBeenCalledWith(
       expect.objectContaining({ data: { ...input, userId: "user-2" } }),
     );
@@ -287,10 +318,14 @@ describe("CvsService.update", () => {
 
     await expect(service.update(USER, input)).resolves.toMatchObject({ name: "Changed" });
 
+    expect(prisma.cv.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: "cv-1" } }),
+    );
     expect(prisma.cv.update).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { id: "cv-1" },
         data: { name: "Changed", education: "PhD", description: "New" },
+        include: { user: { select: { email: true } } },
       }),
     );
   });
@@ -335,9 +370,10 @@ describe("CvsService.update", () => {
     it("answers NOT_FOUND for the CV of another employee, also for an admin", async () => {
       prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-3" }));
 
-      expect(await rejection(service.update(ADMIN, { ...input, userId: "user-2" }))).toBeInstanceOf(
-        NotFoundException,
-      );
+      const error = await rejection(service.update(ADMIN, { ...input, userId: "user-2" }));
+
+      expect(error).toBeInstanceOf(NotFoundException);
+      expect((error as Error).message).toBe("CV not found");
       expect(prisma.cv.update).not.toHaveBeenCalled();
     });
 
@@ -359,8 +395,14 @@ describe("CvsService.delete", () => {
 
     await expect(service.delete(USER, "cv-1")).resolves.toMatchObject({ id: "cv-1" });
 
-    expect(prisma.cv.delete).toHaveBeenCalledWith(
+    expect(prisma.cv.findUnique).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: "cv-1" } }),
+    );
+    expect(prisma.cv.delete).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "cv-1" },
+        include: { user: { select: { email: true } } },
+      }),
     );
   });
 

@@ -5,10 +5,12 @@ import { meMock, userCvsMock } from "../../user-details.mocks";
 import { UserCvs } from "./UserCvs";
 
 // Cvs opens the CV Preview with the router; no app router is mounted in a unit test.
-vi.mock("@/shared/i18n", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/shared/i18n")>()),
-  useRouter: () => ({ push: vi.fn() }),
-}));
+vi.mock("@/shared/i18n", async (importOriginal) =>
+  (await import("@/shared/testing/withMockedRouter")).withMockedRouter(
+    await importOriginal<typeof import("@/shared/i18n")>(),
+    () => ({ push: vi.fn() }),
+  ),
+);
 
 const annaCv = {
   id: "1",
