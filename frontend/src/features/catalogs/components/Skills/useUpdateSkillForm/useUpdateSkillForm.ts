@@ -47,7 +47,7 @@ export function useUpdateSkillForm(
     return submitForm(event, send);
   }
 
-  return { form, failed, hasChanged, isOpen, open, setOpen: setIsOpen, submit };
+  return { form, failed, hasChanged, skill, isOpen, open, setOpen: setIsOpen, submit };
 }
 
 export type UseUpdateSkillFormResult = ReturnType<typeof useUpdateSkillForm>;

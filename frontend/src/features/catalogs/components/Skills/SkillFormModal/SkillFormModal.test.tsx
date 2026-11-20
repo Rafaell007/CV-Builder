@@ -43,8 +43,10 @@ function CreateHarness({ create = vi.fn(), categories = loaded() }: CreateHarnes
 
 function UpdateHarness({
   update,
+  categories = loaded(),
 }: {
   update: (id: string, input: SkillInput) => Promise<SkillListItem>;
+  categories?: UseSkillCategoriesResult;
 }) {
   const editing = useUpdateSkillForm(update);
   return (
@@ -52,7 +54,12 @@ function UpdateHarness({
       <button type="button" onClick={() => editing.open(react)}>
         Open
       </button>
-      <SkillFormModal kind="update" skillForm={editing} categories={loaded()} />
+      <SkillFormModal
+        kind="update"
+        skillForm={editing}
+        categories={categories}
+        currentCategory={editing.skill?.category}
+      />
     </>
   );
 }
@@ -129,6 +136,20 @@ describe("SkillFormModal", () => {
     await user.click(submit);
 
     expect(update).toHaveBeenCalledExactlyOnceWith("1", { name: "React", categoryId: "c3" });
+  });
+
+  it("update: shows the skill's category while the categories still load", async () => {
+    const { user } = renderWithProviders(
+      <UpdateHarness
+        update={vi.fn()}
+        categories={loaded({ categories: undefined, loading: true })}
+      />,
+    );
+    const dialog = await openDialog(user, "Update skill");
+
+    expect(within(dialog).getByRole("combobox", { name: "Category" })).toHaveTextContent(
+      "Frontend",
+    );
   });
 
   it("shows the general message when the request fails for another reason", async () => {

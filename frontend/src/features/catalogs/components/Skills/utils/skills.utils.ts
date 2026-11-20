@@ -1,6 +1,29 @@
 import { z } from "zod";
+import type { SelectOption } from "@/shared/components";
 import { catalogNameRule, type CatalogNameMessages } from "../../../utils";
-import type { SkillFormValues } from "../skills.types";
+import type { SkillCategoryItem, SkillFormValues } from "../skills.types";
+
+/** The category a skill has now (Update modal): its id and the name to show. */
+export type CurrentSkillCategory = Pick<SkillCategoryItem, "id" | "name">;
+
+/**
+ * The options of the Category select. `current` is added when the loaded categories do not have it (they still load,
+ * they failed, or the modal fades out): the Select shows only the label of an option it has, so without it the field
+ * of a skill with a category would look empty.
+ */
+export function categoryOptions(
+  categories: readonly SkillCategoryItem[] | undefined,
+  current?: CurrentSkillCategory,
+): SelectOption[] {
+  const options = (categories ?? []).map((category) => ({
+    value: category.id,
+    label: category.name,
+  }));
+  if (current && !options.some((option) => option.value === current.id)) {
+    options.push({ value: current.id, label: current.name });
+  }
+  return options;
+}
 
 /** The translated texts of the skill form rules. */
 export interface SkillFormMessages extends CatalogNameMessages {

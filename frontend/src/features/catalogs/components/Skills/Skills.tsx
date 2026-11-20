@@ -55,7 +55,12 @@ export function Skills() {
       modals={
         <>
           <SkillFormModal kind="create" skillForm={creation} categories={categories} />
-          <SkillFormModal kind="update" skillForm={editing} categories={categories} />
+          <SkillFormModal
+            kind="update"
+            skillForm={editing}
+            categories={categories}
+            currentCategory={editing.skill?.category}
+          />
         </>
       }
     />

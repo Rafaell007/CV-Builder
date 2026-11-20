@@ -3,6 +3,7 @@ import { Controller } from "react-hook-form";
 import { FormModal, Select, TextField } from "@/shared/components";
 import type { UseCreateSkillFormResult } from "../useCreateSkillForm";
 import type { UseSkillCategoriesResult } from "../useSkillCategories";
+import { categoryOptions, type CurrentSkillCategory } from "../utils";
 import styles from "./SkillFormModal.module.css";
 
 export interface SkillFormModalProps {
@@ -15,21 +16,25 @@ export interface SkillFormModalProps {
   >;
   /** The options of the Category field (`useSkillCategories`). */
   categories: UseSkillCategoriesResult;
+  /** Update only: the category the skill has now, so the field shows it even before the categories load. */
+  currentCategory?: CurrentSkillCategory | undefined;
 }
 
 /**
  * The Create or Update skill modal: the Name field and the Category select with their errors, and the submit and
  * CANCEL buttons. The Category field is disabled while the categories load; when they fail it says so with Retry.
  */
-export function SkillFormModal({ kind, skillForm, categories }: SkillFormModalProps) {
+export function SkillFormModal({
+  kind,
+  skillForm,
+  categories,
+  currentCategory,
+}: SkillFormModalProps) {
   const t = useTranslations("catalogs.skills");
   const { form, failed, hasChanged, isOpen, setOpen, submit } = skillForm;
   const { isValid, isSubmitting, errors } = form.formState;
   const categoriesFailed = categories.failed && !categories.loading;
-  const options = (categories.categories ?? []).map((category) => ({
-    value: category.id,
-    label: category.name,
-  }));
+  const options = categoryOptions(categories.categories, currentCategory);
 
   return (
     <FormModal

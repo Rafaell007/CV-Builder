@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { skillFormSchema } from "./skills.utils";
+import { databasesCategory, frontendCategory } from "../skills.mocks";
+import { categoryOptions, skillFormSchema } from "./skills.utils";
 
 const schema = skillFormSchema({
   nameRequired: "name required",
@@ -31,5 +32,26 @@ describe("skillFormSchema", () => {
     expect(schema.safeParse({ name: "React", categoryId: "" }).error?.issues[0]?.message).toBe(
       "category required",
     );
+  });
+});
+
+describe("categoryOptions", () => {
+  it("turns the loaded categories into options", () => {
+    expect(categoryOptions([databasesCategory, frontendCategory])).toEqual([
+      { value: "c2", label: "Databases" },
+      { value: "c1", label: "Frontend" },
+    ]);
+  });
+
+  it("adds the current category while the categories are not loaded", () => {
+    expect(categoryOptions(undefined, frontendCategory)).toEqual([
+      { value: "c1", label: "Frontend" },
+    ]);
+  });
+
+  it("does not add the current category twice", () => {
+    expect(categoryOptions([frontendCategory], frontendCategory)).toEqual([
+      { value: "c1", label: "Frontend" },
+    ]);
   });
 });
