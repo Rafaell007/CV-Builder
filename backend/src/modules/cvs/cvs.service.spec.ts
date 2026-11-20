@@ -107,6 +107,10 @@ describe("CvsService.list", () => {
     await service.list(ADMIN, args({ userId: "user-2" }));
 
     expect(whereOfList()).toEqual({ userId: "user-2" });
+    expect(prisma.user.findUnique).toHaveBeenCalledWith({
+      where: { id: "user-2" },
+      select: { id: true },
+    });
   });
 
   it("answers NOT_FOUND when an admin selects an employee that does not exist", async () => {
@@ -257,6 +261,10 @@ describe("CvsService.create", () => {
 
     await service.create(ADMIN, { ...input, userId: "user-2" });
 
+    expect(prisma.user.findUnique).toHaveBeenCalledWith({
+      where: { id: "user-2" },
+      select: { id: true },
+    });
     expect(prisma.cv.create).toHaveBeenCalledWith(
       expect.objectContaining({ data: { ...input, userId: "user-2" } }),
     );
