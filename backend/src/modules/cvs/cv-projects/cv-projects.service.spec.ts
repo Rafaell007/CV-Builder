@@ -183,6 +183,18 @@ describe("CvProjectsService.list", () => {
     ]);
   });
 
+  it("sorts by the project name descending", async () => {
+    await service.list(USER, {
+      cvId: "cv-1",
+      sort: { field: "name", direction: SortDirection.DESC },
+    });
+
+    expect(firstCall<{ orderBy: unknown }>(prisma.cvProject.findMany).orderBy).toEqual([
+      { project: { name: "desc" } },
+      { id: "asc" },
+    ]);
+  });
+
   it("sorts by the start date of the person", async () => {
     await service.list(USER, {
       cvId: "cv-1",
