@@ -331,6 +331,7 @@ There is no designer to ask; we follow Figma as closely as possible and decide t
 - No dark notifications; we use the light colours.
 - The input state "Active" means focus.
 - Off-grid spacing (30, 15, 14, 22, 42, 36, 44, 26, 73px) is kept exact, not rounded.
+- Skill type and category names are backend data and are shown as stored, untranslated, in every language (the type is a free string, so a fixed list of translations would miss new types).
 
 Predictions for KAN-77 (2026-11-03): not drawn in Figma, chosen by us; fix here and in the token when a better source appears.
 
