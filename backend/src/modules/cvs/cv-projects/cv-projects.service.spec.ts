@@ -146,6 +146,17 @@ describe("CvProjectsService.list", () => {
     expect(include.roles.orderBy).toEqual({ role: { name: "asc" } });
   });
 
+  it("returns the entries in the order of the database", async () => {
+    prisma.cvProject.findMany.mockResolvedValue([
+      storedEntry({ id: "entry-1" }),
+      storedEntry({ id: "entry-2" }),
+    ]);
+
+    const entries = await service.list(USER, { cvId: "cv-1" });
+
+    expect(entries.map(({ id }) => id)).toEqual(["entry-1", "entry-2"]);
+  });
+
   it("checks the access to the CV first and reads nothing when it fails", async () => {
     cvs.assertAccessible.mockRejectedValue(new NotFoundException("CV not found"));
 
