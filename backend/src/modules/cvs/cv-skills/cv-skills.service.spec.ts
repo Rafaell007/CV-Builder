@@ -139,6 +139,18 @@ describe("CvSkillsService.listAvailable", () => {
     });
   });
 
+  it("orders the available skills by category, then name, then id", async () => {
+    prisma.userSkill.findMany.mockResolvedValue([]);
+
+    await service.listAvailable(USER, "cv-1");
+
+    expect(firstCall<{ orderBy: unknown }>(prisma.userSkill.findMany).orderBy).toEqual([
+      { skill: { category: { name: "asc" } } },
+      { skill: { name: "asc" } },
+      { id: "asc" },
+    ]);
+  });
+
   it("uses the owner of the CV, also when an admin asks", async () => {
     prisma.userSkill.findMany.mockResolvedValue([]);
 
