@@ -74,6 +74,9 @@ describe("CvsService.list", () => {
     expect(result.total).toBe(1);
     expect(result.items[0]).toMatchObject({ id: "cv-1", ownerEmail: "user1@example.com" });
     expect(result.items[0]).not.toHaveProperty("user");
+    expect(prisma.cv.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ include: { user: { select: { email: true } } } }),
+    );
   });
 
   it("returns the total of the count, not the number of items on the page", async () => {
@@ -254,7 +257,10 @@ describe("CvsService.create", () => {
     await service.create(USER, input);
 
     expect(prisma.cv.create).toHaveBeenCalledWith(
-      expect.objectContaining({ data: { ...input, userId: USER.id } }),
+      expect.objectContaining({
+        data: { ...input, userId: USER.id },
+        include: { user: { select: { email: true } } },
+      }),
     );
   });
 
@@ -314,6 +320,7 @@ describe("CvsService.update", () => {
       expect.objectContaining({
         where: { id: "cv-1" },
         data: { name: "Changed", education: "PhD", description: "New" },
+        include: { user: { select: { email: true } } },
       }),
     );
   });
@@ -386,7 +393,10 @@ describe("CvsService.delete", () => {
       expect.objectContaining({ where: { id: "cv-1" } }),
     );
     expect(prisma.cv.delete).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { id: "cv-1" } }),
+      expect.objectContaining({
+        where: { id: "cv-1" },
+        include: { user: { select: { email: true } } },
+      }),
     );
   });
 
