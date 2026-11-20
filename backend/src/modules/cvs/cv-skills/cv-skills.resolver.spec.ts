@@ -58,6 +58,17 @@ describe("CvSkillsResolver", () => {
     expect(service.remove).not.toHaveBeenCalled();
   });
 
+  it("refuses to add or change a skill without a user", () => {
+    const { resolver, service } = setup();
+    const add = { cvId: "cv-1", skillId: "skill-1" } as AddCvSkillInput;
+    const update = { id: "link-1", mastery: "EXPERT" } as UpdateCvSkillInput;
+
+    expect(() => resolver.addCvSkill(undefined, add)).toThrow(UnauthorizedException);
+    expect(() => resolver.updateCvSkill(undefined, update)).toThrow(UnauthorizedException);
+    expect(service.add).not.toHaveBeenCalled();
+    expect(service.update).not.toHaveBeenCalled();
+  });
+
   it("requires a verified email for the three mutations only (D16)", () => {
     const verified = (handler: unknown): unknown =>
       Reflect.getMetadata(VERIFIED_KEY, handler as object) as unknown;
