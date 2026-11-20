@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { ForgotPasswordForm } from "./components/ForgotPasswordForm";
+import { ForgotPasswordForm } from "../components/ForgotPasswordForm";
 import styles from "./ForgotPasswordPage.module.css";
 
 export function ForgotPasswordPage() {
