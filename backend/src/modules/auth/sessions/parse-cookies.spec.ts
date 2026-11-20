@@ -17,6 +17,10 @@ describe("readCookie", () => {
     expect(readCookie("refresh_token=a=b", "refresh_token")).toBe("a=b");
   });
 
+  it("ignores spaces around the value", () => {
+    expect(readCookie("a=b ;c=d", "a")).toBe("b");
+  });
+
   it("decodes percent-encoded values", () => {
     expect(readCookie("refresh_token=a%20b", "refresh_token")).toBe("a b");
   });
