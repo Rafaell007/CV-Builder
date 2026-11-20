@@ -61,8 +61,8 @@ function Harness({
       deletion={deletion}
       modals={
         <>
-          <NameFormModal namespace={"catalogs.departments"} kind="create" nameForm={creation} />
-          <NameFormModal namespace={"catalogs.departments"} kind="update" nameForm={editing} />
+          <NameFormModal namespace="catalogs.departments" kind="create" nameForm={creation} />
+          <NameFormModal namespace="catalogs.departments" kind="update" nameForm={editing} />
         </>
       }
     />
