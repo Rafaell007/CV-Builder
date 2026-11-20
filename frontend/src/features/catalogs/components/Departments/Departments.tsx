@@ -7,6 +7,7 @@ import { useCreateCatalogItemForm } from "../../useCreateCatalogItemForm";
 import { useDeleteCatalogItem } from "../../useDeleteCatalogItem";
 import { useUpdateCatalogItemForm } from "../../useUpdateCatalogItemForm";
 import { CatalogPage } from "../CatalogPage";
+import { NameFormModal } from "../NameFormModal";
 import { useCreateDepartment } from "./useCreateDepartment";
 import { useDeleteDepartment } from "./useDeleteDepartment";
 import { useDepartments } from "./useDepartments";
@@ -34,9 +35,15 @@ export function Departments() {
       namespace={NAMESPACE}
       list={list}
       query={query}
-      creation={creation}
-      editing={editing}
+      onCreate={creation.open}
+      onEdit={editing.open}
       deletion={deletion}
+      modals={
+        <>
+          <NameFormModal namespace={NAMESPACE} kind="create" nameForm={creation} />
+          <NameFormModal namespace={NAMESPACE} kind="update" nameForm={editing} />
+        </>
+      }
     />
   );
 }

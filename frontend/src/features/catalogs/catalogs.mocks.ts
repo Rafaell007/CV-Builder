@@ -56,7 +56,7 @@ const refused = (code: string, message: string) => ({
 
 /**
  * Builds the MockedProvider responses of one catalog (list query, create, update, delete) and the stand-in backend for
- * stories. `departments.mocks.ts` and `positions.mocks.ts` call it and export the results under their own names.
+ * stories. `departments.mocks.ts`, `positions.mocks.ts` and `skills.mocks.ts` call it and export the results under their own names.
  */
 export function createCatalogMocks<
   TItem extends CatalogItem,

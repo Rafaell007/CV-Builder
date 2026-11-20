@@ -1,1 +1,6 @@
-export { catalogNameSchema, isCatalogConflict, type CatalogNameMessages } from "./catalogs.utils";
+export {
+  catalogNameRule,
+  catalogNameSchema,
+  isCatalogConflict,
+  type CatalogNameMessages,
+} from "./catalogs.utils";

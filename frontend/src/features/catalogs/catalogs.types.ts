@@ -1,7 +1,10 @@
-/** The texts of one catalog page in `messages/` (namespace `catalogs`). Both have the same keys, so a shared part takes either one. */
-export type CatalogNamespace = "catalogs.departments" | "catalogs.positions";
+/**
+ * The texts of one catalog page in `messages/` (namespace `catalogs`). All have the same keys (skills add a few for
+ * their Type and Category), so a shared part takes any of them.
+ */
+export type CatalogNamespace = "catalogs.departments" | "catalogs.positions" | "catalogs.skills";
 
-/** What a shared catalog part needs from one row: the id and the name. Departments and positions both have this shape. */
+/** What a shared catalog part needs from one row: the id and the name. Departments, positions and skills all have this shape. */
 export interface CatalogItem {
   id: string;
   name: string;

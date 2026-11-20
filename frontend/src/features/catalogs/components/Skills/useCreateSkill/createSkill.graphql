@@ -1,0 +1,13 @@
+# Creates one skill. Admin only (backend). CONFLICT when the name is taken (case-insensitive, D35);
+# BAD_USER_INPUT on `categoryId` when the category does not exist.
+mutation CreateSkill($input: CreateSkillInput!) {
+  createSkill(input: $input) {
+    id
+    name
+    category {
+      id
+      name
+      type
+    }
+  }
+}

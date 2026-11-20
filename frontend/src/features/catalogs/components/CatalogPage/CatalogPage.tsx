@@ -1,47 +1,53 @@
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
   ListPage,
   PageState,
   Pagination,
   SearchField,
+  type DataTableColumn,
   type PageStateLabels,
 } from "@/shared/components";
 import type { UsePagedListResult, UseListStateResult } from "@/shared/lists";
 import { CATALOG_SEARCH_MAX_LENGTH } from "../../catalogs.constants";
 import type { CatalogItem, CatalogNamespace } from "../../catalogs.types";
-import type { UseCreateCatalogItemFormResult } from "../../useCreateCatalogItemForm";
 import type { UseDeleteCatalogItemResult } from "../../useDeleteCatalogItem";
-import type { UseUpdateCatalogItemFormResult } from "../../useUpdateCatalogItemForm";
 import { CatalogTable } from "../CatalogTable";
 import { DeleteCatalogItemModal } from "../DeleteCatalogItemModal";
-import { NameFormModal } from "../NameFormModal";
 
-export interface CatalogPageProps {
-  /** Which catalog's texts to show: `catalogs.departments` or `catalogs.positions`. */
+export interface CatalogPageProps<T extends CatalogItem> {
+  /** Which catalog's texts to show: `catalogs.departments`, `catalogs.positions` or `catalogs.skills`. */
   namespace: CatalogNamespace;
   /** The search, sort and page the user chose (`useListState`). */
   list: UseListStateResult;
-  /** One page of the catalog from the backend (`useDepartments`, `usePositions`). */
-  query: UsePagedListResult<CatalogItem>;
-  creation: UseCreateCatalogItemFormResult;
-  editing: UseUpdateCatalogItemFormResult;
+  /** One page of the catalog from the backend (`useDepartments`, `usePositions`, `useSkills`). */
+  query: UsePagedListResult<T>;
+  /** More table columns after Name (Skills: Type, Category). */
+  extraColumns?: DataTableColumn<T>[];
+  /** Called when the user clicks the create button: opens the catalog's Create modal. */
+  onCreate: () => void;
+  /** Called with the item when the user selects Edit in its row menu: opens the catalog's Update modal. */
+  onEdit: (item: T) => void;
   deletion: UseDeleteCatalogItemResult;
+  /** The catalog's own Create and Update modals (Departments, Positions: `NameFormModal`; Skills: `SkillFormModal`). */
+  modals: ReactNode;
 }
 
 /**
- * The content of a catalog page under its `PageHeader` (Departments, Positions): the shared `ListPage` with search,
- * the sortable table and the page buttons, with the loading, empty, no results and error states, and the Create,
- * Update and Delete modals. The backend searches, sorts and cuts the pages.
+ * The content of a catalog page under its `PageHeader` (Departments, Positions, Skills): the shared `ListPage` with search,
+ * the sortable table and the page buttons, with the loading, empty, no results and error states, and the Delete modal.
+ * Each catalog passes its own Create and Update modals in `modals`. The backend searches, sorts and cuts the pages.
  */
-export function CatalogPage({
+export function CatalogPage<T extends CatalogItem>({
   namespace,
   list,
   query,
-  creation,
-  editing,
+  extraColumns = [],
+  onCreate,
+  onEdit,
   deletion,
-}: CatalogPageProps) {
+  modals,
+}: CatalogPageProps<T>) {
   const t = useTranslations(namespace);
   const { items, total, loading, failed, retry } = query;
 
@@ -83,7 +89,7 @@ export function CatalogPage({
           />
         }
         createLabel={t("button")}
-        onCreate={creation.open}
+        onCreate={onCreate}
         error={
           failed && !loading ? (
             <PageState kind="error" labels={stateLabels} onRetry={retry} />
@@ -108,15 +114,15 @@ export function CatalogPage({
           items={items}
           sort={list.sort}
           onSortChange={list.setSort}
-          onEdit={editing.open}
+          extraColumns={extraColumns}
+          onEdit={onEdit}
           onDelete={deletion.askToDelete}
           loading={loading || (isLeavingPage && items.length === 0)}
           loadingContent={<PageState kind="loading" labels={stateLabels} />}
           emptyContent={<PageState kind={emptyKind} labels={stateLabels} />}
         />
       </ListPage>
-      <NameFormModal namespace={namespace} kind="create" nameForm={creation} />
-      <NameFormModal namespace={namespace} kind="update" nameForm={editing} />
+      {modals}
       <DeleteCatalogItemModal
         namespace={namespace}
         item={deletion.item}

@@ -4,7 +4,7 @@ import { ConfirmModal } from "@/shared/components";
 import type { CatalogItem, CatalogNamespace } from "../../catalogs.types";
 
 export interface DeleteCatalogItemModalProps {
-  /** Which catalog's texts to show: `catalogs.departments` or `catalogs.positions`. */
+  /** Which catalog's texts to show: `catalogs.departments`, `catalogs.positions` or `catalogs.skills`. */
   namespace: CatalogNamespace;
   /** The item to delete. The modal is open while this is set. */
   item: CatalogItem | null;
@@ -17,7 +17,7 @@ export interface DeleteCatalogItemModalProps {
   onCancel: () => void;
 }
 
-/** "Are you sure you want to delete department {name}?" (or position) with CONFIRM and CANCEL. */
+/** "Are you sure you want to delete department {name}?" (or position, skill) with CONFIRM and CANCEL. */
 export function DeleteCatalogItemModal({
   namespace,
   item,

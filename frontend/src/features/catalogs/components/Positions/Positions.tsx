@@ -7,6 +7,7 @@ import { useCreateCatalogItemForm } from "../../useCreateCatalogItemForm";
 import { useDeleteCatalogItem } from "../../useDeleteCatalogItem";
 import { useUpdateCatalogItemForm } from "../../useUpdateCatalogItemForm";
 import { CatalogPage } from "../CatalogPage";
+import { NameFormModal } from "../NameFormModal";
 import { useCreatePosition } from "./useCreatePosition";
 import { useDeletePosition } from "./useDeletePosition";
 import { usePositions } from "./usePositions";
@@ -34,9 +35,15 @@ export function Positions() {
       namespace={NAMESPACE}
       list={list}
       query={query}
-      creation={creation}
-      editing={editing}
+      onCreate={creation.open}
+      onEdit={editing.open}
       deletion={deletion}
+      modals={
+        <>
+          <NameFormModal namespace={NAMESPACE} kind="create" nameForm={creation} />
+          <NameFormModal namespace={NAMESPACE} kind="update" nameForm={editing} />
+        </>
+      }
     />
   );
 }
