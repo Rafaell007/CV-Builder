@@ -95,6 +95,12 @@ describe("TokenService", () => {
       expect(service.hashRefreshToken(token)).not.toContain(token);
     });
 
+    it("hashes different tokens to different values", () => {
+      const service = createService();
+
+      expect(service.hashRefreshToken("token-a")).not.toBe(service.hashRefreshToken("token-b"));
+    });
+
     it("hashes differently with another refresh secret", () => {
       const other = createService({ JWT_REFRESH_SECRET: "y".repeat(32) });
 
