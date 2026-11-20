@@ -263,6 +263,15 @@ describe("CvProjectsService.add", () => {
     expect(cvs.assertAccessible).not.toHaveBeenCalledWith(USER, "project-9");
   });
 
+  it("reads the dates of the project with the project id, not the CV id", async () => {
+    await service.add(USER, addInput({ cvId: "cv-7", projectId: "project-9" }));
+
+    expect(prisma.project.findUnique).toHaveBeenCalledWith({
+      where: { id: "project-9" },
+      select: { startDate: true, endDate: true },
+    });
+  });
+
   it("returns the created entry", async () => {
     await expect(service.add(USER, addInput())).resolves.toMatchObject({
       id: "entry-1",
