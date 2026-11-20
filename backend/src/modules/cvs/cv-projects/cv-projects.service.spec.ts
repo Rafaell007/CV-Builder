@@ -304,6 +304,14 @@ describe("CvProjectsService.add", () => {
     });
   });
 
+  it("asks the database for the project and the roles of the created entry", async () => {
+    await service.add(USER, addInput());
+
+    const { include } = firstCall<{ include: Record<string, unknown> }>(prisma.cvProject.create);
+    expect(include).toHaveProperty("project");
+    expect(include).toHaveProperty("roles");
+  });
+
   it("returns the created entry", async () => {
     await expect(service.add(USER, addInput())).resolves.toMatchObject({
       id: "entry-1",
