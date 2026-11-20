@@ -48,6 +48,27 @@ describe("throttling", () => {
     expect(faked.body.errors?.[0]?.extensions.code).toBe("TOO_MANY_REQUESTS");
   });
 
+  it("blocks forgotPassword after the limit, so the mail of a user cannot be flooded", async () => {
+    const forgotPassword = () =>
+      graphqlRequest(
+        app,
+        `mutation ($input: ForgotPasswordInput!) { forgotPassword(input: $input) }`,
+        {
+          variables: { input: { email: "user1@example.com" } },
+        },
+      );
+
+    for (let attempt = 0; attempt < LIMIT; attempt++) {
+      const { body } = await forgotPassword();
+      expect(body.data).toEqual({ forgotPassword: true }); // counted, not yet blocked
+    }
+
+    const blocked = await forgotPassword();
+
+    expect(blocked.body.data).toBeNull();
+    expect(blocked.body.errors?.[0]?.extensions.code).toBe("TOO_MANY_REQUESTS");
+  });
+
   it("does not throttle the operations that D23 does not list", async () => {
     for (let attempt = 0; attempt < LIMIT + 2; attempt++) {
       const { body } = await graphqlRequest(app, "mutation { signOut }");
