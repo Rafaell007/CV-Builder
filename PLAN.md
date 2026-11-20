@@ -524,7 +524,7 @@ Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE 
 ### Phase 8 — Quality and delivery
 
 - [x] **S8.1 E2E** — smoke flows (sign-in, create CV, preview) stable; test cases listed in the README. **(Could)** fill remaining gaps (D14). Done (KAN-121): `smoke/cv-flow.spec.ts` runs sign in, create CV, add skill and project, preview as the admin (only an admin reads the project catalog, KAN-115); the full suite passed 3 runs in a row locally (CI with 1 worker is not checked yet, and `projects.a11y.spec.ts` is a known failure there, see `e2e/README.md`); `e2e/README.md` lists the test cases per area. The Could part is not done.
-- [ ] **S8.2 Coverage > 80 %** — both apps; results in the README.
+- [ ] **S8.2 Coverage > 80 %** — both apps; results in the README. KAN-122 (auth, projects, CVs): both apps are above 80 % in all four measures and CI runs `test:cov` in both, so the threshold is enforced; results are in the README. The backend functions measure was 71 % before, because the decorator arrows of the GraphQL types ran only at start-up; `app.schema.spec.ts` now builds the schema in a unit test.
 - [ ] **S8.3 README** — all sections from §1.2, including team task distribution, architecture decisions and API documentation (link to `schema.gql` + main operations).
 - [ ] **S8.4 Deploy** (Could) — frontend on Vercel, backend on Render (Docker), database on Neon; test avatar upload (5 MB) through the rewrite early; live URL in the README.
 - [ ] **S8.5 Demo** — runs locally (D30); seeded demo data, script ≤ 30 minutes, likely mentor questions.

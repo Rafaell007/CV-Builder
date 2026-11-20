@@ -139,7 +139,16 @@ Run from the repository root; each runs in every workspace that defines it.
 | Frontend stories | Storybook 10 + Vitest browser mode (Chromium) | `pnpm --filter @cv-builder/frontend test` | set up (theme sample) |
 | E2E | Playwright, seeded test database | `pnpm test:e2e` | set up (smoke test) |
 
-Coverage target: over 80 %. `test:cov` prints the report and fails below 80 % in each app: `pnpm --filter @cv-builder/backend test:cov` (threshold in the Jest config in `backend/package.json`) and `pnpm --filter @cv-builder/frontend test:cov` (threshold in `frontend/vitest.config.mts`; HTML report in `frontend/coverage/`). Both are switched on in CI from Phase 3.
+Coverage target: over 80 %. `test:cov` prints the report and fails below 80 % in each app: `pnpm --filter @cv-builder/backend test:cov` (threshold in the Jest config in `backend/package.json`) and `pnpm --filter @cv-builder/frontend test:cov` (threshold in `frontend/vitest.config.mts`; HTML report in `frontend/coverage/`). CI runs both `test:cov` scripts, so a pull request that drops an app below 80 % fails the build.
+
+Coverage on 2026-11-20 (unit tests; for the backend the integration tests are not counted):
+
+| App | Statements | Branches | Functions | Lines |
+|---|---|---|---|---|
+| Backend | 99.6 % | 96.0 % | 97.4 % | 99.6 % |
+| Frontend | 97.4 % | 92.7 % | 96.7 % | 98.6 % |
+
+The backend `@Field(() => Type)` arrows in DTOs, models and resolvers only run when the GraphQL schema is built. `backend/src/app.schema.spec.ts` builds it in memory, so these functions count as covered.
 
 Frontend component tests render through `renderWithProviders` from `@/shared/testing` (app providers, Apollo mocks, a user-event `user`); see [frontend/src/shared/testing/README.md](frontend/src/shared/testing/README.md).
 
