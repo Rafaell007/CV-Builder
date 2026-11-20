@@ -142,5 +142,84 @@
         "failed": "Coś poszło nie tak. Spróbuj ponownie później"
       }
     }
+  },
+  "skills": {
+    "button": "UTWÓRZ UMIEJĘTNOŚĆ",
+    "table": "Lista umiejętności",
+    "columns": {
+      "name": "Nazwa",
+      "type": "Typ",
+      "category": "Kategoria"
+    },
+    "actions": {
+      "column": "Akcje",
+      "menu": "Akcje dla umiejętności {name}",
+      "edit": "Edytuj",
+      "delete": "Usuń"
+    },
+    "search": {
+      "label": "Szukaj umiejętności",
+      "placeholder": "Szukaj"
+    },
+    "pagination": {
+      "navigation": "Paginacja umiejętności",
+      "previous": "Poprzednia strona",
+      "next": "Następna strona",
+      "page": "Strona {number}"
+    },
+    "states": {
+      "loading": "Ładowanie umiejętności",
+      "empty": "Nie znaleziono umiejętności",
+      "noResults": "Nie znaleziono umiejętności",
+      "error": "Coś poszło nie tak. Spróbuj ponownie później",
+      "retry": "Spróbuj ponownie"
+    },
+    "create": {
+      "title": "Utwórz umiejętność",
+      "close": "Zamknij",
+      "submit": "Utwórz",
+      "cancel": "Anuluj",
+      "success": {
+        "title": "Umiejętność utworzona",
+        "text": "Umiejętność {name} została dodana do listy."
+      }
+    },
+    "update": {
+      "title": "Edytuj umiejętność",
+      "close": "Zamknij",
+      "submit": "Zapisz",
+      "cancel": "Anuluj",
+      "success": {
+        "title": "Umiejętność zaktualizowana",
+        "text": "Umiejętność {name} została zapisana."
+      }
+    },
+    "delete": {
+      "title": "Usuń umiejętność",
+      "message": "Czy na pewno chcesz usunąć umiejętność <strong>{name}</strong>?",
+      "close": "Zamknij",
+      "confirm": "Potwierdź",
+      "cancel": "Anuluj",
+      "failedTitle": "Nie udało się usunąć umiejętności",
+      "failedText": "Coś poszło nie tak. Spróbuj ponownie.",
+      "inUseText": "Nie można usunąć umiejętności, ponieważ jest obecnie używana"
+    },
+    "form": {
+      "fields": {
+        "name": "Umiejętność",
+        "category": "Kategoria"
+      },
+      "errors": {
+        "nameRequired": "Umiejętność jest wymagana",
+        "nameTooLong": "Nazwa umiejętności nie może przekraczać 100 znaków",
+        "nameTaken": "Umiejętność już istnieje",
+        "categoryRequired": "Kategoria jest wymagana",
+        "categoryNotFound": "Nie znaleziono kategorii",
+        "categoriesFailed": "Nie udało się wczytać kategorii",
+        "categoriesRetry": "Spróbuj ponownie",
+        "serverInvalid": "Serwer nie przyjął tej wartości",
+        "failed": "Coś poszło nie tak. Spróbuj ponownie później"
+      }
+    }
   }
 }

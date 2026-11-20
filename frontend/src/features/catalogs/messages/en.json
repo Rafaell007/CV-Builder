@@ -142,5 +142,84 @@
         "failed": "Something went wrong. Please try again later"
       }
     }
+  },
+  "skills": {
+    "button": "CREATE SKILL",
+    "table": "Skills list",
+    "columns": {
+      "name": "Name",
+      "type": "Type",
+      "category": "Category"
+    },
+    "actions": {
+      "column": "Actions",
+      "menu": "Actions for {name}",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "search": {
+      "label": "Search skills",
+      "placeholder": "Search"
+    },
+    "pagination": {
+      "navigation": "Skills pagination",
+      "previous": "Previous page",
+      "next": "Next page",
+      "page": "Page {number}"
+    },
+    "states": {
+      "loading": "Loading skills",
+      "empty": "No skills found",
+      "noResults": "No skills found",
+      "error": "Something went wrong. Please try again later",
+      "retry": "Retry"
+    },
+    "create": {
+      "title": "Create skill",
+      "close": "Close",
+      "submit": "Create",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Skill created",
+        "text": "{name} was added to the skills."
+      }
+    },
+    "update": {
+      "title": "Edit skill",
+      "close": "Close",
+      "submit": "Save",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Skill updated",
+        "text": "{name} was saved."
+      }
+    },
+    "delete": {
+      "title": "Delete skill",
+      "message": "Are you sure you want to delete skill <strong>{name}</strong>?",
+      "close": "Close",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "failedTitle": "Could not delete the skill",
+      "failedText": "Something went wrong. Please try again.",
+      "inUseText": "Skill cannot be deleted because it is currently in use"
+    },
+    "form": {
+      "fields": {
+        "name": "Skill",
+        "category": "Category"
+      },
+      "errors": {
+        "nameRequired": "Skill is required",
+        "nameTooLong": "Skill name must not exceed 100 characters",
+        "nameTaken": "Skill already exists",
+        "categoryRequired": "Category is required",
+        "categoryNotFound": "Category not found",
+        "categoriesFailed": "Could not load the categories",
+        "categoriesRetry": "Retry",
+        "serverInvalid": "The server did not accept this value",
+        "failed": "Something went wrong. Please try again later"
+      }
+    }
   }
 }
