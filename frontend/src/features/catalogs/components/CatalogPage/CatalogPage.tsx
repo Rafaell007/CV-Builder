@@ -34,7 +34,7 @@ export interface CatalogPageProps<T extends CatalogItem> {
 }
 
 /**
- * The content of a catalog page under its `PageHeader` (Departments, Positions): the shared `ListPage` with search,
+ * The content of a catalog page under its `PageHeader` (Departments, Positions, Skills): the shared `ListPage` with search,
  * the sortable table and the page buttons, with the loading, empty, no results and error states, and the Delete modal.
  * Each catalog passes its own Create and Update modals in `modals`. The backend searches, sorts and cuts the pages.
  */
