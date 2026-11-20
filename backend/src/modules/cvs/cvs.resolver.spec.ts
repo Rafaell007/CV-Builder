@@ -48,6 +48,14 @@ describe("CvsResolver", () => {
     expect(service.get).not.toHaveBeenCalled();
   });
 
+  it("passes undefined as the user id of deleteCv when the client sends null", async () => {
+    const { resolver, service } = setup();
+
+    await resolver.deleteCv(USER, "cv-1", null as unknown as string);
+
+    expect(service.delete).toHaveBeenCalledWith(USER, "cv-1", undefined);
+  });
+
   it.each([
     ["cvs", (r: CvsResolver) => r.cvs(undefined, { page: new PageInput() } as CvsArgs)],
     [
