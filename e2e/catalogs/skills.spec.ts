@@ -65,12 +65,15 @@ test.describe("skill list, as an admin", () => {
   });
 
   test("a click on Name sorts descending on the backend", async ({ page }) => {
-    const first = await dataRows(page).first().getByRole("cell").first().textContent();
+    const firstName = dataRows(page).first().getByRole("cell").first();
+    // Wait for the loaded page: before it, the cell text is empty and the check below means nothing.
+    await expect(firstName).toHaveText(/\S/);
+    const ascendingFirst = (await firstName.textContent()) ?? "";
 
     await page.getByRole("button", { name: "Name" }).click();
 
     await expect(header(page)).toHaveAttribute("aria-sort", "descending");
-    await expect(dataRows(page).first()).not.toContainText(first!);
+    await expect(firstName).not.toHaveText(ascendingFirst);
   });
 
   test("searches without regard to letter case and shows the type and category", async ({
