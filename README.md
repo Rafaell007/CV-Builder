@@ -146,7 +146,7 @@ Coverage on 2026-11-20 (unit tests; for the backend the integration tests are no
 | App | Statements | Branches | Functions | Lines |
 |---|---|---|---|---|
 | Backend | 99.6 % | 96.0 % | 97.4 % | 99.6 % |
-| Frontend | 97.4 % | 92.7 % | 96.7 % | 98.6 % |
+| Frontend | 97.7 % | 93.0 % | 97.0 % | 98.9 % |
 
 The backend `@Field(() => Type)` arrows in DTOs, models and resolvers only run when the GraphQL schema is built. `backend/src/app.schema.spec.ts` builds it in memory, so these functions count as covered.
 
