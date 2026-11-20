@@ -419,6 +419,14 @@ describe("CvProjectsService.update", () => {
     });
   });
 
+  it("stores empty responsibilities as no value", async () => {
+    await service.update(USER, updateInput({ responsibilities: "" }));
+
+    expect(firstCall<{ data: unknown }>(prisma.cvProject.update).data).toMatchObject({
+      responsibilities: null,
+    });
+  });
+
   it("rejects dates outside the project", async () => {
     await expect(
       service.update(USER, updateInput({ endDate: new Date("2027-02-01T00:00:00Z") })),
