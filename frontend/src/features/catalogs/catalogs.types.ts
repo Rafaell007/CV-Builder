@@ -4,7 +4,7 @@
  */
 export type CatalogNamespace = "catalogs.departments" | "catalogs.positions" | "catalogs.skills";
 
-/** What a shared catalog part needs from one row: the id and the name. Departments and positions both have this shape. */
+/** What a shared catalog part needs from one row: the id and the name. Departments, positions and skills all have this shape. */
 export interface CatalogItem {
   id: string;
   name: string;

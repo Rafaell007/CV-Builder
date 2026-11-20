@@ -7,7 +7,7 @@ import type { CatalogItem, CatalogNamespace } from "../catalogs.types";
 import { useCatalogNameForm } from "../useCatalogNameForm";
 
 /**
- * The Update flow of a catalog (Update department, Update position): the item that is being edited, the open state
+ * The Update flow of a catalog (Update department, Update position; Update skill has its own form): the item that is being edited, the open state
  * of the modal and the request. `open(item)` fills the form with the current name. A failed request keeps the typed
  * name and shows the error inside the modal. Only a successful request closes the modal and shows a success toast.
  * `update` sends the request of the catalog for the id, resolves with the saved item and rejects with its error.

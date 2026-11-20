@@ -6,7 +6,7 @@ import type { CatalogItem, CatalogNamespace } from "../../catalogs.types";
 import styles from "./CatalogTable.module.css";
 
 export interface CatalogTableProps<T extends CatalogItem> {
-  /** Which catalog's texts to show: `catalogs.departments` or `catalogs.positions`. */
+  /** Which catalog's texts to show: `catalogs.departments`, `catalogs.positions` or `catalogs.skills`. */
   namespace: CatalogNamespace;
   items: readonly T[];
   /** The backend sort. The table only shows it and reports a click on a header. */

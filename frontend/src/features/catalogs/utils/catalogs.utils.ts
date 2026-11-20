@@ -29,7 +29,7 @@ export function catalogNameSchema(
 }
 
 /**
- * True when the backend refused the request with `CONFLICT`. For departments and positions it has one cause per request
+ * True when the backend refused the request with `CONFLICT`. For departments, positions and skills it has one cause per request
  * (backend READMEs): on create or update the name is taken; on delete the item is in use.
  */
 export function isCatalogConflict(error: unknown): boolean {
