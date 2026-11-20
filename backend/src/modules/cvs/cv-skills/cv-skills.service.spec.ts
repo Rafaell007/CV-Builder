@@ -234,6 +234,15 @@ describe("CvSkillsService.update", () => {
     });
   });
 
+  it("looks up the link by its id and reads only the CV id", async () => {
+    await service.update(USER, { id: "link-1", mastery: Mastery.EXPERT });
+
+    expect(prisma.cvSkill.findUnique).toHaveBeenCalledWith({
+      where: { id: "link-1" },
+      select: { cvId: true },
+    });
+  });
+
   it("finds the CV through the link and checks the access to it", async () => {
     await service.update(ADMIN, { id: "link-1", mastery: Mastery.EXPERT });
 
