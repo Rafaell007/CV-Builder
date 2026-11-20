@@ -48,6 +48,28 @@ describe("CvsResolver", () => {
     expect(service.get).not.toHaveBeenCalled();
   });
 
+  it.each([
+    ["cvs", (r: CvsResolver) => r.cvs(undefined, { page: new PageInput() } as CvsArgs)],
+    [
+      "createCv",
+      (r: CvsResolver) => r.createCv(undefined, { name: "n", education: "e", description: "d" }),
+    ],
+    [
+      "updateCv",
+      (r: CvsResolver) =>
+        r.updateCv(undefined, { id: "cv-1", name: "n", education: "e", description: "d" }),
+    ],
+    ["deleteCv", (r: CvsResolver) => r.deleteCv(undefined, "cv-1")],
+  ])("refuses %s without a user", (name, call) => {
+    const { resolver, service } = setup();
+
+    expect(() => call(resolver)).toThrow(UnauthorizedException);
+    expect(service.list).not.toHaveBeenCalled();
+    expect(service.create).not.toHaveBeenCalled();
+    expect(service.update).not.toHaveBeenCalled();
+    expect(service.delete).not.toHaveBeenCalled();
+  });
+
   it("requires a verified email for the three mutations only (D16)", () => {
     const verified = (handler: unknown): unknown =>
       Reflect.getMetadata(VERIFIED_KEY, handler as object) as unknown;
