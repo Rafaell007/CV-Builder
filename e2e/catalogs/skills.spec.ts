@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
+import { createCvs, deleteCvsByName } from "../support/cvs";
+import { addCvSkillsByName } from "../support/cvSkills";
 import { createSkill, deleteSkillsByName } from "../support/skills";
 
 // The Skills page is the shared CatalogPage (support/catalogPage.ts tests it with Departments and Positions) with two
@@ -8,7 +10,7 @@ import { createSkill, deleteSkillsByName } from "../support/skills";
 // `afterEach`, so the list checks never see them.
 
 const PAGE_SIZE = 10;
-// Every skill these tests make has this text in its name, so `afterEach` can remove all of them.
+// Every skill and CV these tests make has this text in its name, so `afterEach` can remove all of them.
 const PREFIX = "E2E Skill";
 
 const search = (page: Page) => page.getByRole("searchbox", { name: "Search skills" });
@@ -118,6 +120,7 @@ test.describe("skills, create, update and delete", () => {
   });
 
   test.afterEach(async ({ context }) => {
+    await deleteCvsByName(context, PREFIX);
     await deleteSkillsByName(context, PREFIX);
   });
 
@@ -195,11 +198,16 @@ test.describe("skills, create, update and delete", () => {
     await expect(page.getByText("No skills found")).toBeVisible();
   });
 
-  test("shows the in-use text inside the modal and keeps the row when a user has the skill", async ({
+  test("shows the in-use text inside the modal and keeps the row when a CV has the skill", async ({
+    context,
     page,
   }) => {
-    // The seed admin has Leadership (backend/prisma/seed/users.data.ts).
+    // A CV of this test holds the skill, so the delete must be refused. Adding it needs the seed admin to have
+    // Leadership (backend/prisma/seed/users.data.ts): if the seed changes, the set-up throws before Confirm, and the
+    // test can never delete a seed skill.
     const inUse = "Leadership";
+    const [cvId] = await createCvs(context, `${PREFIX} CV`, 1);
+    await addCvSkillsByName(context, cvId!, [inUse]);
     await find(page, inUse);
     await openRowMenu(page, inUse, "Delete");
     await confirmDialog(page).getByRole("button", { name: "Confirm" }).click();
