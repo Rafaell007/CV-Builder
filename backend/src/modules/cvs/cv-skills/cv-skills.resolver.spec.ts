@@ -69,6 +69,16 @@ describe("CvSkillsResolver", () => {
     expect(service.update).not.toHaveBeenCalled();
   });
 
+  it("passes on the error when the service cannot remove the skills", async () => {
+    const { resolver, service } = setup();
+    const failure = new Error("remove failed");
+    service.remove.mockRejectedValue(failure);
+
+    await expect(resolver.removeCvSkills(USER, { cvId: "cv-1", ids: ["link-1"] })).rejects.toBe(
+      failure,
+    );
+  });
+
   it("requires a verified email for the three mutations only (D16)", () => {
     const verified = (handler: unknown): unknown =>
       Reflect.getMetadata(VERIFIED_KEY, handler as object) as unknown;
