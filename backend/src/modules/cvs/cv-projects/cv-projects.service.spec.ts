@@ -256,6 +256,13 @@ describe("CvProjectsService.add", () => {
     });
   });
 
+  it("checks the access to the CV of the input, not to the project", async () => {
+    await service.add(USER, addInput({ cvId: "cv-7", projectId: "project-9" }));
+
+    expect(cvs.assertAccessible).toHaveBeenCalledWith(USER, "cv-7");
+    expect(cvs.assertAccessible).not.toHaveBeenCalledWith(USER, "project-9");
+  });
+
   it("returns the created entry", async () => {
     await expect(service.add(USER, addInput())).resolves.toMatchObject({
       id: "entry-1",
