@@ -1,0 +1,4 @@
+# Deletes one skill. Admin only (backend). CONFLICT when a user, a CV or a project still uses the skill (D18).
+mutation DeleteSkill($id: ID!) {
+  deleteSkill(id: $id)
+}

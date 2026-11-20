@@ -1,0 +1,13 @@
+# Changes the name and the category of one skill. Admin only (backend). CONFLICT when another skill has the name (its
+# own name is allowed); NOT_FOUND when the skill is gone; BAD_USER_INPUT on `categoryId` when the category does not exist.
+mutation UpdateSkill($input: UpdateSkillInput!) {
+  updateSkill(input: $input) {
+    id
+    name
+    category {
+      id
+      name
+      type
+    }
+  }
+}

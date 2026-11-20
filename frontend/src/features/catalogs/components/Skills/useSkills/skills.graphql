@@ -1,0 +1,16 @@
+# One page of the skills catalog. Admin only (backend). The backend searches the name, sorts and cuts the page,
+# so the frontend never filters or sorts the loaded rows (docs/pages/17-skills-page-admin.md).
+query SkillCatalog($page: PageInput!, $search: String, $sort: SortInput) {
+  skillCatalog(page: $page, search: $search, sort: $sort) {
+    items {
+      id
+      name
+      category {
+        id
+        name
+        type
+      }
+    }
+    total
+  }
+}
