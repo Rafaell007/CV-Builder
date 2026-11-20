@@ -112,6 +112,15 @@ describe("PasswordResetService", () => {
       });
     });
 
+    it("mails the stored address of the user, not the text that was typed", async () => {
+      prisma.user.findUnique.mockResolvedValue({ id: "user-1", email: "ada@example.com" });
+
+      await createService().requestReset("  Ada@Example.com ");
+
+      const [to] = mail.sendPasswordReset.mock.calls[0] as [string, string];
+      expect(to).toBe("ada@example.com");
+    });
+
     it("creates the token before the mail, so a mailed token always exists", async () => {
       prisma.user.findUnique.mockResolvedValue({ id: "user-1", email: "ada@example.com" });
       const order: string[] = [];
