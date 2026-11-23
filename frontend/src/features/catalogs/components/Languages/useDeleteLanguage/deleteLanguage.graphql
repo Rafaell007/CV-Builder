@@ -1,0 +1,4 @@
+# Deletes one language. Admin only (backend). CONFLICT when a user still has the language (D18).
+mutation DeleteLanguage($id: ID!) {
+  deleteLanguage(id: $id)
+}

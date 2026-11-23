@@ -1,0 +1,7 @@
+/*
+ * ISO codes are uppercase: the letters show uppercase while typing, the value itself is uppercased on submit
+ * (`languageFormSchema`). Only the look changes, so the browser keeps its own cursor, undo and phone-keyboard input.
+ */
+.iso input {
+  text-transform: uppercase;
+}

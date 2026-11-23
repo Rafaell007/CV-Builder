@@ -221,5 +221,87 @@
         "failed": "Something went wrong. Please try again later"
       }
     }
+  },
+  "languages": {
+    "button": "CREATE LANGUAGE",
+    "table": "Languages list",
+    "columns": {
+      "name": "Name",
+      "iso": "ISO",
+      "nativeName": "Native name"
+    },
+    "actions": {
+      "column": "Actions",
+      "menu": "Actions for {name}",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "search": {
+      "label": "Search languages",
+      "placeholder": "Search"
+    },
+    "pagination": {
+      "navigation": "Languages pagination",
+      "previous": "Previous page",
+      "next": "Next page",
+      "page": "Page {number}"
+    },
+    "states": {
+      "loading": "Loading languages",
+      "empty": "No languages found",
+      "noResults": "No languages found",
+      "error": "Something went wrong. Please try again later",
+      "retry": "Retry"
+    },
+    "create": {
+      "title": "Create language",
+      "close": "Close",
+      "submit": "Create",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Language created",
+        "text": "{name} was added to the languages."
+      }
+    },
+    "update": {
+      "title": "Update language",
+      "close": "Close",
+      "submit": "Update",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Language updated",
+        "text": "{name} was saved."
+      }
+    },
+    "delete": {
+      "title": "Delete language",
+      "message": "Are you sure you want to delete language <strong>{name}</strong>?",
+      "close": "Close",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "failedTitle": "Could not delete the language",
+      "failedText": "Something went wrong. Please try again.",
+      "inUseText": "Language cannot be deleted because it is currently in use"
+    },
+    "form": {
+      "fields": {
+        "name": "Name",
+        "iso": "ISO",
+        "nativeName": "Native name"
+      },
+      "errors": {
+        "nameRequired": "Name is required",
+        "nameTooLong": "Name must not exceed 100 characters",
+        "nameTaken": "Language already exists",
+        "isoRequired": "ISO is required",
+        "isoTooLong": "ISO must not exceed 5 characters",
+        "isoInvalid": "ISO may contain only the letters A-Z and one hyphen",
+        "isoTaken": "ISO code already exists",
+        "nativeNameRequired": "Native name is required",
+        "nativeNameTooLong": "Native name must not exceed 100 characters",
+        "serverInvalid": "The server did not accept this value",
+        "failed": "Something went wrong. Please try again later"
+      }
+    }
   }
 }

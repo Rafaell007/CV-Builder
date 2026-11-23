@@ -1,0 +1,13 @@
+# One page of the languages catalog. Admin only (backend). The backend searches the name, sorts by name or ISO code
+# and cuts the page, so the frontend never filters or sorts the loaded rows (docs/pages/19-languages-page-admin.md).
+query Languages($page: PageInput!, $search: String, $sort: SortInput) {
+  languages(page: $page, search: $search, sort: $sort) {
+    items {
+      id
+      name
+      iso
+      nativeName
+    }
+    total
+  }
+}

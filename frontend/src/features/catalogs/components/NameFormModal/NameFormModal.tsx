@@ -1,8 +1,7 @@
 import { useTranslations } from "next-intl";
-import { FormModal, TextField } from "@/shared/components";
+import { FormErrorMessage, FormModal, TextField } from "@/shared/components";
 import type { CatalogNamespace } from "../../catalogs.types";
 import type { UseCreateCatalogItemFormResult } from "../../useCreateCatalogItemForm";
-import styles from "./NameFormModal.module.css";
 
 export interface NameFormModalProps {
   /** Which catalog's texts to show: `catalogs.departments` or `catalogs.positions`. */
@@ -40,11 +39,7 @@ export function NameFormModal({ namespace, kind, nameForm }: NameFormModalProps)
         required
         error={errors.name?.message}
       />
-      {failed && (
-        <p role="alert" className={styles.error}>
-          {t("form.errors.failed")}
-        </p>
-      )}
+      {failed && <FormErrorMessage>{t("form.errors.failed")}</FormErrorMessage>}
     </FormModal>
   );
 }

@@ -1,0 +1,10 @@
+# Creates one language. Admin only (backend). The backend uppercases the ISO code. CONFLICT when the name is taken
+# (case-insensitive, D35); CONFLICT with reason ISO_TAKEN when the ISO code is taken.
+mutation CreateLanguage($input: CreateLanguageInput!) {
+  createLanguage(input: $input) {
+    id
+    name
+    iso
+    nativeName
+  }
+}

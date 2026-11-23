@@ -4,7 +4,7 @@ import { ConfirmModal } from "@/shared/components";
 import type { CatalogItem, CatalogNamespace } from "../../catalogs.types";
 
 export interface DeleteCatalogItemModalProps {
-  /** Which catalog's texts to show: `catalogs.departments`, `catalogs.positions` or `catalogs.skills`. */
+  /** Which catalog's texts to show: `catalogs.departments`, `catalogs.positions`, `catalogs.skills` or `catalogs.languages`. */
   namespace: CatalogNamespace;
   /** The item to delete. The modal is open while this is set. */
   item: CatalogItem | null;

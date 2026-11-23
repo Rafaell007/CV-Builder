@@ -16,7 +16,7 @@ import { CatalogTable } from "../CatalogTable";
 import { DeleteCatalogItemModal } from "../DeleteCatalogItemModal";
 
 export interface CatalogPageProps<T extends CatalogItem> {
-  /** Which catalog's texts to show: `catalogs.departments`, `catalogs.positions` or `catalogs.skills`. */
+  /** Which catalog's texts to show: `catalogs.departments`, `catalogs.positions`, `catalogs.skills` or `catalogs.languages`. */
   namespace: CatalogNamespace;
   /** The search, sort and page the user chose (`useListState`). */
   list: UseListStateResult;
