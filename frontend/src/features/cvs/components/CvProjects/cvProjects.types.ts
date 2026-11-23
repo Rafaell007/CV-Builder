@@ -1,11 +1,15 @@
 import type { SortState } from "@/shared/components";
-import type { CvProjectsQuery, ProjectCatalogQuery, ProjectRolesQuery } from "@/shared/graphql";
+import type {
+  AvailableCvProjectsQuery,
+  CvProjectsQuery,
+  ProjectRolesQuery,
+} from "@/shared/graphql";
 
 /** One project of a CV, as the `CvProjects` query returns it. `id` is the CV-project link, `project.id` the catalog project. */
 export type CvProjectItem = CvProjectsQuery["cvProjects"][number];
 
-/** One project of the catalog, as the Add project modal offers it. */
-export type CatalogProject = ProjectCatalogQuery["projects"]["items"][number];
+/** One project of the catalog that is not yet in the CV, as the Add project modal offers it. */
+export type CatalogProject = AvailableCvProjectsQuery["availableCvProjects"][number];
 
 /** One role that a person can have in a project. */
 export type ProjectRoleItem = ProjectRolesQuery["projectRoles"][number];

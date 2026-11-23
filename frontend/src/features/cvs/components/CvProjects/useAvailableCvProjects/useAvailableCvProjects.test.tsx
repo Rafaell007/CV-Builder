@@ -3,58 +3,62 @@ import { useState, type ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import { renderWithProviders, type RenderWithProvidersOptions } from "@/shared/testing";
 import {
+  availableCvProjectsMock,
+  availableCvProjectsNetworkErrorMock,
+  availableCvProjectsRefusedMock,
   bank,
   blog,
-  projectCatalogMock,
-  projectCatalogNetworkErrorMock,
-  projectCatalogRefusedMock,
+  CV_ID,
 } from "../cvProjects.mocks";
-import { useProjectCatalog, type UseProjectCatalogResult } from "./useProjectCatalog";
+import {
+  useAvailableCvProjects,
+  type UseAvailableCvProjectsResult,
+} from "./useAvailableCvProjects";
 
 function setup(options: RenderWithProvidersOptions) {
-  let current!: UseProjectCatalogResult;
+  let current!: UseAvailableCvProjectsResult;
   let enable!: () => void;
   function Probe(): ReactNode {
     const [enabled, setEnabled] = useState(false);
     enable = () => setEnabled(true);
-    current = useProjectCatalog(enabled);
+    current = useAvailableCvProjects(CV_ID, enabled);
     return null;
   }
   renderWithProviders(<Probe />, options);
   return { result: () => current, enable: () => act(() => enable()) };
 }
 
-describe("useProjectCatalog", () => {
+describe("useAvailableCvProjects", () => {
   it("asks the backend only after it is enabled", async () => {
     // No other mock: a request before `enable` would fail the test with an unexpected-request error.
-    const { result, enable } = setup({ mocks: [projectCatalogMock()] });
-    expect(result()).toMatchObject({ projects: undefined, loading: false });
+    const { result, enable } = setup({ mocks: [availableCvProjectsMock([blog, bank])] });
+    expect(result()).toMatchObject({ options: undefined, loading: false });
 
     enable();
 
-    await expect.poll(() => result().projects).toEqual([blog, bank]);
+    await expect.poll(() => result().options).toEqual([blog, bank]);
   });
 
-  it("reports a refused request (a user who is not an admin) and a network error as failed", async () => {
-    const refused = setup({ mocks: [projectCatalogRefusedMock()] });
+  it("reports a refused request (a CV the user may not use) and a network error as failed", async () => {
+    const refused = setup({ mocks: [availableCvProjectsRefusedMock()] });
     refused.enable();
     await expect.poll(() => refused.result().failed).toBe(true);
 
-    const offline = setup({ mocks: [projectCatalogNetworkErrorMock()] });
+    const offline = setup({ mocks: [availableCvProjectsNetworkErrorMock()] });
     offline.enable();
     await expect.poll(() => offline.result().failed).toBe(true);
-    expect(offline.result().projects).toBeUndefined();
+    expect(offline.result().options).toBeUndefined();
   });
 
   it("retry sends the failed request again", async () => {
     const { result, enable } = setup({
-      mocks: [projectCatalogNetworkErrorMock(), projectCatalogMock()],
+      mocks: [availableCvProjectsNetworkErrorMock(), availableCvProjectsMock([blog, bank])],
     });
     enable();
     await expect.poll(() => result().failed).toBe(true);
 
     result().retry();
 
-    await expect.poll(() => result().projects).toEqual([blog, bank]);
+    await expect.poll(() => result().options).toEqual([blog, bank]);
   });
 });

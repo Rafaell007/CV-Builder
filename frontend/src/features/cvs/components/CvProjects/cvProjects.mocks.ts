@@ -2,15 +2,14 @@ import type { MockLink } from "@apollo/client/testing";
 import {
   AddCvProjectDocument,
   type AddCvProjectInput,
+  AvailableCvProjectsDocument,
   CvProjectsDocument,
-  HeldCvProjectsDocument,
-  ProjectCatalogDocument,
   ProjectRolesDocument,
   RemoveCvProjectsDocument,
   UpdateCvProjectDocument,
   type UpdateCvProjectInput,
 } from "@/shared/graphql";
-import { CATALOG_PAGE, DEFAULT_CV_PROJECTS_SORT } from "./cvProjects.constants";
+import { DEFAULT_CV_PROJECTS_SORT } from "./cvProjects.constants";
 import type { CatalogProject, CvProjectItem, ProjectRoleItem } from "./cvProjects.types";
 import { toCvProjectsVariables } from "./utils";
 
@@ -115,40 +114,30 @@ export const cvProjectsNetworkErrorMock = (
   error: new Error("Failed to fetch"),
 });
 
-/** MockedProvider response of the `HeldCvProjects` query: the ids of the projects that the CV holds. */
-export const heldCvProjectsMock = (
-  projects: CvProjectItem[] = [],
+/**
+ * MockedProvider response of the `AvailableCvProjects` query: the projects that the CV does not hold. The default is
+ * the bank project, because the sample CV holds the blog project.
+ */
+export const availableCvProjectsMock = (
+  projects: CatalogProject[] = [bank],
   cvId = CV_ID,
 ): MockLink.MockedResponse => ({
-  request: { query: HeldCvProjectsDocument, variables: { cvId } },
-  result: {
-    data: {
-      cvProjects: projects.map((item) => ({
-        __typename: "CvProject",
-        id: item.id,
-        project: { __typename: "Project", id: item.project.id },
-      })),
-    },
-  },
+  request: { query: AvailableCvProjectsDocument, variables: { cvId } },
+  result: { data: { availableCvProjects: projects } },
 });
 
-/** MockedProvider response of the `ProjectCatalog` query. */
-export const projectCatalogMock = (
-  projects: CatalogProject[] = [blog, bank],
+/** The `AvailableCvProjects` query is refused, like for a CV the user may not use (NOT_FOUND). */
+export const availableCvProjectsRefusedMock = (
+  code = "NOT_FOUND",
+  cvId = CV_ID,
 ): MockLink.MockedResponse => ({
-  request: { query: ProjectCatalogDocument, variables: { page: CATALOG_PAGE } },
-  result: { data: { projects: { items: projects, total: projects.length } } },
-});
-
-/** The `ProjectCatalog` query is refused, like for a user who is not an admin (FORBIDDEN). */
-export const projectCatalogRefusedMock = (code = "FORBIDDEN"): MockLink.MockedResponse => ({
-  request: { query: ProjectCatalogDocument, variables: { page: CATALOG_PAGE } },
+  request: { query: AvailableCvProjectsDocument, variables: { cvId } },
   result: { errors: [{ message: code, extensions: { code } }] },
 });
 
-/** The `ProjectCatalog` query fails like a network error. */
-export const projectCatalogNetworkErrorMock = (): MockLink.MockedResponse => ({
-  request: { query: ProjectCatalogDocument, variables: { page: CATALOG_PAGE } },
+/** The `AvailableCvProjects` query fails like a network error. */
+export const availableCvProjectsNetworkErrorMock = (cvId = CV_ID): MockLink.MockedResponse => ({
+  request: { query: AvailableCvProjectsDocument, variables: { cvId } },
   error: new Error("Failed to fetch"),
 });
 
