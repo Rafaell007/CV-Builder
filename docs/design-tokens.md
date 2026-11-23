@@ -327,6 +327,16 @@ Header and content:
 - Skills table (852 wide): columns 240 (category) · rest (skill) · 115 (experience) · 140 (last used); cell side padding 16. Header text 14 / 21 (a wrapped header has a 21px line pitch), 8 above and 8 below, then a 1px #C63031 line. A row is 37 (8 + 20 + 9); the last row of a category is 53 and a 1px #AEAEAE line (54 together).
 - Not copied: the Figma lines between the columns end at the top of the last text line (about 17px above the end of the text). Our lines cover the whole text and the 16px padding, so a long text is never next to a missing line.
 
+### CV Skills (1440 › CV Skills = `docs/images/figma/desktop-1440/light/frame-45.png`, dark = the same frame in `dark`; measured on the images, 2026-11-23)
+
+- Block: 852 wide, centred; the first category name starts 34 under the tab bar (y 145). Category name: Body, #2E2E2E / #F5F5F7. Category name → skills 16; category → category 32.
+- Skills: three columns of 284, rows 48, no gaps between them. The skill is padded 16 left; the bar starts there, the name starts 16 after the bar (name in the secondary text colour).
+- Level bar: 80 × **4** (not 3). The fill is 20, 40, 60, 80, 100% of the width: grey, blue, green, yellow, red. Light fill: #717171, #1A93D5, #428946, #FEBE19, #CB4445; track: #B5B5B5, #A7D5EE, #B6D1B8, #FEE6A7. Dark fill: palette grey-500, blue, green, yellow, red; track: grey-600, blue-dark, green-dark, yellow-dark (all drawn at 90% over the page; tokens `--color-mastery-*`). The red bar is always full, so it has no track.
+- ADD SKILL (grey) and REMOVE SKILLS (red): each 220 × 40, icon and text centred with 16 between them, 16 between the buttons, the right button ends 24 before the right edge of the block, the buttons start 52 under the last skill row.
+- Not checked: the selected skill in the selection mode (this frame shows none; the older note under "Selection toolbar" says the bar turns grey at 90%) and the tablet layout.
+
+### Icons
+
 No icon names in the file, but every glyph matches Google Material Icons by size and position: more-vert (4×16 at 10,4), visibility (22×15 at 1,4.5), search (17.49 at 3,3), chevron-right (7.41×12 at 8.59,6). We use Material Icons paths (Apache 2.0).
 
 ## Decisions where Figma is unclear
