@@ -20,8 +20,8 @@ export interface CvProjectEntry {
 
 /**
  * Adds projects to a CV through the API, so a spec does not click through the Add project modal for its set-up.
- * The context must hold an Admin session: only an admin can read the project catalog today (open point KAN-115), and an
- * admin may change the CV of any user. The entries go away with their CV (`deleteCvsByName`), so no clean-up is needed.
+ * The context must hold an Admin session: this helper reads the catalog with the admin only `projects` query, and an
+ * admin may change the CV of any user. (An employee reads the options of their own CV with `availableCvProjects`, KAN-156.) The entries go away with their CV (`deleteCvsByName`), so no clean-up is needed.
  */
 export async function addCvProjectsByName(
   adminContext: BrowserContext,

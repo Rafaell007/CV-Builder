@@ -3,8 +3,8 @@ import { deleteCvsByName } from "../support/cvs";
 import { ADMIN_EMAIL, PASSWORD } from "../support/signIn";
 
 // The smoke flow of the whole product (PLAN S8.1): sign in, create a CV, add a skill and a project, open the preview.
-// It uses the pages for every step; the other specs set data up through the API. The admin runs it, because only an
-// admin can read the project catalog today (open point KAN-115). The CV has this prefix, so `afterEach` removes it.
+// It uses the pages for every step; the other specs set data up through the API. The admin runs it; it was the only
+// user who could read the project catalog before KAN-156. The CV has this prefix, so `afterEach` removes it.
 const PREFIX = "E2E Smoke";
 const CV_NAME = `${PREFIX} flow`;
 

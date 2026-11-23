@@ -84,6 +84,7 @@ Each bullet is one `test()`. The name of the spec file is in bold.
 - Removes a project after a confirmation, a cancel removes nothing, and the project stays in the catalog.
 - Escape closes the row menu and the modal without a change.
 - Shows the empty state and keeps ADD PROJECT available.
+- An employee adds a project to their own CV, and a project that the CV holds is not offered again (KAN-156).
 - An admin adds a project to the CV of a user: the form fills from the catalog, needs a role, and the project is kept.
 
 **cv-skills.spec.ts**
@@ -224,7 +225,7 @@ Each bullet is one `test()`. The name of the spec file is in bold.
 - The page is never in the DOM twice while it loads, and the toast area exists.
 
 **cv-flow.spec.ts**
-- An admin signs in on the page, creates a CV, adds a skill and a project, and sees both in the preview. Every step uses the pages, not the API. The admin runs it because only an admin can read the project catalog (KAN-115).
+- An admin signs in on the page, creates a CV, adds a skill and a project, and sees both in the preview. Every step uses the pages, not the API. The admin runs it; before KAN-156 only an admin could read the project catalog.
 
 ### user-cvs
 
