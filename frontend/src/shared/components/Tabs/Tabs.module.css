@@ -1,15 +1,15 @@
 .list {
   display: flex;
-  gap: var(--space-6);
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
-  border-bottom: 1px solid var(--color-border);
   list-style: none;
 }
 
+/* The side padding makes the active underline longer than the label. */
 .tab {
   display: block;
-  padding: var(--space-3) 0;
+  padding: var(--space-3) var(--space-6);
   border-bottom: 2px solid transparent;
   color: var(--color-text);
   font: var(--text-tab);
