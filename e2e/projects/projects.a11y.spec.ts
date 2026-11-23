@@ -30,6 +30,9 @@ const focusedIn = (container: ReturnType<typeof dialog>) => container.locator(":
 async function openProjectsPage(page: Page) {
   await page.goto("/en/admin/projects");
   await expect(page.getByRole("heading", { name: "Projects" })).toBeVisible();
+  // The heading shows before the rows. Wait for the first row, or a test that presses Tab at once finds only the
+  // loading state, and a row menu that opens can be replaced when the list arrives.
+  await expect(actionsButton(page, "Banking Portal")).toBeVisible();
 }
 
 test.describe("projects page, keyboard and focus", () => {
@@ -126,7 +129,10 @@ test.describe("projects page, keyboard and focus", () => {
 
     // While a menu is open the rest of the page is inert (Radix), so the next row button is found by its label
     // attribute, not by its role. A click on it first closes the open menu.
-    await rowMenuTrigger(page, "Travel Booking App").click({ force: true });
+    const next = await rowMenuTrigger(page, "Travel Booking App").boundingBox();
+    expect(next).not.toBeNull();
+    if (!next) return;
+    await page.mouse.click(next.x + next.width / 2, next.y + next.height / 2);
     await expect(page.getByRole("menu")).toHaveCount(0);
 
     await actionsButton(page, "Travel Booking App").click();
