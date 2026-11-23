@@ -11,10 +11,13 @@ import { isIsoTaken, languageFormSchema, normalizeIso } from "../utils";
 const NAMESPACE = "catalogs.languages";
 const EMPTY_VALUES: LanguageFormValues = { name: "", iso: "", nativeName: "" };
 
-/** The values as they are sent and compared: trimmed, the ISO code uppercase. */
+/**
+ * The values as they are compared: trimmed, the ISO code uppercase, each run of whitespace in the name one space (like
+ * the backend `NormalizeSpaces`, so "New  York" for "New York" is not a change).
+ */
 function normalize(values: LanguageFormValues): LanguageFormValues {
   return {
-    name: values.name.trim(),
+    name: values.name.trim().replace(/\s+/g, " "),
     iso: normalizeIso(values.iso),
     nativeName: values.nativeName.trim(),
   };

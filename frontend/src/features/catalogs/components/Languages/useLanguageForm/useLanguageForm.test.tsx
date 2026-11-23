@@ -109,6 +109,14 @@ describe("useLanguageForm", () => {
     expect(result().hasChanged).toBe(true);
   });
 
+  it("does not count extra spaces inside the name as a change, like the backend", async () => {
+    const { result, fill } = setup();
+    act(() => result().reset({ name: "Old English", iso: "ANG", nativeName: "Englisc" }));
+
+    await fill("name", "Old   English");
+    expect(result().hasChanged).toBe(false);
+  });
+
   it("shows CONFLICT with reason ISO_TAKEN under the ISO code and keeps the values", async () => {
     const { result, fillAll } = setup();
     await fillAll(ENGLISH);
