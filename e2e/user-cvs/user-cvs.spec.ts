@@ -85,6 +85,8 @@ test.describe("User CVs tab, as an admin", () => {
 
     await page.getByRole("button", { name: `Actions for ${PREFIX} user1 1` }).click();
     await page.getByRole("menuitem", { name: "Edit" }).click();
+    // The click ends the selection guard of the modal (see `useFirstFieldFocus`); without it `fill` can add the text to the old name.
+    await dialog(page).getByRole("textbox", { name: "Name" }).click();
     await dialog(page).getByRole("textbox", { name: "Name" }).fill(renamed);
     await dialog(page).getByRole("button", { name: "Save" }).click();
 
