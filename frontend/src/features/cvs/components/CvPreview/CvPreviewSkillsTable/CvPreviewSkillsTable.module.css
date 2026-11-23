@@ -17,6 +17,8 @@
   letter-spacing: var(--text-table-header-ls);
   text-align: left;
   text-transform: uppercase;
+  /* A header that wraps to two lines keeps its first line level with the other headers. */
+  vertical-align: top;
 }
 
 /* The two number columns have a fixed width. The skill column takes the rest, so the table has two groups
@@ -38,7 +40,9 @@
 }
 
 /* A line under the last skill of a category separates the blocks. The category cell spans all rows, so its bottom edge is the block end. The category name is red, the skill name is bold. */
+/* The fixed width keeps the skill names next to the category. Without it the browser shares the free space between the category and the skill column. */
 .category {
+  width: 200px;
   vertical-align: top;
   color: var(--color-cv-accent);
   font-weight: 500;
