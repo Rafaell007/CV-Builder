@@ -51,7 +51,7 @@ Rules (the same in the backend):
 ## Delete CV
 
 - Delete: `Delete` in the row menu opens `components/DeleteCvModal` (the shared `ConfirmModal`): `Are you sure you want to delete CV {name}?` with the name in bold, `Confirm` and `Cancel`. `useDeleteCv` holds the chosen CV and sends the `deleteCv` mutation (`useDeleteCv/deleteCv.graphql`). Texts: `messages/` (`cvs.delete`, `en` and `pl`). Page document: [docs/pages/20-cvs-page.md](../../../../docs/pages/20-cvs-page.md), section Delete CV (AC-30 to AC-36, AC-39).
-- Exports: `useDeleteCv({ page, rowsOnPage, onPageChange })` returns `{ cv, pending, askToDelete(cv), cancel(), confirm() }`; `DeleteCvModal({ cv, pending, onConfirm, onCancel })`; `toDeleteCvFailure(error)` in `utils`.
+- Exports: `useDeleteCv({ page, rowsOnPage, onPageChange })` returns `{ cv, pending, askToDelete(cv), cancel(), confirm() }`; `DeleteCvModal({ cv, pending, onConfirm, onCancel })`.
 - While the request runs, CONFIRM shows its loading state and a second press sends nothing (the hook and `ConfirmModal` both block it).
 - Success: the CV leaves the Apollo cache (the row goes at once), the `Cvs` query loads again for the new total, the modal closes. `confirm` resolves `true` after a successful delete, `false` otherwise. The hook goes back one page when the user deletes the only CV on page 2 or later: it calls `onPageChange(page - 1)` after the delete succeeds (as `Projects.tsx` does in `handleConfirmDelete`). The page passes the current `page`, the number of rows it shows (`rowsOnPage`) and its `setPage`; nothing else is needed.
 - The modal keeps the last CV name while it fades out. Vitest cannot see the fade (jsdom has no animation).
@@ -59,7 +59,7 @@ Rules (the same in the backend):
   - `NOT_FOUND` (the CV is deleted, or it belongs to another user; the backend gives the same answer): the text `This CV does not exist any more. The list was updated.` The hook also loads the `Cvs` query again.
   - `FORBIDDEN`: the text `You are not allowed to delete this CV.`
   - Any other failure (network, server): `Something went wrong. Please try again.`
-  - The backend message is never shown. `utils/toDeleteCvFailure` returns `notFound`, `forbidden` or `undefined`, and the hook picks the translated text.
+  - The backend message is never shown. `readFailure` (`shared/failures`) returns the kind, and the hook picks the translated text: `notFound` and `forbidden` have their own text, every other kind shows the general one.
 - Who may delete (AC-32, AC-33, AC-34): the backend decides. A user deletes only their own CVs, an admin any CV. The frontend shows `Delete` for every row it receives, because the list already holds only rows the user may see.
 
 ## CV Details: loading one CV
@@ -67,7 +67,7 @@ Rules (the same in the backend):
 Spec: [docs/pages/21-cv-details-page.md](../../../../docs/pages/21-cv-details-page.md) (PLAN S7.2, KAN-113). The page is built in steps; this is the data part.
 
 - `useCv(id)` sends the `Cv` query (`useCv/cv.graphql`) and returns `cv`, `loading`, `failure` and `retry`. `failure` is `undefined` when the request worked. `retry` repeats the request for the same id.
-- `utils/toCvLoadFailure(error)` turns a failed request into `notFound`, `forbidden` or `failed`:
+- `useCv` reads a failed request with `readFailure` (`shared/failures`) and returns `notFound`, `forbidden` or `failed`:
   - `notFound`: the backend code `NOT_FOUND`. It also means the CV belongs to another user (the backend gives the same answer, so a user cannot learn which ids exist). The page must not try to tell the two cases apart.
   - `forbidden`: the backend code `FORBIDDEN`. The `cv` query does not send it today; the page is ready for it.
   - `failed`: any other code, or a network error. Only this kind shows Retry, because a repeat cannot change the answer of the other two.
@@ -129,7 +129,7 @@ Spec: [docs/pages/23-cv-projects-page.md](../../../../docs/pages/23-cv-projects-
 
 ## Notes
 
-- **Signed-out users on the CV Details page.** The spec lists authentication errors as a separate case. `toCvLoadFailure` has no kind for it: a code like `UNAUTHENTICATED` becomes `failed`. This is decided: the page relies on the global handler in `shared/apollo/errorLink` (session refresh and redirect to sign-in, planned in PLAN D9 and S3), which is not built yet. Until it is, a signed-out user sees `failed` with Retry. When the handler exists, check that the redirect happens before this page shows an error.
+- **Signed-out users on the CV Details page.** The spec lists authentication errors as a separate case. `readFailure` has no kind for it: a code like `UNAUTHENTICATED` becomes `failed`. This is decided: the page relies on the global handler in `shared/apollo/errorLink` (session refresh and redirect to sign-in, planned in PLAN D9 and S3), which is not built yet. Until it is, a signed-out user sees `failed` with Retry. When the handler exists, check that the redirect happens before this page shows an error.
 - **The description is a `role="button"` on a `<p>`**, like in projects (the same known issue). A real `<button>` would be cleaner.
 - **Two copies of `useClampedText`.** `ProjectDescription` is shared now (`shared/components/ProjectDescription`, used by Projects and CV projects), but `CvDescription` of the CVs list still has its own copy of the hook and CSS. Replace it with the shared component. The 1023px limit is written in CSS only (no breakpoint token yet).
 - **A click on the description line does nothing for a CV that is not cut.** The row above opens the CV. This is the decided behaviour.

@@ -1,9 +1,9 @@
 "use client";
 
+import { readFailure } from "@/shared/failures";
 import { CvsDocument, type CvsQueryVariables } from "@/shared/graphql";
 import { usePagedList, type UsePagedListResult } from "@/shared/lists";
 import type { CvListItem } from "../cvs.types";
-import { toCvLoadFailure } from "../utils";
 
 export type UseCvsResult = Omit<UsePagedListResult<CvListItem>, "items" | "error"> & {
   /** The rows of the current page, as the backend returned them. */
@@ -18,6 +18,6 @@ export function useCvs(variables: CvsQueryVariables): UseCvsResult {
   return {
     cvs: items,
     ...list,
-    forbidden: error !== undefined && toCvLoadFailure(error) === "forbidden",
+    forbidden: error !== undefined && readFailure(error).kind === "forbidden",
   };
 }
