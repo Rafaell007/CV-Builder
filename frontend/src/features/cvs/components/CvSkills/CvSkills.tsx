@@ -81,12 +81,18 @@ export function CvSkills({ cvId }: CvSkillsProps) {
         />
       ) : (
         <div className={styles.actions}>
-          <Button variant="ghost" onClick={adding.open} disabled={skills === undefined || busy}>
+          <Button
+            variant="ghost"
+            className={styles.action}
+            onClick={adding.open}
+            disabled={skills === undefined || busy}
+          >
             <AddIcon />
             {t("actions.add")}
           </Button>
           <Button
             variant="text"
+            className={styles.action}
             onClick={removal.start}
             disabled={skills === undefined || skills.length === 0 || busy}
           >

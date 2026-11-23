@@ -318,6 +318,31 @@ Header and content:
 - "Change password": Body style (400 · 16 · 24 · 0.15), text main (#2E2E2E / #F5F5F7).
 - CHANGE: primary button 160×48, radius 40, right-aligned in the column (disabled fill #AEAEAE, as the Button disabled state).
 
+### Tabs and CV Preview (1440 › User profile, CV tabs, CV Preview = `docs/images/figma/desktop-1440/light/frame-41.png`; measured on the images, 2026-11-23)
+
+- Tabs: every tab 150 wide, the tabs touch each other, the first starts at x 224 (the content edge), the label is centred (500 / 600 active · 14 · uppercase). The active underline is 2px, #C63031, the full 150 wide, at y 110–111. The header is 56 and the tab bar ends at y 112 (the tab is 52 high under a 4px page padding). No line under the tab bar.
+- Document column: 852 wide, centred in the content. The document and the EXPORT PDF button start 34 under the tab bar (y 146). The button is 160 × 40, text style Button, transparent with a red border and red text, at the right edge of the column, on the row of the name.
+- Name (Title, 34 / 42) and position (Body, uppercase, 24) follow each other with no gap. Header → overview 32. The sections (overview, Projects, Professional skills) are 32 apart; a section title (Title, 42) → its content 32.
+- Overview and project blocks: left column 260, a 1px #C63031 line, the right column starts 24 after the line. The text starts 16 under the top of the line. Heading → value 8, block → block 16.
+- Skills table (852 wide): columns 240 (category) · rest (skill) · 115 (experience) · 140 (last used); cell side padding 16. Header text 14 / 21 (a wrapped header has a 21px line pitch), 8 above and 8 below, then a 1px #C63031 line. A row is 37 (8 + 20 + 9); the last row of a category is 53 and a 1px #AEAEAE line (54 together).
+- Not copied: the Figma lines between the columns end at the top of the last text line (about 17px above the end of the text). Our lines cover the whole text and the 16px padding, so a long text is never next to a missing line.
+
+### CV Skills (1440 › CV Skills = `docs/images/figma/desktop-1440/light/frame-45.png`, dark = the same frame in `dark`; measured on the images, 2026-11-23)
+
+- Block: 852 wide, centred; the first category name starts 34 under the tab bar (y 145). Category name: Body, #2E2E2E / #F5F5F7. Category name → skills 16; category → category 32.
+- Skills: three columns of 284, rows 48, no gaps between them. The skill is padded 16 left; the bar starts there, the name starts 16 after the bar (name in the secondary text colour).
+- Level bar: 80 × **4** (not 3). The fill is 20, 40, 60, 80, 100% of the width: grey, blue, green, yellow, red. Light fill: #717171, #1A93D5, #428946, #FEBE19, #CB4445; track: #B5B5B5, #A7D5EE, #B6D1B8, #FEE6A7. Dark fill: palette grey-500, blue, green, yellow, red; track: grey-600, blue-dark, green-dark, yellow-dark (all drawn at 90% over the page; tokens `--color-mastery-*`). The red bar is always full, so it has no track.
+- ADD SKILL (grey) and REMOVE SKILLS (red): each 220 × 40, icon and text centred with 16 between them, 16 between the buttons, the right button ends 24 before the right edge of the block, the buttons start 52 under the last skill row.
+- Not checked: the selected skill in the selection mode (this frame shows none; the older note under "Selection toolbar" says the bar turns grey at 90%) and the tablet layout.
+
+### CV Projects (1440 › CV Projects = `docs/images/figma/desktop-1440/light/frame-46.png`, dark = the same frame in `dark`; measured on the images, 2026-11-23)
+
+- Columns: Name, Domain, Start Date, End Date and the kebab. **No Responsibilities column** (the page doc lists one; see `frontend/src/features/cvs/README.md`).
+- Under a row: the project description (14 / 20, two lines in the sample), then 18 below it the responsibilities as tags. A tag: filled pill 24 high, 8 at the sides, 13 / 20 text (`--text-tag`), 8 between tags. Light fill #E2E2E4 with #2E2E2E text, dark fill #626262 with #F5F5F7 text (`--color-tag-bg`). Each line of the responsibilities text is one tag. The environment technologies of the project are not in the list: they are in the Add project modal (frame-47).
+- Search 320 wide at x 244; ADD PROJECT: text button 220 × 40, plus icon and text centred, 8 apart.
+- Table (shared `DataTable`, all list pages): header 58, rows 73 apart; a row with a detail line is 71 high and has 16 under the detail. The CV projects list has no line under the last row (Languages and Projects lists have one).
+- Not matched on purpose: the description colour. Figma draws #919192 in both themes (about 3:1 on the light page); we keep `--color-text-secondary` for the contrast (decided 2026-11-23).
+
 ### Icons
 
 No icon names in the file, but every glyph matches Google Material Icons by size and position: more-vert (4×16 at 10,4), visibility (22×15 at 1,4.5), search (17.49 at 3,3), chevron-right (7.41×12 at 8.59,6). We use Material Icons paths (Apache 2.0).
@@ -414,7 +439,7 @@ Predictions for KAN-82 (2026-11-06): not drawn, or drawn inconsistently; chosen 
 - No internet text: we use the Figma message ("…Please try again or go back."), not the shorter one in `docs/pages/07-no-internet-page.md` ("…Please try again."), because Figma is the source of truth. The user goes back with the browser's Back button; the screen has no back button.
 - Not found message: Figma has no typed line break; the text wraps on its own after "looking for." in the 560 box. We put the break in the text (like Device error and No internet), so the lines stay the same in every language and font rendering. GO BACK with no previous page in the tab (link opened directly) goes to `/`, which redirects to `/users`.
 
-Highlighted breadcrumb in dark (2026-11-09): Figma draws #C63031 on #2E2E2E, 2.5:1. Dark uses #E9B0B0 (`--color-primary-text`), as error text does; light keeps #C63031 (5.0:1).
+Highlighted breadcrumb (2026-11-23): both themes use `--color-primary` (#C63031), as Figma draws it. Before, dark used the light pink #E9B0B0 for contrast (#C63031 on #2E2E2E is 2.5:1). The team chose the design red over the contrast.
 
 Avatar initial in dark (2026-11-06): Figma draws #2E2E2E on #C63031, 2.5:1. The initial uses #F5F5F7 in both themes (5.0:1).
 

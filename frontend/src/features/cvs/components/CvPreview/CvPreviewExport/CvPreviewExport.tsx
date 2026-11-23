@@ -23,7 +23,13 @@ export function CvPreviewExport({ disabled, exporting, onExport }: CvPreviewExpo
 
   return (
     <div className={styles.toolbar}>
-      <Button variant="primary" loading={exporting} disabled={disabled} onClick={onExport}>
+      <Button
+        variant="text"
+        className={styles.export}
+        loading={exporting}
+        disabled={disabled}
+        onClick={onExport}
+      >
         {t("label")}
       </Button>
       <span role="status" className={styles.status}>

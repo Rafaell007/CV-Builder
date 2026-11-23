@@ -30,8 +30,9 @@
   color: var(--color-text-secondary);
 }
 
+/* The red of the design tokens in both themes (the dark theme no longer uses the light pink of the error text). */
 .highlighted {
-  color: var(--color-primary-text);
+  color: var(--color-primary);
 }
 
 .icon {
@@ -49,7 +50,7 @@
 }
 
 .highlighted.link:hover {
-  color: var(--color-primary-text);
+  color: var(--color-primary);
 }
 
 .link:focus-visible {

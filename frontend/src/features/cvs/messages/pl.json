@@ -186,13 +186,12 @@
     "columns": {
       "name": "Nazwa",
       "domain": "Domena",
-      "responsibilities": "Obowiązki",
       "startDate": "Data rozpoczęcia",
       "endDate": "Data zakończenia"
     },
     "present": "Obecnie",
     "dateMissing": "Brak daty",
-    "noResponsibilities": "Brak obowiązków",
+    "responsibilities": "Obowiązki",
     "actions": {
       "add": "DODAJ PROJEKT",
       "column": "Akcje",

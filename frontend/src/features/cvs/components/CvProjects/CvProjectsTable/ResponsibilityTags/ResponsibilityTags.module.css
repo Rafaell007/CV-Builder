@@ -1,0 +1,22 @@
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Filled pill (Figma CV projects list, measured: 24 high, 8px at the sides, 13px text, light #E2E2E4, dark #626262).
+   min-width: 0 and overflow-wrap let a long text shrink instead of widening the table. */
+.tag {
+  min-width: 0;
+  max-width: 100%;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-tag-bg);
+  color: var(--color-text);
+  font: var(--text-tag);
+  letter-spacing: var(--text-tag-ls);
+  overflow-wrap: anywhere;
+}

@@ -1,7 +1,11 @@
 import { CombinedGraphQLErrors } from "@apollo/client";
 import { describe, expect, it } from "vitest";
 import { DEFAULT_CV_PROJECTS_SORT } from "../cvProjects.constants";
-import { toCvProjectFailure, toCvProjectsVariables } from "./cvProjects.utils";
+import {
+  toCvProjectFailure,
+  toCvProjectsVariables,
+  toResponsibilityTags,
+} from "./cvProjects.utils";
 
 function graphQlError(code: string): CombinedGraphQLErrors {
   return new CombinedGraphQLErrors({ errors: [{ message: code, extensions: { code } }] });
@@ -58,5 +62,21 @@ describe("toCvProjectFailure", () => {
     });
 
     expect(toCvProjectFailure(error)).toBe("notFound");
+  });
+});
+
+describe("toResponsibilityTags", () => {
+  it("makes one tag per line and trims it", () => {
+    expect(toResponsibilityTags("Did something great\r\n  Did not break production  ")).toEqual([
+      "Did something great",
+      "Did not break production",
+    ]);
+  });
+
+  it("leaves blank lines out and gives no tag for no text", () => {
+    expect(toResponsibilityTags("One\n\n   \nTwo")).toEqual(["One", "Two"]);
+    expect(toResponsibilityTags("")).toEqual([]);
+    expect(toResponsibilityTags(null)).toEqual([]);
+    expect(toResponsibilityTags(undefined)).toEqual([]);
   });
 });
