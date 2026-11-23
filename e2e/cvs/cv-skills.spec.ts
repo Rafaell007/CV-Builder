@@ -5,7 +5,9 @@ import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
 
 // Every CV that a test makes has this prefix, so `afterEach` can remove it, also after a test failed halfway.
 // A CV takes its skills with it, so there is nothing else to clean up.
-const PREFIX = "E2E Skills";
+// It must not contain the prefix of another spec: `deleteCvsByName` matches a part of the name, and the admin clean-up
+// of catalogs/skills.spec.ts ("E2E Skill") sees the CVs of all users, so it deleted "E2E Skills ..." CVs mid-test.
+const PREFIX = "E2E CvSkills";
 
 // Seed (backend/prisma/seed/users.data.ts): user1 has TypeScript (Advanced), JavaScript (Expert) and React (Expert),
 // among others, and no Python. The admin has Communication, and no TypeScript.
