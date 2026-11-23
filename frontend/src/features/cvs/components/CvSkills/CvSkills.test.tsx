@@ -123,7 +123,7 @@ describe("CvSkills", () => {
       const { user, dialog } = await openAddModal(withAdd());
 
       const skill = within(dialog).getByRole("combobox", { name: "Skill" });
-      const mastery = within(dialog).getByRole("combobox", { name: "Skill mastery" });
+      const mastery = within(dialog).getByRole("combobox", { name: "Mastery" });
       expect(dialog.querySelector("form")).toHaveFocus();
       expect(mastery).not.toHaveFocus();
       await waitFor(() => expect(skill).toBeEnabled());
@@ -131,14 +131,14 @@ describe("CvSkills", () => {
       expect(skill).toHaveFocus();
     });
 
-    it("shows an optional Skill mastery field and keeps ADD enabled without a mastery", async () => {
+    it("shows an optional Mastery field and keeps ADD enabled without a mastery", async () => {
       const { user, dialog } = await openAddModal(withAdd());
       const field = within(dialog).getByRole("combobox", { name: "Skill" });
       await waitFor(() => expect(field).toBeEnabled());
       await user.click(field);
       await user.click(screen.getByRole("option", { name: "Docker" }));
 
-      const mastery = within(dialog).getByRole("combobox", { name: "Skill mastery" });
+      const mastery = within(dialog).getByRole("combobox", { name: "Mastery" });
       expect(mastery).toBeEnabled();
       await user.click(mastery);
       expect(screen.getAllByRole("option").map((option) => option.textContent)).toEqual([
@@ -173,7 +173,7 @@ describe("CvSkills", () => {
       await waitFor(() => expect(field).toBeEnabled());
       await user.click(field);
       await user.click(screen.getByRole("option", { name: "Docker" }));
-      const mastery = within(dialog).getByRole("combobox", { name: "Skill mastery" });
+      const mastery = within(dialog).getByRole("combobox", { name: "Mastery" });
       await user.click(mastery);
       await user.click(screen.getByRole("option", { name: "Expert" }));
       expect(mastery).toHaveTextContent("Expert");
@@ -209,7 +209,7 @@ describe("CvSkills", () => {
       await user.click(screen.getByRole("option", { name: "Docker" }));
       expect(field).toHaveTextContent("Docker");
 
-      const mastery = within(dialog).getByRole("combobox", { name: "Skill mastery" });
+      const mastery = within(dialog).getByRole("combobox", { name: "Mastery" });
       expect(mastery).toBeEnabled();
       await user.click(mastery);
       await user.click(screen.getByRole("option", { name: "No mastery" }));
@@ -241,7 +241,7 @@ describe("CvSkills", () => {
       await waitFor(() => expect(field).toBeEnabled());
       await user.click(field);
       await user.click(screen.getByRole("option", { name: "Docker" }));
-      await user.click(within(dialog).getByRole("combobox", { name: "Skill mastery" }));
+      await user.click(within(dialog).getByRole("combobox", { name: "Mastery" }));
       await user.click(screen.getByRole("option", { name: "Expert" }));
 
       await user.click(within(dialog).getByRole("button", { name: "Add" }));

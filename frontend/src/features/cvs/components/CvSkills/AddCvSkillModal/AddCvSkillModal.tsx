@@ -11,7 +11,7 @@ export interface AddCvSkillModalProps {
 }
 
 /**
- * The Add skill modal: the Skill field with the skills of the CV owner, the optional Skill mastery field, ADD and
+ * The Add skill modal: the Skill field with the skills of the CV owner, the optional Mastery field, ADD and
  * CANCEL. The doc of page 22 lists only Skill, but Figma shows the mastery and Figma wins (agreed with Rafal).
  */
 export function AddCvSkillModal({ adding }: AddCvSkillModalProps) {

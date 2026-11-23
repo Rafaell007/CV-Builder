@@ -85,7 +85,7 @@ function AddSkillDemo({ fails }: AddSkillDemoProps) {
             name={name}
             render={({ field, fieldState }) => (
               <Select
-                label={name === "skill" ? "Skill" : "Skill mastery"}
+                label={name === "skill" ? "Skill" : "Mastery"}
                 options={name === "skill" ? SKILLS : LEVELS}
                 name={field.name}
                 value={field.value}
@@ -120,7 +120,7 @@ async function openAndFill(canvas: ReturnType<typeof within>) {
   await expect(within(dialog).getByRole("button", { name: "Add" })).toBeDisabled();
   await userEvent.click(within(dialog).getByRole("combobox", { name: "Skill" }));
   await userEvent.click(await body.findByRole("option", { name: "React" }));
-  await userEvent.click(within(dialog).getByRole("combobox", { name: "Skill mastery" }));
+  await userEvent.click(within(dialog).getByRole("combobox", { name: "Mastery" }));
   await userEvent.click(await body.findByRole("option", { name: "Expert" }));
   return dialog;
 }
