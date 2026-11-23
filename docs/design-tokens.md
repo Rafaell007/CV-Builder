@@ -318,7 +318,14 @@ Header and content:
 - "Change password": Body style (400 · 16 · 24 · 0.15), text main (#2E2E2E / #F5F5F7).
 - CHANGE: primary button 160×48, radius 40, right-aligned in the column (disabled fill #AEAEAE, as the Button disabled state).
 
-### Icons
+### Tabs and CV Preview (1440 › User profile, CV tabs, CV Preview = `docs/images/figma/desktop-1440/light/frame-41.png`; measured on the images, 2026-11-23)
+
+- Tabs: every tab 150 wide, the tabs touch each other, the first starts at x 224 (the content edge), the label is centred (500 / 600 active · 14 · uppercase). The active underline is 2px, #C63031, the full 150 wide, at y 110–111. The header is 56 and the tab bar ends at y 112 (the tab is 52 high under a 4px page padding). No line under the tab bar.
+- Document column: 852 wide, centred in the content. The document and the EXPORT PDF button start 34 under the tab bar (y 146). The button is 160 × 40, text style Button, transparent with a red border and red text, at the right edge of the column, on the row of the name.
+- Name (Title, 34 / 42) and position (Body, uppercase, 24) follow each other with no gap. Header → overview 32. The sections (overview, Projects, Professional skills) are 32 apart; a section title (Title, 42) → its content 32.
+- Overview and project blocks: left column 260, a 1px #C63031 line, the right column starts 24 after the line. The text starts 16 under the top of the line. Heading → value 8, block → block 16.
+- Skills table (852 wide): columns 240 (category) · rest (skill) · 115 (experience) · 140 (last used); cell side padding 16. Header text 14 / 21 (a wrapped header has a 21px line pitch), 8 above and 8 below, then a 1px #C63031 line. A row is 37 (8 + 20 + 9); the last row of a category is 53 and a 1px #AEAEAE line (54 together).
+- Not copied: the Figma lines between the columns end at the top of the last text line (about 17px above the end of the text). Our lines cover the whole text and the 16px padding, so a long text is never next to a missing line.
 
 No icon names in the file, but every glyph matches Google Material Icons by size and position: more-vert (4×16 at 10,4), visibility (22×15 at 1,4.5), search (17.49 at 3,3), chevron-right (7.41×12 at 8.59,6). We use Material Icons paths (Apache 2.0).
 
