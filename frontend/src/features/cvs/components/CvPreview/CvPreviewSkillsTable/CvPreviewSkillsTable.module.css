@@ -19,8 +19,11 @@
   text-transform: uppercase;
 }
 
+/* The two number columns have a fixed width. The skill column takes the rest, so the table has two groups
+   (category and skill on the left, experience and last used on the right) with free space between them. */
 .headCellNumber {
   composes: headCell;
+  width: 120px;
   text-align: center;
 }
 
@@ -47,6 +50,7 @@
 
 .cellNumber {
   composes: cell;
+  width: 120px;
   text-align: center;
   font-weight: 400;
 }
