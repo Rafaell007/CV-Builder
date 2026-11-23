@@ -16,3 +16,7 @@ The global catalog of positions (page 26). A user can be assigned one position. 
 - **Same shape as:** the [Departments module](../departments/README.md). A fix in one usually belongs in both.
 - **Tests:** `*.spec.ts` next to the code; `backend/test/positions/positions.int-spec.ts` runs every operation over HTTP against the test database.
 - **Docs:** [positions page](../../../../docs/pages/26-positions-page.md) · [PLAN.md D18, D35](../../../../PLAN.md)
+
+## Notes
+
+- **Search:** `%` and `_` typed by the user act as wildcards. Use the escape helper from `common/pagination` (fixed first in languages, KAN-99).

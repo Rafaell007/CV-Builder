@@ -15,3 +15,9 @@ The global languages catalog (PLAN.md S5.4, §7). Admin only.
 - **Authorization:** `@Roles(Role.ADMIN)` on `LanguagesResolver`.
 - **Tests:** `*.spec.ts` next to the code; `backend/test/languages/languages.int-spec.ts` runs every operation over HTTP against the test database.
 - **Docs:** [Languages page (admin)](../../../../docs/pages/19-languages-page-admin.md) · [PLAN.md S5.4](../../../../PLAN.md)
+
+## Notes
+
+- **Migration order:** migration `20261123120000` has an older timestamp than `20261123130000_add_mastery_none`, which is in work on branch `fix/skill-mastery`. If that one merges first, a local `prisma migrate dev` can ask for a database reset. Use `prisma migrate deploy`, or rename the languages migration before the merge.
+- **Seed match:** the seed in `catalogs.ts` finds a language by ISO code OR by name with `findFirst`. An admin can edit two seed languages so that one matches by ISO code and the other by name. Then the match is arbitrary.
+- **Search:** `%`, `_` and `\` are escaped with `escapeLike` from `common/pagination`, so they search as plain characters.
