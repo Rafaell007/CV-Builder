@@ -136,7 +136,8 @@ test.describe("languages, create, update and delete", () => {
 
     await openCreate(page);
     await fillForm(page, name, "qa-b", "Created");
-    await expect(field(page, "ISO")).toHaveValue("QA-B");
+    // Uppercase by CSS while typing; the backend gets and stores "QA-B" (the row below).
+    await expect(field(page, "ISO")).toHaveCSS("text-transform", "uppercase");
     await dialog(page).getByRole("button", { name: "Create" }).click();
 
     await expect(dialog(page)).toBeHidden();

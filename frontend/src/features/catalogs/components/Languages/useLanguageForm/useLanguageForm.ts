@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useMemo, useRef, useState, type BaseSyntheticEvent, type ChangeEvent } from "react";
+import { useMemo, useRef, useState, type BaseSyntheticEvent } from "react";
 import { useWatch } from "react-hook-form";
 import { applyServerFieldErrors, useZodForm } from "@/shared/forms";
 import { isCatalogConflict } from "../../../utils";
@@ -18,13 +18,6 @@ function normalize(values: LanguageFormValues): LanguageFormValues {
     iso: normalizeIso(values.iso),
     nativeName: values.nativeName.trim(),
   };
-}
-
-/** Uppercases the typed text in the input itself and puts the cursor back where it was ("pt-br" → "PT-BR"). */
-function uppercaseInPlace(input: HTMLInputElement) {
-  const { selectionStart, selectionEnd } = input;
-  input.value = input.value.toUpperCase();
-  input.setSelectionRange(selectionStart, selectionEnd);
 }
 
 /**
@@ -69,16 +62,6 @@ export function useLanguageForm() {
     typed.name !== original.name ||
     typed.iso !== original.iso ||
     typed.nativeName !== original.nativeName;
-
-  const isoRegistration = form.register("iso");
-  /** The props of the ISO input: the usual registration, but each typed letter shows uppercase at once. */
-  const isoField = {
-    ...isoRegistration,
-    onChange: (event: ChangeEvent<HTMLInputElement>) => {
-      uppercaseInPlace(event.target);
-      return isoRegistration.onChange(event);
-    },
-  };
 
   /** Fills the form with `values` (they become the new "unchanged" state) and clears the general error. */
   function reset(values: LanguageFormValues) {
@@ -131,7 +114,7 @@ export function useLanguageForm() {
     }
   }
 
-  return { form, failed, hasChanged, isoField, reset, showError, submit };
+  return { form, failed, hasChanged, reset, showError, submit };
 }
 
 export type UseLanguageFormResult = ReturnType<typeof useLanguageForm>;

@@ -17,15 +17,7 @@ export function useUpdateLanguageForm(
 ) {
   const t = useTranslations("catalogs.languages");
   const toast = useToast();
-  const {
-    form,
-    failed,
-    hasChanged,
-    isoField,
-    reset,
-    showError,
-    submit: submitForm,
-  } = useLanguageForm();
+  const { form, failed, hasChanged, reset, showError, submit: submitForm } = useLanguageForm();
   // The language stays set while the modal fades out, so the request still has its id.
   const [language, setLanguage] = useState<LanguageListItem | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -55,7 +47,7 @@ export function useUpdateLanguageForm(
     return submitForm(event, send);
   }
 
-  return { form, failed, hasChanged, isoField, language, isOpen, open, setOpen: setIsOpen, submit };
+  return { form, failed, hasChanged, language, isOpen, open, setOpen: setIsOpen, submit };
 }
 
 export type UseUpdateLanguageFormResult = ReturnType<typeof useUpdateLanguageForm>;

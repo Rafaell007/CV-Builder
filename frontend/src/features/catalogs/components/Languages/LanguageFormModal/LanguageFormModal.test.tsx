@@ -74,26 +74,26 @@ describe("LanguageFormModal", () => {
     });
   });
 
-  it("shows the typed ISO letters uppercase at once", async () => {
-    const { user } = renderWithProviders(<CreateHarness />);
+  // The uppercase look is CSS only (checked in the E2E test): the input keeps what was typed, the request gets uppercase.
+  it("keeps the ISO code as typed and sends it uppercase", async () => {
+    const create = vi.fn().mockResolvedValue(english);
+    const { user } = renderWithProviders(<CreateHarness create={create} />);
     const dialog = await openDialog(user, "Create language");
     const iso = within(dialog).getByRole("textbox", { name: "ISO" });
 
+    await user.type(within(dialog).getByRole("textbox", { name: "Name" }), "Portuguese");
     await user.type(iso, "pt-br");
+    await user.type(within(dialog).getByRole("textbox", { name: "Native name" }), "Português");
+    expect(iso).toHaveValue("pt-br");
+    const submit = within(dialog).getByRole("button", { name: "Create" });
+    await waitFor(() => expect(submit).toBeEnabled());
+    await user.click(submit);
 
-    expect(iso).toHaveValue("PT-BR");
-  });
-
-  it("keeps the cursor in place when a letter is typed in the middle of the ISO code", async () => {
-    const { user } = renderWithProviders(<CreateHarness />);
-    const dialog = await openDialog(user, "Create language");
-    const iso = within(dialog).getByRole("textbox", { name: "ISO" });
-    await user.type(iso, "pt");
-
-    await user.type(iso, "-", { initialSelectionStart: 1, initialSelectionEnd: 1 });
-
-    expect(iso).toHaveValue("P-T");
-    expect(iso).toHaveProperty("selectionStart", 2);
+    expect(create).toHaveBeenCalledExactlyOnceWith({
+      name: "Portuguese",
+      iso: "PT-BR",
+      nativeName: "Português",
+    });
   });
 
   it("shows the message of an invalid ISO code under the field", async () => {
