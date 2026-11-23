@@ -115,3 +115,4 @@ The PDF of a CV, in `cv-pdf/`: `cv-pdf.service.ts`, `cv-pdf.resolver.ts`, `cv-pd
 - **Description cap:** 2000 characters is a team choice, not a page-doc rule (`MAX_DESCRIPTION_LENGTH` in `dto/cv-fields.ts`). Change it in one place if the mentor wants another number. The error message uses the constant.
 - **Schema in history:** in KAN-111 the merge commit holds a `schema.gql` that is already regenerated with the page default of 10, one commit before the code that sets it. Do not bisect on that single commit. `CI` checks only the final state.
 - **Open (frontend):** the CVs page and the CV details page (S7.1 and S7.2 front end) are not built. `PLAN.md` S7.1 stays unticked until then.
+- **Search:** `%` and `_` typed by the user act as wildcards. Use the escape helper from `common/pagination` (fixed first in languages, KAN-99).

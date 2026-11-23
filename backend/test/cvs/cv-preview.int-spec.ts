@@ -112,8 +112,8 @@ describe("cv preview", () => {
       const { id } = await prisma.language.create({ data: { name, iso, nativeName: name } });
       await prisma.userLanguage.create({ data: { userId: ann.id, languageId: id, proficiency } });
     };
-    await language("Polish", "pl", "NATIVE");
-    await language("English", "en", "C1");
+    await language("Polish", "PL", "NATIVE");
+    await language("English", "EN", "C1");
 
     const cv = async (userId: string, name: string, education = "MSc", description = "Text") =>
       (await prisma.cv.create({ data: { userId, name, education, description } })).id;

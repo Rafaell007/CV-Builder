@@ -16,3 +16,7 @@ The global catalog of departments (page 25). A user can be assigned one departme
 - **Same shape as:** the [Positions module](../positions/README.md). A fix in one usually belongs in both.
 - **Tests:** `*.spec.ts` next to the code; `backend/test/departments/departments.int-spec.ts` runs every operation over HTTP against the test database.
 - **Docs:** [departments page](../../../../docs/pages/25-departments-page.md) · [PLAN.md D18, D35](../../../../PLAN.md)
+
+## Notes
+
+- **Search:** `%` and `_` typed by the user act as wildcards. Use the escape helper from `common/pagination` (fixed first in languages, KAN-99).

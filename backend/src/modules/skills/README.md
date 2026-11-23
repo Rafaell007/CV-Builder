@@ -17,3 +17,7 @@ The global skills catalog (PLAN.md S5.3, §7) and its categories. Admin only.
 - **Authorization:** `@Roles(Role.ADMIN)` on `SkillsResolver`.
 - **Tests:** `*.spec.ts` next to the code; `backend/test/skills/skills.int-spec.ts` runs every operation over HTTP against the test database.
 - **Docs:** [Skills page (admin)](../../../../docs/pages/17-skills-page-admin.md) · [PLAN.md S5.3](../../../../PLAN.md)
+
+## Notes
+
+- **Search:** `%` and `_` typed by the user act as wildcards. Use the escape helper from `common/pagination` (fixed first in languages, KAN-99).

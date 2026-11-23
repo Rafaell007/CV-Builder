@@ -9,6 +9,7 @@ import { AuthModule } from "./modules/auth/auth.module";
 import { CvsModule } from "./modules/cvs/cvs.module";
 import { DepartmentsModule } from "./modules/departments/departments.module";
 import { HealthModule } from "./modules/health/health.module";
+import { LanguagesModule } from "./modules/languages/languages.module";
 import { PositionsModule } from "./modules/positions/positions.module";
 import { ProjectsModule } from "./modules/projects/projects.module";
 import { SkillsModule } from "./modules/skills/skills.module";
@@ -37,6 +38,7 @@ import { PrismaModule } from "./prisma/prisma.module";
     CvsModule,
     DepartmentsModule,
     PositionsModule,
+    LanguagesModule,
   ],
 })
 export class AppModule {}
