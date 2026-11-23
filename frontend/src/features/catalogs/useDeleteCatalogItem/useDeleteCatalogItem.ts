@@ -3,8 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { useToast } from "@/shared/components";
+import { readFailure } from "@/shared/failures";
 import type { CatalogItem, CatalogNamespace } from "../catalogs.types";
-import { isCatalogConflict } from "../utils";
 
 export type UseDeleteCatalogItemResult = {
   /** The item the user chose to delete. The modal is open while this is set. */
@@ -51,7 +51,7 @@ export function useDeleteCatalogItem(
       setItem(null);
       return true;
     } catch (failure) {
-      if (isCatalogConflict(failure)) {
+      if (readFailure(failure).kind === "conflict") {
         // The modal stays open: the user reads the reason there and can cancel or try again.
         setError(t("delete.inUseText"));
       } else {

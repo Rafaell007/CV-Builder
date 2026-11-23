@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
+import { readFailure } from "@/shared/failures";
 import { renderWithProviders, type RenderWithProvidersOptions } from "@/shared/testing";
-import { isCatalogConflict } from "../../../utils";
 import {
   createDepartmentMock as createMock,
   createDepartmentRefusedMock as refusedMock,
@@ -33,6 +33,6 @@ describe("useCreateDepartment", () => {
       .create("Design")
       .catch((caught: unknown) => caught);
 
-    expect(isCatalogConflict(error)).toBe(true);
+    expect(readFailure(error).kind).toBe("conflict");
   });
 });

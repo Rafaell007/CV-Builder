@@ -4,8 +4,8 @@ import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import { getServerFieldErrors } from "@/shared/forms";
 import { EnvironmentOptionsDocument } from "@/shared/graphql";
+import { readFailure } from "@/shared/failures";
 import { renderWithProviders, type RenderWithProvidersOptions } from "@/shared/testing";
-import { isCatalogConflict } from "../../../utils";
 import {
   createSkillMock as createMock,
   createSkillRefusedMock as refusedMock,
@@ -46,7 +46,7 @@ describe("useCreateSkill", () => {
       .create(input)
       .catch((caught: unknown) => caught);
 
-    expect(isCatalogConflict(error)).toBe(true);
+    expect(readFailure(error).kind).toBe("conflict");
   });
 
   it("rejects with the categoryId field error of a missing category", async () => {

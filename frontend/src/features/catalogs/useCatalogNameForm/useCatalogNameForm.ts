@@ -3,9 +3,10 @@
 import { useTranslations } from "next-intl";
 import { useMemo, useRef, useState, type BaseSyntheticEvent } from "react";
 import { useWatch } from "react-hook-form";
+import { readFailure } from "@/shared/failures";
 import { applyServerFieldErrors, useZodForm } from "@/shared/forms";
 import type { CatalogNameFormValues, CatalogNamespace } from "../catalogs.types";
-import { catalogNameSchema, isCatalogConflict } from "../utils";
+import { catalogNameSchema } from "../utils";
 
 const EMPTY_VALUES: CatalogNameFormValues = { name: "" };
 
@@ -48,7 +49,7 @@ export function useCatalogNameForm(namespace: CatalogNamespace) {
 
   /** Shows a failed request: a taken name or a field error under the field, anything else as the general message. */
   function showError(error: unknown) {
-    if (isCatalogConflict(error)) {
+    if (readFailure(error).kind === "conflict") {
       form.setError(
         "name",
         { type: "server", message: t("form.errors.nameTaken") },

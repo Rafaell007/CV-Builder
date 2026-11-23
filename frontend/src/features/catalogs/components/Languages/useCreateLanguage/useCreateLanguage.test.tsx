@@ -1,8 +1,8 @@
 import { CombinedGraphQLErrors } from "@apollo/client";
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
+import { readFailure } from "@/shared/failures";
 import { renderWithProviders, type RenderWithProvidersOptions } from "@/shared/testing";
-import { isCatalogConflict } from "../../../utils";
 import {
   createLanguageMock as createMock,
   createLanguageRefusedMock as refusedMock,
@@ -37,7 +37,7 @@ describe("useCreateLanguage", () => {
       .create(input)
       .catch((caught: unknown) => caught);
 
-    expect(isCatalogConflict(error)).toBe(true);
+    expect(readFailure(error).kind).toBe("conflict");
   });
 
   it("rejects with the CONFLICT error and reason ISO_TAKEN of a taken ISO code", async () => {

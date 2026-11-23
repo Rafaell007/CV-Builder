@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
+import { readFailure } from "@/shared/failures";
 import { renderWithProviders, type RenderWithProvidersOptions } from "@/shared/testing";
-import { isCatalogConflict } from "../../../utils";
 import {
   updateLanguageMock as updateMock,
   updateLanguageRefusedMock as refusedMock,
@@ -35,6 +35,6 @@ describe("useUpdateLanguage", () => {
       .update("2", input)
       .catch((caught: unknown) => caught);
 
-    expect(isCatalogConflict(error)).toBe(true);
+    expect(readFailure(error).kind).toBe("conflict");
   });
 });
