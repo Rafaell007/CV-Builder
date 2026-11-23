@@ -21,6 +21,8 @@ export interface DataTableProps<Row> {
    * Return `null` for a row that has no line.
    */
   renderRowDetail?: (row: Row) => ReactNode;
+  /** False takes the line away under the last row (the CV projects list in Figma has none). Default true. */
+  lastRowLine?: boolean;
   /** Slot at the end of each row, for example a button or a menu. Clicks in it do not click the row. */
   renderRowActions?: (row: Row) => ReactNode;
   selectable?: boolean;
@@ -46,6 +48,7 @@ export function DataTable<Row>({
   onSortChange,
   onRowClick,
   renderRowDetail,
+  lastRowLine = true,
   renderRowActions,
   selectable = false,
   selectedIds = [],
@@ -147,7 +150,12 @@ export function DataTable<Row>({
 
   return (
     <div className={styles.scroll}>
-      <table className={styles.table} aria-label={label} aria-busy={loading}>
+      <table
+        className={styles.table}
+        aria-label={label}
+        aria-busy={loading}
+        data-last-line={lastRowLine ? undefined : "false"}
+      >
         <thead>
           <tr>
             {selectable && (

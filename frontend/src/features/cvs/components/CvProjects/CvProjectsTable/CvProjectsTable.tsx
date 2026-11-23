@@ -95,6 +95,7 @@ export function CvProjectsTable({
       getRowId={(item) => item.id}
       sort={sort}
       onSortChange={onSortChange}
+      lastRowLine={false}
       renderRowDetail={(item) => (
         <div className={styles.detail}>
           <ProjectDescription text={item.project.description} />

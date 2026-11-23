@@ -74,6 +74,11 @@
   border-bottom: 0;
 }
 
+/* `lastRowLine={false}`: no line under the last row (or under its detail line). */
+.table[data-last-line="false"] tbody > tr:last-child {
+  border-bottom: 0;
+}
+
 .detailRow {
   border-bottom: 1px solid var(--color-border);
 }

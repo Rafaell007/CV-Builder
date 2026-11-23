@@ -279,6 +279,24 @@ describe("DataTable", () => {
     });
   });
 
+  describe("line under the last row", () => {
+    // jsdom does not apply the CSS module, so the test checks the attribute that the CSS reads.
+    it("keeps the line by default", () => {
+      renderTable();
+
+      expect(screen.getByRole("table", { name: "People" })).not.toHaveAttribute("data-last-line");
+    });
+
+    it("marks the table when lastRowLine is false", () => {
+      renderTable({ lastRowLine: false });
+
+      expect(screen.getByRole("table", { name: "People" })).toHaveAttribute(
+        "data-last-line",
+        "false",
+      );
+    });
+  });
+
   describe("states", () => {
     it("shows the loading content instead of the rows and keeps the header", () => {
       renderTable({ loading: true, loadingContent: "Loading…" });
