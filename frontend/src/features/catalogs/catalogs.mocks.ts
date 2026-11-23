@@ -47,6 +47,8 @@ export interface CatalogMocksConfig<
   createData: (item: TItem) => object;
   updateData: (item: TItem) => object;
   deleteData: () => object;
+  /** The text the stand-in backend sorts by for a sort field (Languages: `name` or `iso`). Default: the name. */
+  sortValue?: (item: TItem, field: string) => string;
 }
 
 /** A GraphQL error as the backend sends it, for example `CONFLICT` for a taken name or an item in use. */
@@ -56,13 +58,14 @@ const refused = (code: string, message: string) => ({
 
 /**
  * Builds the MockedProvider responses of one catalog (list query, create, update, delete) and the stand-in backend for
- * stories. `departments.mocks.ts`, `positions.mocks.ts` and `skills.mocks.ts` call it and export the results under their own names.
+ * stories. `departments.mocks.ts`, `positions.mocks.ts`, `skills.mocks.ts` and `languages.mocks.ts` call it and export the results under their own
+ * names.
  */
 export function createCatalogMocks<
   TItem extends CatalogItem,
   TListData extends Record<string, unknown>,
 >(config: CatalogMocksConfig<TItem, TListData>) {
-  const { noun, listDocument, item } = config;
+  const { noun, listDocument, item, sortValue = (row: TItem) => row.name } = config;
 
   /** The variables of the first request of the page: page 1 of 10 rows, sorted by name ascending. No search: it is left out. */
   const defaultVariables: CatalogListVariables = {
@@ -102,7 +105,7 @@ export function createCatalogMocks<
 
   /**
    * A stand-in for the backend, for stories: it answers every request, whatever the search, the sort or the page, with
-   * the rules of the real backend (search in the name without regard to case, sort by name, ascending by default, 10
+   * the rules of the real backend (search in the name without regard to case, sort by `sortValue`, ascending by default, 10
    * rows on a page). It lives in the mocks so a story works when the user types or clicks. The page never filters,
    * sorts or cuts pages itself.
    */
@@ -113,8 +116,11 @@ export function createCatalogMocks<
     result: (variables: CatalogListVariables) => {
       const search = variables.search?.trim().toLowerCase();
       const matching = search ? all.filter((row) => row.name.toLowerCase().includes(search)) : all;
+      const field = variables.sort?.field ?? DEFAULT_CATALOG_SORT.field;
       const direction = variables.sort?.direction === "DESC" ? -1 : 1;
-      const sorted = [...matching].sort((a, b) => a.name.localeCompare(b.name) * direction);
+      const sorted = [...matching].sort(
+        (a, b) => sortValue(a, field).localeCompare(sortValue(b, field)) * direction,
+      );
       const number = variables.page.number ?? 1;
       const size = variables.page.size ?? DEFAULT_PAGE_SIZE;
       return {

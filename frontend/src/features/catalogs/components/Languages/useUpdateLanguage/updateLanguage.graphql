@@ -1,0 +1,11 @@
+# Changes the name, ISO code and native name of one language. Admin only (backend). CONFLICT when another language
+# has the name; CONFLICT with reason ISO_TAKEN when another language has the ISO code (its own values are allowed);
+# NOT_FOUND when the language is gone.
+mutation UpdateLanguage($input: UpdateLanguageInput!) {
+  updateLanguage(input: $input) {
+    id
+    name
+    iso
+    nativeName
+  }
+}

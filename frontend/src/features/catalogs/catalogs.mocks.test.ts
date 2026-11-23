@@ -12,8 +12,16 @@ import {
   manyDepartments,
   variablesFor,
 } from "./components/Departments/departments.mocks";
+import {
+  english,
+  fakeBackendMock as fakeLanguagesBackendMock,
+  german,
+  polish,
+  variablesFor as languageVariablesFor,
+} from "./components/Languages/languages.mocks";
 
 type Result = { data: { departments: { items: { name: string }[]; total: number } } };
+type LanguagesResult = { data: { languages: { items: { iso: string }[] } } };
 
 describe("createCatalogMocks (checked through the departments mocks)", () => {
   it("builds a list response with the total of all pages", () => {
@@ -72,5 +80,18 @@ describe("createCatalogMocks (checked through the departments mocks)", () => {
 
     const descending = answer(variablesFor({ sort: { field: "name", direction: "DESC" } }));
     expect(descending.data.departments.items[0]?.name).toBe("Finance");
+  });
+
+  it("sorts by the catalog's sortValue for another sort field (languages: the ISO code)", () => {
+    // English (EN), German (DE), Polish (PL): by name E-G-P, by ISO code DE-EN-PL.
+    const backend = fakeLanguagesBackendMock([english, german, polish]);
+    const result = backend.result;
+    if (typeof result !== "function") throw new Error("expected a result function");
+
+    const byIso = result(
+      languageVariablesFor({ sort: { field: "iso", direction: "ASC" } }),
+    ) as LanguagesResult;
+
+    expect(byIso.data.languages.items.map((row) => row.iso)).toEqual(["DE", "EN", "PL"]);
   });
 });
