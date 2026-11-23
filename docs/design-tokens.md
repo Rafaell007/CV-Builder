@@ -414,7 +414,7 @@ Predictions for KAN-82 (2026-11-06): not drawn, or drawn inconsistently; chosen 
 - No internet text: we use the Figma message ("…Please try again or go back."), not the shorter one in `docs/pages/07-no-internet-page.md` ("…Please try again."), because Figma is the source of truth. The user goes back with the browser's Back button; the screen has no back button.
 - Not found message: Figma has no typed line break; the text wraps on its own after "looking for." in the 560 box. We put the break in the text (like Device error and No internet), so the lines stay the same in every language and font rendering. GO BACK with no previous page in the tab (link opened directly) goes to `/`, which redirects to `/users`.
 
-Highlighted breadcrumb in dark (2026-11-09): Figma draws #C63031 on #2E2E2E, 2.5:1. Dark uses #E9B0B0 (`--color-primary-text`), as error text does; light keeps #C63031 (5.0:1).
+Highlighted breadcrumb (2026-11-23): both themes use `--color-primary` (#C63031), as Figma draws it. Before, dark used the light pink #E9B0B0 for contrast (#C63031 on #2E2E2E is 2.5:1). The team chose the design red over the contrast.
 
 Avatar initial in dark (2026-11-06): Figma draws #2E2E2E on #C63031, 2.5:1. The initial uses #F5F5F7 in both themes (5.0:1).
 
