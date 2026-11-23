@@ -122,20 +122,19 @@ export class UsersService {
    * An admin (`actorId`) deletes a user and, by the database cascade, everything the user owns (D13). The
    * user's session ends at once: the auth guard reads the user from the database on every request.
    * D24: an admin cannot delete themselves (`SELF_DELETE`). The delete runs while the actor and the target are
-   * locked, like `update`. `NOT_FOUND` when there is no such user.
+   * locked, like `update`, and its checks run in the same order: `FORBIDDEN`, `NOT_FOUND`, then D24 (`CONFLICT`).
    */
   async delete(sentId: string, actorId: string): Promise<void> {
     const id = canonicalId(sentId);
-    // Needs no data: the actor is signed in, so they exist.
-    if (id === actorId) {
-      throw new ConflictException({
-        message: "You cannot delete yourself",
-        reason: SELF_DELETE_REASON,
-      });
-    }
     try {
       await this.prisma.$transaction(async (tx) => {
         await lockActorAndTarget(tx, id, actorId);
+        if (id === actorId) {
+          throw new ConflictException({
+            message: "You cannot delete yourself",
+            reason: SELF_DELETE_REASON,
+          });
+        }
         // The row is locked, so it still exists here: no P2025 to map.
         await tx.user.delete({ where: { id } });
       });
@@ -169,11 +168,12 @@ export class UsersService {
    * - P2002: the only unique column a write sets is `email` (create only), so the email is taken.
    * - P2003: the department or position was deleted after the check. Checking again names the field.
    * - P2025: the user to update does not exist.
-   * - P2034: another request changed the same rows at the same time (see `toTransactionConflict`).
+   * - P2034, P2028: another request changed the same rows at the same time, or the transaction could not
+   *   finish in time (see `toTransactionConflict`).
    */
   private async toWriteError(error: unknown, ids: DepartmentAndPosition): Promise<unknown> {
     if (!(error instanceof Prisma.PrismaClientKnownRequestError)) return error;
-    if (error.code === "P2034") return toTransactionConflict(error);
+    if (TRANSACTION_CONFLICT_CODES.has(error.code)) return toTransactionConflict(error);
     if (error.code === "P2025") return new NotFoundException("User not found");
     if (error.code === "P2002") {
       return new ConflictException({
@@ -195,12 +195,18 @@ export class UsersService {
 type DepartmentAndPosition = Pick<CreateUserInput, "departmentId" | "positionId">;
 
 /**
- * P2034 (a deadlock or a write conflict: PostgreSQL stopped this transaction because a parallel one needs the
- * same rows) becomes a `CONFLICT` the admin can simply retry, instead of a server error. Example: a user is
- * deleted while their browser refreshes its session token. Any other error is returned as is.
+ * Transaction errors after which nothing was saved, so the admin can simply try again:
+ * - P2034: a deadlock or a write conflict; PostgreSQL stopped this transaction because a parallel one needs the
+ *   same rows. Example: a user is deleted while their browser refreshes its session token.
+ * - P2028: Prisma rolled the transaction back because it did not finish in time (default 5 s), or got no free
+ *   database connection in time (default 2 s). Example: many requests wait for the same locked user at once.
  */
+const TRANSACTION_CONFLICT_CODES: ReadonlySet<string> = new Set(["P2034", "P2028"]);
+
+/** A transaction error from `TRANSACTION_CONFLICT_CODES` becomes a `CONFLICT` to retry, not a server error. Any other error is returned as is. */
 function toTransactionConflict(error: unknown): unknown {
-  return error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2034"
+  return error instanceof Prisma.PrismaClientKnownRequestError &&
+    TRANSACTION_CONFLICT_CODES.has(error.code)
     ? new ConflictException("The user was changed at the same time. Try again")
     : error;
 }

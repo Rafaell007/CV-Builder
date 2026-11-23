@@ -417,9 +417,12 @@ describe("UsersService", () => {
       ]);
     });
 
-    it("fails with a CONFLICT to retry when PostgreSQL stops the transaction (P2034)", async () => {
+    it.each([
+      ["P2034", "a deadlock or write conflict"],
+      ["P2028", "a transaction that did not finish in time"],
+    ])("fails with a CONFLICT to retry on %s (%s)", async (code) => {
       prisma.$queryRaw.mockResolvedValue(lockedRows([ACTOR_ID, Role.ADMIN], [ID, Role.USER]));
-      prisma.user.update.mockRejectedValue(databaseError("P2034"));
+      prisma.user.update.mockRejectedValue(databaseError(code));
 
       await expect(createService().update(input, ACTOR_ID)).rejects.toThrow(
         new ConflictException("The user was changed at the same time. Try again"),
@@ -437,17 +440,29 @@ describe("UsersService", () => {
       expect(prisma.user.delete).toHaveBeenCalledWith({ where: { id: ID } });
     });
 
-    it("refuses an admin who deletes themselves (SELF_DELETE), without opening a transaction", async () => {
+    it("refuses an admin who deletes themselves (SELF_DELETE), after the lock", async () => {
+      prisma.$queryRaw.mockResolvedValue(lockedRows([ACTOR_ID, Role.ADMIN]));
+
       await expect(reasonOf(createService().delete(ACTOR_ID, ACTOR_ID))).resolves.toBe(
         SELF_DELETE_REASON,
       );
-      expect(prisma.$transaction).not.toHaveBeenCalled();
+      expect(prisma.$queryRaw).toHaveBeenCalled();
+      expect(prisma.user.delete).not.toHaveBeenCalled();
     });
 
     it("refuses SELF_DELETE when the admin's own id comes in upper case", async () => {
+      prisma.$queryRaw.mockResolvedValue(lockedRows([ACTOR_ID, Role.ADMIN]));
+
       await expect(
         reasonOf(createService().delete(ACTOR_ID.toUpperCase(), ACTOR_ID)),
       ).resolves.toBe(SELF_DELETE_REASON);
+    });
+
+    it("refuses with FORBIDDEN, not SELF_DELETE, an actor demoted before they delete themselves", async () => {
+      prisma.$queryRaw.mockResolvedValue(lockedRows([ACTOR_ID, Role.USER]));
+
+      await expect(createService().delete(ACTOR_ID, ACTOR_ID)).rejects.toThrow(ForbiddenException);
+      expect(prisma.user.delete).not.toHaveBeenCalled();
     });
 
     it.each([
@@ -480,9 +495,12 @@ describe("UsersService", () => {
       expect(prisma.user.delete).not.toHaveBeenCalled();
     });
 
-    it("fails with a CONFLICT to retry when PostgreSQL stops the transaction (P2034)", async () => {
+    it.each([
+      ["P2034", "a deadlock or write conflict"],
+      ["P2028", "a transaction that did not finish in time"],
+    ])("fails with a CONFLICT to retry on %s (%s)", async (code) => {
       prisma.$queryRaw.mockResolvedValue(lockedRows([ACTOR_ID, Role.ADMIN], [ID, Role.USER]));
-      prisma.user.delete.mockRejectedValue(databaseError("P2034"));
+      prisma.user.delete.mockRejectedValue(databaseError(code));
 
       await expect(createService().delete(ID, ACTOR_ID)).rejects.toThrow(
         new ConflictException("The user was changed at the same time. Try again"),
