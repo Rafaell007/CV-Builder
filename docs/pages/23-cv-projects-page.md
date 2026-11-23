@@ -174,9 +174,10 @@ The table displays the following columns:
 |---|---|
 | Name | Project name |
 | Domain | Project domain |
-| Responsibilities | CV-specific responsibilities |
 | Start Date | Participation start date |
 | End Date | Participation end date |
+
+Under each row a detail line shows the project description and the CV-specific responsibilities as tags (one tag per line of the text). The table has no Responsibilities column and no line under the last row (Figma wins over this document, decided 2026-11-23; Figma: `docs/images/figma/desktop-1440/light/frame-46.png`).
 
 Requirements:
 
@@ -987,7 +988,7 @@ Requirements:
 |---|---|
 | AC-1 | Projects tab is available on the CV Details page |
 | AC-2 | Only projects assigned to the selected CV are displayed |
-| AC-3 | Projects table displays Name, Domain, Responsibilities, Start Date and End Date columns |
+| AC-3 | Projects table displays Name, Domain, Start Date and End Date columns; the project description and the responsibilities as tags are under each row |
 | AC-4 | Search filters projects by Name and Domain |
 | AC-5 | Search is case-insensitive |
 | AC-6 | Projects can be sorted by Name, Start Date and End Date |

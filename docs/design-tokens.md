@@ -340,7 +340,8 @@ Header and content:
 - Columns: Name, Domain, Start Date, End Date and the kebab. **No Responsibilities column** (the page doc lists one; see `frontend/src/features/cvs/README.md`).
 - Under a row: the project description (14 / 20, two lines in the sample), then 18 below it the responsibilities as tags. A tag: filled pill 24 high, 8 at the sides, 13 / 20 text (`--text-tag`), 8 between tags. Light fill #E2E2E4 with #2E2E2E text, dark fill #626262 with #F5F5F7 text (`--color-tag-bg`). Each line of the responsibilities text is one tag. The environment technologies of the project are not in the list: they are in the Add project modal (frame-47).
 - Search 320 wide at x 244; ADD PROJECT: text button 220 × 40, plus icon and text centred, 8 apart.
-- Not matched: the description colour (Figma #919192 in both themes, ours `--color-text-secondary`) and the row metrics of the shared table (Figma: header about 58, first row 71, 16 under the tags; ours: 48.5, 56.5, 12). Both are shared with the Projects list.
+- Table (shared `DataTable`, all list pages): header 58, rows 73 apart; a row with a detail line is 71 high and has 16 under the detail. The CV projects list has no line under the last row (Languages and Projects lists have one).
+- Not matched on purpose: the description colour. Figma draws #919192 in both themes (about 3:1 on the light page); we keep `--color-text-secondary` for the contrast (decided 2026-11-23).
 
 ### Icons
 
