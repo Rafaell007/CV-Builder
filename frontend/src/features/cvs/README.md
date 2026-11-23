@@ -129,7 +129,7 @@ Spec: [docs/pages/23-cv-projects-page.md](../../../../docs/pages/23-cv-projects-
 
 ## Notes
 
-- **Signed-out users on the CV Details page.** The spec lists authentication errors as a separate case. `readFailure` has no kind for it: a code like `UNAUTHENTICATED` becomes `failed`. This is decided: the page relies on the global handler in `shared/apollo/errorLink` (session refresh and redirect to sign-in, planned in PLAN D9 and S3), which is not built yet. Until it is, a signed-out user sees `failed` with Retry. When the handler exists, check that the redirect happens before this page shows an error.
+- **Signed-out users on the CV Details page.** The spec lists authentication errors as a separate case. `readFailure` has no kind for it: a code like `UNAUTHENTICATED` becomes `unknown` (`failed` on this page). This is decided: the page relies on `shared/apollo/sessionLink`, which refreshes the session, runs the request once more and redirects to sign-in when the session is over (PLAN D9). Not checked yet: that the redirect happens before this page shows its error screen.
 - **The description is a `role="button"` on a `<p>`**, like in projects (the same known issue). A real `<button>` would be cleaner.
 - **Two copies of `useClampedText`.** `ProjectDescription` is shared now (`shared/components/ProjectDescription`, used by Projects and CV projects), but `CvDescription` of the CVs list still has its own copy of the hook and CSS. Replace it with the shared component. The 1023px limit is written in CSS only (no breakpoint token yet).
 - **A click on the description line does nothing for a CV that is not cut.** The row above opens the CV. This is the decided behaviour.
