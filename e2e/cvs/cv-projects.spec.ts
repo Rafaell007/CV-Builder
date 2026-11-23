@@ -253,6 +253,10 @@ test.describe("CV Projects page, as an employee (KAN-156)", () => {
       await page.getByRole("option", { name: "Hospital Appointment System", exact: true }).click();
       await dialog.getByRole("combobox", { name: "Roles" }).click();
       await page.getByRole("option", { name: "Developer", exact: true }).click();
+      // The next field takes the focus, so the open Roles list closes and the click on Add reaches the button.
+      await dialog
+        .getByRole("textbox", { name: "Responsibilities" })
+        .fill("Built the booking screens.");
       await dialog.getByRole("button", { name: "Add", exact: true }).click();
 
       await expect(page.getByText("Project added", { exact: true })).toBeVisible();
