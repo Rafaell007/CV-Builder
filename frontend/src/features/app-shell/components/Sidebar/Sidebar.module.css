@@ -12,10 +12,16 @@
 .logoRow {
   display: flex;
   align-items: center;
+  gap: var(--space-4);
   height: var(--space-14);
-  padding-left: var(--space-14);
+  padding-left: var(--space-4);
   overflow: hidden;
   white-space: nowrap;
+}
+
+/* 24×24 at left 16; it is the only thing in the row when the sidebar is collapsed. */
+.logo {
+  flex: none;
 }
 
 .appName {
