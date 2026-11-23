@@ -335,6 +335,13 @@ Header and content:
 - ADD SKILL (grey) and REMOVE SKILLS (red): each 220 × 40, icon and text centred with 16 between them, 16 between the buttons, the right button ends 24 before the right edge of the block, the buttons start 52 under the last skill row.
 - Not checked: the selected skill in the selection mode (this frame shows none; the older note under "Selection toolbar" says the bar turns grey at 90%) and the tablet layout.
 
+### CV Projects (1440 › CV Projects = `docs/images/figma/desktop-1440/light/frame-46.png`, dark = the same frame in `dark`; measured on the images, 2026-11-23)
+
+- Columns: Name, Domain, Start Date, End Date and the kebab. **No Responsibilities column** (the page doc lists one; see `frontend/src/features/cvs/README.md`).
+- Under a row: the project description (14 / 20, two lines in the sample), then 18 below it the responsibilities as tags. A tag: filled pill 24 high, 8 at the sides, 13 / 20 text (`--text-tag`), 8 between tags. Light fill #E2E2E4 with #2E2E2E text, dark fill #626262 with #F5F5F7 text (`--color-tag-bg`). Each line of the responsibilities text is one tag. The environment technologies of the project are not in the list: they are in the Add project modal (frame-47).
+- Search 320 wide at x 244; ADD PROJECT: text button 220 × 40, plus icon and text centred, 8 apart.
+- Not matched: the description colour (Figma #919192 in both themes, ours `--color-text-secondary`) and the row metrics of the shared table (Figma: header about 58, first row 71, 16 under the tags; ours: 48.5, 56.5, 12). Both are shared with the Projects list.
+
 ### Icons
 
 No icon names in the file, but every glyph matches Google Material Icons by size and position: more-vert (4×16 at 10,4), visibility (22×15 at 1,4.5), search (17.49 at 3,3), chevron-right (7.41×12 at 8.59,6). We use Material Icons paths (Apache 2.0).
