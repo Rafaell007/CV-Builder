@@ -167,7 +167,43 @@ describe("CvSkills", () => {
       expect(mastery).toHaveTextContent("Expert");
       await user.click(mastery);
       await user.click(screen.getByRole("option", { name: "No mastery" }));
-      expect(mastery).not.toHaveTextContent("Expert");
+      expect(mastery).toHaveTextContent("No mastery");
+
+      await user.click(within(dialog).getByRole("button", { name: "Add" }));
+
+      // The mock only matches a request without mastery: a request with one would fail.
+      expect(await screen.findByText("Skill added")).toBeInTheDocument();
+    });
+
+    it("shows No mastery as chosen, closes the list and adds the skill without mastery", async () => {
+      const { user, dialog } = await openAddModal(
+        withAdd(
+          addCvSkillMock(docker),
+          cvSkillsMock([
+            ...sampleSkills,
+            cvSkill({
+              id: "link-new",
+              skillId: docker.id,
+              name: docker.name,
+              mastery: docker.mastery,
+              category: docker.category,
+            }),
+          ]),
+        ),
+      );
+      const field = within(dialog).getByRole("combobox", { name: "Skill" });
+      await waitFor(() => expect(field).toBeEnabled());
+      await user.click(field);
+      await user.click(screen.getByRole("option", { name: "Docker" }));
+      expect(field).toHaveTextContent("Docker");
+
+      const mastery = within(dialog).getByRole("combobox", { name: "Skill mastery" });
+      expect(mastery).toBeEnabled();
+      await user.click(mastery);
+      await user.click(screen.getByRole("option", { name: "No mastery" }));
+
+      expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+      expect(mastery).toHaveTextContent("No mastery");
 
       await user.click(within(dialog).getByRole("button", { name: "Add" }));
 
