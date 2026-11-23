@@ -12,6 +12,7 @@ export { DeleteForeverIcon } from "./DeleteForeverIcon";
 export { DomainIcon } from "./DomainIcon";
 export { ExpandMoreIcon } from "./ExpandMoreIcon";
 export { FolderCopyIcon } from "./FolderCopyIcon";
+export { LogoIcon } from "./LogoIcon";
 export { LogoutIcon } from "./LogoutIcon";
 export { MoreVertIcon } from "./MoreVertIcon";
 export { PeopleIcon } from "./PeopleIcon";
