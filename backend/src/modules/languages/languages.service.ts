@@ -4,6 +4,7 @@ import { Prisma } from "../../generated/prisma/client";
 import { PrismaService } from "../../prisma/prisma.service";
 import type { CreateLanguageInput } from "./dto/create-language.input";
 import type { UpdateLanguageInput } from "./dto/update-language.input";
+import { IsoCodeTakenException } from "./iso-code-taken.exception";
 import type { Language } from "./models/language";
 import type { LanguagePage } from "./models/language-page";
 
@@ -81,11 +82,9 @@ export class LanguagesService {
    */
   private async toWriteError(error: unknown, iso: string, id?: string): Promise<unknown> {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-      return new ConflictException(
-        (await this.isIsoDuplicate(error, iso, id))
-          ? "ISO code already exists"
-          : "Language already exists",
-      );
+      return (await this.isIsoDuplicate(error, iso, id))
+        ? new IsoCodeTakenException()
+        : new ConflictException("Language already exists");
     }
     return toNotFoundError(error);
   }

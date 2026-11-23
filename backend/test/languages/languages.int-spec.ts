@@ -169,6 +169,7 @@ describe("languages", () => {
         message: "Language already exists",
         extensions: { code: "CONFLICT" },
       });
+      expect(body.errors?.[0]).not.toHaveProperty("extensions.reason");
       await expect(prisma.language.count()).resolves.toBe(1);
     });
 
@@ -185,7 +186,7 @@ describe("languages", () => {
 
       expect(body.errors?.[0]).toMatchObject({
         message: "ISO code already exists",
-        extensions: { code: "CONFLICT" },
+        extensions: { code: "CONFLICT", reason: "ISO_TAKEN" },
       });
       await expect(prisma.language.count()).resolves.toBe(1);
     });
@@ -369,7 +370,7 @@ describe("languages", () => {
 
       expect(body.errors?.[0]).toMatchObject({
         message: "ISO code already exists",
-        extensions: { code: "CONFLICT" },
+        extensions: { code: "CONFLICT", reason: "ISO_TAKEN" },
       });
       await expect(prisma.language.findUniqueOrThrow({ where: { id } })).resolves.toMatchObject(
         GERMAN,

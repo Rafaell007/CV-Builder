@@ -4,6 +4,7 @@ import { PageInput, SortDirection } from "../../common/pagination";
 import { Prisma } from "../../generated/prisma/client";
 import type { PrismaService } from "../../prisma/prisma.service";
 import { LanguagesService } from "./languages.service";
+import { IsoCodeTakenException } from "./iso-code-taken.exception";
 
 const ID = "6f1d3c52-8a0e-4f6c-9a43-2b7d5e1c9a10";
 const INPUT = { name: "German", iso: "DE", nativeName: "Deutsch" };
@@ -132,9 +133,7 @@ describe("LanguagesService", () => {
     it("fails with CONFLICT for an ISO code that already exists", async () => {
       prisma.language.create.mockRejectedValue(duplicateOn("Language_iso_key"));
 
-      await expect(createService().create(INPUT)).rejects.toThrow(
-        new ConflictException("ISO code already exists"),
-      );
+      await expect(createService().create(INPUT)).rejects.toThrow(IsoCodeTakenException);
       expect(prisma.language.findFirst).not.toHaveBeenCalled();
     });
 
@@ -142,9 +141,7 @@ describe("LanguagesService", () => {
       prisma.language.create.mockRejectedValue(databaseError("P2002"));
       prisma.language.findFirst.mockResolvedValue({ id: ID });
 
-      await expect(createService().create(INPUT)).rejects.toThrow(
-        new ConflictException("ISO code already exists"),
-      );
+      await expect(createService().create(INPUT)).rejects.toThrow(IsoCodeTakenException);
       expect(prisma.language.findFirst).toHaveBeenCalledWith({
         where: { iso: "DE" },
         select: { id: true },
@@ -193,7 +190,7 @@ describe("LanguagesService", () => {
       prisma.language.update.mockRejectedValue(duplicateOn("Language_iso_key"));
 
       await expect(createService().update({ id: ID, ...INPUT })).rejects.toThrow(
-        new ConflictException("ISO code already exists"),
+        IsoCodeTakenException,
       );
     });
 
@@ -202,7 +199,7 @@ describe("LanguagesService", () => {
       prisma.language.findFirst.mockResolvedValue({ id: "another-id" });
 
       await expect(createService().update({ id: ID, ...INPUT })).rejects.toThrow(
-        new ConflictException("ISO code already exists"),
+        IsoCodeTakenException,
       );
       expect(prisma.language.findFirst).toHaveBeenCalledWith({
         where: { iso: "DE", id: { not: ID } },
