@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import type { CSSProperties } from "react";
-import { expect, fn } from "storybook/test";
+import { expect, fn, within } from "storybook/test";
 import type { NavLabelKey } from "../../navigation.types";
 import { getNavItems, toSidebarLinks } from "../../utils";
 import { ProfileMenu } from "../ProfileMenu";
@@ -67,7 +67,9 @@ type Story = StoryObj<typeof meta>;
 // Figma 1440 › USERS: 4 links, Employees active.
 export const User: Story = {
   play: async ({ canvas }) => {
-    await expect(canvas.getAllByRole("link")).toHaveLength(4);
+    // The logo is a link too, so only the navigation area is counted.
+    const navigation = within(canvas.getByRole("navigation", { name: "Main navigation" }));
+    await expect(navigation.getAllByRole("link")).toHaveLength(4);
     await expect(canvas.getByRole("link", { name: "Employees" })).toHaveAttribute(
       "aria-current",
       "page",
@@ -79,7 +81,8 @@ export const User: Story = {
 export const Admin: Story = {
   args: linksFor("ADMIN", "/admin/departments"),
   play: async ({ canvas }) => {
-    await expect(canvas.getAllByRole("link")).toHaveLength(7);
+    const navigation = within(canvas.getByRole("navigation", { name: "Main navigation" }));
+    await expect(navigation.getAllByRole("link")).toHaveLength(7);
     await expect(canvas.getByRole("link", { name: "Departments" })).toHaveAttribute(
       "aria-current",
       "page",

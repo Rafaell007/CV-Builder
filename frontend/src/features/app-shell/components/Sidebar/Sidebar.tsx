@@ -49,8 +49,10 @@ export function Sidebar({
   return (
     <aside className={styles.sidebar}>
       <div className={styles.logoRow}>
-        <LogoIcon className={styles.logo} />
-        <span className={styles.appName}>{labels.appName}</span>
+        <Link href="/" className={styles.logoLink}>
+          <LogoIcon className={styles.logo} aria-hidden="true" />
+          <span className={styles.appName}>{labels.appName}</span>
+        </Link>
       </div>
       <button
         type="button"
