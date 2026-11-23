@@ -12,5 +12,6 @@ export {
 export {
   toCvProjectFailure,
   toCvProjectsVariables,
+  toResponsibilityTags,
   type CvProjectFailure,
 } from "./cvProjects.utils";

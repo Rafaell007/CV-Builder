@@ -184,6 +184,8 @@ export function describeCatalogPage(c: CatalogPageCase): void {
 
       await openRowMenu(page, name, "Edit");
       await expect(field(page)).toHaveValue(name);
+      // The click ends the selection guard of the modal (see `useFirstFieldFocus`); without it `fill` can add the text to the old name.
+      await field(page).click();
       await field(page).fill(renamed);
       await dialog(page).getByRole("button", { name: "Save" }).click();
 

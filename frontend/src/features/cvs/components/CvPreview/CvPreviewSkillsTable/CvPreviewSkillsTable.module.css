@@ -9,25 +9,47 @@
   color: var(--color-text);
 }
 
+/*
+ * Values measured on Figma 1440 › CV Preview (852 wide table): columns 240 (category) · rest (skill) · 115 (experience)
+ * · 140 (last used); header text 14/21 with 8px above and below, so a wrapped header has a 21px line pitch.
+ * A row is 37 high (8 + 20 + 9); the last row of a category is 53 (8 + 20 + 25) and the 1px line.
+ */
+
 /* Header: a red line under it (Figma: #C63031 in both themes). The numeric columns are centred. */
 .headCell {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-2) var(--space-4);
   border-bottom: 1px solid var(--color-primary);
   font: var(--text-table-header);
+  line-height: 21px;
   letter-spacing: var(--text-table-header-ls);
   text-align: left;
   text-transform: uppercase;
+  /* A header that wraps to two lines keeps its first line level with the other headers. */
+  vertical-align: top;
 }
 
+/* The two number columns have a fixed width. The skill column takes the rest, so the table has two groups
+   (category and skill on the left, experience and last used on the right) with free space between them.
+   Experience is the second to last cell of a row, last used the last one (the category cell only changes the start). */
 .headCellNumber {
   composes: headCell;
   text-align: center;
 }
 
+.headCellNumber:nth-last-child(2),
+.cellNumber:nth-last-child(2) {
+  width: 115px;
+}
+
+.headCellNumber:last-child,
+.cellNumber:last-child {
+  width: 140px;
+}
+
 /* Lines sit on the cells, not on the <tbody>: collapsed borders on row groups differ between browsers. */
 .category,
 .cell {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-2) var(--space-4) 9px;
   border-bottom: 1px solid var(--color-cv-divider);
   font: var(--text-table-cell);
   letter-spacing: var(--text-table-cell-ls);
@@ -35,7 +57,9 @@
 }
 
 /* A line under the last skill of a category separates the blocks. The category cell spans all rows, so its bottom edge is the block end. The category name is red, the skill name is bold. */
+/* The fixed width keeps the skill names next to the category. Without it the browser shares the free space between the category and the skill column. */
 .category {
+  width: 240px;
   vertical-align: top;
   color: var(--color-cv-accent);
   font-weight: 500;
@@ -53,6 +77,11 @@
 
 .row:not(:last-child) .cell {
   border-bottom-color: transparent;
+}
+
+/* Extra space under the last skill of a category, before the line. */
+.row:last-child .cell {
+  padding-bottom: 25px;
 }
 
 .empty {

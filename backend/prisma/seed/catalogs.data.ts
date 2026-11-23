@@ -80,16 +80,16 @@ interface LanguageSeed {
 }
 
 export const LANGUAGES: LanguageSeed[] = [
-  { name: "English", iso: "en", nativeName: "English" },
-  { name: "Polish", iso: "pl", nativeName: "Polski" },
-  { name: "German", iso: "de", nativeName: "Deutsch" },
-  { name: "French", iso: "fr", nativeName: "Français" },
-  { name: "Spanish", iso: "es", nativeName: "Español" },
-  { name: "Italian", iso: "it", nativeName: "Italiano" },
-  { name: "Ukrainian", iso: "uk", nativeName: "Українська" },
-  { name: "Russian", iso: "ru", nativeName: "Русский" },
-  { name: "Czech", iso: "cs", nativeName: "Čeština" },
-  { name: "Portuguese", iso: "pt", nativeName: "Português" },
-  { name: "Japanese", iso: "ja", nativeName: "日本語" },
-  { name: "Chinese", iso: "zh", nativeName: "中文" },
+  { name: "English", iso: "EN", nativeName: "English" },
+  { name: "Polish", iso: "PL", nativeName: "Polski" },
+  { name: "German", iso: "DE", nativeName: "Deutsch" },
+  { name: "French", iso: "FR", nativeName: "Français" },
+  { name: "Spanish", iso: "ES", nativeName: "Español" },
+  { name: "Italian", iso: "IT", nativeName: "Italiano" },
+  { name: "Ukrainian", iso: "UK", nativeName: "Українська" },
+  { name: "Russian", iso: "RU", nativeName: "Русский" },
+  { name: "Czech", iso: "CS", nativeName: "Čeština" },
+  { name: "Portuguese", iso: "PT", nativeName: "Português" },
+  { name: "Japanese", iso: "JA", nativeName: "日本語" },
+  { name: "Chinese", iso: "ZH", nativeName: "中文" },
 ];

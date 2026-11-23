@@ -10,6 +10,7 @@ Table for a backend list page. It only renders; the page owns the query state (`
 - **Row actions:** `renderRowActions(row)` renders a slot at the row end (button, menu). Clicks in it do not click the row. With the 40×40 `Menu` button the column is 74 wide, and 56 below 1024px (Figma).
 - **Selection:** `selectable`, `selectedIds`, `onSelectionChange`. The header checkbox works on the rows of the current page; the selection of other pages stays.
 - **States:** `loading` shows `loadingContent` in the body and keeps the header; `emptyContent` shows when there are no rows.
+- **Sizes (Figma):** the header is 58 high and the rows are 73 apart (71 above a detail line, 16 under it). `lastRowLine={false}` takes the line away under the last row (the CV projects list). The row heights are minimums, so a taller cell wins.
 - **Texts:** the `labels` prop replaces the English defaults (a11y texts only; pass translated ones).
 
 ## Known issues

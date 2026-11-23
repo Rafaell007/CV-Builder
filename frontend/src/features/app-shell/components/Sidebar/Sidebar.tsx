@@ -1,5 +1,5 @@
 import type { ComponentType, ReactNode } from "react";
-import { ChevronLeftIcon, type IconProps } from "@/shared/components/icons";
+import { ChevronLeftIcon, LogoIcon, type IconProps } from "@/shared/components/icons";
 import { Link } from "@/shared/i18n";
 import styles from "./Sidebar.module.css";
 
@@ -49,6 +49,7 @@ export function Sidebar({
   return (
     <aside className={styles.sidebar}>
       <div className={styles.logoRow}>
+        <LogoIcon className={styles.logo} />
         <span className={styles.appName}>{labels.appName}</span>
       </div>
       <button

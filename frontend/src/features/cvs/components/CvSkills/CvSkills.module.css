@@ -1,20 +1,31 @@
-/* Values: Figma CV Skills (1440 frame): the groups are centred under the tabs; ADD SKILL and REMOVE SKILLS sit below
-   them at the right end of the same 852px block. */
+/* Values: Figma CV Skills (1440 frame-45, measured): the groups are centred under the tabs and start 34 under them
+   (CvLayout gives 24); ADD SKILL and REMOVE SKILLS sit 52 under the last skill row, in the same 852px block. */
 .page {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: 52px;
+  padding-top: 10px;
 }
 
+/* Two 220 × 40 buttons 16 apart, the right one ends 24 before the right edge of the block. */
 .actions {
   display: flex;
-  gap: var(--space-6);
+  gap: var(--space-4);
   align-items: center;
   justify-content: flex-end;
   box-sizing: border-box;
   width: 100%;
   max-width: 852px;
   margin: 0 auto;
+  padding-right: var(--space-6);
+}
+
+/* Icon and text are centred, 16 apart. Two classes, so the size wins over the shared Button. */
+.actions .action {
+  gap: var(--space-4);
+  min-width: 220px;
+  height: var(--space-10);
+  padding: 0 var(--space-3);
 }
 
 /* The state (loading, empty, error) has the width of the groups, so the page does not jump when the skills arrive. */

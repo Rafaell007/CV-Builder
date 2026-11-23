@@ -11,9 +11,9 @@ The document sections (KAN-158) are presentational: props in, JSX out. No data f
 - States, all with the shared `PageState`: loading (`role="status"`), error (`role="alert"`) with Retry, and unauthorized. Unauthorized shows `You are not authorized to access this CV` and no CV data, with no Retry, because the answer would be the same. There is no empty state: `cvPreview` is non-null in the schema. Texts: `cvs.preview.states` and `cvs.preview.sections.professionalSkills`.
 - Heading order: the page `h1` is the CV name of `CvLayout` (`PageHeader`, visually hidden). The container adds no `h1`; the document starts with `h2`. The `<article>` has the label `CV preview`.
 - The document is a sheet with a border and the surface colour, at most 900px wide, in the middle of the page. Colours come from design tokens.
-- EXPORT PDF (S7.6, KAN-119): the `CvPreviewExport` button is above the document in every state. It is disabled while the preview data is missing (loading, error, unauthorized). See the section below.
+- EXPORT PDF (S7.6, KAN-119): the `CvPreviewExport` button is in every state, at the top right of the document column, on the row of the name (Figma frame 41). It is disabled while the preview data is missing (loading, error, unauthorized). See the section below.
 - Stories: `CvPreview.stories.tsx` (Desktop, Tablet, Loading, LoadFailed, Unauthorized, Polish).
-- Not done: layout check against Figma, dark theme and keyboard check by a person.
+- Layout: checked against Figma frame 41 on 2026-11-23 (distances and widths are in `docs/design-tokens.md` › Tabs and CV Preview) and measured in the real browser in the stories. Not done: dark theme, the tablet layout (no Figma frame was measured) and the keyboard check by a person.
 
 ## CvPreviewExport (S7.6, KAN-119)
 
@@ -22,18 +22,18 @@ The document sections (KAN-158) are presentational: props in, JSX out. No data f
 - The button shows the shared spinner while the PDF is made (`aria-busy`), stays focusable and ignores a second click (AC-27, AC-28). A hidden `role="status"` text (`Generating the PDF`) tells screen readers about the running export.
 - `disabled` is true when `useCvPreview` has no data. No request starts then (AC-26, AC-48). **Note:** the button is off only when there is no data at all. While a refetch runs with old data on the screen, or after an error that keeps old data, it stays on, and the PDF is made from the current server data, not from the old data on the screen. The spec says "disabled while preview data is unavailable", so this was judged acceptable. Change `disabled={!preview}` in `CvPreview.tsx` if the spec should be read more strictly.
 - The PDF is made by the backend (`exportCvPdf`) from the same data as the preview. The file name comes from the backend (the CV name in lower case with hyphens, AC-22). The download starts when the answer arrives. A failure shows a toast and the preview stays (AC-47).
-- **The button is not in the shared `PageHeader`.** The spec says "in the page header", but `PageHeader` has no place for actions and is used by every page. The button is in a bar above the document, at the right edge of the sheet. Move it if `PageHeader` gets an actions slot.
+- **The button is not in the shared `PageHeader`.** The spec says "in the page header", but `PageHeader` has no place for actions and is used by every page. The button is in a bar with no height at the top of the document column. The button hangs over the first row of the document (the name), as in Figma, and `CvPreviewHeader` keeps 176px free at its right end so a long name does not run under it. Move it if `PageHeader` gets an actions slot.
 - **The PDF follows the language of the page.** The hook sends `locale`, and the backend prints the section titles and column names in `en` or `pl`. The CV content is not translated. The period of a project also follows the language: `useCvPreview` sends `locale`, and the backend writes `Till now` (`en`) or `obecnie` (`pl`), the same text as in the PDF. See `backend/src/modules/cvs/README.md`.
 - **No print layout.** The first plan said a CSS `@media print` rule would come with S7.6. It was not made, because the PDF is made by the backend and the page is not printed.
 - Tests: `CvPreviewExport.test.tsx` (props only), the export flow in `CvPreview.test.tsx` and `useExportCvPdf.test.tsx`, `useSaveFile.test.ts`, `utils/cvPdf.utils.test.ts`. The download itself needs a real browser, so the unit tests replace `useSaveFile`. `e2e/cvs/cv-preview-export.spec.ts` checks the real download and its file name.
-- Not done: layout check against Figma (the position and the look of the button) and a keyboard check by a person.
+- Not done: a keyboard check by a person. The position and the look of the button follow Figma frame 41 (160 × 40).
 
 ## CvPreviewSkillsTable (KAN-159)
 
 `CvPreviewSkillsTable({ skillGroups })`: the Professional Skills table. `skillGroups` is `CvPreviewData["skillGroups"]` from `useCvPreview`.
 
 - Columns: Skills Category, Skill, Experience in Years, Last Used. It is a real `<table>` with a visually hidden `<caption>` and `<th scope>` headers.
-- Each category is one `<tbody>`. The category cell (`<th scope="row">`) spans the rows of its skills (`rowSpan`). A thicker line on the cells of the last row separates the categories. The lines are on the cells, not on the `<tbody>`, because collapsed borders on row groups differ between browsers.
+- Each category is one `<tbody>`. The category cell (`<th scope="row">`) spans the rows of its skills (`rowSpan`). A line on the cells of the last row separates the categories, and the last row has 16px more space under it (Figma). The lines are on the cells, not on the `<tbody>`, because collapsed borders on row groups differ between browsers.
 - A category without skills is not shown. When no category has skills, the table shows the message `No skills added` under the header row.
 - React keys use the position and the name, because a category or a skill name can repeat.
 - A skill with no experience or no last used year (`null`) shows an en dash. Screen readers read the column name and `not available` (for example `Last Used: not available`) instead of the dash, so the meaning does not depend on colour.

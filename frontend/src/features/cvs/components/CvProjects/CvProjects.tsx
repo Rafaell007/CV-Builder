@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Button, PageState, SearchField, type PageStateLabels } from "@/shared/components";
+import { AddIcon, Button, PageState, SearchField, type PageStateLabels } from "@/shared/components";
 import { AddCvProjectModal } from "./AddCvProjectModal";
 import { SEARCH_MAX_LENGTH } from "./cvProjects.constants";
 import styles from "./CvProjects.module.css";
@@ -56,7 +56,10 @@ export function CvProjects({ cvId }: CvProjectsProps) {
           defaultValue={list.search}
           onSearch={list.setSearch}
         />
-        <Button onClick={adding.open}>{t("actions.add")}</Button>
+        <Button variant="text" className={styles.addButton} onClick={adding.open}>
+          <AddIcon />
+          {t("actions.add")}
+        </Button>
       </div>
       {failed && !loading ? (
         <PageState kind="error" labels={stateLabels} onRetry={retry} />

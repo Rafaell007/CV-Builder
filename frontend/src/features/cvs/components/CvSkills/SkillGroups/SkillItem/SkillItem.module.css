@@ -6,7 +6,8 @@
   box-sizing: border-box;
   width: 100%;
   min-height: var(--space-12);
-  padding: 0 var(--space-4);
+  /* 15 + the 1px border = 16: the bar starts 16 from the column edge, as in Figma. */
+  padding: 0 calc(var(--space-4) - 1px);
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
   background: transparent;

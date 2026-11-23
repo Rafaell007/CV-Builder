@@ -17,3 +17,7 @@ The global catalog of projects (page 27) and the project roles. Admin only, exce
 - **Used by CV projects:** `project-environment.ts` holds `WITH_ENVIRONMENT` and `toProject`. The CVs module uses them to return the project inside a `CvProject` (see [CVs README](../cvs/README.md)).
 - **Tests:** `*.spec.ts` next to the code; `backend/test/projects/projects.int-spec.ts` runs every operation over HTTP against the test database.
 - **Docs:** [projects page](../../../../docs/pages/27-projects-page.md) · [PLAN.md S5.5, D18, D25](../../../../PLAN.md)
+
+## Notes
+
+- **Search:** `%` and `_` typed by the user act as wildcards. Use the escape helper from `common/pagination` (fixed first in languages, KAN-99).

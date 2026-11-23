@@ -36,3 +36,14 @@ export function toCvProjectFailure(error: unknown): CvProjectFailure | undefined
   if (codes.includes("BAD_USER_INPUT")) return "invalid";
   return undefined;
 }
+
+/**
+ * The responsibilities of a CV project as tags: one tag per line of the text, blank lines left out.
+ * The text is free text from the form; a text of one line is one tag.
+ */
+export function toResponsibilityTags(responsibilities: string | null | undefined): string[] {
+  return (responsibilities ?? "")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line !== "");
+}

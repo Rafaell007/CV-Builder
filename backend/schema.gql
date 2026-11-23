@@ -40,6 +40,12 @@ input CreateDepartmentInput {
   name: String!
 }
 
+input CreateLanguageInput {
+  iso: String!
+  name: String!
+  nativeName: String!
+}
+
 input CreatePositionInput {
   name: String!
 }
@@ -172,6 +178,18 @@ type Health {
   status: String!
 }
 
+type Language {
+  id: ID!
+  iso: String!
+  name: String!
+  nativeName: String!
+}
+
+type LanguagePage {
+  items: [Language!]!
+  total: Int!
+}
+
 enum Mastery {
   ADVANCED
   BEGINNER
@@ -187,11 +205,13 @@ type Mutation {
   changePassword(input: ChangePasswordInput!): Boolean!
   createCv(input: CreateCvInput!): Cv!
   createDepartment(input: CreateDepartmentInput!): Department!
+  createLanguage(input: CreateLanguageInput!): Language!
   createPosition(input: CreatePositionInput!): Position!
   createProject(input: CreateProjectInput!): Project!
   createSkill(input: CreateSkillInput!): Skill!
   deleteCv(id: ID!, userId: ID): Cv!
   deleteDepartment(id: ID!): Boolean!
+  deleteLanguage(id: ID!): Boolean!
   deletePosition(id: ID!): Boolean!
   deleteProject(id: ID!): Boolean!
   deleteSkill(id: ID!): Boolean!
@@ -208,6 +228,7 @@ type Mutation {
   updateCvProject(input: UpdateCvProjectInput!): CvProject!
   updateCvSkill(input: UpdateCvSkillInput!): CvSkill!
   updateDepartment(input: UpdateDepartmentInput!): Department!
+  updateLanguage(input: UpdateLanguageInput!): Language!
   updatePosition(input: UpdatePositionInput!): Position!
   updateProject(input: UpdateProjectInput!): Project!
   updateSkill(input: UpdateSkillInput!): Skill!
@@ -271,6 +292,7 @@ type Query {
   departments(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): DepartmentPage!
   exportCvPdf(cvId: ID!, locale: String = "en"): CvPdf!
   health: Health!
+  languages(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): LanguagePage!
   me: SessionUser
   positions(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): PositionPage!
   projectRoles: [ProjectRole!]!
@@ -370,6 +392,13 @@ input UpdateCvSkillInput {
 input UpdateDepartmentInput {
   id: ID!
   name: String!
+}
+
+input UpdateLanguageInput {
+  id: ID!
+  iso: String!
+  name: String!
+  nativeName: String!
 }
 
 input UpdatePositionInput {
