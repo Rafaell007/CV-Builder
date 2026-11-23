@@ -80,18 +80,29 @@ describe("handleRequest", () => {
   });
 
   it("lets a signed-in user open a protected route", async () => {
-    const fetchMock = mockBackend();
+    const fetchMock = mockBackend({ body: { data: { me: { role: "USER" } } } });
 
     const response = await proxy(requestFor("/cvs", { access: FRESH, refresh: "r" }));
 
     expect(isRedirect(response)).toBe(false);
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("redirects a user whose session ended to sign-in, also on a page with no protected query", async () => {
+    mockBackend({ body: { data: null, errors: [{ extensions: { code: "UNAUTHENTICATED" } }] } });
+    const request = requestFor("/cvs", { access: FRESH, refresh: "r" });
+
+    const response = await proxy(request);
+
+    expect(location(response)).toBe("http://localhost:3000/en/sign-in");
+    expect(response.headers.getSetCookie()).toHaveLength(2);
+    expect(request.cookies.get("access_token")).toBeUndefined();
   });
 
   it.each(["/sign-in", "/sign-up"])(
     "redirects a signed-in user from %s to /en/users",
     async (path) => {
-      mockBackend();
+      mockBackend({ body: { data: { me: { role: "USER" } } } });
 
       const response = await proxy(requestFor(path, { access: FRESH, refresh: "r" }));
 
