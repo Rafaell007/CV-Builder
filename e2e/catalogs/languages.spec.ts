@@ -1,5 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
-import { createLanguage, deleteLanguagesByName } from "../support/languages";
+import {
+  createLanguage,
+  deleteLanguagesByIsoPrefix,
+  deleteLanguagesByName,
+} from "../support/languages";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
 
 // The Languages page is the shared CatalogPage (support/catalogPage.ts tests it with Departments and Positions) with
@@ -10,9 +14,10 @@ import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
 // without touching seed data; Languages.test.tsx and the backend tests cover it (catalogs README).
 
 const PAGE_SIZE = 10;
-// Every language these tests make has this text in its name, so `afterEach` can remove all of them. Their ISO codes
-// start with "Q", which no seed language uses.
+// Every language these tests make has this text in its name or an ISO code that starts with ISO_PREFIX (no seed
+// language does), so `afterEach` can remove all of them, also the "ENGLISH" one a failed letter-case test would leave.
 const PREFIX = "E2E Language";
+const ISO_PREFIX = "Q";
 
 const search = (page: Page) => page.getByRole("searchbox", { name: "Search languages" });
 const columnHeader = (page: Page, name: string) =>
@@ -127,6 +132,7 @@ test.describe("languages, create, update and delete", () => {
 
   test.afterEach(async ({ context }) => {
     await deleteLanguagesByName(context, PREFIX);
+    await deleteLanguagesByIsoPrefix(context, ISO_PREFIX);
   });
 
   test("creates a language: the ISO code turns uppercase, the modal closes and a toast shows", async ({

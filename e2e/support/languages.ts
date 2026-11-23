@@ -35,6 +35,29 @@ export async function deleteLanguagesByName(context: BrowserContext, text: strin
     { search: text, page: { number: 1, size: MAX_PAGE_SIZE } },
   );
   for (const { id } of languages.items) {
-    await graphql(context, "mutation Delete($id: ID!) { deleteLanguage(id: $id) }", { id });
+    await deleteLanguage(context, id);
   }
+}
+
+/**
+ * Deletes every language whose ISO code starts with `prefix` (among the first 100 languages). The search looks at
+ * names only, so this catches a test language whose name has no common text (e.g. "ENGLISH" made by a failed test).
+ * Use it in `afterEach`.
+ */
+export async function deleteLanguagesByIsoPrefix(
+  context: BrowserContext,
+  prefix: string,
+): Promise<void> {
+  const { languages } = await graphql<{ languages: { items: { id: string; iso: string }[] } }>(
+    context,
+    "query All($page: PageInput!) { languages(page: $page) { items { id iso } } }",
+    { page: { number: 1, size: MAX_PAGE_SIZE } },
+  );
+  for (const { id, iso } of languages.items) {
+    if (iso.startsWith(prefix)) await deleteLanguage(context, id);
+  }
+}
+
+async function deleteLanguage(context: BrowserContext, id: string): Promise<void> {
+  await graphql(context, "mutation Delete($id: ID!) { deleteLanguage(id: $id) }", { id });
 }
