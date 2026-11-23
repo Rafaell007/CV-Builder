@@ -340,6 +340,9 @@ test.describe("projects page, create, update and delete", () => {
       "01/01/2024",
     );
     await expect(dialog(page).getByRole("button", { name: "Update" })).toBeDisabled();
+    // The click ends the selection guard of the modal (see `useFirstFieldFocus`), as the first pointer press of a user does.
+    // Without it, `fill` can run inside the first second: the guard collapses the selection of `fill` and the new text is added to the old name.
+    await dialog(page).getByRole("textbox", { name: "Name" }).click();
     await dialog(page).getByRole("textbox", { name: "Name" }).fill(renamed);
     await dialog(page).getByRole("button", { name: "Update" }).click();
 
