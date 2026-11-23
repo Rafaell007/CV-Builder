@@ -21,6 +21,7 @@ export * from "./PageHeader";
 export * from "./PageState";
 export * from "./Pagination";
 export * from "./PasswordField";
+export * from "./ProjectDescription";
 export * from "./SearchField";
 export * from "./SelectionToolbar";
 export * from "./Select";

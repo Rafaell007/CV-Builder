@@ -1,12 +1,17 @@
 import { useLocale, useTranslations } from "next-intl";
 import type { ReactNode } from "react";
-import { DataTable, Menu, type DataTableColumn, type SortState } from "@/shared/components";
+import {
+  DataTable,
+  Menu,
+  ProjectDescription,
+  type DataTableColumn,
+  type SortState,
+} from "@/shared/components";
 import { DESKTOP_MIN_WIDTH } from "@/shared/constants";
 import { formatCalendarDate } from "@/shared/utils";
 import { PROJECT_SORT_FIELDS } from "../../projects.constants";
 import type { ProjectListItem } from "../../projects.types";
 import { EnvironmentTags } from "./EnvironmentTags";
-import { ProjectDescription } from "./ProjectDescription";
 import styles from "./ProjectsTable.module.css";
 
 export interface ProjectsTableProps {
