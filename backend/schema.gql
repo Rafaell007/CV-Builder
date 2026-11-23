@@ -64,6 +64,16 @@ input CreateSkillInput {
   name: String!
 }
 
+input CreateUserInput {
+  departmentId: ID!
+  email: String!
+  firstName: String!
+  lastName: String!
+  password: String!
+  positionId: ID!
+  role: Role!
+}
+
 type Cv {
   createdAt: DateTime!
   description: String!
@@ -209,12 +219,14 @@ type Mutation {
   createPosition(input: CreatePositionInput!): Position!
   createProject(input: CreateProjectInput!): Project!
   createSkill(input: CreateSkillInput!): Skill!
+  createUser(input: CreateUserInput!): User!
   deleteCv(id: ID!, userId: ID): Cv!
   deleteDepartment(id: ID!): Boolean!
   deleteLanguage(id: ID!): Boolean!
   deletePosition(id: ID!): Boolean!
   deleteProject(id: ID!): Boolean!
   deleteSkill(id: ID!): Boolean!
+  deleteUser(id: ID!): Boolean!
   forgotPassword(input: ForgotPasswordInput!): Boolean!
   refresh: Boolean!
   removeCvProjects(input: RemoveCvProjectsInput!): Boolean!
@@ -232,6 +244,7 @@ type Mutation {
   updatePosition(input: UpdatePositionInput!): Position!
   updateProject(input: UpdateProjectInput!): Project!
   updateSkill(input: UpdateSkillInput!): Skill!
+  updateUser(input: UpdateUserInput!): User!
   verifyEmail(input: VerifyEmailInput!): SessionUser!
 }
 
@@ -300,6 +313,8 @@ type Query {
   skillCatalog(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): SkillPage!
   skillCategories: [SkillCategory!]!
   skills: [EnvironmentSkill!]!
+  user(id: ID!): User!
+  users(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): UserPage!
 }
 
 input RemoveCvProjectsInput {
@@ -420,6 +435,30 @@ input UpdateSkillInput {
   categoryId: ID!
   id: ID!
   name: String!
+}
+
+input UpdateUserInput {
+  departmentId: ID!
+  firstName: String!
+  id: ID!
+  lastName: String!
+  positionId: ID!
+  role: Role!
+}
+
+type User {
+  department: Department
+  email: String!
+  firstName: String
+  id: ID!
+  lastName: String
+  position: Position
+  role: Role!
+}
+
+type UserPage {
+  items: [User!]!
+  total: Int!
 }
 
 input VerifyEmailInput {
