@@ -273,6 +273,31 @@ describe("languages", () => {
       await expect(names({ search: "Deutsch" })).resolves.toEqual([]);
     });
 
+    it.each(["%", "_", "\\"])(
+      "searches %s as a plain character, not as a wildcard",
+      async (search) => {
+        await expect(names({ search })).resolves.toEqual([]);
+      },
+    );
+
+    it.each([
+      ["o%B", "Foo%Bar"],
+      ["o_B", "Foo_Bar"],
+      ["o\\B", "Foo\\Bar"],
+    ])(
+      "finds a name that holds the characters of the search %s, and no other",
+      async (search, name) => {
+        await prisma.language.createMany({
+          data: [
+            { name, iso: "XA", nativeName: "x" },
+            { name: "FooXBar", iso: "XB", nativeName: "x" },
+          ],
+        });
+
+        await expect(names({ search })).resolves.toEqual([name]);
+      },
+    );
+
     it("searches, sorts and pages together, and keeps the total of all matches", async () => {
       await createLanguage({ name: "Swiss German", iso: "GSW", nativeName: "Schwiizertüütsch" });
 

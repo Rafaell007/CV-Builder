@@ -1,5 +1,5 @@
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
-import { ListArgs, resolveSort, toSkipTake } from "../../common/pagination";
+import { escapeLike, ListArgs, resolveSort, toSkipTake } from "../../common/pagination";
 import { Prisma } from "../../generated/prisma/client";
 import { PrismaService } from "../../prisma/prisma.service";
 import type { CreateLanguageInput } from "./dto/create-language.input";
@@ -34,7 +34,7 @@ export class LanguagesService {
       direction: "asc",
     });
     const where: Prisma.LanguageWhereInput = search
-      ? { name: { contains: search, mode: "insensitive" } }
+      ? { name: { contains: escapeLike(search), mode: "insensitive" } }
       : {};
     const [items, total] = await this.prisma.$transaction([
       this.prisma.language.findMany({
