@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { PeopleIcon, TrendingUpIcon, DomainIcon } from "@/shared/components/icons";
 import { renderWithProviders } from "@/shared/testing";
@@ -18,6 +18,12 @@ const props: SidebarProps = {
 };
 
 describe("Sidebar", () => {
+  it("links the logo and app name to the home page", () => {
+    renderWithProviders(<Sidebar {...props} />);
+
+    expect(screen.getByRole("link", { name: "CV Builder" })).toHaveAttribute("href", "/en");
+  });
+
   it("marks only the link of the current page", () => {
     renderWithProviders(<Sidebar {...props} />);
 
@@ -52,11 +58,10 @@ describe("Sidebar", () => {
   it("draws bars instead of links while loading", () => {
     renderWithProviders(<Sidebar {...props} loading />);
 
-    expect(screen.queryByRole("link")).not.toBeInTheDocument();
-    expect(screen.getByRole("navigation", { name: "Main navigation" })).toHaveAttribute(
-      "aria-busy",
-      "true",
-    );
+    const navigation = screen.getByRole("navigation", { name: "Main navigation" });
+
+    expect(within(navigation).queryByRole("link")).not.toBeInTheDocument();
+    expect(navigation).toHaveAttribute("aria-busy", "true");
   });
 
   it("tells whether it is expanded and reports a click on the collapse button", async () => {
