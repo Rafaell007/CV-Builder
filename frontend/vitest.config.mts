@@ -20,6 +20,8 @@ export default defineConfig(({ mode }) => {
       tsconfigPaths: true,
     },
     test: {
+      // Stops with a clear message when the generated GraphQL file is older than its sources (KAN-167).
+      globalSetup: ["./vitest.global-setup.ts"],
       // Two projects, both run by `pnpm test`. `extends: true` shares the plugins and resolve options above.
       projects: [
         {
