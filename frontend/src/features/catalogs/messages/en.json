@@ -264,9 +264,9 @@
       }
     },
     "update": {
-      "title": "Edit language",
+      "title": "Update language",
       "close": "Close",
-      "submit": "Save",
+      "submit": "Update",
       "cancel": "Cancel",
       "success": {
         "title": "Language updated",

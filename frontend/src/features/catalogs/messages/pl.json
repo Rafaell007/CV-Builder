@@ -264,9 +264,9 @@
       }
     },
     "update": {
-      "title": "Edytuj język",
+      "title": "Zaktualizuj język",
       "close": "Zamknij",
-      "submit": "Zapisz",
+      "submit": "Zaktualizuj",
       "cancel": "Anuluj",
       "success": {
         "title": "Język zaktualizowany",
