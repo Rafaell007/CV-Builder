@@ -5,8 +5,8 @@ import { useApolloClient, useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/shared/components";
+import { readFailure } from "@/shared/failures";
 import { CvSkillsDocument, RemoveCvSkillsDocument } from "@/shared/graphql";
-import { toCvSkillFailure } from "../utils";
 
 /**
  * The Remove skills flow: the selection mode, the chosen skills and the confirmation (AC-26 to AC-35).
@@ -73,15 +73,15 @@ export function useRemoveCvSkills(cvId: string) {
       return true;
     } catch (failure) {
       setConfirming(false);
-      const reason = toCvSkillFailure(failure);
+      const { kind } = readFailure(failure);
       // A link is already gone (or the CV is not visible any more): load the list again so the stale skills leave it.
-      if (reason === "notFound") {
+      if (kind === "notFound") {
         void client.refetchQueries({ include: [CvSkillsDocument] });
         cancel();
       }
       toast.error({
         title: t("failedTitle"),
-        description: t(reason === "notFound" || reason === "forbidden" ? reason : "failedText"),
+        description: t(kind === "notFound" || kind === "forbidden" ? kind : "failedText"),
       });
       return false;
     } finally {

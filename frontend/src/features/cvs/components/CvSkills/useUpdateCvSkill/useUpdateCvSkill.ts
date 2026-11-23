@@ -4,9 +4,9 @@ import { useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { useToast } from "@/shared/components";
+import { readFailure } from "@/shared/failures";
 import { UpdateCvSkillDocument } from "@/shared/graphql";
 import type { CvSkillItem, CvSkillMastery } from "../cvSkills.types";
-import { toCvSkillFailure } from "../utils";
 
 /**
  * The Update skill flow: the open state of the modal, the chosen mastery and the `updateCvSkill` request
@@ -54,8 +54,8 @@ export function useUpdateCvSkill() {
       });
     } catch (failure) {
       // Nothing resets the chosen mastery here, so the value stays.
-      const reason = toCvSkillFailure(failure);
-      setError(t(`errors.${reason === "notFound" || reason === "forbidden" ? reason : "failed"}`));
+      const { kind } = readFailure(failure);
+      setError(t(`errors.${kind === "notFound" || kind === "forbidden" ? kind : "failed"}`));
     } finally {
       sending.current = false;
     }

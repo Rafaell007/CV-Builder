@@ -102,7 +102,7 @@ Spec: [docs/pages/22-cv-skills-page.md](../../../../docs/pages/22-cv-skills-page
   - `useUpdateCvSkill()`: Update skill. The Skill field is disabled (page doc). The mastery is the one value that changes, so SAVE is enabled only when it differs from the saved one and no request that changes nothing is sent.
   - `useRemoveCvSkills(cvId)`: the selection mode and the confirmation. A skill is chosen by the id of its CV-skill link. CANCEL and Escape leave the mode. A failed request keeps the choice. `NOT_FOUND` loads the list again and leaves the mode.
   - `useMasteryLabel()`: the translated level name.
-- `utils/groupSkillsByCategory` (keeps the order of the backend, so no empty category) and `utils/toCvSkillFailure` (`notFound`, `forbidden`, `conflict`, `invalid`; anything else is a friendly general text).
+- `utils/groupSkillsByCategory` (keeps the order of the backend, so no empty category). The hooks read a failed request with `readFailure` (`shared/failures`: `notFound`, `forbidden`, `conflict`, `invalid`; anything else is a friendly general text).
 - UI changes come only after the backend answered. Add loads the list again. Update shows the cached skill that the answer changed. Remove leaves the skills out of the cached list when the answer arrives (`cache.modify`), then loads the list again.
 - Texts: `cvs.skills` (`en`, `pl`). Mocks for tests and stories: `cvSkills.mocks.ts`.
 - Storybook: `CvSkills.stories.tsx` (`Features/Cvs/CvSkills`): Desktop, Tablet, Loading, Empty, LoadFailed, SelectionMode, AddSkillModal, UpdateSkillModal, RemoveSkillsModal and Polish.
