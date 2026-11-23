@@ -11,10 +11,12 @@ import type { UpdateCvProjectInput } from "./dto/update-cv-project.input";
 
 const USER: AuthUser = { id: "user-1", role: Role.USER, isVerified: true };
 const ENTRY = { id: "entry-1" };
+const PROJECT = { id: "project-1" };
 
 function setup() {
   const service = {
     list: jest.fn().mockResolvedValue([ENTRY]),
+    listAvailable: jest.fn().mockResolvedValue([PROJECT]),
     add: jest.fn().mockResolvedValue(ENTRY),
     update: jest.fn().mockResolvedValue(ENTRY),
     remove: jest.fn().mockResolvedValue(undefined),
@@ -39,6 +41,23 @@ describe("CvProjectsResolver", () => {
     expect(service.add).toHaveBeenCalledWith(USER, add);
     expect(service.update).toHaveBeenCalledWith(USER, update);
     expect(service.remove).toHaveBeenCalledWith(USER, remove);
+  });
+
+  it("passes the signed-in user and the CV id to the available projects query", async () => {
+    const { resolver, service } = setup();
+
+    await expect(resolver.availableCvProjects(USER, { cvId: "cv-1" })).resolves.toEqual([PROJECT]);
+
+    expect(service.listAvailable).toHaveBeenCalledWith(USER, "cv-1");
+  });
+
+  it("refuses the available projects query without a user", () => {
+    const { resolver, service } = setup();
+
+    expect(() => resolver.availableCvProjects(undefined, { cvId: "cv-1" })).toThrow(
+      UnauthorizedException,
+    );
+    expect(service.listAvailable).not.toHaveBeenCalled();
   });
 
   it("refuses a call without a user", async () => {

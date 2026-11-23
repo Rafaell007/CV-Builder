@@ -13,6 +13,9 @@ const FIELDS = `id cvId startDate endDate responsibilities
 const LIST = `query ($cvId: ID!, $search: String, $sort: SortInput) {
   cvProjects(cvId: $cvId, search: $search, sort: $sort) { ${FIELDS} }
 }`;
+const AVAILABLE = `query ($cvId: ID!) {
+  availableCvProjects(cvId: $cvId) { id name domain description startDate endDate environment { name } }
+}`;
 const ADD = `mutation ($input: AddCvProjectInput!) { addCvProject(input: $input) { ${FIELDS} } }`;
 const UPDATE = `mutation ($input: UpdateCvProjectInput!) { updateCvProject(input: $input) { ${FIELDS} } }`;
 const REMOVE = `mutation ($input: RemoveCvProjectsInput!) { removeCvProjects(input: $input) }`;
@@ -241,6 +244,99 @@ describe("cv projects", () => {
 
     it("refuses a call without a session", async () => {
       const { body } = await call(null, LIST, { cvId: annCv });
+
+      expect(errorOf(body)?.extensions.code).toBe("UNAUTHENTICATED");
+    });
+  });
+
+  describe("availableCvProjects query", () => {
+    async function available(who: Who, cvId: string) {
+      const { body } = await call(who, AVAILABLE, { cvId });
+      expect(body.errors).toBeUndefined();
+      return (body.data?.["availableCvProjects"] as { name: string }[]).map(({ name }) => name);
+    }
+
+    it("lets an Employee read the projects they can add to their own CV (KAN-156)", async () => {
+      const { body } = await call(ann, AVAILABLE, { cvId: annCv });
+
+      expect(body.errors).toBeUndefined();
+      expect(body.data?.["availableCvProjects"]).toEqual([
+        {
+          id: bank,
+          name: "Bank App",
+          domain: "Finance",
+          description: "Catalog text",
+          startDate: "2026-01-01T00:00:00.000Z",
+          endDate: "2026-12-31T00:00:00.000Z",
+          environment: [{ name: "TypeScript" }],
+        },
+        {
+          id: shop,
+          name: "Web Shop",
+          domain: "Retail",
+          description: "Catalog text",
+          startDate: "2026-01-01T00:00:00.000Z",
+          endDate: "2026-12-31T00:00:00.000Z",
+          environment: [{ name: "TypeScript" }],
+        },
+      ]);
+    });
+
+    it("leaves out the projects that the CV holds (AC-31)", async () => {
+      await addedEntry(ann);
+
+      expect(await available(ann, annCv)).toEqual(["Web Shop"]);
+      // The other CV of the same owner is not affected.
+      expect(await available(ann, annOtherCv)).toEqual(["Bank App", "Web Shop"]);
+    });
+
+    it("answers an empty list when the CV holds every project", async () => {
+      await addedEntry(ann);
+      await addedEntry(ann, { projectId: shop });
+
+      expect(await available(ann, annCv)).toEqual([]);
+    });
+
+    it("orders the projects by name", async () => {
+      const alpha = await prisma.project.create({
+        data: {
+          name: "Alpha Tool",
+          domain: "Internal",
+          description: "Catalog text",
+          startDate: new Date("2026-01-01"),
+          endDate: new Date("2026-12-31"),
+        },
+      });
+      try {
+        expect(await available(ann, annCv)).toEqual(["Alpha Tool", "Bank App", "Web Shop"]);
+      } finally {
+        await prisma.project.delete({ where: { id: alpha.id } });
+      }
+    });
+
+    it("lets an admin read the options for the CV of any user (AC-30)", async () => {
+      await addedEntry(ann);
+
+      expect(await available(admin, annCv)).toEqual(["Web Shop"]);
+    });
+
+    it("answers NOT_FOUND for the CV of another user, like for a missing CV (AC-28, AC-29)", async () => {
+      const other = await call(ann, AVAILABLE, { cvId: benCv });
+      const missing = await call(ann, AVAILABLE, { cvId: MISSING_ID });
+
+      expect(errorOf(other.body)?.extensions.code).toBe("NOT_FOUND");
+      expect(errorOf(missing.body)?.extensions.code).toBe("NOT_FOUND");
+      expect(other.body.data).toBeNull();
+    });
+
+    it("answers BAD_USER_INPUT for an id that is not a UUID", async () => {
+      const { body } = await call(ann, AVAILABLE, { cvId: "not-a-uuid" });
+
+      expect(errorOf(body)?.extensions.code).toBe("BAD_USER_INPUT");
+    });
+
+    it("refuses a call without a session", async () => {
+      const { body } = await call(null, AVAILABLE, { cvId: annCv });
 
       expect(errorOf(body)?.extensions.code).toBe("UNAUTHENTICATED");
     });

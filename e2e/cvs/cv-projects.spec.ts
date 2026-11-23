@@ -232,6 +232,51 @@ test.describe("CV Projects page, empty CV", () => {
   });
 });
 
+test.describe("CV Projects page, as an employee (KAN-156)", () => {
+  test("an employee adds a project to their own CV, and a project that the CV holds is not offered again", async ({
+    context,
+    page,
+  }) => {
+    await signIn(context, USER_EMAIL);
+    const [cvId = ""] = await createCvs(context, `${PREFIX} employee`, 1);
+    try {
+      await page.goto(`/en/cvs/${cvId}/projects`);
+      await page.getByRole("button", { name: "ADD PROJECT" }).click();
+      const dialog = addDialog(page);
+      await expect(dialog).toBeVisible();
+      // The backend answers the options for this CV, so the list loads for a user who is not an admin.
+      await expect(dialog.getByText(/The projects you can add could not be loaded/)).toBeHidden();
+      const project = dialog.getByRole("combobox", { name: "Name" });
+      await expect(project).toBeEnabled();
+
+      await project.click();
+      await page.getByRole("option", { name: "Hospital Appointment System", exact: true }).click();
+      await dialog.getByRole("combobox", { name: "Roles" }).click();
+      await page.getByRole("option", { name: "Developer", exact: true }).click();
+      // The next field takes the focus, so the open Roles list closes and the click on Add reaches the button.
+      await dialog
+        .getByRole("textbox", { name: "Responsibilities" })
+        .fill("Built the booking screens.");
+      await dialog.getByRole("button", { name: "Add", exact: true }).click();
+
+      await expect(page.getByText("Project added", { exact: true })).toBeVisible();
+      await expect(dialog).toBeHidden();
+      await expect(row(page, "Hospital Appointment System")).toContainText("Healthcare");
+
+      await page.getByRole("button", { name: "ADD PROJECT" }).click();
+      const again = addDialog(page).getByRole("combobox", { name: "Name" });
+      await expect(again).toBeEnabled();
+      await again.click();
+      await expect(
+        page.getByRole("option", { name: "Hospital Appointment System", exact: true }),
+      ).toBeHidden();
+      await expect(page.getByRole("option", { name: "Banking Portal", exact: true })).toBeVisible();
+    } finally {
+      await deleteCvsByName(context, PREFIX);
+    }
+  });
+});
+
 test.describe("CV Projects page, as an admin", () => {
   test("an admin adds a project to the CV of a user: the form fills from the catalog, needs a role, and the project is kept", async ({
     browser,

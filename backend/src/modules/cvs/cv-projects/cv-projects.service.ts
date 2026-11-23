@@ -5,6 +5,7 @@ import { resolveSort } from "../../../common/pagination";
 import type { ResolvedSort } from "../../../common/pagination";
 import { Prisma } from "../../../generated/prisma/client";
 import { PrismaService } from "../../../prisma/prisma.service";
+import type { Project } from "../../projects/models/project";
 import { toProject, WITH_ENVIRONMENT } from "../../projects/project-environment";
 import { resolveCvProjectDates } from "./cv-project-dates";
 import { CvsService } from "../cvs.service";
@@ -52,6 +53,22 @@ export class CvProjectsService {
       orderBy: [orderBy(field, direction), { id: "asc" }],
     });
     return rows.map(toCvProject);
+  }
+
+  /**
+   * The projects of the catalog that are not yet in the CV: the options of the Add project modal (AC-31).
+   * The CV decides who may ask, so a user without access to the CV gets no catalog. The CV id is part of the
+   * filter, so the answer never depends on another CV.
+   */
+  async listAvailable(user: AuthUser, cvId: string): Promise<Project[]> {
+    await this.cvs.assertAccessible(user, cvId);
+    const rows = await this.prisma.project.findMany({
+      where: { cvProjects: { none: { cvId } } },
+      include: WITH_ENVIRONMENT,
+      // The id keeps the order stable when names are equal.
+      orderBy: [{ name: "asc" }, { id: "asc" }],
+    });
+    return rows.map(toProject);
   }
 
   async add(user: AuthUser, input: AddCvProjectInput): Promise<CvProject> {
