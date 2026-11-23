@@ -21,3 +21,10 @@ The `/admin/departments`, `/admin/positions`, `/admin/skills` and `/admin/langua
 - The general error inside a modal ("Something went wrong…", "Could not load the categories") is the shared `FormErrorMessage` (`@/shared/components`, KAN-100): `NameFormModal`, `SkillFormModal` and `LanguageFormModal` had the same `<p role="alert">` and `.error` rule three times.
 - The Retry of the Category error ("Could not load the categories") is the shared `Button` with `variant="text"`, under the message (decided 2026-11-20). It is the standard pill button, so it is larger than a text link; the visible text is upper case, the accessible name stays "Retry".
 - `useSkillCategories(enabled)` uses `skip: !enabled`. In Apollo Client 4 the loaded categories stay available after `skip` turns true, so the Category select keeps its options while a modal fades out. `useSkillCategories.test.tsx` checks this. If an Apollo upgrade makes that test fail, the Create modal will show an empty Category field while it closes.
+
+## Notes (PR review of KAN-100, 2026-11-23)
+
+- `useLanguageForm` compares the name with each run of whitespace as one space, like the backend `NormalizeSpaces`. The Department, Position and Skill forms (`catalogNameRule`) only trim, so "New York" for "New York" still enables Save there although the backend stores the same name. Fix with the shared-code refactor below.
+- The language form hooks (`useLanguageForm`, `useCreateLanguageForm`, `useUpdateLanguageForm`) repeat the Skills and catalog form hooks. The planned shared-code refactor ticket merges them; change one set and check the other.
+- The migration `20261123120000_languages_catalog_rules` stops on a unique-key error if the database has an ISO code in two letter cases ("en" and "EN"). The seed data has none; for other data, merge those rows first (backend `languages/README.md`). A merged migration is not edited.
+- There is no E2E test for deleting a language in use: no API gives a user a language yet. Add it with the user-languages ticket (S6.x).
