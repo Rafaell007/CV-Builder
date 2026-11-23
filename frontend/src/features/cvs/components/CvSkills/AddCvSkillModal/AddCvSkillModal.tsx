@@ -45,6 +45,8 @@ export function AddCvSkillModal({ adding }: AddCvSkillModalProps) {
       closeLabel={t("close")}
       submitLabel={t("submit")}
       cancelLabel={t("cancel")}
+      // The Skill field is disabled while its options load, so the focus stays on the form: no field looks focused.
+      initialFocus="form"
       canSubmit={skillId !== ""}
       isSubmitting={pending}
       onSubmit={(event) => {

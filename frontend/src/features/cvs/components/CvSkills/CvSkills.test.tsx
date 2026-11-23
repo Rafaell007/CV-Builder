@@ -119,6 +119,18 @@ describe("CvSkills", () => {
       expect(screen.getByText("Skill added")).toBeInTheDocument();
     });
 
+    it("opens with no field focused, so both labels rest inside, and the first Tab reaches Skill", async () => {
+      const { user, dialog } = await openAddModal(withAdd());
+
+      const skill = within(dialog).getByRole("combobox", { name: "Skill" });
+      const mastery = within(dialog).getByRole("combobox", { name: "Skill mastery" });
+      expect(dialog.querySelector("form")).toHaveFocus();
+      expect(mastery).not.toHaveFocus();
+      await waitFor(() => expect(skill).toBeEnabled());
+      await user.tab();
+      expect(skill).toHaveFocus();
+    });
+
     it("shows an optional Skill mastery field and keeps ADD enabled without a mastery", async () => {
       const { user, dialog } = await openAddModal(withAdd());
       const field = within(dialog).getByRole("combobox", { name: "Skill" });
