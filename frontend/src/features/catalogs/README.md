@@ -3,7 +3,7 @@
 The `/admin/departments`, `/admin/positions` and `/admin/skills` pages (PLAN S5.1, S5.2, S5.3; KAN-96, KAN-98): the global lists of departments, positions and skills, for Admin users. Each page lists, searches, sorts (by name) and pages on the backend, and creates, updates and deletes one item. A department or position has a name only; a skill has a name and a category, and shows the category's type.
 
 - Exports (`index.ts`): `Departments`, `Positions`, `Skills` (the page bodies).
-- Texts: `messages/en.json`, `pl.json` (namespace `catalogs`). `departments`, `positions` and `skills` share their keys, so the shared parts take the namespace `catalogs.departments`, `catalogs.positions` or `catalogs.skills` (`CatalogNamespace`) and work for all three. `skills` has extra keys for its columns and the Category field.
+- Texts: `messages/en.json`, `pl.json` (namespace `catalogs`). `departments`, `positions`, `skills` and `languages` share their keys, so the shared parts take the namespace `catalogs.departments`, `catalogs.positions`, `catalogs.skills` or `catalogs.languages` (`CatalogNamespace`) and work for all four. `skills` has extra keys for its columns and the Category field; `languages` for the ISO and Native name columns and fields.
 - Shared by all catalogs (everything except the GraphQL wiring and the skill form):
   - `catalogs.types.ts`: `CatalogNamespace`, `CatalogItem` (`id`, `name`), `CatalogNameFormValues`.
   - `catalogs.constants.ts`: `CATALOG_SORT_FIELDS`, `DEFAULT_CATALOG_SORT` (name ascending; the backend sorts by name only), `MAX_CATALOG_NAME_LENGTH` (100, as the backend), `CATALOG_SEARCH_MAX_LENGTH`.

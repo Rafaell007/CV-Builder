@@ -221,5 +221,87 @@
         "failed": "Coś poszło nie tak. Spróbuj ponownie później"
       }
     }
+  },
+  "languages": {
+    "button": "UTWÓRZ JĘZYK",
+    "table": "Lista języków",
+    "columns": {
+      "name": "Nazwa",
+      "iso": "ISO",
+      "nativeName": "Nazwa rodzima"
+    },
+    "actions": {
+      "column": "Akcje",
+      "menu": "Akcje dla języka {name}",
+      "edit": "Edytuj",
+      "delete": "Usuń"
+    },
+    "search": {
+      "label": "Szukaj języków",
+      "placeholder": "Szukaj"
+    },
+    "pagination": {
+      "navigation": "Paginacja języków",
+      "previous": "Poprzednia strona",
+      "next": "Następna strona",
+      "page": "Strona {number}"
+    },
+    "states": {
+      "loading": "Ładowanie języków",
+      "empty": "Nie znaleziono języków",
+      "noResults": "Nie znaleziono języków",
+      "error": "Coś poszło nie tak. Spróbuj ponownie później",
+      "retry": "Spróbuj ponownie"
+    },
+    "create": {
+      "title": "Utwórz język",
+      "close": "Zamknij",
+      "submit": "Utwórz",
+      "cancel": "Anuluj",
+      "success": {
+        "title": "Język utworzony",
+        "text": "Język {name} został dodany do listy."
+      }
+    },
+    "update": {
+      "title": "Edytuj język",
+      "close": "Zamknij",
+      "submit": "Zapisz",
+      "cancel": "Anuluj",
+      "success": {
+        "title": "Język zaktualizowany",
+        "text": "Język {name} został zapisany."
+      }
+    },
+    "delete": {
+      "title": "Usuń język",
+      "message": "Czy na pewno chcesz usunąć język <strong>{name}</strong>?",
+      "close": "Zamknij",
+      "confirm": "Potwierdź",
+      "cancel": "Anuluj",
+      "failedTitle": "Nie udało się usunąć języka",
+      "failedText": "Coś poszło nie tak. Spróbuj ponownie.",
+      "inUseText": "Nie można usunąć języka, ponieważ jest obecnie używany"
+    },
+    "form": {
+      "fields": {
+        "name": "Nazwa",
+        "iso": "ISO",
+        "nativeName": "Nazwa rodzima"
+      },
+      "errors": {
+        "nameRequired": "Nazwa jest wymagana",
+        "nameTooLong": "Nazwa nie może przekraczać 100 znaków",
+        "nameTaken": "Język już istnieje",
+        "isoRequired": "Kod ISO jest wymagany",
+        "isoTooLong": "Kod ISO nie może przekraczać 5 znaków",
+        "isoInvalid": "Kod ISO może zawierać tylko litery A-Z i jeden łącznik",
+        "isoTaken": "Kod ISO już istnieje",
+        "nativeNameRequired": "Nazwa rodzima jest wymagana",
+        "nativeNameTooLong": "Nazwa rodzima nie może przekraczać 100 znaków",
+        "serverInvalid": "Serwer nie przyjął tej wartości",
+        "failed": "Coś poszło nie tak. Spróbuj ponownie później"
+      }
+    }
   }
 }
