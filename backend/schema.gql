@@ -196,6 +196,7 @@ enum Mastery {
   ELEMENTARY
   EXPERT
   INTERMEDIATE
+  NONE
 }
 
 type Mutation {

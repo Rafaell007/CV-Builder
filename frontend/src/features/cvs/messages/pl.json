@@ -111,6 +111,7 @@
     },
     "masteryLevel": "Poziom: {level}",
     "mastery": {
+      "NONE": "Brak poziomu",
       "BEGINNER": "Początkujący",
       "ELEMENTARY": "Podstawowy",
       "INTERMEDIATE": "Średnio zaawansowany",
@@ -131,7 +132,7 @@
       "title": "Dodaj umiejętność",
       "close": "Zamknij",
       "skill": "Umiejętność",
-      "mastery": "Poziom umiejętności",
+      "mastery": "Poziom",
       "noMastery": "Brak poziomu",
       "submit": "Dodaj",
       "cancel": "Anuluj",

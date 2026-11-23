@@ -10,6 +10,7 @@ import {
   CV_ID,
   cvSkillsMock,
 } from "../cvSkills.mocks";
+import { NO_MASTERY } from "../cvSkills.constants";
 import { useAddCvSkill, type UseAddCvSkillResult } from "./useAddCvSkill";
 
 function setup(options: RenderWithProvidersOptions) {
@@ -99,19 +100,35 @@ describe("useAddCvSkill", () => {
     expect(result().isOpen).toBe(false);
   });
 
-  it("sends no mastery after the user chose a level and then cleared it", async () => {
+  it("sends no mastery when the user did not touch the field", async () => {
     const { result } = setup({
       mocks: [availableCvSkillsMock([docker]), addCvSkillMock(docker), cvSkillsMock()],
+    });
+    act(() => result().open());
+    act(() => result().select(docker.id));
+
+    // The mock has no mastery in its variables: a request with one would fail.
+    await act(() => result().submit());
+    expect(result().isOpen).toBe(false);
+  });
+
+  it("sends NONE after the user chose a level and then No mastery", async () => {
+    const { result } = setup({
+      mocks: [
+        availableCvSkillsMock([docker]),
+        addCvSkillMock(docker, CV_ID, "NONE"),
+        cvSkillsMock(),
+      ],
     });
     act(() => result().open());
     act(() => result().select(docker.id));
     act(() => result().selectMastery("EXPERT"));
     expect(result().mastery).toBe("EXPERT");
 
-    act(() => result().selectMastery(""));
-    expect(result().mastery).toBe("");
+    act(() => result().selectMastery(NO_MASTERY));
+    expect(result().mastery).toBe(NO_MASTERY);
 
-    // The mock has no mastery in its variables: a request with one would fail.
+    // The mock carries NONE in its variables: a request with another level would fail.
     await act(() => result().submit());
     expect(result().isOpen).toBe(false);
   });

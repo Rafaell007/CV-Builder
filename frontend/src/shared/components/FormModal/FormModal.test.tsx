@@ -110,6 +110,31 @@ function DateFirstModal() {
   );
 }
 
+// The first field is disabled while its options load (Add skill): without `initialFocus="form"` the focus would jump to the second field.
+function LoadingFirstFieldModal({ initialFocus }: { initialFocus?: "form" }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open loading</Button>
+      <FormModal
+        open={open}
+        onOpenChange={setOpen}
+        title="Loading"
+        closeLabel="Close"
+        submitLabel="Save"
+        cancelLabel="Cancel"
+        canSubmit
+        isSubmitting={false}
+        onSubmit={(event) => event.preventDefault()}
+        initialFocus={initialFocus}
+      >
+        <TextField label="First" disabled />
+        <TextField label="Second" />
+      </FormModal>
+    </>
+  );
+}
+
 async function renderOpen(submit = vi.fn<(values: Values) => Promise<void>>()) {
   const rendered = renderWithProviders(<AddSkillModal submit={submit} />);
   await rendered.user.click(screen.getByRole("button", { name: "Add skill" }));
@@ -139,6 +164,27 @@ describe("FormModal", () => {
     // Tab passes over the date field to the next one
     await user.tab();
     expect(screen.getByRole("textbox", { name: "Name" })).toHaveFocus();
+  });
+
+  it("focuses the first enabled field by default, even when an earlier field is disabled", async () => {
+    const { user } = renderWithProviders(<LoadingFirstFieldModal />);
+
+    await user.click(screen.getByRole("button", { name: "Open loading" }));
+
+    await screen.findByRole("dialog", { name: "Loading" });
+    expect(screen.getByRole("textbox", { name: "Second" })).toHaveFocus();
+  });
+
+  it("keeps the focus on the form with initialFocus form, so no field looks focused and the first Tab reaches the first enabled field", async () => {
+    const { user } = renderWithProviders(<LoadingFirstFieldModal initialFocus="form" />);
+
+    await user.click(screen.getByRole("button", { name: "Open loading" }));
+
+    const dialog = await screen.findByRole("dialog", { name: "Loading" });
+    expect(dialog.querySelector("form")).toHaveFocus();
+    expect(screen.getByRole("textbox", { name: "Second" })).not.toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("textbox", { name: "Second" })).toHaveFocus();
   });
 
   it("undoes a select() from the focus trap right after opening, but keeps a selection the user makes", async () => {

@@ -1,5 +1,12 @@
 import type { CvSkillMastery } from "./cvSkills.types";
 
+/**
+ * The level "No mastery": a value of the backend `Mastery` enum, so the page stores and shows it like any level. It is
+ * not in `MASTERY_LEVELS` because its bar is empty and grey. "" (nothing chosen yet) is not a level and Radix Select
+ * does not allow it as an option value, so "No mastery" needs this value to show as chosen.
+ */
+export const NO_MASTERY: CvSkillMastery = "NONE";
+
 /** The colour of the bar (a theme token, so Light and Dark both work). Figma: grey, blue, green, yellow, red. */
 export type MasteryTone = "neutral" | "info" | "success" | "warning" | "error";
 

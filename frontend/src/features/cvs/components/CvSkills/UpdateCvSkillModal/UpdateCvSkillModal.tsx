@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { FormModal, Select } from "@/shared/components";
-import { MASTERY_LEVELS } from "../cvSkills.constants";
+import { MASTERY_LEVELS, NO_MASTERY } from "../cvSkills.constants";
 import type { UseUpdateCvSkillResult } from "../useUpdateCvSkill";
 import { useMasteryLabel } from "../useMasteryLabel";
 import styles from "./UpdateCvSkillModal.module.css";
@@ -45,9 +45,16 @@ export function UpdateCvSkillModal({ updating }: UpdateCvSkillModalProps) {
       />
       <Select
         label={t("mastery")}
-        options={MASTERY_LEVELS.map(({ level }) => ({ value: level, label: masteryLabel(level) }))}
+        options={[NO_MASTERY, ...MASTERY_LEVELS.map(({ level }) => level)].map((level) => ({
+          value: level,
+          label: masteryLabel(level),
+        }))}
         value={mastery}
         onValueChange={(value) => {
+          if (value === NO_MASTERY) {
+            select(NO_MASTERY);
+            return;
+          }
           const next = MASTERY_LEVELS.find(({ level }) => level === value);
           if (next) select(next.level);
         }}

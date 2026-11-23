@@ -13,8 +13,9 @@ enum Role {
   USER
 }
 
-// Shared by UserSkill and CvSkill.
+// Shared by UserSkill and CvSkill. NONE means the user chose no level on purpose (the bar is grey).
 enum Mastery {
+  NONE
   BEGINNER
   ELEMENTARY
   INTERMEDIATE
