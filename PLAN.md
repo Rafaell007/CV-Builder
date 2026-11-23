@@ -362,7 +362,7 @@ Checked against `docs/pages/10` to `27` in S2.1a. Conventions:
 
 | Model | Fields | Rules |
 |---|---|---|
-| User | id, email unique (≤ 255), passwordHash, role `ADMIN`/`USER`, isVerified, firstName? (≤ 100), lastName? (≤ 100), departmentId?, positionId?, createdAt, updatedAt | delete cascades (D13). Sign-up takes only email + password (8 to 128 characters with a letter and a digit, D33); admin create takes email + password too; names, department and position are required by the profile update, not by the database |
+| User | id, email unique (≤ 255), passwordHash, role `ADMIN`/`USER`, isVerified, firstName? (≤ 100), lastName? (≤ 100), departmentId?, positionId?, createdAt, updatedAt | delete cascades (D13). Sign-up takes only email + password (8 to 128 characters with a letter and a digit, D33); admin create (S6.1) takes email + password (D33) and requires names, department, position and role; names, department and position stay optional in the database, for users who signed up |
 | Avatar | userId (PK), data (bytes), mimeType, updatedAt | ≤ 5 MB, PNG/JPG/JPEG/GIF (D11) |
 | Department · Position | id, name unique without regard to case (`citext`, ≤ 100 by `CHECK`, D35), createdAt, updatedAt | delete blocked when used |
 | SkillCategory | id, name unique (≤ 100), type (short text), createdAt, updatedAt | seeded; a skill's type comes from its category and is not stored on `Skill` (page 17); delete blocked while it has skills |
