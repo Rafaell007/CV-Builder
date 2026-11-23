@@ -15,7 +15,15 @@ import { useLanguageForm } from "../useLanguageForm";
 export function useCreateLanguageForm(create: (input: LanguageInput) => Promise<LanguageListItem>) {
   const t = useTranslations("catalogs.languages");
   const toast = useToast();
-  const { form, failed, hasChanged, reset, showError, submit: submitForm } = useLanguageForm();
+  const {
+    form,
+    failed,
+    hasChanged,
+    isoField,
+    reset,
+    showError,
+    submit: submitForm,
+  } = useLanguageForm();
   const [isOpen, setIsOpen] = useState(false);
 
   function open() {
@@ -41,7 +49,7 @@ export function useCreateLanguageForm(create: (input: LanguageInput) => Promise<
     return submitForm(event, send);
   }
 
-  return { form, failed, hasChanged, isOpen, open, setOpen: setIsOpen, submit };
+  return { form, failed, hasChanged, isoField, isOpen, open, setOpen: setIsOpen, submit };
 }
 
 export type UseCreateLanguageFormResult = ReturnType<typeof useCreateLanguageForm>;
