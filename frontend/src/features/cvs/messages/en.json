@@ -186,13 +186,12 @@
     "columns": {
       "name": "Name",
       "domain": "Domain",
-      "responsibilities": "Responsibilities",
       "startDate": "Start Date",
       "endDate": "End Date"
     },
     "present": "Present",
     "dateMissing": "Date missing",
-    "noResponsibilities": "No responsibilities",
+    "responsibilities": "Responsibilities",
     "actions": {
       "add": "ADD PROJECT",
       "column": "Actions",

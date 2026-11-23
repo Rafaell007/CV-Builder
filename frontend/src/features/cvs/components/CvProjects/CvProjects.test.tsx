@@ -33,6 +33,8 @@ const rowNames = () =>
   screen
     .getAllByRole("row")
     .slice(1)
+    // The line under a row (description and tags) is a row of its own.
+    .filter((row) => !row.hasAttribute("data-row-detail"))
     .map((row) => within(row).getAllByRole("cell")[0]?.textContent);
 
 describe("CvProjects", () => {
@@ -42,25 +44,46 @@ describe("CvProjects", () => {
 
       expect(screen.getByRole("status", { name: "Loading projects" })).toBeInTheDocument();
       await loaded();
-      for (const name of ["Name", "Domain", "Responsibilities", "Start Date", "End Date"]) {
+      for (const name of ["Name", "Domain", "Start Date", "End Date"]) {
         expect(screen.getByRole("columnheader", { name })).toBeInTheDocument();
       }
       expect(rowNames()).toEqual(["Blog", "Online Bank"]);
       const blog = screen.getByRole("row", { name: /Blog/ });
       expect(within(blog).getByText("Blogging")).toBeInTheDocument();
-      expect(within(blog).getByText("Built the pages.")).toBeInTheDocument();
       expect(within(blog).getByText("02/01/2025")).toBeInTheDocument();
       expect(within(blog).getByText("11/30/2025")).toBeInTheDocument();
     });
 
-    it("shows Present for a project without an end date, and a dash for no responsibilities", async () => {
+    it("shows the description and the responsibilities as tags under the row, and no Responsibilities column", async () => {
+      setup();
+      await loaded();
+
+      expect(
+        screen.queryByRole("columnheader", { name: "Responsibilities" }),
+      ).not.toBeInTheDocument();
+      const detail = screen.getByText("A blogging website.").closest("[data-row-detail]");
+      expect(detail).not.toBeNull();
+      const tags = within(detail as HTMLElement).getByRole("list", { name: "Responsibilities" });
+      expect(
+        within(tags)
+          .getAllByRole("listitem")
+          .map((item) => item.textContent),
+      ).toEqual(["Built the pages."]);
+    });
+
+    it("shows Present for a project without an end date, and no tags for no responsibilities", async () => {
       setup();
       await loaded();
 
       const bankRow = screen.getByRole("row", { name: /Online Bank/ });
 
       expect(within(bankRow).getByText("Present")).toBeInTheDocument();
-      expect(within(bankRow).getByRole("img", { name: "No responsibilities" })).toBeInTheDocument();
+      const bankDetail = screen
+        .getByText("An online banking application.")
+        .closest("[data-row-detail]");
+      expect(
+        within(bankDetail as HTMLElement).queryByRole("list", { name: "Responsibilities" }),
+      ).not.toBeInTheDocument();
     });
 
     it("shows the empty state, not an error, and keeps ADD PROJECT available (AC-25)", async () => {
