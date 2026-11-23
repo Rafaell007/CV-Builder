@@ -2,7 +2,7 @@ import { useId, type FormEvent, type ReactNode } from "react";
 import { Button } from "../Button";
 import { Modal } from "../Modal";
 import styles from "./FormModal.module.css";
-import { useFirstFieldFocus } from "./useFirstFieldFocus";
+import { useFirstFieldFocus, type InitialFocus } from "./useFirstFieldFocus";
 
 export interface FormModalProps {
   open: boolean;
@@ -19,6 +19,11 @@ export interface FormModalProps {
   isSubmitting: boolean;
   /** React Hook Form's `handleSubmit(...)`. The caller closes the modal only after a successful request. */
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  /**
+   * Where the focus goes on open. `"form"` for a form whose first field is disabled while it loads: no field shows a
+   * focus border, and the first Tab reaches the first enabled field. Default: the first enabled field.
+   */
+  initialFocus?: InitialFocus | undefined;
   /** The form's fields. */
   children: ReactNode;
 }
@@ -38,10 +43,11 @@ export function FormModal({
   canSubmit,
   isSubmitting,
   onSubmit,
+  initialFocus,
   children,
 }: FormModalProps) {
   const formId = useId();
-  const { formRef, onOpenAutoFocus } = useFirstFieldFocus();
+  const { formRef, onOpenAutoFocus } = useFirstFieldFocus(initialFocus);
 
   // Enter in a field submits the form too, so the guard is here, not only on the button.
   function handleSubmit(event: FormEvent<HTMLFormElement>) {

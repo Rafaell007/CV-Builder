@@ -52,6 +52,9 @@ function keepSelectionCollapsed(field: HTMLElement) {
   return stop;
 }
 
+/** Where the focus goes on open: the first enabled field (default), or the form itself (no field looks focused). */
+export type InitialFocus = "firstField" | "form";
+
 // The DatePicker marks its box with this attribute.
 const DATE_PICKER_SELECTOR = "[data-date-picker]";
 
@@ -60,9 +63,11 @@ const DATE_PICKER_SELECTOR = "[data-date-picker]";
  * When the first field is a date field, the form itself gets the focus instead (it has tabindex -1): no cursor and no
  * selected date, and the first Tab reaches the date field. Focusing a date field never opens its calendar (Enter, an
  * arrow or a click does). When no field exists, Radix decides.
+ * With `initialFocus: "form"` the form always gets the focus, for a form whose first field is disabled while it loads
+ * (Add skill): otherwise the focus would jump to the next enabled field and draw its focus border.
  * Put `formRef` on the `<form>` and pass `onOpenAutoFocus` to `Modal`.
  */
-export function useFirstFieldFocus() {
+export function useFirstFieldFocus(initialFocus: InitialFocus = "firstField") {
   const formRef = useRef<HTMLFormElement>(null);
   const stopGuard = useRef<(() => void) | null>(null);
 
@@ -70,6 +75,11 @@ export function useFirstFieldFocus() {
   useEffect(() => () => stopGuard.current?.(), []);
 
   function onOpenAutoFocus(event: Event) {
+    if (initialFocus === "form" && formRef.current) {
+      event.preventDefault();
+      formRef.current.focus();
+      return;
+    }
     const fields = formRef.current?.querySelectorAll<HTMLElement>(FIELD_SELECTOR) ?? [];
     const firstField = fields[0];
     if (!firstField) return;
