@@ -1,5 +1,11 @@
 import type { CvSkillMastery } from "./cvSkills.types";
 
+/**
+ * The choice "No mastery" in the Add skill modal. Radix Select does not allow an option with the value "", and "" also
+ * means "nothing chosen yet", so "No mastery" has its own value: the field then shows it as chosen.
+ */
+export const NO_MASTERY = "NONE";
+
 /** The colour of the bar (a theme token, so Light and Dark both work). Figma: grey, blue, green, yellow, red. */
 export type MasteryTone = "neutral" | "info" | "success" | "warning" | "error";
 

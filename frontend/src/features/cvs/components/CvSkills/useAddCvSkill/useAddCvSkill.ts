@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 import { useToast } from "@/shared/components";
 import { AddCvSkillDocument, CvSkillsDocument } from "@/shared/graphql";
 import { useAvailableCvSkills } from "../useAvailableCvSkills";
+import { NO_MASTERY } from "../cvSkills.constants";
 import type { CvSkillMastery } from "../cvSkills.types";
 import { toCvSkillFailure } from "../utils";
 
@@ -13,6 +14,12 @@ import { toCvSkillFailure } from "../utils";
 type AddError = "required" | "conflict" | "invalid" | "notFound" | "forbidden" | "failed";
 
 const FIELD_ERRORS: readonly AddError[] = ["required", "conflict", "invalid"];
+
+type MasteryChoice = CvSkillMastery | typeof NO_MASTERY | "";
+
+function isLevel(choice: MasteryChoice): choice is CvSkillMastery {
+  return choice !== "" && choice !== NO_MASTERY;
+}
 
 /**
  * The Add skill flow: the open state of the modal, the chosen skill, the optional mastery, the options and the
@@ -26,7 +33,8 @@ export function useAddCvSkill(cvId: string) {
   const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [skillId, setSkillId] = useState("");
-  const [mastery, setMastery] = useState<CvSkillMastery | "">("");
+  // "" is nothing chosen yet; NO_MASTERY is the user's choice of no level. Both send no mastery.
+  const [mastery, setMastery] = useState<MasteryChoice>("");
   const [error, setError] = useState<AddError | undefined>();
   const available = useAvailableCvSkills(cvId, isOpen);
   const [addCvSkill, { loading }] = useMutation(AddCvSkillDocument);
@@ -46,8 +54,8 @@ export function useAddCvSkill(cvId: string) {
     setError(undefined);
   }
 
-  /** An empty string clears the mastery: the request then has no mastery. */
-  function selectMastery(next: CvSkillMastery | "") {
+  /** `NO_MASTERY` is a choice of its own: the field shows it and the request has no mastery. */
+  function selectMastery(next: MasteryChoice) {
     setMastery(next);
     setError(undefined);
   }
@@ -61,7 +69,7 @@ export function useAddCvSkill(cvId: string) {
     sending.current = true;
     try {
       const { data } = await addCvSkill({
-        variables: { input: { cvId, skillId, ...(mastery !== "" && { mastery }) } },
+        variables: { input: { cvId, skillId, ...(isLevel(mastery) && { mastery }) } },
         // The list loads again for the new skill; the backend decides its place in the category.
         refetchQueries: [CvSkillsDocument],
       });

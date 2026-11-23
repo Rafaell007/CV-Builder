@@ -10,6 +10,7 @@ import {
   CV_ID,
   cvSkillsMock,
 } from "../cvSkills.mocks";
+import { NO_MASTERY } from "../cvSkills.constants";
 import { useAddCvSkill, type UseAddCvSkillResult } from "./useAddCvSkill";
 
 function setup(options: RenderWithProvidersOptions) {
@@ -108,8 +109,8 @@ describe("useAddCvSkill", () => {
     act(() => result().selectMastery("EXPERT"));
     expect(result().mastery).toBe("EXPERT");
 
-    act(() => result().selectMastery(""));
-    expect(result().mastery).toBe("");
+    act(() => result().selectMastery(NO_MASTERY));
+    expect(result().mastery).toBe(NO_MASTERY);
 
     // The mock has no mastery in its variables: a request with one would fail.
     await act(() => result().submit());
