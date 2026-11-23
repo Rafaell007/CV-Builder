@@ -26,8 +26,13 @@ const MARKETPLACE: CvProjectEntry = {
 const addDialog = (page: Page) => page.getByRole("dialog", { name: "Add project" });
 const updateDialog = (page: Page) => page.getByRole("dialog", { name: "Update project" });
 const removeDialog = (page: Page) => page.getByRole("alertdialog", { name: "Remove project" });
-const rows = (page: Page) => page.getByRole("row").filter({ has: page.getByRole("cell") });
-const row = (page: Page, name: string) => page.getByRole("row", { name: new RegExp(name) });
+// A project is two table rows: the main row, and under it the detail line with the description and the responsibilities
+// as tags (the table marks it with data-row-detail). `rows` and `row` are the main rows only; `detail` is the line under one.
+const rows = (page: Page) =>
+  page.locator("tbody tr:not([data-row-detail])").filter({ has: page.getByRole("cell") });
+const row = (page: Page, name: string) => rows(page).filter({ hasText: name });
+const detail = (page: Page, name: string) =>
+  row(page, name).locator("xpath=following-sibling::tr[1][@data-row-detail]");
 
 async function openRowMenu(page: Page, name: string, action: "Update" | "Delete") {
   await page.getByRole("button", { name: `Actions for ${name}` }).click();
@@ -74,14 +79,15 @@ test.describe("CV Projects page, as a user", () => {
     await expect(page.getByRole("columnheader").filter({ hasText: /\S/ })).toContainText([
       "Name",
       "Domain",
-      "Responsibilities",
       "Start Date",
       "End Date",
     ]);
     await expect(rows(page)).toHaveCount(2);
     const banking = row(page, "Banking Portal");
     await expect(banking).toContainText("Finance");
-    await expect(banking).toContainText("Built the transfer screens.");
+    await expect(
+      detail(page, "Banking Portal").getByRole("list", { name: "Responsibilities" }),
+    ).toContainText("Built the transfer screens.");
     await expect(banking).toContainText("03/01/2022");
     await expect(banking).toContainText("06/30/2023");
     // The marketplace has no end date: the person still works on it.
@@ -153,9 +159,9 @@ test.describe("CV Projects page, as a user", () => {
 
     await expect(page.getByText("Project updated", { exact: true })).toBeVisible();
     await expect(dialog).toBeHidden();
-    await expect(row(page, "Banking Portal")).toContainText("Led the transfer screens.");
+    await expect(detail(page, "Banking Portal")).toContainText("Led the transfer screens.");
     await page.reload();
-    await expect(row(page, "Banking Portal")).toContainText("Led the transfer screens.");
+    await expect(detail(page, "Banking Portal")).toContainText("Led the transfer screens.");
   });
 
   test("ignores a typed end date earlier than the start date", async ({ page }) => {
@@ -268,7 +274,7 @@ test.describe("CV Projects page, as an admin", () => {
       await expect(page.getByText("Project added", { exact: true })).toBeVisible();
       await expect(dialog).toBeHidden();
       await expect(row(page, "Hospital Appointment System")).toContainText("Healthcare");
-      await expect(row(page, "Hospital Appointment System")).toContainText(
+      await expect(detail(page, "Hospital Appointment System")).toContainText(
         "Built the booking screens.",
       );
 
