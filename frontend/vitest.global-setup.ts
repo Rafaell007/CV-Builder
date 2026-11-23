@@ -17,7 +17,8 @@ function findGraphqlFiles(directory: string): string[] {
 // The generated file is in .gitignore. After a pull it can be older than its sources. Tests then fail with
 // errors from Apollo MockedProvider that do not name the cause, so stop early with a clear message.
 export default function setup() {
-  const message = "The generated GraphQL file is missing or stale. Run: pnpm --filter @cv-builder/frontend codegen";
+  const message =
+    "The generated GraphQL file is missing or stale. Run: pnpm --filter @cv-builder/frontend codegen";
   if (!existsSync(generatedFile)) throw new Error(message);
 
   const generatedTime = statSync(generatedFile).mtimeMs;
