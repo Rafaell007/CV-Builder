@@ -249,6 +249,13 @@ describe("cv skills", () => {
       expect(link.mastery).toBe("EXPERT");
     });
 
+    it("keeps NONE when the user chose no mastery, and does not copy the level of the owner", async () => {
+      const link = await addedLink(ann, { skillId: vue, mastery: "NONE" });
+
+      expect(link.mastery).toBe("NONE");
+      expect((await list(ann, annCv))[0]?.mastery).toBe("NONE");
+    });
+
     it("lets an admin add a skill of the owner to the CV of another user", async () => {
       const link = await addedLink(admin);
 
