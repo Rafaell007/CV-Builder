@@ -17,13 +17,18 @@ function findGraphqlFiles(directory: string): string[] {
 // The generated file is in .gitignore. After a pull it can be older than its sources. Tests then fail with
 // errors from Apollo MockedProvider that do not name the cause, so stop early with a clear message.
 export default function setup() {
-  const message =
-    "The generated GraphQL file is missing or stale. Run: pnpm --filter @cv-builder/frontend codegen";
-  if (!existsSync(generatedFile)) throw new Error(message);
+  // Vitest 5 hides an error thrown here behind "code.charCodeAt is not a function", so print the message and exit.
+  const fail = () => {
+    console.error(
+      "\nThe generated GraphQL file is missing or stale. Run: pnpm --filter @cv-builder/frontend codegen\n",
+    );
+    process.exit(1);
+  };
+  if (!existsSync(generatedFile)) fail();
 
+  // `pnpm codegen` updates the time of the generated file on every run, so it is newer than its sources after it.
   const generatedTime = statSync(generatedFile).mtimeMs;
   const sources = [...findGraphqlFiles(path.join(dirname, "src")), schemaFile];
-  if (sources.some((source) => existsSync(source) && statSync(source).mtimeMs > generatedTime)) {
-    throw new Error(message);
-  }
+  if (sources.some((source) => existsSync(source) && statSync(source).mtimeMs > generatedTime))
+    fail();
 }
