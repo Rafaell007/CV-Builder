@@ -95,7 +95,10 @@ describe("Modal", () => {
 
     expect(onOpenChange).toHaveBeenCalledWith(false);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Add skill" })).toHaveFocus();
+    // Radix returns the focus in a timer after the dialog unmounts, so on a busy machine it comes a moment later.
+    await waitFor(() => expect(screen.getByRole("button", { name: "Add skill" })).toHaveFocus(), {
+      timeout: 5000,
+    });
   });
 
   it("closes with the close button", async () => {

@@ -257,10 +257,6 @@ The full suite (157 test runs: 155 `test()` cases, and the 2 theme tests run onc
 
 CI runs `pnpm test:e2e` in the `e2e` job on a seeded database (1 worker, 2 retries). That CI run is not checked here.
 
-## Known problems (found 2026-11-13, KAN-114)
-
-- **`projects/projects.a11y.spec.ts` fails in a full run with one worker** (`the search field, CREATE PROJECT, the sort buttons and every row menu can be reached with Tab`, `only one row menu is open at a time`). It passes when run alone, and it fails the same on a clean `development` branch, so it does not come from the CV work. Probably a data left by an earlier spec; not investigated.
-
 **Open note (KAN-94):** the `sign-up` spec failed once in a full `pnpm test-all` run under load, and passed 40 of 40 times alone. The cause is not found yet. Check it again before you trust a red `sign-up` run.
 
 **Open note (KAN-98):** `catalogs/skills.spec.ts` "shows the in-use text inside the modal…" presses Confirm on the seed skill Leadership, after a CV of the test holds it. If the backend ever stops refusing the delete of a skill that is in use, this test deletes the seed skill Leadership, and the later tests that use it fail. Run `pnpm --filter @cv-builder/backend db:reset` after such a failure.

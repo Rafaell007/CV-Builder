@@ -43,7 +43,7 @@ function refreshOnce(
 }
 
 export type SessionResult =
-  // A signed-in user. `role` is only read when the caller asks for it (`needRole`), else it is `null`.
+  // A signed-in user. `role` is `null` only after a refresh when the caller did not need the role.
   | { status: "active"; role: Role | null; setCookies: string[] }
   // No usable session. `setCookies` may hold the headers that clear the dead cookies.
   | { status: "none"; setCookies: string[] }
@@ -63,7 +63,7 @@ export type ResolveSessionInput = {
 
 /**
  * Finds out whether the visitor has a session. Refreshes it first when the access token has expired
- * (PLAN D9) and, for admin-only routes, asks the backend for the role. The access token holds only the
+ * (PLAN D9). Otherwise it asks the backend (`me`) whether the session is still valid; that answer also holds the role. The access token holds only the
  * user id, so the role cannot be read from it.
  */
 export async function resolveSession({
@@ -80,6 +80,8 @@ export async function resolveSession({
   const setCookies: string[] = [];
 
   try {
+    // A refresh the backend just accepted already proves the session is valid.
+    let justRefreshed = false;
     if (!isAccessTokenFresh(accessToken, nowMs)) {
       if (!refreshToken) return { status: "none", setCookies };
 
@@ -88,10 +90,13 @@ export async function resolveSession({
       applySetCookies(jar, refreshed.setCookies);
       if (refreshed.errorCodes.includes("UNAUTHENTICATED")) return { status: "none", setCookies };
       if (!refreshed.data?.refresh) return { status: "unavailable", setCookies };
+      justRefreshed = true;
     }
 
-    if (!needRole) return { status: "active", role: null, setCookies };
+    if (justRefreshed && !needRole) return { status: "active", role: null, setCookies };
 
+    // A token that still looks fresh can belong to an ended session (password change on another device,
+    // deleted user). Only the backend knows, so it is asked on every page request (KAN-162).
     const current = await postGraphql(backendUrl, MeDocument, toCookieHeader(jar));
     // The token looked fresh but the backend refuses it (deleted user, rotated secret): the session is over.
     if (current.errorCodes.includes("UNAUTHENTICATED")) {
