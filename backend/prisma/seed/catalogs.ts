@@ -35,12 +35,23 @@ export async function seedCatalogs(db: Db): Promise<Catalogs> {
     db.projectRole.upsert({ where: { name }, update: {}, create: { name } }),
   );
 
+  // Not an upsert: an upsert matches one unique field only. An admin may rename "English" or change its
+  // code "EN", so a seed language is found by its ISO code or its name; creating it again would fail on
+  // the other unique index.
   const languageRows = await Promise.all(
-    LANGUAGES.map((language) =>
-      db.language.upsert({ where: { name: language.name }, update: {}, create: language }),
+    LANGUAGES.map(
+      async (language) =>
+        (await db.language.findFirst({
+          where: { OR: [{ iso: language.iso }, { name: language.name }] },
+          select: { id: true },
+        })) ?? db.language.create({ data: language, select: { id: true } }),
     ),
   );
-  const languages = new Map(languageRows.map((row) => [row.name, row.id]));
+  // Keyed by the seed's own name: the stored name may differ (renamed, or other letter case with
+  // citext, D35), and the later seed steps look languages up by the seed's name.
+  const languages = new Map(
+    LANGUAGES.map((language, index) => [language.name, languageRows[index]!.id]),
+  );
 
   const skills = new Map<string, string>();
   for (const category of SKILL_CATEGORIES) {
