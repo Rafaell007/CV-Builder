@@ -17,9 +17,12 @@ export interface LanguageFormMessages extends CatalogNameMessages {
   nativeNameTooLong: string;
 }
 
-/** The ISO code as it is sent and compared: trimmed and uppercase ("en " → "EN"). */
+/**
+ * The ISO code as it is sent and compared: trimmed, the letters a-z uppercase ("en " → "EN"). Like the backend, only
+ * a-z: `toUpperCase()` would turn "ß" into "SS" and let a letter outside A-Z pass the pattern.
+ */
 export function normalizeIso(iso: string): string {
-  return iso.trim().toUpperCase();
+  return iso.trim().replace(/[a-z]/g, (letter) => letter.toUpperCase());
 }
 
 /**
@@ -34,8 +37,7 @@ export function languageFormSchema(
     name: catalogNameRule(messages),
     iso: z
       .string()
-      .trim()
-      .toUpperCase()
+      .overwrite(normalizeIso)
       .min(1, messages.isoRequired)
       .max(MAX_LANGUAGE_ISO_LENGTH, messages.isoTooLong)
       .regex(LANGUAGE_ISO_PATTERN, messages.isoInvalid),

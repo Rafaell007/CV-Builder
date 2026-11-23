@@ -27,6 +27,11 @@ describe("normalizeIso", () => {
   it("trims and uppercases", () => {
     expect(normalizeIso(" pt-br ")).toBe("PT-BR");
   });
+
+  // Like the backend: full uppercasing would turn "ß" into "SS", a valid code.
+  it.each(["ß", "ı", "é"])("leaves %j as it is (only a-z are uppercased)", (letter) => {
+    expect(normalizeIso(letter)).toBe(letter);
+  });
 });
 
 describe("languageFormSchema", () => {
@@ -55,9 +60,12 @@ describe("languageFormSchema", () => {
     expect(errorOf(tooLong, "nativeName")).toBe("native too long");
   });
 
-  it.each(["E1", "E N", "-EN", "EN-", "A-B-C", "ÉN"])("refuses the ISO code %j", (iso) => {
-    expect(errorOf({ ...valid, iso }, "iso")).toBe("iso invalid");
-  });
+  it.each(["E1", "E N", "-EN", "EN-", "A-B-C", "ÉN", "ß", "ı"])(
+    "refuses the ISO code %j",
+    (iso) => {
+      expect(errorOf({ ...valid, iso }, "iso")).toBe("iso invalid");
+    },
+  );
 
   it.each(["EN", "en", "PT-BR", "zh-cn"])("accepts the ISO code %j", (iso) => {
     expect(errorOf({ ...valid, iso }, "iso")).toBeUndefined();
