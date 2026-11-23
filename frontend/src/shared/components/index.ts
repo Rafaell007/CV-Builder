@@ -7,6 +7,7 @@ export * from "./ConfirmModal";
 export * from "./DataTable";
 export * from "./DatePicker";
 export * from "./ErrorScreen";
+export * from "./FormErrorMessage";
 export * from "./FormModal";
 export * from "./IconButton";
 export * from "./icons";

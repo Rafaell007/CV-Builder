@@ -1,7 +1,6 @@
 import { useTranslations } from "next-intl";
-import { FormModal, TextField } from "@/shared/components";
+import { FormErrorMessage, FormModal, TextField } from "@/shared/components";
 import type { UseCreateLanguageFormResult } from "../useCreateLanguageForm";
-import styles from "./LanguageFormModal.module.css";
 
 export interface LanguageFormModalProps {
   /** Create shows "Create language" with CREATE; Update shows "Update language" with UPDATE. */
@@ -47,11 +46,7 @@ export function LanguageFormModal({ kind, languageForm }: LanguageFormModalProps
         required
         error={errors.nativeName?.message}
       />
-      {failed && (
-        <p role="alert" className={styles.error}>
-          {t("form.errors.failed")}
-        </p>
-      )}
+      {failed && <FormErrorMessage>{t("form.errors.failed")}</FormErrorMessage>}
     </FormModal>
   );
 }
