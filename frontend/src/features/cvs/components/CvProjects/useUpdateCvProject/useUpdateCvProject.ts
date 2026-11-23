@@ -4,16 +4,12 @@ import { useApolloClient, useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
 import { useCallback, useState, type BaseSyntheticEvent } from "react";
 import { useToast } from "@/shared/components";
+import { readFailure } from "@/shared/failures";
 import { CvProjectsDocument, UpdateCvProjectDocument } from "@/shared/graphql";
 import type { CvProjectFormSubmit, CvProjectItem } from "../cvProjects.types";
 import { useCvProjectForm } from "../useCvProjectForm";
 import { useProjectRoles } from "../useProjectRoles";
-import {
-  toCvProjectFailure,
-  toCvProjectFormValues,
-  toProjectRange,
-  toUpdateCvProjectInput,
-} from "../utils";
+import { toCvProjectFormValues, toProjectRange, toUpdateCvProjectInput } from "../utils";
 
 /**
  * The Update project flow (page 23, Update Project): the CV project that is being changed, the open state of the
@@ -63,7 +59,7 @@ export function useUpdateCvProject() {
       // Nothing resets the form here, so the values stay.
       showError(failure);
       // The entry is gone (or the CV is not visible any more): load the list again so the stale row leaves it.
-      if (toCvProjectFailure(failure) === "notFound") {
+      if (readFailure(failure).kind === "notFound") {
         void client.refetchQueries({ include: [CvProjectsDocument] });
       }
     }

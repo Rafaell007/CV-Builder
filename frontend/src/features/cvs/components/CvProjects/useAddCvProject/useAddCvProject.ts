@@ -5,17 +5,13 @@ import { useTranslations } from "next-intl";
 import { useCallback, useState, type BaseSyntheticEvent } from "react";
 import { useWatch } from "react-hook-form";
 import { useToast } from "@/shared/components";
+import { readFailure } from "@/shared/failures";
 import { AddCvProjectDocument, CvProjectsDocument } from "@/shared/graphql";
 import type { CvProjectFormSubmit } from "../cvProjects.types";
 import { useCvProjectForm } from "../useCvProjectForm";
 import { useAvailableCvProjects } from "../useAvailableCvProjects";
 import { useProjectRoles } from "../useProjectRoles";
-import {
-  EMPTY_CV_PROJECT_FORM_VALUES,
-  toAddCvProjectInput,
-  toCvProjectFailure,
-  toProjectRange,
-} from "../utils";
+import { EMPTY_CV_PROJECT_FORM_VALUES, toAddCvProjectInput, toProjectRange } from "../utils";
 
 /**
  * The Add project flow (page 23, Add Project): the open state of the modal, the project that is chosen and the
@@ -75,7 +71,7 @@ export function useAddCvProject(cvId: string) {
       // Nothing resets the form here, so the values stay.
       showError(failure);
       // The project is already in the CV, or a date changed: the options are old, so load them again.
-      if (toCvProjectFailure(failure) === "conflict") available.retry();
+      if (readFailure(failure).kind === "conflict") available.retry();
     }
   }
 

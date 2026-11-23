@@ -9,9 +9,4 @@ export {
   type CvProjectFormMessages,
   type DateLimits,
 } from "./cvProjectForm.utils";
-export {
-  toCvProjectFailure,
-  toCvProjectsVariables,
-  toResponsibilityTags,
-  type CvProjectFailure,
-} from "./cvProjects.utils";
+export { toCvProjectsVariables, toResponsibilityTags } from "./cvProjects.utils";
