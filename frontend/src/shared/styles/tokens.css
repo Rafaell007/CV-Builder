@@ -19,6 +19,12 @@
   --palette-blue: #29b6f6;
   --palette-blue-dark: #145b7b;
   /* Date picker shadow (light): #5E5BE6 at 15% */
+  /* CV skill level bars, light theme (Figma CV Skills, measured as drawn: colour at 90% over the page) */
+  --palette-bar-blue: #1a93d5;
+  --palette-bar-blue-light: #a7d5ee;
+  --palette-bar-green: #428946;
+  --palette-bar-green-light: #b6d1b8;
+  --palette-bar-yellow-light: #fee6a7;
   --palette-indigo-shadow: rgb(94 91 230 / 15%);
   /* Modal overlay (both themes): #121212 at 60% */
   --palette-overlay: rgb(18 18 18 / 60%);
