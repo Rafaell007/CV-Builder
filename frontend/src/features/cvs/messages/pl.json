@@ -111,6 +111,7 @@
     },
     "masteryLevel": "Poziom: {level}",
     "mastery": {
+      "NONE": "Brak poziomu",
       "BEGINNER": "Początkujący",
       "ELEMENTARY": "Podstawowy",
       "INTERMEDIATE": "Średnio zaawansowany",

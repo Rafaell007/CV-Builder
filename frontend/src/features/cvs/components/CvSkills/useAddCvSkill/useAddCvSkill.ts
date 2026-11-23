@@ -6,7 +6,6 @@ import { useRef, useState } from "react";
 import { useToast } from "@/shared/components";
 import { AddCvSkillDocument, CvSkillsDocument } from "@/shared/graphql";
 import { useAvailableCvSkills } from "../useAvailableCvSkills";
-import { NO_MASTERY } from "../cvSkills.constants";
 import type { CvSkillMastery } from "../cvSkills.types";
 import { toCvSkillFailure } from "../utils";
 
@@ -15,17 +14,14 @@ type AddError = "required" | "conflict" | "invalid" | "notFound" | "forbidden" |
 
 const FIELD_ERRORS: readonly AddError[] = ["required", "conflict", "invalid"];
 
-type MasteryChoice = CvSkillMastery | typeof NO_MASTERY | "";
-
-function isLevel(choice: MasteryChoice): choice is CvSkillMastery {
-  return choice !== "" && choice !== NO_MASTERY;
-}
+type MasteryChoice = CvSkillMastery | "";
 
 /**
  * The Add skill flow: the open state of the modal, the chosen skill, the optional mastery, the options and the
  * `addCvSkill` request (AC-14 to AC-20). The options come from the backend (the skills of the CV owner that the CV
  * does not hold) and are loaded each time the modal opens. The mastery is optional (Figma shows the field): when the
- * user chooses none, the request has no mastery and the backend copies the level of the owner. A failed request keeps the chosen skill. Only a successful request closes the
+ * user does not touch the field, the request has no mastery and the backend copies the level of the owner. When the
+ * user chooses "No mastery", the request carries `NONE` and the skill has no level. A failed request keeps the chosen skill. Only a successful request closes the
  * modal; the skill appears in the list when the backend has answered and the list is loaded again.
  */
 export function useAddCvSkill(cvId: string) {
@@ -33,7 +29,7 @@ export function useAddCvSkill(cvId: string) {
   const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [skillId, setSkillId] = useState("");
-  // "" is nothing chosen yet; NO_MASTERY is the user's choice of no level. Both send no mastery.
+  // "" is nothing chosen yet (no mastery is sent). NO_MASTERY is the user's choice of no level (NONE is sent).
   const [mastery, setMastery] = useState<MasteryChoice>("");
   const [error, setError] = useState<AddError | undefined>();
   const available = useAvailableCvSkills(cvId, isOpen);
@@ -54,7 +50,7 @@ export function useAddCvSkill(cvId: string) {
     setError(undefined);
   }
 
-  /** `NO_MASTERY` is a choice of its own: the field shows it and the request has no mastery. */
+  /** `NO_MASTERY` is a level of its own: the field shows it and the request carries `NONE`. */
   function selectMastery(next: MasteryChoice) {
     setMastery(next);
     setError(undefined);
@@ -69,7 +65,7 @@ export function useAddCvSkill(cvId: string) {
     sending.current = true;
     try {
       const { data } = await addCvSkill({
-        variables: { input: { cvId, skillId, ...(isLevel(mastery) && { mastery }) } },
+        variables: { input: { cvId, skillId, ...(mastery !== "" && { mastery }) } },
         // The list loads again for the new skill; the backend decides its place in the category.
         refetchQueries: [CvSkillsDocument],
       });

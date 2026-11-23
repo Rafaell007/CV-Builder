@@ -141,17 +141,17 @@ describe("CvSkills", () => {
       expect(within(dialog).getByRole("button", { name: "Add" })).toBeEnabled();
     });
 
-    it("sends no mastery when the user picks a level and then No mastery", async () => {
+    it("sends NONE when the user picks a level and then No mastery", async () => {
       const { user, dialog } = await openAddModal(
         withAdd(
-          addCvSkillMock(docker),
+          addCvSkillMock(docker, CV_ID, "NONE"),
           cvSkillsMock([
             ...sampleSkills,
             cvSkill({
               id: "link-new",
               skillId: docker.id,
               name: docker.name,
-              mastery: docker.mastery,
+              mastery: "NONE",
               category: docker.category,
             }),
           ]),
@@ -171,21 +171,21 @@ describe("CvSkills", () => {
 
       await user.click(within(dialog).getByRole("button", { name: "Add" }));
 
-      // The mock only matches a request without mastery: a request with one would fail.
+      // The mock only matches a request that carries NONE: another level would fail.
       expect(await screen.findByText("Skill added")).toBeInTheDocument();
     });
 
     it("shows No mastery as chosen, closes the list and adds the skill without mastery", async () => {
       const { user, dialog } = await openAddModal(
         withAdd(
-          addCvSkillMock(docker),
+          addCvSkillMock(docker, CV_ID, "NONE"),
           cvSkillsMock([
             ...sampleSkills,
             cvSkill({
               id: "link-new",
               skillId: docker.id,
               name: docker.name,
-              mastery: docker.mastery,
+              mastery: "NONE",
               category: docker.category,
             }),
           ]),
@@ -207,8 +207,11 @@ describe("CvSkills", () => {
 
       await user.click(within(dialog).getByRole("button", { name: "Add" }));
 
-      // The mock only matches a request without mastery: a request with one would fail.
+      // The mock only matches a request that carries NONE: the owner's level must not be copied.
       expect(await screen.findByText("Skill added")).toBeInTheDocument();
+      expect(
+        await screen.findByRole("button", { name: "Docker Mastery: No mastery" }),
+      ).toBeInTheDocument();
     });
 
     it("sends the chosen mastery with the skill", async () => {
@@ -370,6 +373,23 @@ describe("CvSkills", () => {
       await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
       expect(
         await screen.findByRole("button", { name: "TypeScript Mastery: Expert" }),
+      ).toBeInTheDocument();
+    });
+
+    it("saves No mastery, shows it as chosen and shows it in the list", async () => {
+      const { user, dialog } = await openUpdateModal({
+        mocks: [cvSkillsMock(), updateCvSkillMock(typescript, "NONE")],
+      });
+      const mastery = within(dialog).getByRole("combobox", { name: /Mastery/ });
+      await user.click(mastery);
+      await user.click(screen.getByRole("option", { name: "No mastery" }));
+      expect(mastery).toHaveTextContent("No mastery");
+
+      await user.click(within(dialog).getByRole("button", { name: "Save" }));
+
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+      expect(
+        await screen.findByRole("button", { name: "TypeScript Mastery: No mastery" }),
       ).toBeInTheDocument();
     });
 

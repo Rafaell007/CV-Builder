@@ -8,7 +8,8 @@ export interface MasteryBarProps {
 
 /**
  * The bar left of a skill name. It only draws: the level is also written for screen readers by the skill item,
- * so the bar is hidden from them. An unknown level (a new backend value) shows an empty bar, not a broken page.
+ * so the bar is hidden from them. The level `NONE` (No mastery) is not in `MASTERY_LEVELS` on purpose: it shows the
+ * empty grey bar. An unknown level (a new backend value) looks the same, not a broken page.
  */
 export function MasteryBar({ level }: MasteryBarProps) {
   const found = MASTERY_LEVELS.find((item) => item.level === level);
