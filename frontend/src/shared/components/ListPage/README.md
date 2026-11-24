@@ -4,7 +4,7 @@ The body of a list page (PLAN S5.1, S5.2, KAN-96): the sticky toolbar with the s
 the list, and the page buttons. The route renders the `PageHeader` (top bar with the breadcrumbs) above it, as every
 page does, because only the route knows its trail.
 
-- **Props:** `search` (the `SearchField`), `createLabel`, `onCreate`, `error` (the error state; when set, it replaces
+- **Props:** `search` (the `SearchField`), `createLabel` and `onCreate` (both or neither: without them there is no create button, e.g. for an employee on the Users page), `error` (the error state; when set, it replaces
   the list and the page buttons), `pagination` (the `Pagination`), `children` (the table). Modals are rendered by the
   caller next to it.
 - The error replaces the list but not the toolbar, so the typed search stays (the field is uncontrolled).

@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "@/shared/testing";
 import { ListPage, type ListPageProps } from "./ListPage";
 
-function renderListPage(props: Partial<ListPageProps> = {}) {
+function renderListPage(props: Pick<ListPageProps, "error"> = {}) {
   const onCreate = vi.fn();
   const view = renderWithProviders(
     <ListPage
@@ -44,5 +44,16 @@ describe("ListPage", () => {
     expect(screen.queryByRole("navigation", { name: "Pagination" })).not.toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "Search" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Create department" })).toBeInTheDocument();
+  });
+
+  it("has no create button when the page gives no create props (a user who may not create)", () => {
+    renderWithProviders(
+      <ListPage search={<input aria-label="Search" />} pagination={<nav aria-label="Pagination" />}>
+        <table aria-label="Employees list" />
+      </ListPage>,
+    );
+
+    expect(screen.getByRole("textbox", { name: "Search" })).toBeInTheDocument();
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 });

@@ -4,7 +4,7 @@ import { expect, userEvent, within } from "storybook/test";
 import { Button } from "../Button";
 import { Modal, type ModalProps } from "./Modal";
 
-type ModalStoryArgs = Pick<ModalProps, "title" | "description" | "closeLabel">;
+type ModalStoryArgs = Pick<ModalProps, "title" | "description" | "closeLabel" | "size">;
 
 // Opened by a page button, as on the real pages.
 function ModalDemo(args: ModalStoryArgs) {
@@ -82,5 +82,24 @@ export const ClosesOnEscape: Story = {
     await userEvent.keyboard("{Escape}");
     await expect(within(document.body).queryByRole("dialog")).not.toBeInTheDocument();
     await expect(canvas.getByRole("button", { name: "Open modal" })).toHaveFocus();
+  },
+};
+
+// Create user: 860 wide on desktop (two fields per row), 620 on tablet like every modal.
+export const WideDesktop: Story = {
+  args: { size: "wide" },
+  globals: { viewport: { value: "desktop", isRotated: false } },
+  play: async ({ canvas }) => {
+    const dialog = await openModal(canvas);
+    await expect(dialog).toHaveStyle({ width: "860px" });
+  },
+};
+
+export const WideTablet: Story = {
+  args: { size: "wide" },
+  globals: { viewport: { value: "tablet", isRotated: false } },
+  play: async ({ canvas }) => {
+    const dialog = await openModal(canvas);
+    await expect(dialog).toHaveStyle({ width: "620px" });
   },
 };

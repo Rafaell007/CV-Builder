@@ -243,6 +243,7 @@ Read on 2026-11-04 for KAN-81. Positions from the modal's top-left.
 - Title: 500 · 20 · 24 · 0.15, text main (#2E2E2E / #F5F5F7), at 16 / 24.
 - Close: 24×24 button at top 14, 24 from the right; 12×12 cross at 7,7, #2E2E2E in light.
 - Form modal (620×284): title → first field 26; fields 572×48, 36 apart; last field → buttons 26.
+- Wide form modal (Figma Create user, KAN-104): 860 wide on desktop (fields 400, two per row, 12 apart, rows 84 apart); the tablet frame is 620 with one column. `Modal size="wide"`, 860 from 1024px up.
 - Confirm modal (620×200): message 572 wide in the Body style (400 · 16 · 24 · 0.15), text main; title → message 40, message → buttons 44, bottom 16. The count ("3 skills") is 700 in dark; light read as 500.
 - Button row: right-aligned, 24 apart, 160×48 each. CANCEL secondary (light border + text #2E2E2E, dark #E2E2E4); ADD / UPDATE / CONFIRM primary.
 
@@ -455,3 +456,10 @@ List pages (2026-11-18, KAN-96): drawn inconsistently; chosen by us.
 - 768: the CVs toolbar has no fill; a sticky bar needs one, so it keeps the page background. Dark 768 widths 2px off (666 / 664, search 278 / 276), the User CVs tab bars at left 22 and 37, and its dark top bar without fill: read as artefacts, laid out as on the other pages.
 
 Settings (2026-11-16): the "Change password" text is at left 2 in 1440 light but 0 in dark and on 768; read as an artefact, it starts at 0. On 768 the CHANGE button keeps the desktop left 692, outside the 664 column; read as an artefact, it stays right-aligned in the column as on 1440.
+
+Users list (2026-11-24, KAN-104):
+
+- Avatar initials: Figma draws #F5F5F7 on #AEAEAE (light, 2.0:1) and #2E2E2E on #626262 (dark, 2.3:1). The fills stay (`--color-avatar-bg`); the initials use the main text colour (#2E2E2E light, 6.1:1; #F5F5F7 dark, 5.6:1). Font 400 20/20, as drawn. The shared `Avatar` takes these values (no page used it before).
+- Row menu: the open menu of the Users list is the only row menu drawn. The shared `Menu` follows it on every list page: at least 90 wide, no inset above or below the items, items 32 high, text 14/24.
+- Open-profile arrow (employee view): #626262 light, #AEAEAE dark, as drawn (`--color-row-arrow`; `--color-icon` is #F5F5F7 in dark).
+- Update user, own row: the Role field is disabled (D24) and shows the helper text "You cannot change your own role" under it. Figma has no own-row frame; a disabled field without a reason is unclear to screen-reader and keyboard users. Other fields: Figma draws some Update values at 14/20.02; all use the input 16/23, and the tablet select chevron points down, as on desktop.

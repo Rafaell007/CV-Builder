@@ -6,7 +6,7 @@ import { PageHeader } from "../PageHeader";
 import { PageState } from "../PageState";
 import { Pagination } from "../Pagination";
 import { SearchField } from "../SearchField";
-import { ListPage } from "./ListPage";
+import { ListPage, type ListPageProps } from "./ListPage";
 
 interface Row {
   id: string;
@@ -24,6 +24,10 @@ const stateLabels = {
   error: "Something went wrong. Please try again later",
   retry: "Retry",
 };
+
+// The stories show the page with a create button. Storybook cannot type args from a props union, so the meta uses
+// that variant only (a page without the button is covered by the unit test and the Users stories).
+type ListPageWithCreate = Extract<ListPageProps, { onCreate: () => void }>;
 
 const meta = {
   title: "Shared/ListPage",
@@ -70,7 +74,7 @@ const meta = {
       />
     ),
   },
-} satisfies Meta<typeof ListPage>;
+} satisfies Meta<ListPageWithCreate>;
 
 export default meta;
 

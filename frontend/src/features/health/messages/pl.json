@@ -1,5 +1,0 @@
-{
-  "checking": "Sprawdzanie backendu…",
-  "status": "Stan backendu ({source, select, server {serwer} other {klient}}): {status}",
-  "unavailable": "niedostępny"
-}

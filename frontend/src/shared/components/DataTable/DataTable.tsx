@@ -182,7 +182,11 @@ export function DataTable<Row>({
                 />
               ) : (
                 <th key={column.id} scope="col" className={styles.headCell}>
-                  {column.header}
+                  {column.hideHeader ? (
+                    <span className={styles.visuallyHidden}>{column.header}</span>
+                  ) : (
+                    column.header
+                  )}
                 </th>
               ),
             )}

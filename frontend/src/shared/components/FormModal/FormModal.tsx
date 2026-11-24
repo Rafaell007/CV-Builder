@@ -1,6 +1,6 @@
 import { useId, type FormEvent, type ReactNode } from "react";
 import { Button } from "../Button";
-import { Modal } from "../Modal";
+import { Modal, type ModalSize } from "../Modal";
 import styles from "./FormModal.module.css";
 import { useFirstFieldFocus, type InitialFocus } from "./useFirstFieldFocus";
 
@@ -24,6 +24,8 @@ export interface FormModalProps {
    * focus border, and the first Tab reaches the first enabled field. Default: the first enabled field.
    */
   initialFocus?: InitialFocus | undefined;
+  /** The modal width (`Modal`'s `size`). Default: 620px. */
+  size?: ModalSize | undefined;
   /** The form's fields. */
   children: ReactNode;
 }
@@ -44,6 +46,7 @@ export function FormModal({
   isSubmitting,
   onSubmit,
   initialFocus,
+  size,
   children,
 }: FormModalProps) {
   const formId = useId();
@@ -71,6 +74,7 @@ export function FormModal({
       title={title}
       closeLabel={closeLabel}
       onOpenAutoFocus={onOpenAutoFocus}
+      size={size}
       footer={
         <>
           <Button variant="secondary" onClick={() => handleOpenChange(false)}>

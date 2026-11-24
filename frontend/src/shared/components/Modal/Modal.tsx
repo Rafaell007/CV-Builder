@@ -20,8 +20,12 @@ export interface ModalProps {
   footer?: ReactNode;
   /** Runs when the modal opens, before Radix focuses its first button; `event.preventDefault()` keeps your own focus. */
   onOpenAutoFocus?: (event: Event) => void;
+  /** `"wide"`: 860px from 1024px up, for a form with two fields per row (Create user). Below 1024px both are 620px. */
+  size?: ModalSize | undefined;
   children?: ReactNode;
 }
+
+export type ModalSize = "default" | "wide";
 
 /**
  * Controlled modal dialog. Radix traps focus inside, closes on Escape and locks page scroll;
@@ -35,6 +39,7 @@ export function Modal({
   closeLabel,
   footer,
   onOpenAutoFocus,
+  size = "default",
   children,
 }: ModalProps) {
   const returnFocus = useReturnFocus();
@@ -62,7 +67,7 @@ export function Modal({
           onOpenAutoFocus={handleOpenAutoFocus}
           onEscapeKeyDown={handleEscapeKeyDown}
           onCloseAutoFocus={returnFocus.onCloseAutoFocus}
-          className={styles.content}
+          className={size === "wide" ? `${styles.content} ${styles.wide}` : styles.content}
           // Without a Description part Radix asks for an explicit "no description".
           {...(!hasDescription && { "aria-describedby": undefined })}
         >
