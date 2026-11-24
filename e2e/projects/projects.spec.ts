@@ -7,8 +7,8 @@ import {
 } from "../support/projects";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
 
-// The seed holds 6 projects (backend/prisma/seed/projects.data.ts). The page shows 10 rows (PLAN D19).
-const SEED_COUNT = 6;
+// The seed holds 9 projects (backend/prisma/seed/projects.data.ts). The page shows 10 rows (PLAN D19).
+const SEED_COUNT = 9;
 const PAGE_SIZE = 10;
 
 const search = (page: Page) => page.getByRole("searchbox", { name: "Search projects" });

@@ -27,7 +27,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
-  padding-top: var(--space-4);
+  /* Space between the text and the vertical line of the right column. */
+  padding: var(--space-4) var(--space-4) 0 0;
 }
 
 .main {
@@ -60,6 +61,10 @@
 @media (max-width: 767px) {
   .overview {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .aside {
+    padding-right: 0;
   }
 
   .main {

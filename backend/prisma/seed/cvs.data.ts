@@ -43,6 +43,62 @@ export const CVS: CvSeed[] = [
         responsibilities: "Led the storefront team; owned search, cart and checkout pages.",
         roles: ["Developer", "Team Lead"],
       },
+      // Seven more projects, so this CV has nine (a long CV for the PDF and the preview pages).
+      {
+        project: "Travel Booking App",
+        startDate: "2020-09-01",
+        endDate: "2021-12-31",
+        responsibilities:
+          "Built the search form and the price comparison list; covered the booking steps with Jest tests.",
+        roles: ["Developer"],
+      },
+      {
+        project: "Hospital Appointment System",
+        startDate: "2021-03-01",
+        endDate: "2021-11-30",
+        responsibilities: "Made the Angular booking calendar and the reminder settings screens.",
+        roles: ["Developer"],
+      },
+      {
+        project: "Real Estate Listings Portal",
+        startDate: "2021-02-01",
+        endDate: "2022-04-30",
+        responsibilities:
+          "Implemented the listing page and the map search with saved filters; improved the page load time.",
+        roles: ["Developer"],
+      },
+      {
+        project: "Energy Usage Monitor",
+        startDate: "2022-05-01",
+        endDate: "2023-10-31",
+        responsibilities:
+          "Created the usage charts and the monthly report view; introduced Redux for the filter state.",
+        roles: ["Developer", "Tech Lead"],
+      },
+      {
+        project: "Media Streaming Platform",
+        startDate: "2023-01-01",
+        endDate: "2024-02-29",
+        responsibilities:
+          "Built the web player and the playlist screens; wrote the Playwright tests for playback.",
+        roles: ["Developer"],
+      },
+      {
+        project: "Logistics Tracking Dashboard",
+        startDate: "2024-06-01",
+        endDate: "2025-03-31",
+        responsibilities:
+          "Added the shipment map, the delay alerts and the export of the dispatcher list.",
+        roles: ["Developer", "Team Lead"],
+      },
+      {
+        project: "Learning Management Platform",
+        startDate: "2025-01-01",
+        endDate: null,
+        responsibilities:
+          "Builds the course player and the progress pages; keeps the component library in sync with the design.",
+        roles: ["Developer"],
+      },
     ],
   },
   {
