@@ -167,14 +167,12 @@ export class UsersService {
    * Turns the database errors of a write into API errors; anything else is returned as is.
    * - P2002: the only unique column a write sets is `email` (create only), so the email is taken.
    * - P2003: the department or position was deleted after the check. Checking again names the field.
-   * - P2025: the user to update does not exist.
    * - P2034, P2028: another request changed the same rows at the same time, or the transaction could not
    *   finish in time (see `toTransactionConflict`).
    */
   private async toWriteError(error: unknown, ids: DepartmentAndPosition): Promise<unknown> {
     if (!(error instanceof Prisma.PrismaClientKnownRequestError)) return error;
     if (TRANSACTION_CONFLICT_CODES.has(error.code)) return toTransactionConflict(error);
-    if (error.code === "P2025") return new NotFoundException("User not found");
     if (error.code === "P2002") {
       return new ConflictException({
         message: "An account with this email already exists",
