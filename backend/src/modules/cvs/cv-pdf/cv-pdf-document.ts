@@ -177,6 +177,16 @@ function skillsTable(groups: CvPreviewSkillGroup[], labels: PdfLabels): Content[
   ];
 }
 
+/** The page marker in the bottom right corner: `1/3`. It sits in the bottom margin, so it never moves the content. */
+export function pageMarker(currentPage: number, pageCount: number): Content {
+  return {
+    text: `${currentPage}/${pageCount}`,
+    alignment: "right",
+    fontSize: 8,
+    margin: [40, 0, 40, 0],
+  };
+}
+
 /**
  * The PDF of a CV as a pdfmake document. It takes the same `CvPreview` object as the preview page,
  * so the years, the periods and the domains are the values of the backend calculation and are
@@ -191,6 +201,7 @@ export function buildCvPdfDefinition(preview: CvPreview, locale: CvLocale): TDoc
     info: { title: preview.name },
     pageSize: "A4",
     pageMargins: [40, 40, 40, 40],
+    footer: pageMarker,
     defaultStyle: { font: FONT, fontSize: BODY_FONT_SIZE, color: COLOR_TEXT, lineHeight: 1.25 },
     content: [
       ...header(preview),

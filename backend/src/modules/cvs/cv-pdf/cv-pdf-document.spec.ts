@@ -1,6 +1,6 @@
 import { Mastery, Proficiency } from "../../../generated/prisma/enums";
 import type { CvPreview } from "../cv-preview/models/cv-preview";
-import { buildCvPdfDefinition } from "./cv-pdf-document";
+import { buildCvPdfDefinition, pageMarker } from "./cv-pdf-document";
 
 function preview(overrides: Partial<CvPreview> = {}): CvPreview {
   return {
@@ -205,6 +205,13 @@ describe("buildCvPdfDefinition", () => {
       expect(text).not.toContain(hidden);
     }
     expect(text).toContain("Projects");
+  });
+
+  it("puts the page marker, like 2/3, in the bottom right corner", () => {
+    const { footer } = buildCvPdfDefinition(preview(), "en");
+
+    expect(footer).toBe(pageMarker);
+    expect(pageMarker(2, 3)).toMatchObject({ text: "2/3", alignment: "right" });
   });
 
   it("works for a CV with no data at all", () => {
