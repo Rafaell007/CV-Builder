@@ -10,7 +10,7 @@ const USER: AuthUser = { id: "user-1", role: Role.USER, isVerified: true };
 const PREVIEW: CvPreview = {
   cvId: "cv-1",
   name: "Senior Developer",
-  education: "",
+  education: "MSc",
   description: "",
   fullName: null,
   position: null,
@@ -48,8 +48,8 @@ describe("CvPdfService.export", () => {
     await service.export(USER, "cv-1", "en");
 
     const textOfCall = (call: number) => JSON.stringify(renderer.render.mock.calls[call]?.[0]);
-    expect(textOfCall(0)).toContain("Podsumowanie");
-    expect(textOfCall(1)).toContain("Summary");
+    expect(textOfCall(0)).toContain("Wykształcenie");
+    expect(textOfCall(1)).toContain("Education");
     // The preview is asked in the same language, so the period text matches the PDF language.
     expect(preview.get).toHaveBeenNthCalledWith(1, USER, "cv-1", "pl");
     expect(preview.get).toHaveBeenNthCalledWith(2, USER, "cv-1", "en");

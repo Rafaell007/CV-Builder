@@ -1,4 +1,10 @@
-import type { Content, ContentText, TableCell, TDocumentDefinitions } from "pdfmake/interfaces";
+import type {
+  Content,
+  ContentText,
+  ContentTable,
+  TableCell,
+  TDocumentDefinitions,
+} from "pdfmake/interfaces";
 import type { CvLocale } from "../cv-locale";
 import type { CvPreview } from "../cv-preview/models/cv-preview";
 import { Proficiency } from "../cv-preview/models/proficiency.enum";
@@ -8,19 +14,22 @@ import type { PdfLabels } from "./cv-pdf-labels";
 
 const EN_DASH = "–";
 const FONT = "Roboto";
-const COLOR_MUTED = "#555555";
-const COLOR_LINE = "#bbbbbb";
+// The colours of the design tokens (`--color-primary`, `--color-text`, `--color-cv-divider`). The PDF is
+// always on white paper, so there is only the light theme.
+const COLOR_ACCENT = "#c63031";
+const COLOR_TEXT = "#2e2e2e";
+const COLOR_DIVIDER = "#aeaeae";
 
+// The page is 515 pt wide inside the margins. The preview is 852 px wide, so one pixel is about 0.6 pt.
+const SIDE_COLUMN_WIDTH = 160;
+const COLUMN_GAP = 14;
+const LINE_WIDTH = 0.75;
+
+const BODY_FONT_SIZE = 10;
+const LABEL: Omit<ContentText, "text"> = { bold: true, margin: [0, 0, 0, 3] };
 const SECTION_TITLE: Omit<ContentText, "text"> = {
-  fontSize: 13,
-  bold: true,
-  margin: [0, 14, 0, 4],
-};
-const PART_TITLE: Omit<ContentText, "text"> = {
-  fontSize: 10,
-  bold: true,
-  color: COLOR_MUTED,
-  margin: [0, 6, 0, 2],
+  fontSize: 20,
+  margin: [0, 22, 0, 12],
 };
 
 /** `NATIVE` is the only level that is a word. The levels A1 to C2 are printed as they are. */
@@ -32,110 +41,137 @@ function yearCell(value: number | null): string {
   return value === null ? EN_DASH : String(value);
 }
 
-/** A titled part is left out when it has no lines, like the preview page does. */
-function part(title: string, lines: string[]): Content[] {
-  if (lines.length === 0) return [];
-  return [{ text: title, ...PART_TITLE }, { ul: lines }];
+/** A bold label with its content under it. The block is left out when the content is empty, like on the preview page. */
+function block(label: string, content: Content[]): Content[] {
+  if (content.length === 0) return [];
+  return [{ stack: [{ text: label, ...LABEL }, ...content], margin: [0, 0, 0, 10] }];
+}
+
+/** A table of one row with two columns and a red vertical line between them (the layout of the preview page). */
+function twoColumns(left: Content[], right: Content[], sideWidth: number): ContentTable {
+  return {
+    unbreakable: true,
+    table: { widths: [sideWidth, "*"], body: [[{ stack: left }, { stack: right }]] },
+    layout: {
+      hLineWidth: () => 0,
+      vLineWidth: (index) => (index === 1 ? LINE_WIDTH : 0),
+      vLineColor: () => COLOR_ACCENT,
+      paddingLeft: (index) => (index === 1 ? COLUMN_GAP : 0),
+      paddingRight: () => 0,
+      paddingTop: () => 10,
+      paddingBottom: () => 0,
+    },
+  };
 }
 
 function header(preview: CvPreview): Content[] {
   const content: Content[] = [];
-  if (preview.fullName !== null) content.push({ text: preview.fullName, fontSize: 20, bold: true });
+  if (preview.fullName !== null) content.push({ text: preview.fullName, fontSize: 24 });
   if (preview.position !== null) {
-    content.push({ text: preview.position, fontSize: 12, color: COLOR_MUTED });
+    content.push({ text: preview.position.toUpperCase(), fontSize: 11, margin: [0, 2, 0, 0] });
   }
   return content;
 }
 
 function general(preview: CvPreview, labels: PdfLabels): Content[] {
-  const education = preview.education === "" ? [] : [preview.education];
-  const languages = preview.languages.map(
-    ({ name, proficiency }) => `${name} — ${proficiencyLabel(proficiency, labels)}`,
-  );
-  const parts = [
-    ...part(labels.education, education),
-    ...part(labels.languages, languages),
-    ...part(labels.domains, preview.domains),
+  const education: Content[] = preview.education === "" ? [] : [{ text: preview.education }];
+  const languages: Content[] = preview.languages.map(({ name, proficiency }) => ({
+    text: `${name} — ${proficiencyLabel(proficiency, labels)}`,
+  }));
+  const domains: Content[] = preview.domains.map((domain) => ({ text: domain }));
+  return [
+    ...block(labels.education, education),
+    ...block(labels.languages, languages),
+    ...block(labels.domains, domains),
   ];
-  if (parts.length === 0) return [];
-  return [{ text: labels.generalInformation, ...SECTION_TITLE }, ...parts];
 }
 
-function summary(preview: CvPreview, labels: PdfLabels): Content[] {
+function summary(preview: CvPreview): Content[] {
   return [
-    { text: labels.summary, ...SECTION_TITLE },
-    { text: preview.name, bold: true },
-    ...(preview.description === "" ? [] : [{ text: preview.description, margin: [0, 2, 0, 0] }]),
+    { text: preview.name, bold: true, margin: [0, 0, 0, 3] },
+    ...(preview.description === "" ? [] : [{ text: preview.description, margin: [0, 0, 0, 10] }]),
   ] as Content[];
 }
 
-/** Skill names per category. A category without skills is left out. */
-function skills(groups: CvPreviewSkillGroup[], labels: PdfLabels): Content[] {
-  const filled = groups.filter((group) => group.skills.length > 0);
-  if (filled.length === 0) return [];
-  return [
-    { text: labels.skills, ...SECTION_TITLE },
-    ...filled.map(({ category, skills: list }): Content => ({
-      text: [{ text: `${category}: `, bold: true }, list.map((skill) => skill.name).join(", ")],
-      margin: [0, 0, 0, 2],
-    })),
-  ];
+/** Skill names per category, as one sentence: `React, Redux.` A category without skills is left out. */
+function skills(groups: CvPreviewSkillGroup[]): Content[] {
+  return groups
+    .filter((group) => group.skills.length > 0)
+    .flatMap(({ category, skills: list }) =>
+      block(category, [{ text: `${list.map((skill) => skill.name).join(", ")}.` }]),
+    );
+}
+
+function detail(label: string, value: string | null): Content[] {
+  if (value === null || value === "") return [];
+  return block(label, [{ text: value }]);
 }
 
 function projects(preview: CvPreview, labels: PdfLabels): Content[] {
   if (preview.projects.length === 0) return [];
-  const blocks = preview.projects.map((project): Content => {
-    const lines: Content[] = [
-      { text: project.name, bold: true, fontSize: 11 },
-      { text: project.description, margin: [0, 1, 0, 0] },
+  const rows = preview.projects.map((project): Content => {
+    const left: Content[] = [
+      { text: project.name.toUpperCase(), bold: true, color: COLOR_ACCENT, margin: [0, 0, 0, 3] },
+      ...(project.description === "" ? [] : [{ text: project.description }]),
     ];
-    if (project.roles.length > 0) {
-      lines.push({ text: [{ text: `${labels.role}: `, bold: true }, project.roles.join(", ")] });
-    }
-    lines.push({ text: [{ text: `${labels.period}: `, bold: true }, project.period] });
-    if (project.responsibilities !== null && project.responsibilities !== "") {
-      lines.push({
-        text: [{ text: `${labels.responsibilities}: `, bold: true }, project.responsibilities],
-      });
-    }
-    if (project.environment.length > 0) {
-      lines.push({
-        text: [{ text: `${labels.environment}: `, bold: true }, project.environment.join(", ")],
-      });
-    }
-    return { stack: lines, margin: [0, 0, 0, 8], unbreakable: true };
+    const right: Content[] = [
+      ...detail(labels.roles, project.roles.join(", ")),
+      ...detail(labels.period, project.period),
+      ...detail(labels.responsibilities, project.responsibilities),
+      ...detail(labels.environment, project.environment.join(", ")),
+    ];
+    return twoColumns(left, right, SIDE_COLUMN_WIDTH);
   });
-  return [{ text: labels.projects, ...SECTION_TITLE }, ...blocks];
+  return [{ text: labels.projects, ...SECTION_TITLE }, ...rows];
 }
 
-/** One header row, then the rows of each category. The category cell spans the rows of its skills. */
+/**
+ * The Professional skills table: a header with a red line under it, then the rows of each category. The category cell
+ * spans the rows of its skills, and a grey line closes each category.
+ */
 function skillsTable(groups: CvPreviewSkillGroup[], labels: PdfLabels): Content[] {
   const filled = groups.filter((group) => group.skills.length > 0);
   if (filled.length === 0) return [];
-  const head: TableCell[] = [
-    labels.columnCategory,
-    labels.columnSkill,
-    labels.columnExperience,
-    labels.columnLastUsed,
-  ].map((text) => ({ text, bold: true, fillColor: "#eeeeee" }));
-  const body: TableCell[][] = [head];
+  const headerCell = (text: string, alignment: "left" | "center" = "center"): TableCell => ({
+    text: text.toUpperCase(),
+    fontSize: 8,
+    alignment,
+    bold: true,
+  });
+  const body: TableCell[][] = [
+    [
+      headerCell(labels.columnSkills, "left"),
+      {},
+      headerCell(labels.columnExperience),
+      headerCell(labels.columnLastUsed),
+    ],
+  ];
+  // Index in `body` where a category ends (the line is drawn under that row).
+  const categoryEnds = new Set<number>();
   for (const { category, skills: list } of filled) {
     list.forEach((skill, index) => {
       body.push([
-        index === 0 ? { text: category, rowSpan: list.length, bold: true } : {},
-        skill.name,
-        { text: yearCell(skill.experienceYears), alignment: "right" },
-        { text: yearCell(skill.lastUsedYear), alignment: "right" },
+        index === 0 ? { text: category, rowSpan: list.length, color: COLOR_ACCENT } : {},
+        { text: skill.name, bold: true },
+        { text: yearCell(skill.experienceYears), alignment: "center" },
+        { text: yearCell(skill.lastUsedYear), alignment: "center" },
       ]);
     });
+    categoryEnds.add(body.length);
   }
   return [
     { text: labels.professionalSkills, ...SECTION_TITLE },
     {
-      table: { headerRows: 1, widths: ["*", "*", "auto", "auto"], body },
+      table: { headerRows: 1, widths: [130, "*", 70, 60], body },
       layout: {
-        hLineColor: () => COLOR_LINE,
-        vLineColor: () => COLOR_LINE,
+        // Line index `i` is above row `i`. 1 is under the header, `n` is under the last row of a category.
+        hLineWidth: (index) => (index === 1 || categoryEnds.has(index) ? LINE_WIDTH : 0),
+        hLineColor: (index) => (index === 1 ? COLOR_ACCENT : COLOR_DIVIDER),
+        vLineWidth: () => 0,
+        paddingLeft: () => 6,
+        paddingRight: () => 6,
+        paddingTop: () => 4,
+        paddingBottom: (index) => (categoryEnds.has(index + 1) ? 12 : 3),
       },
     },
   ];
@@ -144,8 +180,10 @@ function skillsTable(groups: CvPreviewSkillGroup[], labels: PdfLabels): Content[
 /**
  * The PDF of a CV as a pdfmake document. It takes the same `CvPreview` object as the preview page,
  * so the years, the periods and the domains are the values of the backend calculation and are
- * not calculated again here (AC-21). The fixed texts (section titles, column names, "Till now") are in
- * the given language, English by default. The content of the CV is printed as it was written.
+ * not calculated again here (AC-21). The layout follows the preview page: the name and the position, the general
+ * information on the left and the summary and the skills on the right, the projects with the details on the right,
+ * and the Professional skills table. The fixed texts (section titles, column names, "Till now") are in the given
+ * language, English by default. The content of the CV is printed as it was written.
  */
 export function buildCvPdfDefinition(preview: CvPreview, locale: CvLocale): TDocumentDefinitions {
   const labels = pdfLabels(locale);
@@ -153,12 +191,15 @@ export function buildCvPdfDefinition(preview: CvPreview, locale: CvLocale): TDoc
     info: { title: preview.name },
     pageSize: "A4",
     pageMargins: [40, 40, 40, 40],
-    defaultStyle: { font: FONT, fontSize: 10 },
+    defaultStyle: { font: FONT, fontSize: BODY_FONT_SIZE, color: COLOR_TEXT, lineHeight: 1.25 },
     content: [
       ...header(preview),
-      ...general(preview, labels),
-      ...summary(preview, labels),
-      ...skills(preview.skillGroups, labels),
+      { text: "", margin: [0, 0, 0, 14] },
+      twoColumns(
+        general(preview, labels),
+        [...summary(preview), ...skills(preview.skillGroups)],
+        SIDE_COLUMN_WIDTH,
+      ),
       ...projects(preview, labels),
       ...skillsTable(preview.skillGroups, labels),
     ],

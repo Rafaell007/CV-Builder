@@ -66,7 +66,7 @@ describe("buildCvPdfDefinition", () => {
       "Retail",
       "Main CV",
       "Frontend developer",
-      "Shop",
+      "SHOP",
       "A shop",
       "Developer, Tester",
       "01.2023 – Till now",
@@ -80,12 +80,14 @@ describe("buildCvPdfDefinition", () => {
     const text = textOf(preview());
 
     for (const label of [
-      "General information",
-      "Summary",
+      "Education",
+      "Language proficiency",
       "Projects",
+      "Project roles",
+      "Period",
       "Professional skills",
-      "Experience in Years",
-      "Period: ",
+      "SKILLS",
+      "EXPERIENCE IN YEARS",
     ]) {
       expect(text).toContain(label);
     }
@@ -99,19 +101,17 @@ describe("buildCvPdfDefinition", () => {
     const text = JSON.stringify(buildCvPdfDefinition(polish, "pl").content);
 
     for (const label of [
-      "Informacje ogólne",
       "Wykształcenie",
       "Znajomość języków",
       "Branże",
-      "Podsumowanie",
-      "Umiejętności",
       "Projekty",
-      "Okres: ",
-      "Obowiązki: ",
-      "Środowisko: ",
+      "Role w projekcie",
+      "Okres",
+      "Obowiązki",
+      "Środowisko",
       "Umiejętności zawodowe",
-      "Doświadczenie w latach",
-      "Ostatnio używana",
+      "DOŚWIADCZENIE W LATACH",
+      "OSTATNIO UŻYWANA",
       "Polish — Ojczysty",
       "01.2023 – obecnie",
     ]) {
@@ -122,24 +122,55 @@ describe("buildCvPdfDefinition", () => {
       expect(text).toContain(content);
     }
     expect(text).not.toContain("Till now");
-    expect(text).not.toContain("General information");
+    expect(text).not.toContain("Education");
+  });
+
+  it("prints the name and the position like the page, the position in capital letters", () => {
+    const text = textOf(preview());
+
+    expect(text).toContain("Anna Nowak");
+    expect(text).toContain("DEVELOPER");
+  });
+
+  it("has no visible title for General information, Summary and Skills, like the page", () => {
+    const text = textOf(preview());
+
+    for (const title of ["General information", "Summary", '"Skills"']) {
+      expect(text).not.toContain(title);
+    }
+  });
+
+  it("keeps each project on one page", () => {
+    const projects = (
+      buildCvPdfDefinition(preview(), "en").content as { unbreakable?: boolean; table?: object }[]
+    )
+      .filter((item) => item.table !== undefined)
+      .slice(1, 2);
+
+    expect(projects).toHaveLength(1);
+    expect(projects[0]?.unbreakable).toBe(true);
   });
 
   it("builds the skills table with the years and an en dash for a missing value", () => {
     const definition = buildCvPdfDefinition(preview(), "en");
 
-    const table = (definition.content as { table?: { body: unknown[][] } }[]).find(
+    const tables = (definition.content as { table?: { body: unknown[][] } }[]).filter(
       (item) => item.table !== undefined,
-    )?.table;
-    expect(table?.body).toEqual([
+    );
+    expect(tables.at(-1)?.table?.body).toEqual([
       expect.any(Array),
       [
-        { text: "Frontend", rowSpan: 2, bold: true },
-        "React",
-        { text: "4", alignment: "right" },
-        { text: "2025", alignment: "right" },
+        { text: "Frontend", rowSpan: 2, color: "#c63031" },
+        { text: "React", bold: true },
+        { text: "4", alignment: "center" },
+        { text: "2025", alignment: "center" },
       ],
-      [{}, "Angular", { text: "–", alignment: "right" }, { text: "–", alignment: "right" }],
+      [
+        {},
+        { text: "Angular", bold: true },
+        { text: "–", alignment: "center" },
+        { text: "–", alignment: "center" },
+      ],
     ]);
   });
 
@@ -164,14 +195,12 @@ describe("buildCvPdfDefinition", () => {
     );
 
     for (const hidden of [
-      "General information",
       "Education",
       "Empty",
-      "Skills",
       "Professional skills",
-      "Role: ",
-      "Responsibilities: ",
-      "Environment: ",
+      "Project roles",
+      "Responsibilities",
+      "Environment",
     ]) {
       expect(text).not.toContain(hidden);
     }
