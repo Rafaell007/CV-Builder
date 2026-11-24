@@ -63,4 +63,31 @@ export const PROJECTS: ProjectSeed[] = [
       "Mobile-first web app for booking flights and hotels with price comparison across several providers.",
     skills: ["JavaScript", "React", "Node.js", "MongoDB", "Jest"],
   },
+  {
+    name: "Real Estate Listings Portal",
+    domain: "Real Estate",
+    startDate: "2021-02-01",
+    endDate: "2022-04-30",
+    description:
+      "Portal for publishing and searching property listings, with map search, saved filters and email alerts for new offers.",
+    skills: ["TypeScript", "React", "Next.js", "GraphQL"],
+  },
+  {
+    name: "Energy Usage Monitor",
+    domain: "Energy",
+    startDate: "2022-05-01",
+    endDate: "2023-10-31",
+    description:
+      "Web application that shows the energy use of buildings in charts, with monthly reports and alerts for unusual consumption.",
+    skills: ["TypeScript", "React", "Redux", "Jest"],
+  },
+  {
+    name: "Media Streaming Platform",
+    domain: "Media",
+    startDate: "2023-01-01",
+    endDate: "2024-02-29",
+    description:
+      "Streaming service for music and podcasts: playlists, offline mode, recommendations and a web player shared with the mobile apps.",
+    skills: ["TypeScript", "React", "Next.js", "Playwright"],
+  },
 ];
