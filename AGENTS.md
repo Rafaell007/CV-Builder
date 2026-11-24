@@ -6,6 +6,13 @@ Plan, stack, decisions, rules and progress: [PLAN.md](PLAN.md). Read a section w
 
 Node 24, pnpm 12, Next.js 16. NestJS 11, Prisma 7, Apollo Client 4 and Storybook 10 also differ from older versions; check the official docs rather than relying on memory.
 
+## Plan is read-only
+
+- Do not edit `PLAN.md` or `docs/pages/` unless the user asks for that edit in the current message. A hook asks the user before each write. A CI check fails a PR that changes them without the label `plan-change`.
+- If code does not comply with the plan, fix the code. If many components do not comply, this is a finding, not a reason to change the plan. Report the list to the user as a checkbox todo.
+- If you think the plan is wrong, say so and stop. The user decides.
+- Only the §12 Progress log of `PLAN.md` gets a new line when a step is merged.
+
 ## Gotchas
 
 - `docker compose up -d` starts PostgreSQL + Mailpit. `pnpm --filter @cv-builder/backend test:int` and `pnpm test:e2e` need Docker.

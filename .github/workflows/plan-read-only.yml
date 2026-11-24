@@ -1,0 +1,24 @@
+name: Plan read-only
+
+# Runs again when the label plan-change is added or removed.
+on:
+  pull_request:
+    branches: [development]
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+jobs:
+  plan-read-only:
+    # A PR with the label plan-change is allowed to change the plan.
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'plan-change') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - run: .github/scripts/check-plan-read-only.sh "${{ github.base_ref }}"
