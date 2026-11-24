@@ -14,6 +14,9 @@ type AddError = "required" | "conflict" | "invalid" | "notFound" | "forbidden" |
 
 const FIELD_ERRORS: readonly AddError[] = ["required", "conflict", "invalid"];
 
+// The kinds of `readFailure` with an own text. Every other kind shows the general `failed` text.
+const OWN_TEXT_KINDS = ["notFound", "forbidden", "conflict", "invalid"] as const;
+
 type MasteryChoice = CvSkillMastery | "";
 
 /**
@@ -77,7 +80,7 @@ export function useAddCvSkill(cvId: string) {
     } catch (failure) {
       const { kind } = readFailure(failure);
       // Nothing resets the chosen skill here, so the value stays.
-      setError(kind === "unknown" ? "failed" : kind);
+      setError(OWN_TEXT_KINDS.find((item) => item === kind) ?? "failed");
       // The skill is already in the CV, or the owner lost it: the options are old, so load them again.
       if (kind === "conflict") available.retry();
     } finally {
