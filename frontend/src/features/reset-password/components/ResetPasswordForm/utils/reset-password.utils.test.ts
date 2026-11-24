@@ -1,16 +1,5 @@
-import { CombinedGraphQLErrors } from "@apollo/client";
 import { describe, expect, it } from "vitest";
-import {
-  isTokenError,
-  toResetPasswordFailure,
-  validateResetPassword,
-} from "./reset-password.utils";
-
-function graphQLError(code: string, reason?: string): CombinedGraphQLErrors {
-  return new CombinedGraphQLErrors({
-    errors: [{ message: "failed", extensions: { code, ...(reason && { reason }) } }],
-  });
-}
+import { isTokenError, validateResetPassword } from "./reset-password.utils";
 
 describe("validateResetPassword", () => {
   it("accepts a valid password that is confirmed", () => {
@@ -42,32 +31,6 @@ describe("validateResetPassword", () => {
       validateResetPassword({ newPassword: "Password123!", confirmPassword: "Password124!" }),
     ).toEqual({ confirmPassword: "confirmMismatch" });
   });
-});
-
-describe("toResetPasswordFailure", () => {
-  it.each([
-    ["RESET_TOKEN_INVALID", "tokenInvalid"],
-    ["RESET_TOKEN_EXPIRED", "tokenExpired"],
-    ["RESET_TOKEN_USED", "tokenUsed"],
-    ["SOMETHING_ELSE", "invalidInput"],
-  ])("maps the reason %s to %s", (reason, key) => {
-    expect(toResetPasswordFailure(graphQLError("BAD_USER_INPUT", reason))).toBe(key);
-  });
-
-  it("maps BAD_USER_INPUT without a reason to invalidInput", () => {
-    expect(toResetPasswordFailure(graphQLError("BAD_USER_INPUT"))).toBe("invalidInput");
-  });
-
-  it("maps a throttled request", () => {
-    expect(toResetPasswordFailure(graphQLError("TOO_MANY_REQUESTS"))).toBe("tooManyRequests");
-  });
-
-  it.each([graphQLError("INTERNAL_SERVER_ERROR"), new Error("Failed to fetch")])(
-    "maps any other error to unexpected",
-    (error) => {
-      expect(toResetPasswordFailure(error)).toBe("unexpected");
-    },
-  );
 });
 
 describe("isTokenError", () => {

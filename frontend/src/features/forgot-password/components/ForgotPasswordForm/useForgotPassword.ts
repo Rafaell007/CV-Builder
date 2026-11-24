@@ -3,10 +3,18 @@
 import { useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
 import { useState, type ChangeEvent, type FormEvent } from "react";
+import { readFailure } from "@/shared/failures";
 import { ForgotPasswordDocument } from "@/shared/graphql";
 import { emailProblem } from "@/shared/utils";
 import type { ForgotPasswordErrorKey } from "./forgot-password.types";
-import { toForgotPasswordFailure } from "./utils";
+
+// Turns the failure of the forgotPassword mutation into the message key the user sees.
+// The backend answers the same for known and unknown emails, so no error says anything about the account.
+function toForgotPasswordFailure(error: unknown): ForgotPasswordErrorKey {
+  const { kind } = readFailure(error);
+  if (kind === "tooManyRequests") return "tooManyRequests";
+  return kind === "invalid" ? "invalidInput" : "unexpected";
+}
 
 export type ForgotPasswordFieldProps = {
   value: string;

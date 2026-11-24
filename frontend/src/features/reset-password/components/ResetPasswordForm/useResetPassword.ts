@@ -3,6 +3,7 @@
 import { useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
 import { useState, type ChangeEvent, type FormEvent } from "react";
+import { readFailure } from "@/shared/failures";
 import { ResetPasswordDocument } from "@/shared/graphql";
 import { useRouter } from "@/shared/i18n";
 import { SIGN_IN_PATH } from "@/shared/session";
@@ -13,10 +14,26 @@ import type {
   ResetPasswordTokenErrorKey,
   ResetPasswordValues,
 } from "./reset-password.types";
-import { isTokenError, toResetPasswordFailure, validateResetPassword } from "./utils";
+import { isTokenError, validateResetPassword } from "./utils";
 
 const FIELDS: readonly ResetPasswordField[] = ["newPassword", "confirmPassword"];
 const EMPTY_VALUES: ResetPasswordValues = { newPassword: "", confirmPassword: "" };
+
+// `extensions.reason` of the backend's BAD_USER_INPUT for a token that cannot be used (backend auth README).
+const TOKEN_REASONS: Record<string, ResetPasswordTokenErrorKey> = {
+  RESET_TOKEN_INVALID: "tokenInvalid",
+  RESET_TOKEN_EXPIRED: "tokenExpired",
+  RESET_TOKEN_USED: "tokenUsed",
+};
+
+// Turns the failure of the resetPassword mutation into the message key the user sees. The password is never part of it.
+function toResetPasswordFailure(error: unknown): ResetPasswordErrorKey {
+  const { kind, reason } = readFailure(error);
+  if (kind === "invalid") {
+    return (reason === undefined ? undefined : TOKEN_REASONS[reason]) ?? "invalidInput";
+  }
+  return kind === "tooManyRequests" ? "tooManyRequests" : "unexpected";
+}
 
 export type ResetPasswordFieldProps = {
   value: string;

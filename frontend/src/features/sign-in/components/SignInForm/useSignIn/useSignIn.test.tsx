@@ -69,6 +69,20 @@ describe("useSignIn", () => {
     expect(replace).not.toHaveBeenCalled();
   });
 
+  it("reports an unexpected error for a throttled request", async () => {
+    replace.mockClear();
+    const { result } = setup(
+      signInMock({
+        errors: [{ message: "Too many requests", extensions: { code: "TOO_MANY_REQUESTS" } }],
+      }),
+    );
+
+    await act(() => result().signIn(values));
+
+    await waitFor(() => expect(result().errorKind).toBe("unexpected"));
+    expect(replace).not.toHaveBeenCalled();
+  });
+
   it("reports an unexpected error for a network failure", async () => {
     replace.mockClear();
     const { result } = setup({ ...signInMock({}), error: new Error("Failed to fetch") });

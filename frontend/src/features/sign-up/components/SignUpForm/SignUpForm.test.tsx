@@ -237,4 +237,31 @@ describe("SignUpForm", () => {
       "Too many attempts, try again later",
     );
   });
+
+  it("asks to check the values when the backend refuses them", async () => {
+    const { user } = renderWithProviders(<SignUpForm />, {
+      mocks: [signUpMock(failure("BAD_USER_INPUT"))],
+    });
+
+    await fillForm(user);
+    await user.click(submit());
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Please check the entered values and try again",
+    );
+  });
+
+  it("does not blame the email for a conflict with another reason", async () => {
+    const { user } = renderWithProviders(<SignUpForm />, {
+      mocks: [signUpMock(failure("CONFLICT", "OTHER"))],
+    });
+
+    await fillForm(user);
+    await user.click(submit());
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Something went wrong. Please try again later",
+    );
+    expect(screen.queryByText("An account with this email already exists")).not.toBeInTheDocument();
+  });
 });

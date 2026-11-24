@@ -1,18 +1,11 @@
-import { CombinedGraphQLErrors } from "@apollo/client";
 import { describe, expect, it } from "vitest";
-import { toSignUpFailure, validateSignUp } from "./sign-up.utils";
+import { validateSignUp } from "./sign-up.utils";
 
 const VALID = {
   email: "new@example.com",
   password: "Password123!",
   confirmPassword: "Password123!",
 };
-
-function graphQLError(code: string, reason?: string): CombinedGraphQLErrors {
-  return new CombinedGraphQLErrors({
-    errors: [{ message: "failed", extensions: { code, ...(reason && { reason }) } }],
-  });
-}
 
 describe("validateSignUp", () => {
   it("accepts valid values", () => {
@@ -65,34 +58,5 @@ describe("validateSignUp", () => {
     expect(validateSignUp({ ...VALID, confirmPassword: "Password123?" }).confirmPassword).toBe(
       "confirmMismatch",
     );
-  });
-});
-
-describe("toSignUpFailure", () => {
-  it("puts a taken email under the email field", () => {
-    expect(toSignUpFailure(graphQLError("CONFLICT", "EMAIL_TAKEN"))).toEqual({
-      field: "email",
-      errorKey: "emailTaken",
-    });
-  });
-
-  it("explains a throttled request and invalid server input", () => {
-    expect(toSignUpFailure(graphQLError("TOO_MANY_REQUESTS")).errorKey).toBe("tooManyRequests");
-    expect(toSignUpFailure(graphQLError("BAD_USER_INPUT")).errorKey).toBe("invalidInput");
-  });
-
-  it("gives a friendly message for any other error", () => {
-    expect(toSignUpFailure(graphQLError("INTERNAL_SERVER_ERROR"))).toEqual({
-      field: null,
-      errorKey: "unexpected",
-    });
-    expect(toSignUpFailure(new TypeError("Failed to fetch")).errorKey).toBe("unexpected");
-  });
-
-  it("does not blame the email for a CONFLICT with another reason", () => {
-    expect(toSignUpFailure(graphQLError("CONFLICT"))).toEqual({
-      field: null,
-      errorKey: "unexpected",
-    });
   });
 });

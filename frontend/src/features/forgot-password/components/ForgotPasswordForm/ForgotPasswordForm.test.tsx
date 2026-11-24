@@ -149,4 +149,17 @@ describe("ForgotPasswordForm", () => {
       "Too many attempts, try again later",
     );
   });
+
+  it("asks to check the values when the backend refuses them", async () => {
+    const { user } = renderWithProviders(<ForgotPasswordForm />, {
+      mocks: [forgotPasswordMock(failure("BAD_USER_INPUT"))],
+    });
+
+    await user.type(screen.getByLabelText("Email"), EMAIL);
+    await user.click(submit());
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Please check the entered values and try again",
+    );
+  });
 });
