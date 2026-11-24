@@ -153,7 +153,7 @@ Same stack and setup order as the other intern team (D2).
 | D21 | 2026-10-28 | Refresh rotation with a 30 s reuse grace window (old token valid once after rotation); reuse after the window revokes the whole token family. Frontend refresh is single-flight | Parallel requests (tabs, `proxy.ts` + Apollo) would otherwise log the user out; reuse detection catches stolen tokens |
 | D22 | 2026-10-28 | `changePassword` and `resetPassword` revoke all the user's refresh tokens; `changePassword` issues a new one for the current session | Old sessions must not survive a password change |
 | D23 | 2026-10-28 | Rate limiting with `@nestjs/throttler` (GraphQL-aware guard) on `signIn`, `signUp`, `forgotPassword`, `verifyEmail`, `resendVerificationCode` | Verification AC-18 and security requirements |
-| D24 | 2026-10-28 | An admin cannot delete themselves, remove their own Admin role, or remove the last admin (`CONFLICT`) | The app must never lose its last admin |
+| D24 | 2026-10-28 | An admin cannot delete themselves or remove their own Admin role (`CONFLICT`, reasons `SELF_DELETE` and `OWN_ROLE`). The last admin needs no check of its own: a change needs an actor who is still an admin, so one admin always remains. When the last two admins change each other at the same moment, the second one gets `FORBIDDEN` | The app must never lose its last admin |
 | D25 | 2026-10-28 | Updating a project's dates is blocked (`CONFLICT`, with the count) when CV projects would fall outside them | CvProject dates must stay within the project's dates |
 | D26 | 2026-10-28 | Theme and language are stored only in cookies (client-side), not on the backend | Settings docs allow it; no extra API or migration |
 | D27 | 2026-10-29 | i18n: `en` and `pl`, both fully translated. The language selector lists only supported languages (settings AC-8); a language is added with its code in `shared/i18n/routing` and a `messages/<code>.json` in every messages folder | 9 full translations per feature cost too much for the deadline; listing untranslated languages would show English anyway |
@@ -505,7 +505,7 @@ Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE 
 
 ### Phase 6 — Users
 
-- [ ] **S6.1 Users list** — BE `users` (search name/email, sort, page; admin create / update / delete with cascade; created users are verified (D16); last-admin and self rules (D24)); FE `/users` with admin modals. AC per users. Depends on S5.1, S5.2.
+- [ ] **S6.1 Users list** — BE `users` (search name/email, sort, page; admin create / update / delete with cascade; created users are verified (D16); last-admin and self rules (D24)); FE `/users` with admin modals. AC per users. Depends on S5.1, S5.2. BE done (KAN-103): `users` (search by words in name or email, sort by first name, last name, department or position, page), `user`, `createUser`, `updateUser`, `deleteUser`; conflicts carry the reasons `EMAIL_TAKEN`, `OWN_ROLE`, `SELF_DELETE` and `CONCURRENT_CHANGE`. FE pending.
 - [ ] **S6.2 User Details shell** — FE `/users/[userId]` layout, tabs (CVs admin only), breadcrumbs, `canEdit`. Depends on S6.1.
 - [ ] **S6.3 Profile + avatar** — BE `updateProfile`; FE read-only vs editable profile, verify banner. **(Should)** avatar REST endpoints (D11) and upload with validation. AC per user-profile.
 - [ ] **S6.4 Skills (own page + user tab)** — BE `users/skills` (remove also removes from CVs); FE `features/skills` grouped by category, add / update / remove with selection mode. AC per skills, user-skills. Depends on S5.3.

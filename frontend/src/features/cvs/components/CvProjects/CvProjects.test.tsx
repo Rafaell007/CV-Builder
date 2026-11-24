@@ -4,14 +4,13 @@ import type { RenderWithProvidersOptions } from "@/shared/testing";
 import { CvProjects } from "./CvProjects";
 import {
   addCvProjectMock,
+  availableCvProjectsMock,
+  availableCvProjectsRefusedMock,
   bank,
   CV_ID,
   cvProject,
   cvProjectsMock,
   cvProjectsNetworkErrorMock,
-  heldCvProjectsMock,
-  projectCatalogMock,
-  projectCatalogRefusedMock,
   projectRolesMock,
   removeCvProjectsMock,
   removeCvProjectsRefusedMock,
@@ -286,14 +285,12 @@ describe("CvProjects", () => {
   });
 
   describe("Add project", () => {
-    // The projects that the CV holds, asked without a search: only the blog.
-    const heldMock = () => heldCvProjectsMock([blogEntry]);
+    // The backend leaves out the projects that the CV holds: the CV holds the blog, so only the bank is offered.
     const withAdd = (...mocks: NonNullable<RenderWithProvidersOptions["mocks"]>[number][]) => ({
       mocks: [
         cvProjectsMock([blogEntry]),
-        projectCatalogMock(),
+        availableCvProjectsMock([bank]),
         projectRolesMock(),
-        heldMock(),
         ...mocks,
       ],
     });
@@ -379,14 +376,9 @@ describe("CvProjects", () => {
       expect(screen.getByText("Project added")).toBeInTheDocument();
     });
 
-    it("says that the list could not be loaded, with Retry, for a user the catalog refuses (open point KAN-115)", async () => {
+    it("says that the list could not be loaded, with Retry, when the backend refuses the options", async () => {
       const { user } = setup({
-        mocks: [
-          cvProjectsMock([blogEntry]),
-          projectCatalogRefusedMock(),
-          projectRolesMock(),
-          heldMock(),
-        ],
+        mocks: [cvProjectsMock([blogEntry]), availableCvProjectsRefusedMock(), projectRolesMock()],
       });
       await loaded();
 

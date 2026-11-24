@@ -1,14 +1,14 @@
 "use client";
 
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
-import { useCallback, useMemo, useState, type BaseSyntheticEvent } from "react";
+import { useCallback, useState, type BaseSyntheticEvent } from "react";
 import { useWatch } from "react-hook-form";
 import { useToast } from "@/shared/components";
-import { AddCvProjectDocument, CvProjectsDocument, HeldCvProjectsDocument } from "@/shared/graphql";
+import { AddCvProjectDocument, CvProjectsDocument } from "@/shared/graphql";
 import type { CvProjectFormSubmit } from "../cvProjects.types";
 import { useCvProjectForm } from "../useCvProjectForm";
-import { useProjectCatalog } from "../useProjectCatalog";
+import { useAvailableCvProjects } from "../useAvailableCvProjects";
 import { useProjectRoles } from "../useProjectRoles";
 import {
   EMPTY_CV_PROJECT_FORM_VALUES,
@@ -20,50 +20,29 @@ import {
 /**
  * The Add project flow (page 23, Add Project): the open state of the modal, the project that is chosen and the
  * `addCvProject` request. The form itself is `useCvProjectForm`. The options come from the backend and are loaded
- * each time the modal opens: the catalog, the roles and the projects that the CV holds (they are not offered
- * again, AC-31). Choosing a project fills the two date fields with the days of the project; the user can narrow
- * them. A failed request keeps every typed value. Only a successful request closes the modal; the project appears
+ * each time the modal opens: the projects that can be added (the backend leaves out the projects that the CV
+ * holds, AC-31) and the roles. Choosing a project fills the two date fields with the days of the project; the
+ * user can narrow them. A failed request keeps every typed value. Only a successful request closes the modal; the project appears
  * in the list when the backend has answered and the list is loaded again.
  */
 export function useAddCvProject(cvId: string) {
   const t = useTranslations("cvs.projects.add");
   const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
-  const catalog = useProjectCatalog(isOpen);
+  const available = useAvailableCvProjects(cvId, isOpen);
   const roles = useProjectRoles(isOpen);
-  // The projects that the CV holds, with no search: the list on the page can show fewer rows than the CV has.
-  // Its own document: a refetch of the list after a change must not run this request too.
-  const held = useQuery(HeldCvProjectsDocument, {
-    variables: { cvId },
-    skip: !isOpen,
-    fetchPolicy: "network-only",
-    notifyOnNetworkStatusChange: true,
-  });
   const [addCvProject] = useMutation(AddCvProjectDocument);
 
   const rangeOf = useCallback(
     (projectId: string) => {
-      const found = catalog.projects?.find((item) => item.id === projectId);
+      const found = available.options?.find((item) => item.id === projectId);
       return found === undefined ? undefined : toProjectRange(found);
     },
-    [catalog.projects],
+    [available.options],
   );
   const { form, error, reset, showError, submit: submitForm } = useCvProjectForm(rangeOf);
   const projectId = useWatch({ control: form.control, name: "projectId" });
-  const project = catalog.projects?.find((item) => item.id === projectId);
-
-  // The catalog without the projects that the CV holds. `undefined` until both answers are here.
-  const heldProjects = held.data?.cvProjects;
-  const options = useMemo(() => {
-    if (catalog.projects === undefined || heldProjects === undefined) return undefined;
-    const heldIds = new Set(heldProjects.map((item) => item.project.id));
-    return catalog.projects.filter((item) => !heldIds.has(item.id));
-  }, [catalog.projects, heldProjects]);
-
-  function retryProjects() {
-    catalog.retry();
-    void held.refetch().catch(() => undefined);
-  }
+  const project = available.options?.find((item) => item.id === projectId);
 
   function open() {
     reset(EMPTY_CV_PROJECT_FORM_VALUES);
@@ -96,7 +75,7 @@ export function useAddCvProject(cvId: string) {
       // Nothing resets the form here, so the values stay.
       showError(failure);
       // The project is already in the CV, or a date changed: the options are old, so load them again.
-      if (toCvProjectFailure(failure) === "conflict") retryProjects();
+      if (toCvProjectFailure(failure) === "conflict") available.retry();
     }
   }
 
@@ -113,10 +92,10 @@ export function useAddCvProject(cvId: string) {
     submit,
     project,
     selectProject,
-    options,
-    optionsLoading: catalog.loading || held.loading,
-    optionsFailed: catalog.failed || held.error !== undefined,
-    retryProjects,
+    options: available.options,
+    optionsLoading: available.loading,
+    optionsFailed: available.failed,
+    retryProjects: available.retry,
     roles: roles.roles,
     rolesLoading: roles.loading,
     rolesFailed: roles.failed,

@@ -21,9 +21,3 @@ export const MAX_RESPONSIBILITIES_LENGTH = 2000;
 
 /** The backend accepts 1 to 50 roles on one CV project (`roleIds`). */
 export const MAX_ROLES = 50;
-
-/**
- * The catalog page the Add project modal asks for. The backend allows 100 items per page at most. A catalog with
- * more projects needs a search field in the modal; the page doc has none, so this is the first page only.
- */
-export const CATALOG_PAGE = { number: 1, size: 100 } as const;

@@ -6,11 +6,10 @@ import {
   addCvProjectMock,
   addCvProjectNetworkErrorMock,
   addCvProjectRefusedMock,
+  availableCvProjectsMock,
   bank,
   cvProject,
   CV_ID,
-  heldCvProjectsMock,
-  projectCatalogMock,
   projectRolesMock,
   sampleRoles,
 } from "../cvProjects.mocks";
@@ -18,7 +17,6 @@ import { useAddCvProject, type UseAddCvProjectResult } from "./useAddCvProject";
 
 // The submit handler only needs these two methods of the form event.
 const fakeEvent = { preventDefault: () => undefined, persist: () => undefined };
-const blogEntry = cvProject();
 const submitEvent = fakeEvent as unknown as BaseSyntheticEvent;
 
 function setup(options: RenderWithProvidersOptions) {
@@ -31,9 +29,8 @@ function setup(options: RenderWithProvidersOptions) {
   return { result: () => current };
 }
 
-// The projects that the CV holds, asked without a search (blog is in the CV, bank is not).
-const heldMock = () => heldCvProjectsMock([blogEntry]);
-const openMocks = () => [projectCatalogMock(), projectRolesMock(), heldMock()];
+// The backend leaves out the projects that the CV holds: blog is in the CV, so only bank is offered.
+const openMocks = () => [availableCvProjectsMock([bank]), projectRolesMock()];
 
 // What the form sends for the bank project with the dates of the project and one role.
 const bankInput = {
@@ -150,13 +147,12 @@ describe("useAddCvProject", () => {
   });
 
   it("keeps the values and shows the conflict message, then loads the options again (AC-27, AC-31)", async () => {
-    // The conflict loads the catalog and the held projects again: one more answer for each.
+    // The conflict loads the options again: one more answer.
     const { result } = setup({
       mocks: [
         ...openMocks(),
         addCvProjectRefusedMock(bankInput, "CONFLICT"),
-        projectCatalogMock(),
-        heldMock(),
+        availableCvProjectsMock([bank]),
       ],
     });
     await openAndChooseBank(result);

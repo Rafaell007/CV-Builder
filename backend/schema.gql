@@ -296,6 +296,7 @@ type ProjectRole {
 }
 
 type Query {
+  availableCvProjects(cvId: ID!): [Project!]!
   availableCvSkills(cvId: ID!): [AvailableCvSkill!]!
   cv(id: ID!): Cv!
   cvPreview(cvId: ID!, locale: String = "en"): CvPreview!

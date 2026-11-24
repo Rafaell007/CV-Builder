@@ -84,6 +84,7 @@ Each bullet is one `test()`. The name of the spec file is in bold.
 - Removes a project after a confirmation, a cancel removes nothing, and the project stays in the catalog.
 - Escape closes the row menu and the modal without a change.
 - Shows the empty state and keeps ADD PROJECT available.
+- An employee adds a project to their own CV, and a project that the CV holds is not offered again (KAN-156).
 - An admin adds a project to the CV of a user: the form fills from the catalog, needs a role, and the project is kept.
 
 **cv-skills.spec.ts**
@@ -224,7 +225,7 @@ Each bullet is one `test()`. The name of the spec file is in bold.
 - The page is never in the DOM twice while it loads, and the toast area exists.
 
 **cv-flow.spec.ts**
-- An admin signs in on the page, creates a CV, adds a skill and a project, and sees both in the preview. Every step uses the pages, not the API. The admin runs it because only an admin can read the project catalog (KAN-115).
+- An admin signs in on the page, creates a CV, adds a skill and a project, and sees both in the preview. Every step uses the pages, not the API. The admin runs it; before KAN-156 only an admin could read the project catalog.
 
 ### user-cvs
 
@@ -275,10 +276,6 @@ Each bullet is one `test()`. The name of the spec file is in bold.
 The full suite (157 test runs: 155 `test()` cases, and the 2 theme tests run once per theme) passed 3 runs in a row locally. Each run took about 48 seconds with 50% of the CPU cores as workers (10 on the test machine). One earlier run failed once: `user-cvs` "Delete asks first…" clicked the row menu while the confirm modal was still closing. The spec now waits for the modal to close.
 
 CI runs `pnpm test:e2e` in the `e2e` job on a seeded database (1 worker, 2 retries). That CI run is not checked here.
-
-## Known problems (found 2026-11-13, KAN-114)
-
-- **`projects/projects.a11y.spec.ts` fails in a full run with one worker** (`the search field, CREATE PROJECT, the sort buttons and every row menu can be reached with Tab`, `only one row menu is open at a time`). It passes when run alone, and it fails the same on a clean `development` branch, so it does not come from the CV work. Probably a data left by an earlier spec; not investigated.
 
 **Open note (KAN-94):** the `sign-up` spec failed once in a full `pnpm test-all` run under load, and passed 40 of 40 times alone. The cause is not found yet. Check it again before you trust a red `sign-up` run.
 

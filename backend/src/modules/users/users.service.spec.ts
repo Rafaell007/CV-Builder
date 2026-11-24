@@ -11,7 +11,12 @@ import type { PrismaService } from "../../prisma/prisma.service";
 import { EMAIL_TAKEN_REASON } from "../auth/auth.service";
 import { Role } from "../auth/models/role.enum";
 import { hashPassword } from "../auth/password";
-import { OWN_ROLE_REASON, SELF_DELETE_REASON, UsersService } from "./users.service";
+import {
+  CONCURRENT_CHANGE_REASON,
+  OWN_ROLE_REASON,
+  SELF_DELETE_REASON,
+  UsersService,
+} from "./users.service";
 
 // argon2 is slow and its output random; the tests only need to know the service stores what it returns.
 jest.mock("../auth/password", () => ({ hashPassword: jest.fn() }));
@@ -424,8 +429,8 @@ describe("UsersService", () => {
       prisma.$queryRaw.mockResolvedValue(lockedRows([ACTOR_ID, Role.ADMIN], [ID, Role.USER]));
       prisma.user.update.mockRejectedValue(databaseError(code));
 
-      await expect(createService().update(input, ACTOR_ID)).rejects.toThrow(
-        new ConflictException("The user was changed at the same time. Try again"),
+      await expect(reasonOf(createService().update(input, ACTOR_ID))).resolves.toBe(
+        CONCURRENT_CHANGE_REASON,
       );
     });
   });
@@ -502,8 +507,8 @@ describe("UsersService", () => {
       prisma.$queryRaw.mockResolvedValue(lockedRows([ACTOR_ID, Role.ADMIN], [ID, Role.USER]));
       prisma.user.delete.mockRejectedValue(databaseError(code));
 
-      await expect(createService().delete(ID, ACTOR_ID)).rejects.toThrow(
-        new ConflictException("The user was changed at the same time. Try again"),
+      await expect(reasonOf(createService().delete(ID, ACTOR_ID))).resolves.toBe(
+        CONCURRENT_CHANGE_REASON,
       );
     });
 

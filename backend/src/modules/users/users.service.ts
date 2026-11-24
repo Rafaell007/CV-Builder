@@ -22,6 +22,9 @@ export const OWN_ROLE_REASON = "OWN_ROLE";
 /** `extensions.reason` of the `CONFLICT` when an admin deletes themselves (D24). */
 export const SELF_DELETE_REASON = "SELF_DELETE";
 
+/** `extensions.reason` of the `CONFLICT` after which nothing was saved and the admin can try again. */
+export const CONCURRENT_CHANGE_REASON = "CONCURRENT_CHANGE";
+
 /** The columns of the Users table that sort (users page, Sorting). Any other field is refused. */
 const SORT_FIELDS = ["firstName", "lastName", "department", "position"] as const;
 type UserSortField = (typeof SORT_FIELDS)[number];
@@ -167,14 +170,12 @@ export class UsersService {
    * Turns the database errors of a write into API errors; anything else is returned as is.
    * - P2002: the only unique column a write sets is `email` (create only), so the email is taken.
    * - P2003: the department or position was deleted after the check. Checking again names the field.
-   * - P2025: the user to update does not exist.
    * - P2034, P2028: another request changed the same rows at the same time, or the transaction could not
    *   finish in time (see `toTransactionConflict`).
    */
   private async toWriteError(error: unknown, ids: DepartmentAndPosition): Promise<unknown> {
     if (!(error instanceof Prisma.PrismaClientKnownRequestError)) return error;
     if (TRANSACTION_CONFLICT_CODES.has(error.code)) return toTransactionConflict(error);
-    if (error.code === "P2025") return new NotFoundException("User not found");
     if (error.code === "P2002") {
       return new ConflictException({
         message: "An account with this email already exists",
@@ -207,7 +208,10 @@ const TRANSACTION_CONFLICT_CODES: ReadonlySet<string> = new Set(["P2034", "P2028
 function toTransactionConflict(error: unknown): unknown {
   return error instanceof Prisma.PrismaClientKnownRequestError &&
     TRANSACTION_CONFLICT_CODES.has(error.code)
-    ? new ConflictException("The user was changed at the same time. Try again")
+    ? new ConflictException({
+        message: "The user was changed at the same time. Try again",
+        reason: CONCURRENT_CHANGE_REASON,
+      })
     : error;
 }
 

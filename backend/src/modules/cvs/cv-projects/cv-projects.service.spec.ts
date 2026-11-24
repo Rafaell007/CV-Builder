@@ -27,7 +27,7 @@ const prisma = {
     update: jest.fn(),
     deleteMany: jest.fn(),
   },
-  project: { findUnique: jest.fn() },
+  project: { findUnique: jest.fn(), findMany: jest.fn() },
   projectRole: { count: jest.fn() },
   $transaction: transaction,
 };
@@ -256,6 +256,75 @@ describe("CvProjectsService.list", () => {
 
     expect(error).toBeInstanceOf(ValidationFailedException);
     expect(prisma.cvProject.findMany).not.toHaveBeenCalled();
+  });
+});
+
+describe("CvProjectsService.listAvailable", () => {
+  function storedProject(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+    return {
+      id: "project-2",
+      name: "Web Shop",
+      domain: "Retail",
+      description: "Text",
+      createdAt: new Date("2026-10-01T10:00:00.000Z"),
+      updatedAt: new Date("2026-10-01T10:00:00.000Z"),
+      ...PROJECT_DATES,
+      skills: [{ skill: { id: "skill-1", name: "TypeScript" } }],
+      ...overrides,
+    };
+  }
+
+  it("returns the projects that are not in the CV, with the environment as a plain list", async () => {
+    prisma.project.findMany.mockResolvedValue([storedProject()]);
+
+    const result = await service.listAvailable(USER, "cv-1");
+
+    expect(result).toEqual([
+      expect.objectContaining({
+        id: "project-2",
+        name: "Web Shop",
+        environment: [{ id: "skill-1", name: "TypeScript" }],
+      }),
+    ]);
+    expect(result[0]).not.toHaveProperty("skills");
+  });
+
+  it("leaves out the projects that the CV holds, and never looks at another CV", async () => {
+    prisma.project.findMany.mockResolvedValue([]);
+
+    await service.listAvailable(USER, "cv-1");
+
+    expect(firstCall<{ where: unknown }>(prisma.project.findMany).where).toEqual({
+      cvProjects: { none: { cvId: "cv-1" } },
+    });
+  });
+
+  it("orders the projects by name, then id", async () => {
+    prisma.project.findMany.mockResolvedValue([]);
+
+    await service.listAvailable(USER, "cv-1");
+
+    expect(firstCall<{ orderBy: unknown }>(prisma.project.findMany).orderBy).toEqual([
+      { name: "asc" },
+      { id: "asc" },
+    ]);
+  });
+
+  it("checks the access to the CV for the user who asks, also for an admin", async () => {
+    prisma.project.findMany.mockResolvedValue([]);
+
+    await service.listAvailable(USER, "cv-1");
+    await service.listAvailable(ADMIN, "cv-1");
+
+    expect(cvs.assertAccessible).toHaveBeenNthCalledWith(1, USER, "cv-1");
+    expect(cvs.assertAccessible).toHaveBeenNthCalledWith(2, ADMIN, "cv-1");
+  });
+
+  it("reads nothing when the CV is not accessible", async () => {
+    cvs.assertAccessible.mockRejectedValue(new NotFoundException("CV not found"));
+
+    expect(await rejection(service.listAvailable(USER, "cv-2"))).toBeInstanceOf(NotFoundException);
+    expect(prisma.project.findMany).not.toHaveBeenCalled();
   });
 });
 

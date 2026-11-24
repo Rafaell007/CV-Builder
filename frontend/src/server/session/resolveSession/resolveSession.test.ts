@@ -72,15 +72,16 @@ describe("resolveSession", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("uses a fresh access token without calling the backend", async () => {
-    const fetchMock = mockBackend();
+  it("asks the backend whether a fresh access token still belongs to a valid session", async () => {
+    const fetchMock = mockBackend({ body: ADMIN });
 
     expect(await resolve({ accessToken: FRESH, refreshToken: "r" })).toEqual({
       status: "active",
-      role: null,
+      role: "ADMIN",
       setCookies: [],
     });
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(calls(fetchMock)).toHaveLength(1);
+    expect(calls(fetchMock)[0]?.query).toContain("me");
   });
 
   it("refreshes an expired access token and returns the new cookies", async () => {

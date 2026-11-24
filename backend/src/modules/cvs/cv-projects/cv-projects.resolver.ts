@@ -1,8 +1,10 @@
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { CurrentUser, Verified } from "../../../common/auth";
 import type { AuthUser } from "../../../common/auth";
+import { Project } from "../../projects/models/project";
 import { CvProjectsService } from "./cv-projects.service";
 import { AddCvProjectInput } from "./dto/add-cv-project.input";
+import { AvailableCvProjectsArgs } from "./dto/available-cv-projects.args";
 import { CvProjectsArgs } from "./dto/cv-projects.args";
 import { RemoveCvProjectsInput } from "./dto/remove-cv-projects.input";
 import { UpdateCvProjectInput } from "./dto/update-cv-project.input";
@@ -20,6 +22,14 @@ export class CvProjectsResolver {
     @Args() args: CvProjectsArgs,
   ): Promise<CvProject[]> {
     return this.service.list(requireUser(user), args);
+  }
+
+  @Query(() => [Project])
+  availableCvProjects(
+    @CurrentUser() user: AuthUser | undefined,
+    @Args() { cvId }: AvailableCvProjectsArgs,
+  ): Promise<Project[]> {
+    return this.service.listAvailable(requireUser(user), cvId);
   }
 
   @Verified()

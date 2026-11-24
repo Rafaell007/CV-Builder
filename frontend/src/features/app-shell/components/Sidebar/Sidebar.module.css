@@ -10,13 +10,20 @@
 }
 
 .logoRow {
+  height: var(--space-14);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* The logo and the app name are one link to the home page; it fills the row so the whole row is clickable. */
+.logoLink {
   display: flex;
   align-items: center;
   gap: var(--space-4);
-  height: var(--space-14);
+  height: 100%;
   padding-left: var(--space-4);
-  overflow: hidden;
-  white-space: nowrap;
+  color: inherit;
+  text-decoration: none;
 }
 
 /* 24×24 at left 16; it is the only thing in the row when the sidebar is collapsed. */
