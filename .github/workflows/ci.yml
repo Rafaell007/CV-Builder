@@ -295,3 +295,72 @@ jobs:
           name: playwright-report
           path: e2e/playwright-report/
           retention-days: 14
+
+  # Runs the ready-made browser scenarios of the run-cv-builder skill (.claude/skills/run-cv-builder/scenarios/).
+  # Separate from e2e so a scenario cannot hide behind the counts of the spec files, and so both jobs run in parallel.
+  # Most scenarios assert. The ones that only observe write to observations.jsonl, which the artifact keeps.
+  scenarios:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    # Same services as the e2e job. run.sh seeds cv_builder_test in this Postgres through the E2E config.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: cv_builder
+          POSTGRES_PASSWORD: cv_builder
+          POSTGRES_DB: cv_builder
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U cv_builder -d cv_builder"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+      mailpit:
+        image: axllent/mailpit:v1.32
+        ports:
+          - 1025:1025
+          - 8025:8025
+        options: >-
+          --health-cmd "/mailpit readyz"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      RUN_SKIP_DOCKER: "1"
+      RUN_OUT: ${{ github.workspace }}/run-skill-output
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @cv-builder/backend db:generate
+
+      - name: Install Chromium
+        run: pnpm --filter @cv-builder/e2e exec playwright install --with-deps chromium
+
+      - name: Scenarios
+        run: .claude/skills/run-cv-builder/run.sh .claude/skills/run-cv-builder/scenarios/*.spec.ts
+
+      # Screenshots and observations.jsonl, so a reviewer can look at the pages without running anything.
+      - name: Upload screenshots and observations
+        uses: actions/upload-artifact@v5
+        if: ${{ !cancelled() }}
+        with:
+          name: run-skill-output
+          path: run-skill-output/
+          retention-days: 14

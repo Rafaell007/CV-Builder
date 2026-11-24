@@ -2,6 +2,7 @@
 # Runs one or more Playwright scenario files against the real app (Next.js, NestJS, PostgreSQL) and keeps screenshots.
 # Usage (from anywhere): .claude/skills/run-cv-builder/run.sh [scenario.spec.ts ...]
 # Default scenario: smoke.spec.ts next to this file. Screenshots go to $RUN_OUT (default e2e/test-results/run-skill).
+# RUN_SKIP_DOCKER=1 skips `docker compose up` (CI has its own database service).
 set -euo pipefail
 
 SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -13,7 +14,8 @@ export RUN_OUT="${RUN_OUT:-$ROOT/e2e/test-results/run-skill}"
 if [ $# -eq 0 ]; then set -- "$SKILL_DIR/smoke.spec.ts"; fi
 
 cd "$ROOT"
-docker compose up -d --wait
+# CI provides PostgreSQL and Mailpit as job services on the same ports, so it sets RUN_SKIP_DOCKER to skip compose.
+if [ -z "${RUN_SKIP_DOCKER:-}" ]; then docker compose up -d --wait; fi
 
 rm -rf "$TMP"
 mkdir -p "$TMP" "$RUN_OUT"
