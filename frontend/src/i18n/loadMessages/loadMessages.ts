@@ -4,7 +4,6 @@ import type catalogs from "@/features/catalogs/messages/en.json";
 import type cvs from "@/features/cvs/messages/en.json";
 import type deviceError from "@/features/device-error/messages/en.json";
 import type forgotPassword from "@/features/forgot-password/messages/en.json";
-import type health from "@/features/health/messages/en.json";
 import type noInternet from "@/features/no-internet/messages/en.json";
 import type notFound from "@/features/not-found/messages/en.json";
 import type projects from "@/features/projects/messages/en.json";
@@ -13,6 +12,7 @@ import type settings from "@/features/settings/messages/en.json";
 import type signIn from "@/features/sign-in/messages/en.json";
 import type signUp from "@/features/sign-up/messages/en.json";
 import type userDetails from "@/features/user-details/messages/en.json";
+import type users from "@/features/users/messages/en.json";
 import type verifyEmail from "@/features/verify-email/messages/en.json";
 import type common from "@/shared/i18n/messages/en.json";
 
@@ -25,7 +25,6 @@ export type Messages = {
   cvs: typeof cvs;
   deviceError: typeof deviceError;
   forgotPassword: typeof forgotPassword;
-  health: typeof health;
   noInternet: typeof noInternet;
   notFound: typeof notFound;
   projects: typeof projects;
@@ -34,6 +33,7 @@ export type Messages = {
   signIn: typeof signIn;
   signUp: typeof signUp;
   userDetails: typeof userDetails;
+  users: typeof users;
   verifyEmail: typeof verifyEmail;
 };
 
@@ -47,7 +47,6 @@ const loaders: Record<Locale, () => Promise<Messages>> = {
     cvs: (await import("@/features/cvs/messages/en.json")).default,
     deviceError: (await import("@/features/device-error/messages/en.json")).default,
     forgotPassword: (await import("@/features/forgot-password/messages/en.json")).default,
-    health: (await import("@/features/health/messages/en.json")).default,
     noInternet: (await import("@/features/no-internet/messages/en.json")).default,
     notFound: (await import("@/features/not-found/messages/en.json")).default,
     projects: (await import("@/features/projects/messages/en.json")).default,
@@ -56,6 +55,7 @@ const loaders: Record<Locale, () => Promise<Messages>> = {
     signIn: (await import("@/features/sign-in/messages/en.json")).default,
     signUp: (await import("@/features/sign-up/messages/en.json")).default,
     userDetails: (await import("@/features/user-details/messages/en.json")).default,
+    users: (await import("@/features/users/messages/en.json")).default,
     verifyEmail: (await import("@/features/verify-email/messages/en.json")).default,
   }),
   pl: async () => ({
@@ -65,7 +65,6 @@ const loaders: Record<Locale, () => Promise<Messages>> = {
     cvs: (await import("@/features/cvs/messages/pl.json")).default,
     deviceError: (await import("@/features/device-error/messages/pl.json")).default,
     forgotPassword: (await import("@/features/forgot-password/messages/pl.json")).default,
-    health: (await import("@/features/health/messages/pl.json")).default,
     noInternet: (await import("@/features/no-internet/messages/pl.json")).default,
     notFound: (await import("@/features/not-found/messages/pl.json")).default,
     projects: (await import("@/features/projects/messages/pl.json")).default,
@@ -74,6 +73,7 @@ const loaders: Record<Locale, () => Promise<Messages>> = {
     signIn: (await import("@/features/sign-in/messages/pl.json")).default,
     signUp: (await import("@/features/sign-up/messages/pl.json")).default,
     userDetails: (await import("@/features/user-details/messages/pl.json")).default,
+    users: (await import("@/features/users/messages/pl.json")).default,
     verifyEmail: (await import("@/features/verify-email/messages/pl.json")).default,
   }),
 };

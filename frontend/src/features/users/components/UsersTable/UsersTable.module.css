@@ -1,0 +1,29 @@
+.text {
+  overflow-wrap: anywhere;
+}
+
+/* The 40px circle sits 16px from the row start, as in Figma (the cell inset). */
+.avatar {
+  display: flex;
+}
+
+/* Open-profile arrow (employee view, Figma): 24px chevron in a 40×40 round hit area. Hover and focus as IconButton. */
+.profileLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-10);
+  height: var(--space-10);
+  border: 1px solid transparent;
+  border-radius: var(--radius-round);
+  color: var(--color-row-arrow);
+}
+
+.profileLink:hover {
+  border-color: var(--color-icon-button-hover-border);
+}
+
+.profileLink:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}

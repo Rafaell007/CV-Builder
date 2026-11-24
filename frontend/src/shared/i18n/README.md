@@ -23,8 +23,8 @@ The request config is `src/i18n/request.ts`. next-intl finds it by that path, so
 
 ## Translating a component
 
-- Client or non-async component: `const t = useTranslations("health"); t("status", { source, status })`.
-- Async Server Component: `const t = await getTranslations("health")` from `next-intl/server`.
+- Client or non-async component: `const t = useTranslations("users"); t("actions.menu", { name })`.
+- Async Server Component: `const t = await getTranslations("users")` from `next-intl/server`.
 - Keys are typed from the English files (`src/i18n/next-intl.d.ts`), so a wrong key fails typecheck.
 
 ## Adding messages for a feature
