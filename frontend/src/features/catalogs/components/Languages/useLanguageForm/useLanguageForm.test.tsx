@@ -151,6 +151,26 @@ describe("useLanguageForm", () => {
     expect(result().form.getFieldState("name").error).toBeUndefined();
   });
 
+  it("shows the general message when FORBIDDEN comes with CONFLICT, because FORBIDDEN wins", async () => {
+    const { result, fillAll } = setup();
+    await fillAll(ENGLISH);
+
+    act(() =>
+      result().showError(
+        new CombinedGraphQLErrors({
+          errors: [
+            { message: "Exists", extensions: { code: "CONFLICT" } },
+            { message: "Denied", extensions: { code: "FORBIDDEN" } },
+          ],
+        }),
+      ),
+    );
+
+    await waitFor(() => expect(result().failed).toBe(true));
+    expect(result().form.getFieldState("name").error).toBeUndefined();
+    expect(result().form.getFieldState("iso").error).toBeUndefined();
+  });
+
   it("shows a BAD_USER_INPUT error under its field", () => {
     const { result } = setup();
 
