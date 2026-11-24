@@ -148,13 +148,48 @@ function projects(preview: CvPreview, labels: PdfLabels): Content[] {
 }
 
 /**
- * The Professional skills table: a header with a red line under it, then the rows of each category. The category cell
- * spans the rows of its skills, and a grey line closes each category.
+ * The most skills in one row of the Professional skills table. Even with skill names of 100 characters (the input
+ * limit, about three lines each) such a row is shorter than a page, so a row never has to break.
+ */
+export const MAX_SKILLS_PER_ROW = 12;
+
+const CELL_PADDING_X = 6;
+const CELL_PADDING_TOP = 4;
+const CELL_PADDING_BOTTOM = 3;
+// The space under the last skill of a category, above its grey line.
+const CATEGORY_END_SPACE = 9;
+
+/** The skill, experience and last used columns, as a table inside the right cell of a row. */
+function skillColumns(body: TableCell[][]): ContentTable {
+  return {
+    table: { widths: ["*", 70, 60], body },
+    layout: {
+      hLineWidth: () => 0,
+      vLineWidth: () => 0,
+      paddingLeft: () => CELL_PADDING_X,
+      paddingRight: () => CELL_PADDING_X,
+      paddingTop: () => CELL_PADDING_TOP,
+      paddingBottom: () => CELL_PADDING_BOTTOM,
+    },
+  };
+}
+
+function chunks<T>(list: T[], size: number): T[][] {
+  return Array.from({ length: Math.ceil(list.length / size) }, (_, index) =>
+    list.slice(index * size, (index + 1) * size),
+  );
+}
+
+/**
+ * The Professional skills table: a header with a red line under it, then one row for each category, with the category
+ * name on the left and its skills on the right. A row never breaks across pages (`dontBreakRows`), so the name is
+ * always next to its skills. A category with more than `MAX_SKILLS_PER_ROW` skills gets more rows, each with the name,
+ * so no row is taller than a page. A grey line closes each category. The header repeats on each page.
  */
 function skillsTable(groups: CvPreviewSkillGroup[], labels: PdfLabels): Content[] {
   const filled = groups.filter((group) => group.skills.length > 0);
   if (filled.length === 0) return [];
-  const headerCell = (text: string, alignment: "left" | "center" = "center"): TableCell => ({
+  const headerCell = (text: string, alignment: "left" | "center" = "center"): ContentText => ({
     text: text.toUpperCase(),
     fontSize: 8,
     alignment,
@@ -162,38 +197,47 @@ function skillsTable(groups: CvPreviewSkillGroup[], labels: PdfLabels): Content[
   });
   const body: TableCell[][] = [
     [
-      headerCell(labels.columnSkills, "left"),
-      {},
-      headerCell(labels.columnExperience),
-      headerCell(labels.columnLastUsed),
+      { ...headerCell(labels.columnSkills, "left"), margin: [0, CELL_PADDING_TOP, 0, 0] },
+      skillColumns([[{}, headerCell(labels.columnExperience), headerCell(labels.columnLastUsed)]]),
     ],
   ];
   // Index in `body` where a category ends (the line is drawn under that row).
   const categoryEnds = new Set<number>();
   for (const { category, skills: list } of filled) {
-    list.forEach((skill, index) => {
+    for (const part of chunks(list, MAX_SKILLS_PER_ROW)) {
       body.push([
-        index === 0 ? { text: category, rowSpan: list.length, color: COLOR_ACCENT } : {},
-        { text: skill.name, bold: true },
-        { text: yearCell(skill.experienceYears), alignment: "center" },
-        { text: yearCell(skill.lastUsedYear), alignment: "center" },
+        { text: category, color: COLOR_ACCENT, margin: [0, CELL_PADDING_TOP, 0, 0] },
+        skillColumns(
+          part.map((skill) => [
+            { text: skill.name, bold: true },
+            { text: yearCell(skill.experienceYears), alignment: "center" },
+            { text: yearCell(skill.lastUsedYear), alignment: "center" },
+          ]),
+        ),
       ]);
-    });
+    }
     categoryEnds.add(body.length);
   }
   const table: TableBlock = {
     id: "skills-table",
-    // The header row never stays alone at the bottom of a page.
-    table: { headerRows: 1, keepWithHeaderRows: 1, widths: [130, "*", 70, 60], body },
+    // The header row never stays alone at the bottom of a page, and a category row never breaks.
+    table: {
+      headerRows: 1,
+      keepWithHeaderRows: 1,
+      dontBreakRows: true,
+      widths: [130, "*"],
+      body,
+    },
     layout: {
       // Line index `i` is above row `i`. 1 is under the header, `n` is under the last row of a category.
       hLineWidth: (index) => (index === 1 || categoryEnds.has(index) ? LINE_WIDTH : 0),
       hLineColor: (index) => (index === 1 ? COLOR_ACCENT : COLOR_DIVIDER),
       vLineWidth: () => 0,
-      paddingLeft: () => 6,
-      paddingRight: () => 6,
-      paddingTop: () => 4,
-      paddingBottom: (index) => (categoryEnds.has(index + 1) ? 12 : 3),
+      // The right cell holds the inner table, which has its own padding.
+      paddingLeft: (column) => (column === 0 ? CELL_PADDING_X : 0),
+      paddingRight: (column) => (column === 0 ? CELL_PADDING_X : 0),
+      paddingTop: () => 0,
+      paddingBottom: (row) => (categoryEnds.has(row + 1) ? CATEGORY_END_SPACE : 0),
     },
   };
   return [{ id: "skills-title", text: labels.professionalSkills, ...SECTION_TITLE }, table];

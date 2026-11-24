@@ -1,7 +1,12 @@
 import type { Node, NodeQueries } from "pdfmake/interfaces";
 import { Mastery, Proficiency } from "../../../generated/prisma/enums";
 import type { CvPreview } from "../cv-preview/models/cv-preview";
-import { buildCvPdfDefinition, keepBlocksTogether, pageMarker } from "./cv-pdf-document";
+import {
+  buildCvPdfDefinition,
+  keepBlocksTogether,
+  MAX_SKILLS_PER_ROW,
+  pageMarker,
+} from "./cv-pdf-document";
 import { CvPdfRenderer } from "./cv-pdf-renderer";
 
 function preview(overrides: Partial<CvPreview> = {}): CvPreview {
@@ -179,26 +184,53 @@ describe("buildCvPdfDefinition", () => {
     expect(Buffer.from(bytes).subarray(0, 5).toString()).toBe("%PDF-");
   });
 
-  it("builds the skills table with the years and an en dash for a missing value", () => {
-    const definition = buildCvPdfDefinition(preview(), "en");
+  // The Professional skills table: one row per category (or per part of a long category), name left, skills right.
+  type SkillsTable = {
+    table: { body: [{ text: string }, { table: { body: unknown[][] } }][]; dontBreakRows: boolean };
+  };
+  function skillsTableOf(groups: CvPreview["skillGroups"]): SkillsTable["table"] {
+    const content = buildCvPdfDefinition(preview({ skillGroups: groups }), "en").content as {
+      id?: string;
+    }[];
+    return (content.find((item) => item.id === "skills-table") as SkillsTable).table;
+  }
 
-    const tables = (definition.content as { table?: { body: unknown[][] } }[]).filter(
-      (item) => item.table !== undefined,
-    );
-    expect(tables.at(-1)?.table?.body).toEqual([
-      expect.any(Array),
+  it("builds the skills table with the years and an en dash for a missing value", () => {
+    const table = skillsTableOf(preview().skillGroups);
+
+    expect(table.body).toHaveLength(2);
+    expect(table.body[1]?.[0]).toMatchObject({ text: "Frontend", color: "#c63031" });
+    expect(table.body[1]?.[1].table.body).toEqual([
       [
-        { text: "Frontend", rowSpan: 2, color: "#c63031" },
         { text: "React", bold: true },
         { text: "4", alignment: "center" },
         { text: "2025", alignment: "center" },
       ],
       [
-        {},
         { text: "Angular", bold: true },
         { text: "–", alignment: "center" },
         { text: "–", alignment: "center" },
       ],
+    ]);
+  });
+
+  it("never breaks a category row, so the category name is always next to its skills", () => {
+    expect(skillsTableOf(preview().skillGroups).dontBreakRows).toBe(true);
+  });
+
+  it("splits a long category into rows of at most MAX_SKILLS_PER_ROW skills, each with the name", () => {
+    const skill = preview().skillGroups[0]!.skills[0]!;
+    const many = Array.from({ length: MAX_SKILLS_PER_ROW + 1 }, (_, index) => ({
+      ...skill,
+      name: `Skill ${index}`,
+    }));
+
+    const table = skillsTableOf([{ category: "Long", skills: many }]);
+
+    expect(table.body.slice(1).map((row) => row[0].text)).toEqual(["Long", "Long"]);
+    expect(table.body.slice(1).map((row) => row[1].table.body.length)).toEqual([
+      MAX_SKILLS_PER_ROW,
+      1,
     ]);
   });
 
