@@ -20,6 +20,8 @@ describe("readFailure", () => {
     ["FORBIDDEN", "forbidden"],
     ["CONFLICT", "conflict"],
     ["BAD_USER_INPUT", "invalid"],
+    ["UNAUTHENTICATED", "unauthenticated"],
+    ["TOO_MANY_REQUESTS", "tooManyRequests"],
   ] as const)("reads %s as %s", (code, kind) => {
     expect(readFailure(graphQlError(code))).toEqual({ kind });
   });
@@ -54,6 +56,25 @@ describe("readFailure", () => {
   it("keeps the order forbidden, conflict, invalid when notFound is not there", () => {
     expect(readFailure(graphQlErrors("CONFLICT", "FORBIDDEN"))).toEqual({ kind: "forbidden" });
     expect(readFailure(graphQlErrors("BAD_USER_INPUT", "CONFLICT"))).toEqual({ kind: "conflict" });
+  });
+
+  it("puts unauthenticated and tooManyRequests after the codes of the service", () => {
+    expect(readFailure(graphQlErrors("TOO_MANY_REQUESTS", "BAD_USER_INPUT"))).toEqual({
+      kind: "invalid",
+    });
+    expect(readFailure(graphQlErrors("UNAUTHENTICATED", "BAD_USER_INPUT"))).toEqual({
+      kind: "invalid",
+    });
+    expect(readFailure(graphQlErrors("TOO_MANY_REQUESTS", "UNAUTHENTICATED"))).toEqual({
+      kind: "unauthenticated",
+    });
+  });
+
+  it("keeps the reason of a throttled request", () => {
+    expect(readFailure(graphQlError("TOO_MANY_REQUESTS", "RESEND_COOLDOWN"))).toEqual({
+      kind: "tooManyRequests",
+      reason: "RESEND_COOLDOWN",
+    });
   });
 
   it("returns the backend reason of the error that decided the kind", () => {
