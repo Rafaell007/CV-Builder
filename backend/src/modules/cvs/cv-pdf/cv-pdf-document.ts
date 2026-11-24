@@ -2,6 +2,8 @@ import type {
   Content,
   ContentText,
   ContentTable,
+  Node,
+  NodeQueries,
   TableCell,
   TDocumentDefinitions,
 } from "pdfmake/interfaces";
@@ -27,10 +29,18 @@ const LINE_WIDTH = 0.75;
 
 const BODY_FONT_SIZE = 10;
 const LABEL: Omit<ContentText, "text"> = { bold: true, margin: [0, 0, 0, 3] };
+// `headlineLevel` marks a section title for `keepBlocksTogether`.
 const SECTION_TITLE: Omit<ContentText, "text"> = {
   fontSize: 20,
   margin: [0, 22, 0, 12],
+  headlineLevel: 1,
 };
+
+// Every top-level block has an `id`, so `keepBlocksTogether` can tell the blocks from the text inside them.
+const PROJECT_ID_PREFIX = "project-";
+
+// pdfmake reads `id` on every node and passes it to `pageBreakBefore`, but its types list it only for some nodes.
+type TableBlock = ContentTable & { id: string };
 
 /** `NATIVE` is the only level that is a word. The levels A1 to C2 are printed as they are. */
 function proficiencyLabel(proficiency: Proficiency, labels: PdfLabels): string {
@@ -47,10 +57,14 @@ function block(label: string, content: Content[]): Content[] {
   return [{ stack: [{ text: label, ...LABEL }, ...content], margin: [0, 0, 0, 10] }];
 }
 
-/** A table of one row with two columns and a red vertical line between them (the layout of the preview page). */
-function twoColumns(left: Content[], right: Content[], sideWidth: number): ContentTable {
+/**
+ * A table of one row with two columns and a red vertical line between them (the layout of the preview page).
+ * The row may break across pages, so a block taller than the rest of the page continues on the next one and no
+ * text is cut. `keepBlocksTogether` moves a project that would break to the next page when it can.
+ */
+function twoColumns(id: string, left: Content[], right: Content[], sideWidth: number): TableBlock {
   return {
-    unbreakable: true,
+    id,
     table: { widths: [sideWidth, "*"], body: [[{ stack: left }, { stack: right }]] },
     layout: {
       hLineWidth: () => 0,
@@ -67,9 +81,16 @@ function twoColumns(left: Content[], right: Content[], sideWidth: number): Conte
 
 function header(preview: CvPreview): Content[] {
   const content: Content[] = [];
-  if (preview.fullName !== null) content.push({ text: preview.fullName, fontSize: 24 });
+  if (preview.fullName !== null) {
+    content.push({ id: "full-name", text: preview.fullName, fontSize: 24 });
+  }
   if (preview.position !== null) {
-    content.push({ text: preview.position.toUpperCase(), fontSize: 11, margin: [0, 2, 0, 0] });
+    content.push({
+      id: "position",
+      text: preview.position.toUpperCase(),
+      fontSize: 11,
+      margin: [0, 2, 0, 0],
+    });
   }
   return content;
 }
@@ -110,7 +131,7 @@ function detail(label: string, value: string | null): Content[] {
 
 function projects(preview: CvPreview, labels: PdfLabels): Content[] {
   if (preview.projects.length === 0) return [];
-  const rows = preview.projects.map((project): Content => {
+  const rows = preview.projects.map((project, index): Content => {
     const left: Content[] = [
       { text: project.name.toUpperCase(), bold: true, color: COLOR_ACCENT, margin: [0, 0, 0, 3] },
       ...(project.description === "" ? [] : [{ text: project.description }]),
@@ -121,9 +142,9 @@ function projects(preview: CvPreview, labels: PdfLabels): Content[] {
       ...detail(labels.responsibilities, project.responsibilities),
       ...detail(labels.environment, project.environment.join(", ")),
     ];
-    return twoColumns(left, right, SIDE_COLUMN_WIDTH);
+    return twoColumns(`${PROJECT_ID_PREFIX}${index}`, left, right, SIDE_COLUMN_WIDTH);
   });
-  return [{ text: labels.projects, ...SECTION_TITLE }, ...rows];
+  return [{ id: "projects-title", text: labels.projects, ...SECTION_TITLE }, ...rows];
 }
 
 /**
@@ -160,22 +181,48 @@ function skillsTable(groups: CvPreviewSkillGroup[], labels: PdfLabels): Content[
     });
     categoryEnds.add(body.length);
   }
-  return [
-    { text: labels.professionalSkills, ...SECTION_TITLE },
-    {
-      table: { headerRows: 1, widths: [130, "*", 70, 60], body },
-      layout: {
-        // Line index `i` is above row `i`. 1 is under the header, `n` is under the last row of a category.
-        hLineWidth: (index) => (index === 1 || categoryEnds.has(index) ? LINE_WIDTH : 0),
-        hLineColor: (index) => (index === 1 ? COLOR_ACCENT : COLOR_DIVIDER),
-        vLineWidth: () => 0,
-        paddingLeft: () => 6,
-        paddingRight: () => 6,
-        paddingTop: () => 4,
-        paddingBottom: (index) => (categoryEnds.has(index + 1) ? 12 : 3),
-      },
+  const table: TableBlock = {
+    id: "skills-table",
+    // The header row never stays alone at the bottom of a page.
+    table: { headerRows: 1, keepWithHeaderRows: 1, widths: [130, "*", 70, 60], body },
+    layout: {
+      // Line index `i` is above row `i`. 1 is under the header, `n` is under the last row of a category.
+      hLineWidth: (index) => (index === 1 || categoryEnds.has(index) ? LINE_WIDTH : 0),
+      hLineColor: (index) => (index === 1 ? COLOR_ACCENT : COLOR_DIVIDER),
+      vLineWidth: () => 0,
+      paddingLeft: () => 6,
+      paddingRight: () => 6,
+      paddingTop: () => 4,
+      paddingBottom: (index) => (categoryEnds.has(index + 1) ? 12 : 3),
     },
-  ];
+  };
+  return [{ id: "skills-title", text: labels.professionalSkills, ...SECTION_TITLE }, table];
+}
+
+const isBlock = (node: Node) => node.id !== undefined;
+const isSectionTitle = (node: Node) => node.headlineLevel === 1;
+const isProject = (node: Node) => node.id?.startsWith(PROJECT_ID_PREFIX) === true;
+const breaksAcrossPages = (node: Node) => node.pageNumbers.length > 1;
+
+/**
+ * The `pageBreakBefore` rule of the PDF. pdfmake calls it for each node after the layout, and `true` moves the node
+ * to the next page.
+ * - A project that would break across pages moves to the next page, unless it is already at the top of a page (only
+ *   a section title above it). A project taller than one page then starts on a new page and continues on the next.
+ * - A section title never stays alone at the bottom of a page: it moves when its block does not start on the page,
+ *   or when its first project moves.
+ */
+export function keepBlocksTogether(node: Node, queries: NodeQueries): boolean {
+  const blocksAbove = queries
+    .getPreviousNodesOnPage()
+    .filter((other) => isBlock(other) && !isSectionTitle(other));
+  if (isProject(node)) return breaksAcrossPages(node) && blocksAbove.length > 0;
+  if (isSectionTitle(node)) {
+    const next = queries.getFollowingNodesOnPage().find(isBlock);
+    if (next === undefined) return true;
+    return isProject(next) && breaksAcrossPages(next) && blocksAbove.length > 0;
+  }
+  return false;
 }
 
 /** The page marker in the bottom right corner: `1/3`. It sits in the bottom margin, so it never moves the content. */
@@ -203,11 +250,13 @@ export function buildCvPdfDefinition(preview: CvPreview, locale: CvLocale): TDoc
     pageSize: "A4",
     pageMargins: [40, 40, 40, 40],
     footer: pageMarker,
+    pageBreakBefore: keepBlocksTogether,
     defaultStyle: { font: FONT, fontSize: BODY_FONT_SIZE, color: COLOR_TEXT, lineHeight: 1.25 },
     content: [
       ...header(preview),
       { text: "", margin: [0, 0, 0, 14] },
       twoColumns(
+        "summary",
         general(preview, labels),
         [...summary(preview), ...skills(preview.skillGroups)],
         SIDE_COLUMN_WIDTH,
