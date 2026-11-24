@@ -1,1 +1,1 @@
-export { toVerifyEmailFailure, validateCode } from "./verify-email.utils";
+export { validateCode } from "./verify-email.utils";

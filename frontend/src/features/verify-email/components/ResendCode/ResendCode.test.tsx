@@ -121,6 +121,17 @@ describe("ResendCode", () => {
     );
   });
 
+  it.each([
+    ["the resend cooldown", failure("TOO_MANY_REQUESTS", "RESEND_COOLDOWN")],
+    ["the throttler", failure("TOO_MANY_REQUESTS")],
+  ])("asks the user to wait for %s", async (_name, result) => {
+    const { user } = renderResend([resendMock(result)]);
+
+    await user.click(button());
+
+    expect(await screen.findByRole("button", { name: "Resend code in 60 s" })).toBeDisabled();
+  });
+
   it("tells the page when the account is verified already", async () => {
     const { user } = renderResend([resendMock(failure("CONFLICT", "ALREADY_VERIFIED"))]);
 
