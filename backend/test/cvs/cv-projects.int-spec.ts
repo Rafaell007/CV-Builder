@@ -446,10 +446,18 @@ describe("cv projects", () => {
       const late = await add(ann, { endDate: "2027-01-01" });
 
       expect(errorOf(early.body)?.extensions.fieldErrors).toEqual([
-        { field: "startDate", messages: ["Start date must be within project duration"] },
+        {
+          field: "startDate",
+          messages: ["Start date must be within project duration"],
+          reasons: ["START_OUTSIDE_PROJECT"],
+        },
       ]);
       expect(errorOf(late.body)?.extensions.fieldErrors).toEqual([
-        { field: "endDate", messages: ["End date must be within project duration"] },
+        {
+          field: "endDate",
+          messages: ["End date must be within project duration"],
+          reasons: ["END_OUTSIDE_PROJECT"],
+        },
       ]);
       expect(await prisma.cvProject.count()).toBe(0);
     });
@@ -458,7 +466,11 @@ describe("cv projects", () => {
       const { body } = await add(ann, { startDate: "2026-05-01", endDate: "2026-04-30" });
 
       expect(errorOf(body)?.extensions.fieldErrors).toEqual([
-        { field: "endDate", messages: ["End date cannot be earlier than start date"] },
+        {
+          field: "endDate",
+          messages: ["End date cannot be earlier than start date"],
+          reasons: ["END_BEFORE_START"],
+        },
       ]);
     });
 
@@ -554,7 +566,11 @@ describe("cv projects", () => {
       });
 
       expect(errorOf(body)?.extensions.fieldErrors).toEqual([
-        { field: "endDate", messages: ["End date must be within project duration"] },
+        {
+          field: "endDate",
+          messages: ["End date must be within project duration"],
+          reasons: ["END_OUTSIDE_PROJECT"],
+        },
       ]);
       const stored = await prisma.cvProject.findUniqueOrThrow({ where: { id: entry.id } });
       expect(stored.startDate).toEqual(new Date("2026-03-01"));

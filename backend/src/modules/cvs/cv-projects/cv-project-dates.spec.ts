@@ -73,7 +73,11 @@ describe("resolveCvProjectDates", () => {
     );
 
     expect(errors).toEqual([
-      { field: "startDate", messages: ["Start date must be within project duration"] },
+      {
+        field: "startDate",
+        messages: ["Start date must be within project duration"],
+        reasons: ["START_OUTSIDE_PROJECT"],
+      },
     ]);
   });
 
@@ -83,7 +87,11 @@ describe("resolveCvProjectDates", () => {
     );
 
     expect(errors).toEqual([
-      { field: "startDate", messages: ["Start date must be within project duration"] },
+      {
+        field: "startDate",
+        messages: ["Start date must be within project duration"],
+        reasons: ["START_OUTSIDE_PROJECT"],
+      },
     ]);
   });
 
@@ -95,7 +103,13 @@ describe("resolveCvProjectDates", () => {
           PROJECT,
         ),
       ),
-    ).toEqual([{ field: "endDate", messages: ["End date must be within project duration"] }]);
+    ).toEqual([
+      {
+        field: "endDate",
+        messages: ["End date must be within project duration"],
+        reasons: ["END_OUTSIDE_PROJECT"],
+      },
+    ]);
   });
 
   it("rejects an end date before the start date", () => {
@@ -106,7 +120,13 @@ describe("resolveCvProjectDates", () => {
           PROJECT,
         ),
       ),
-    ).toEqual([{ field: "endDate", messages: ["End date cannot be earlier than start date"] }]);
+    ).toEqual([
+      {
+        field: "endDate",
+        messages: ["End date cannot be earlier than start date"],
+        reasons: ["END_BEFORE_START"],
+      },
+    ]);
   });
 
   it("reports both messages when the end date is before the start and before the project", () => {
@@ -124,6 +144,7 @@ describe("resolveCvProjectDates", () => {
           "End date cannot be earlier than start date",
           "End date must be within project duration",
         ],
+        reasons: ["END_BEFORE_START", "END_OUTSIDE_PROJECT"],
       },
     ]);
   });
@@ -137,5 +158,51 @@ describe("resolveCvProjectDates", () => {
     );
 
     expect(errors.map(({ field }) => field)).toEqual(["startDate", "endDate"]);
+  });
+
+  it("sends one reason for each message, in the order of the messages", () => {
+    const [endError] = fieldErrorsOf(() =>
+      resolveCvProjectDates(
+        { startDate: new Date("2026-03-10"), endDate: new Date("2025-06-01") },
+        PROJECT,
+      ),
+    );
+
+    expect(endError?.reasons).toHaveLength(endError?.messages.length ?? -1);
+  });
+
+  describe("near midnight (whole UTC days)", () => {
+    it("accepts the last minute of the last day of the project", () => {
+      expect(() =>
+        resolveCvProjectDates({ startDate: new Date("2026-12-31T23:59:59.999Z") }, PROJECT),
+      ).not.toThrow();
+    });
+
+    it("rejects the first millisecond after the project", () => {
+      const errors = fieldErrorsOf(() =>
+        resolveCvProjectDates({ startDate: new Date("2027-01-01T00:00:00.000Z") }, PROJECT),
+      );
+
+      expect(errors[0]?.reasons).toEqual(["START_OUTSIDE_PROJECT"]);
+    });
+
+    it("counts the UTC day of a time with an offset, not the local day of the sender", () => {
+      // 2027-01-01 00:30 in UTC+1 is 2026-12-31 23:30 UTC: still the last day of the project.
+      expect(() =>
+        resolveCvProjectDates({ startDate: new Date("2027-01-01T00:30:00+01:00") }, PROJECT),
+      ).not.toThrow();
+    });
+
+    it("accepts an end date late on the same UTC day as the start date", () => {
+      expect(() =>
+        resolveCvProjectDates(
+          {
+            startDate: new Date("2026-05-05T23:59:00Z"),
+            endDate: new Date("2026-05-05T00:01:00Z"),
+          },
+          PROJECT,
+        ),
+      ).not.toThrow();
+    });
   });
 });

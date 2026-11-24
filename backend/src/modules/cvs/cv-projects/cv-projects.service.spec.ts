@@ -447,7 +447,11 @@ describe("CvProjectsService.add", () => {
       service.add(USER, addInput({ startDate: new Date("2025-01-01T00:00:00Z") })),
     ).rejects.toMatchObject({
       fieldErrors: [
-        { field: "startDate", messages: ["Start date must be within project duration"] },
+        {
+          field: "startDate",
+          messages: ["Start date must be within project duration"],
+          reasons: ["START_OUTSIDE_PROJECT"],
+        },
       ],
     });
     expect(prisma.cvProject.create).not.toHaveBeenCalled();
@@ -571,7 +575,13 @@ describe("CvProjectsService.update", () => {
     await expect(
       service.update(USER, updateInput({ endDate: new Date("2027-02-01T00:00:00Z") })),
     ).rejects.toMatchObject({
-      fieldErrors: [{ field: "endDate", messages: ["End date must be within project duration"] }],
+      fieldErrors: [
+        {
+          field: "endDate",
+          messages: ["End date must be within project duration"],
+          reasons: ["END_OUTSIDE_PROJECT"],
+        },
+      ],
     });
     expect(prisma.cvProject.update).not.toHaveBeenCalled();
   });
