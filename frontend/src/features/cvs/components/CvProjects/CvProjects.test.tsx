@@ -4,6 +4,7 @@ import type { RenderWithProvidersOptions } from "@/shared/testing";
 import { CvProjects } from "./CvProjects";
 import {
   addCvProjectMock,
+  addCvProjectRefusedMock,
   availableCvProjectsMock,
   availableCvProjectsRefusedMock,
   bank,
@@ -16,6 +17,7 @@ import {
   removeCvProjectsRefusedMock,
   sampleCvProjects,
   updateCvProjectMock,
+  type RejectedField,
 } from "./cvProjects.mocks";
 
 const [blogEntry, bankEntry] = sampleCvProjects as [
@@ -374,6 +376,57 @@ describe("CvProjects", () => {
       await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
       await waitFor(() => expect(rowNames()).toEqual(["Blog", "Online Bank"]));
       expect(screen.getByText("Project added")).toBeInTheDocument();
+    });
+
+    describe("when the backend rejects a date", () => {
+      const input = {
+        cvId: CV_ID,
+        projectId: bank.id,
+        startDate: "2024-03-01T00:00:00.000Z",
+        endDate: "2025-06-30T00:00:00.000Z",
+        responsibilities: null,
+        roleIds: ["role-1"],
+      };
+
+      async function submitBank(rejected: RejectedField[]) {
+        const view = await openAdd(
+          withAdd(addCvProjectRefusedMock(input, "BAD_USER_INPUT", rejected)),
+        );
+        await view.user.click(view.project);
+        await view.user.click(screen.getByRole("option", { name: "Online Bank" }));
+        const roles = within(view.dialog).getByRole("combobox", { name: "Roles" });
+        await waitFor(() => expect(roles).not.toHaveAttribute("aria-disabled", "true"));
+        await view.user.click(roles);
+        await view.user.click(screen.getByRole("option", { name: "Developer" }));
+        await waitFor(() =>
+          expect(within(view.dialog).getByRole("button", { name: "Add" })).toBeEnabled(),
+        );
+        await view.user.click(within(view.dialog).getByRole("button", { name: "Add" }));
+        return view;
+      }
+
+      it("shows the text of the form for each reason of the end date, and keeps the typed values", async () => {
+        const { dialog } = await submitBank([
+          { field: "endDate", reasons: ["END_BEFORE_START", "END_OUTSIDE_PROJECT"] },
+        ]);
+
+        const endDate = within(dialog).getByRole("textbox", { name: "End Date" });
+        await waitFor(() => expect(endDate).toBeInvalid());
+        expect(endDate).toHaveAccessibleDescription(
+          "End date cannot be earlier than start date. End date must be within project duration",
+        );
+        expect(endDate).toHaveValue("06/30/2025");
+        // Only the field error: no general message is added.
+        expect(within(dialog).getAllByRole("alert")).toHaveLength(1);
+      });
+
+      it("shows the general text of the field for a reason that this form does not know", async () => {
+        const { dialog } = await submitBank([{ field: "endDate", reasons: ["SOMETHING_NEW"] }]);
+
+        const endDate = within(dialog).getByRole("textbox", { name: "End Date" });
+        await waitFor(() => expect(endDate).toBeInvalid());
+        expect(endDate).toHaveAccessibleDescription("End date must be within project duration");
+      });
     });
 
     it("says that the list could not be loaded, with Retry, when the backend refuses the options", async () => {
