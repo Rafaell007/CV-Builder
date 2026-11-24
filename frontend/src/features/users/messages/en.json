@@ -1,0 +1,121 @@
+{
+  "button": "CREATE USER",
+  "table": "Employees list",
+  "columns": {
+    "avatar": "Avatar",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "department": "Department",
+    "position": "Position"
+  },
+  "missing": "Not filled",
+  "actions": {
+    "column": "Actions",
+    "menu": "Actions for {name}",
+    "view": "View",
+    "update": "Update",
+    "delete": "Delete",
+    "openProfile": "Open profile of {name}"
+  },
+  "search": {
+    "label": "Search employees",
+    "placeholder": "Search"
+  },
+  "pagination": {
+    "navigation": "Employees pagination",
+    "previous": "Previous page",
+    "next": "Next page",
+    "page": "Page {number}"
+  },
+  "states": {
+    "loading": "Loading employees",
+    "empty": "No employees found",
+    "noResults": "No employees found",
+    "error": "Failed to load employees",
+    "retry": "Retry"
+  },
+  "create": {
+    "title": "Create user",
+    "close": "Close",
+    "submit": "Create",
+    "cancel": "Cancel",
+    "success": {
+      "title": "User created",
+      "text": "{name} was added to the employees."
+    }
+  },
+  "update": {
+    "title": "Update user",
+    "close": "Close",
+    "submit": "Update",
+    "cancel": "Cancel",
+    "success": {
+      "title": "User updated",
+      "text": "The data of {name} was saved."
+    }
+  },
+  "delete": {
+    "title": "Delete user",
+    "message": "Are you sure you want to delete user <strong>{name}</strong>?",
+    "close": "Close",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "success": {
+      "title": "User deleted",
+      "text": "{name} was removed from the employees."
+    },
+    "failedTitle": "Could not delete the user",
+    "failedText": "Something went wrong. Please try again.",
+    "selfText": "You cannot delete your own account.",
+    "notFoundText": "This user no longer exists.",
+    "forbiddenText": "You do not have permission to do this.",
+    "concurrentChangeText": "Someone changed this user at the same time. Try again."
+  },
+  "form": {
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "department": "Department",
+      "position": "Position",
+      "role": "Role"
+    },
+    "roles": {
+      "ADMIN": "Admin",
+      "USER": "Employee"
+    },
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "ownRoleLocked": "You cannot change your own role",
+    "options": {
+      "loading": "Loading…",
+      "departmentsFailed": "Failed to load departments",
+      "positionsFailed": "Failed to load positions",
+      "retry": "Retry"
+    },
+    "errors": {
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email address",
+      "emailTaken": "A user with this email already exists",
+      "passwordRequired": "Password is required",
+      "passwordTooShort": "Password must be at least {min} characters long",
+      "passwordTooLong": "Password must be at most {max} characters long",
+      "passwordWeak": "Password must contain at least one letter and one digit",
+      "firstNameRequired": "First name is required",
+      "firstNameTooLong": "First name must be at most {max} characters long",
+      "lastNameRequired": "Last name is required",
+      "lastNameTooLong": "Last name must be at most {max} characters long",
+      "departmentRequired": "Department is required",
+      "positionRequired": "Position is required",
+      "roleRequired": "Role is required",
+      "serverInvalid": "Check this field",
+      "forbidden": "You do not have permission to do this.",
+      "ownRole": "You cannot change your own role.",
+      "notFound": "This user no longer exists.",
+      "concurrentChange": "Someone changed this user at the same time. Try again.",
+      "failed": "Something went wrong. Try again."
+    }
+  }
+}

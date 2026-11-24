@@ -25,6 +25,13 @@
   color: var(--color-text);
 }
 
+/* Figma Create user (desktop): 860 wide; the tablet frame keeps 620 */
+@media (min-width: 1024px) {
+  .wide {
+    width: min(860px, calc(100% - 2 * var(--space-4)));
+  }
+}
+
 /*
  * Title at 16 / 24; first content 26 below the title.
  * ConfirmModal composes these classes and sets --modal-header-gap and --modal-footer-gap. A variable, not an

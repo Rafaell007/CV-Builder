@@ -101,6 +101,11 @@
   /* Table sort arrow (docs/design-tokens.md › List page) */
   --color-sort-icon: var(--palette-grey-500);
 
+  /* Initials circle of the shared Avatar (Users list; Figma fill, text = --color-text for contrast, docs/design-tokens.md) */
+  --color-avatar-bg: var(--palette-grey-400);
+  /* Open-profile arrow at the end of a Users row (Figma: #626262 light, #AEAEAE dark) */
+  --color-row-arrow: var(--palette-grey-500);
+
   /* CV skill level bars: fill and track per level (docs/design-tokens.md › CV Skills) */
   /* Filled tag (CV projects list: the responsibilities under a row; Figma frame-46, light #E2E2E4, dark #626262) */
   --color-tag-bg: var(--palette-grey-200);
@@ -182,6 +187,8 @@
   --color-calendar-arrow: var(--palette-grey-100);
   --shadow-calendar: none;
   --color-sort-icon: var(--palette-grey-400);
+  --color-avatar-bg: var(--palette-grey-500);
+  --color-row-arrow: var(--palette-grey-400);
 
   --color-tag-bg: var(--palette-grey-500);
 
@@ -259,6 +266,8 @@
     --color-calendar-arrow: var(--palette-grey-100);
     --shadow-calendar: none;
     --color-sort-icon: var(--palette-grey-400);
+    --color-avatar-bg: var(--palette-grey-500);
+    --color-row-arrow: var(--palette-grey-400);
 
     --color-tag-bg: var(--palette-grey-500);
 

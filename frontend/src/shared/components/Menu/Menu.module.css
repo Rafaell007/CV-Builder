@@ -22,11 +22,14 @@
   outline-offset: 2px;
 }
 
-/* Row menu: surface fill, border and 8px radius (Figma, DS Table Nav). */
+/* Row menu: surface fill, border and 8px radius (Figma, DS Table Nav). At least 90 wide, no inset above or below
+   the items (the open Users row menu, docs/design-tokens.md › Decisions › Users list). */
 .content {
   z-index: 10;
-  min-width: 160px;
-  padding: var(--space-1) 0;
+  min-width: 90px;
+  padding: 0;
+  /* Without an inset, the highlighted first and last items would cover the round corners. */
+  overflow: hidden;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-menu);
   background: var(--color-surface);
@@ -38,8 +41,8 @@
   height: var(--space-8);
   padding: 0 15px;
   color: var(--color-text);
-  font: var(--text-body);
-  letter-spacing: var(--text-body-ls);
+  font: var(--text-menu);
+  letter-spacing: var(--text-menu-ls);
   cursor: pointer;
   outline: none;
 }

@@ -220,7 +220,7 @@ Playwright drives a real browser through the whole app against a freshly seeded 
 
 | Area | Test case | Spec |
 |---|---|---|
-| Smoke | `/` redirects to the employees page, and the backend health query answers on the server and in the browser | `e2e/smoke/home.spec.ts` |
+| Smoke | `/` redirects to the employees page, and the seeded admin shows in the list (browser → Next.js → NestJS → PostgreSQL) | `e2e/smoke/home.spec.ts` |
 
 One spec per user flow is added with each step.
 

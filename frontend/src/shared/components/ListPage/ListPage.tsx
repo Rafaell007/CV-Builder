@@ -3,19 +3,28 @@ import { Button } from "../Button";
 import { AddIcon } from "../icons";
 import styles from "./ListPage.module.css";
 
-export interface ListPageProps {
+/**
+ * The create button: both props or neither. Without them there is no button, for a user who may not create
+ * (an employee on the Users page). TypeScript refuses a label without a handler and the other way round.
+ */
+type ListPageCreateProps =
+  | {
+      /** Text of the create button, for example "Create project". Below 1024px only the plus icon shows; the text stays its accessible name. */
+      createLabel: string;
+      onCreate: () => void;
+    }
+  | { createLabel?: undefined; onCreate?: undefined };
+
+export type ListPageProps = ListPageCreateProps & {
   /** The search field at the left of the toolbar (the shared `SearchField`). */
   search: ReactNode;
-  /** Text of the create button, for example "Create project". Below 1024px only the plus icon shows; the text stays its accessible name. */
-  createLabel: string;
-  onCreate: () => void;
   /** When set, it is shown instead of the list and the page buttons: the error state with Retry. */
   error?: ReactNode;
   /** The page buttons under the list (the shared `Pagination`). */
   pagination: ReactNode;
   /** The list itself (a table). */
   children: ReactNode;
-}
+};
 
 /**
  * The body of a list page under the route's `PageHeader`: the sticky toolbar with the search field and the create
@@ -34,10 +43,12 @@ export function ListPage({
     <div>
       <div className={styles.toolbar}>
         <div className={styles.search}>{search}</div>
-        <Button variant="text" className={styles.createButton} onClick={onCreate}>
-          <AddIcon className={styles.createIcon} />
-          <span className={styles.createLabel}>{createLabel}</span>
-        </Button>
+        {onCreate && (
+          <Button variant="text" className={styles.createButton} onClick={onCreate}>
+            <AddIcon className={styles.createIcon} />
+            <span className={styles.createLabel}>{createLabel}</span>
+          </Button>
+        )}
       </div>
       {error ?? (
         <>

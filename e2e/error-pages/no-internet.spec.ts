@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { signIn, USER_EMAIL } from "../support/signIn";
+import { seededUserCell } from "../support/users";
 
 // No Internet (S4.2, KAN-93): offline or a query that cannot reach the server shows "Oops" with RETRY.
 // The page stays mounted but hidden, so it comes back as it was.
@@ -47,7 +48,7 @@ test.describe("no internet", () => {
     await retry.click();
 
     await expect(page.getByRole("heading", { name: "Employees" })).toBeVisible();
-    await expect(page.getByText("Backend health (client): ok")).toBeVisible();
+    await expect(seededUserCell(page)).toBeVisible();
     await expect(page.getByRole("heading", { name: "Oops" })).toBeHidden();
   });
 });

@@ -249,6 +249,16 @@ describe("DataTable", () => {
     });
   });
 
+  it("keeps a hidden header for screen readers only", () => {
+    renderTable({ columns: [columns[0]!, { ...columns[1]!, hideHeader: true }] });
+
+    const header = screen.getByRole("columnheader", { name: "Position" });
+    // The text sits in the visually hidden span, not straight in the cell (unit tests have no CSS module class
+    // names; the Storybook story checks that nothing shows).
+    expect(within(header).getByText("Position").tagName).toBe("SPAN");
+    expect(screen.getByRole("columnheader", { name: "First name" })).toBeInTheDocument();
+  });
+
   describe("row detail", () => {
     it("draws a detail line under each row across the full width", () => {
       renderTable({

@@ -1,0 +1,8 @@
+/*
+ * Figma Users page (1440): the create button centres its plus icon and text, 8 apart (icon at 56, text at 88), as
+ * on the CVs page, not at the left as on Projects. Values: docs/design-tokens.md › List page.
+ */
+.page {
+  --list-page-create-justify: center;
+  --list-page-create-gap: var(--space-2);
+}

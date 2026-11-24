@@ -1,5 +1,6 @@
 import { expect, test, type BrowserContext } from "@playwright/test";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
+import { seededUserCell } from "../support/users";
 
 async function cookieNames(context: BrowserContext): Promise<string[]> {
   return (await context.cookies()).map((cookie) => cookie.name);
@@ -62,7 +63,8 @@ test.describe("with a session", () => {
     await page.goto("/users");
 
     await expect(page).toHaveURL(/\/users$/);
-    await expect(page.getByText("Backend health (server): ok")).toBeVisible();
+    // The list loads with the new access cookie.
+    await expect(seededUserCell(page)).toBeVisible();
     expect(await cookieNames(context)).toContain("access_token");
   });
 
