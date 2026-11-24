@@ -69,7 +69,8 @@
     "failedText": "Coś poszło nie tak. Spróbuj ponownie.",
     "selfText": "Nie możesz usunąć własnego konta.",
     "notFoundText": "Ten użytkownik już nie istnieje.",
-    "forbiddenText": "Nie masz uprawnień, aby to zrobić."
+    "forbiddenText": "Nie masz uprawnień, aby to zrobić.",
+    "concurrentChangeText": "Ktoś w tym samym czasie zmienił tego użytkownika. Spróbuj ponownie."
   },
   "form": {
     "fields": {
@@ -113,6 +114,7 @@
       "forbidden": "Nie masz uprawnień do tej operacji.",
       "ownRole": "Nie możesz zmienić własnej roli.",
       "notFound": "Ten użytkownik już nie istnieje.",
+      "concurrentChange": "Ktoś w tym samym czasie zmienił tego użytkownika. Spróbuj ponownie.",
       "failed": "Coś poszło nie tak. Spróbuj ponownie."
     }
   }

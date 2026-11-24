@@ -36,6 +36,12 @@ describe("toDeleteUserFailure", () => {
     );
   });
 
+  it("returns concurrentChange for the CONFLICT of a change at the same time", () => {
+    expect(
+      toDeleteUserFailure(graphQlError({ code: "CONFLICT", reason: "CONCURRENT_CHANGE" })),
+    ).toBe("concurrentChange");
+  });
+
   it("returns notFound and forbidden for those codes", () => {
     expect(toDeleteUserFailure(graphQlError({ code: "NOT_FOUND" }))).toBe("notFound");
     expect(toDeleteUserFailure(graphQlError({ code: "FORBIDDEN" }))).toBe("forbidden");

@@ -89,5 +89,6 @@ function failureText(failure: ReturnType<typeof toDeleteUserFailure>) {
   if (failure === "self") return "selfText";
   if (failure === "notFound") return "notFoundText";
   if (failure === "forbidden") return "forbiddenText";
+  if (failure === "concurrentChange") return "concurrentChangeText";
   return "failedText";
 }

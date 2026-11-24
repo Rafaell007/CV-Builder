@@ -69,7 +69,8 @@
     "failedText": "Something went wrong. Please try again.",
     "selfText": "You cannot delete your own account.",
     "notFoundText": "This user no longer exists.",
-    "forbiddenText": "You do not have permission to do this."
+    "forbiddenText": "You do not have permission to do this.",
+    "concurrentChangeText": "Someone changed this user at the same time. Try again."
   },
   "form": {
     "fields": {
@@ -113,6 +114,7 @@
       "forbidden": "You do not have permission to do this.",
       "ownRole": "You cannot change your own role.",
       "notFound": "This user no longer exists.",
+      "concurrentChange": "Someone changed this user at the same time. Try again.",
       "failed": "Something went wrong. Try again."
     }
   }

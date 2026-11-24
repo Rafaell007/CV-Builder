@@ -110,6 +110,18 @@ describe("useUpdateUserForm", () => {
     expect(result().form.getValues("lastName")).toBe(" Victor ");
   });
 
+  it("shows CONCURRENT_CHANGE as its own message and keeps the values", async () => {
+    const { result } = setup({
+      mocks: [updateUserRefusedMock(input, { code: "CONFLICT", reason: "CONCURRENT_CHANGE" })],
+    });
+    openAndChange(result);
+    await submit(result);
+
+    expect(result().isOpen).toBe(true);
+    expect(result().generalError).toBe("concurrentChange");
+    expect(result().form.getValues("lastName")).toBe(" Victor ");
+  });
+
   it("shows NOT_FOUND as 'no longer exists'", async () => {
     const { result } = setup({ mocks: [updateUserRefusedMock(input, { code: "NOT_FOUND" })] });
     openAndChange(result);

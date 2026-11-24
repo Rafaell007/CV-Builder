@@ -6,10 +6,11 @@ import { useRef, useState, type BaseSyntheticEvent } from "react";
 import type { DefaultValues, FieldValues, Path } from "react-hook-form";
 import type { z } from "zod";
 import { applyServerFieldErrors, useZodForm } from "@/shared/forms";
-import { EMAIL_TAKEN_REASON, OWN_ROLE_REASON } from "../users.constants";
+import { CONCURRENT_CHANGE_REASON, EMAIL_TAKEN_REASON, OWN_ROLE_REASON } from "../users.constants";
 
 /** The message under the fields when a request failed in a way no field can show. */
-export type UserFormGeneralError = "failed" | "forbidden" | "ownRole" | "notFound";
+export type UserFormGeneralError =
+  "failed" | "forbidden" | "ownRole" | "notFound" | "concurrentChange";
 
 export type UseUserFormOptions<TValues extends FieldValues, TSubmit extends FieldValues> = {
   /** The rules of the form, with translated messages. Build it in `useMemo`. */
@@ -23,7 +24,8 @@ export type UseUserFormOptions<TValues extends FieldValues, TSubmit extends Fiel
  * The form that Create user and Update user share: the rules, the guard against a double submit and the mapping of a
  * failed request. A failed request keeps every typed value. A taken email (`CONFLICT`, reason `EMAIL_TAKEN`) shows
  * under Email, `BAD_USER_INPUT` field errors under their field; `FORBIDDEN` (no longer an admin), `OWN_ROLE` (D24),
- * `NOT_FOUND` (user deleted meanwhile) and anything else become one general message (`generalError`).
+ * `NOT_FOUND` (user deleted meanwhile), `CONCURRENT_CHANGE` (changed at the same time, nothing saved) and anything else
+ * become one general message (`generalError`).
  */
 export function useUserForm<TValues extends FieldValues, TSubmit extends FieldValues>({
   schema,
@@ -71,6 +73,12 @@ export function useUserForm<TValues extends FieldValues, TSubmit extends FieldVa
     }
     if (code === "NOT_FOUND") {
       setGeneralError("notFound");
+      return;
+    }
+    // Both mutations can answer this one: another request locked the same user. Nothing was saved, so the values stay
+    // and the admin submits again.
+    if (code === "CONFLICT" && errorExtension(error, "reason") === CONCURRENT_CHANGE_REASON) {
+      setGeneralError("concurrentChange");
       return;
     }
     const allShown = applyServerFieldErrors(error, form.setError, {

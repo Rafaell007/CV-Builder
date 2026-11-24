@@ -138,6 +138,10 @@ describe("useDeleteUser", () => {
   it.each([
     [{ code: "CONFLICT", reason: "SELF_DELETE" }, "You cannot delete your own account."],
     [{ code: "FORBIDDEN" }, "You do not have permission to do this."],
+    [
+      { code: "CONFLICT", reason: "CONCURRENT_CHANGE" },
+      "Someone changed this user at the same time. Try again.",
+    ],
     [{ code: "INTERNAL_SERVER_ERROR" }, "Something went wrong. Please try again."],
   ])(
     "closes and shows a translated text, not the backend message, for %o",
