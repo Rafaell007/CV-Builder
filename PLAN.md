@@ -408,6 +408,11 @@ Seed (all users verified, D16): 1 admin, 2+ users, departments, positions, skill
 
 **Priority (D29):** steps without a tag are **Must**. **(Should)** — do after all Must steps of the same phase. **(Could)** — dropped first when time runs out.
 
+**Status snapshot, frozen on 2026-11-24.** Do not update it. This file has no status markers; the current status of each step is in Jira and in [§12 Progress log](#12-progress-log).
+- Merged into `development`: S0.1, S3.3, S3.4, S3.5, S3.6, S3.7, S3.8, S7.5, S7.6, S7.7, S8.1.
+- In progress: S0.2, S0.3, S0.4, S0.5, S2.1.
+- Every other step was not started or had no merged work.
+
 ### Phase 0 — Monorepo and infrastructure
 
 - [x] **S0.1 Monorepo structure**
