@@ -13,6 +13,7 @@ import { LanguagesModule } from "./modules/languages/languages.module";
 import { PositionsModule } from "./modules/positions/positions.module";
 import { ProjectsModule } from "./modules/projects/projects.module";
 import { SkillsModule } from "./modules/skills/skills.module";
+import { UsersModule } from "./modules/users/users.module";
 import { PrismaModule } from "./prisma/prisma.module";
 
 @Module({
@@ -39,6 +40,7 @@ import { PrismaModule } from "./prisma/prisma.module";
     DepartmentsModule,
     PositionsModule,
     LanguagesModule,
+    UsersModule,
   ],
 })
 export class AppModule {}
