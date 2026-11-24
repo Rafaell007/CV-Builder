@@ -5,7 +5,7 @@ The `/sign-in` page (PLAN S3.4, KAN-87): tabs, welcome text and the email + pass
 - Exports: `SignIn` (the whole page content; the route only renders it).
 - Tabs: the shared `AuthTabs` (`@/shared/components/AuthTabs`), shared with the sign-up page.
 - `components/SignInForm`: the form. `useSignInForm` holds the form state and the Zod rules (`utils`), `useSignIn` sends the `SignIn` mutation and opens `/users`.
-- Errors: `UNAUTHENTICATED` shows "Invalid email or password" (the backend does not say which one was wrong); anything else shows "Something went wrong". Typed values stay in both cases.
+- Errors: `UNAUTHENTICATED` shows "Invalid email or password" (the backend does not say which one was wrong); anything else, a throttled request too, shows "Something went wrong". Typed values stay in both cases. `useSignIn` reads the failure with `readFailure` (`shared/failures`, kind `unauthenticated`).
 - The mutation is named `SignIn`, so the session link never tries to refresh the session for it ([session](../../shared/session/README.md)).
 - Texts: `messages/` (`signIn` namespace, `en` and `pl`).
 - Used by: `app/[locale]/(auth)/sign-in/page.tsx`. A signed-in user never sees the page: the proxy redirects to `/users`.

@@ -1,6 +1,5 @@
-import { CombinedGraphQLErrors } from "@apollo/client";
 import { z } from "zod";
-import type { SignInErrorKind, SignInValidationMessages } from "../sign-in.types";
+import type { SignInValidationMessages } from "../sign-in.types";
 
 export const MIN_PASSWORD_LENGTH = 6;
 
@@ -16,16 +15,4 @@ export function createSignInSchema(messages: SignInValidationMessages) {
       .min(1, messages.passwordRequired)
       .pipe(z.string().min(MIN_PASSWORD_LENGTH, messages.passwordTooShort)),
   });
-}
-
-/**
- * Sorts a failed request. The backend answers a wrong email and a wrong password the same way
- * (`UNAUTHENTICATED`), so the page cannot tell which one was wrong. Anything else is unexpected.
- */
-export function getSignInErrorKind(error: unknown): SignInErrorKind {
-  if (CombinedGraphQLErrors.is(error)) {
-    const isRejected = error.errors.some((item) => item.extensions?.code === "UNAUTHENTICATED");
-    if (isRejected) return "invalidCredentials";
-  }
-  return "unexpected";
 }
