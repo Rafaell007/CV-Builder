@@ -1,12 +1,14 @@
 import type { FieldValues, Path, UseFormSetError } from "react-hook-form";
+import type { ServerFieldError } from "../forms.types";
 import { getServerFieldErrors } from "../utils";
 
 export type ApplyServerFieldErrorsOptions<TValues extends FieldValues> = {
   // The form fields the server checks. A server field outside this list cannot be shown inline.
   fields: readonly Path<TValues>[];
   // The translated text under the field. The server's own messages are English (class-validator),
-  // so they are never shown as they are.
-  getMessage: (field: Path<TValues>) => string;
+  // so they are never shown as they are. `reasons` holds the stable codes the server sent for the field,
+  // and is empty when the rule has none.
+  getMessage: (field: Path<TValues>, reasons: readonly string[]) => string;
 };
 
 /**
@@ -25,11 +27,15 @@ export function applyServerFieldErrors<TValues extends FieldValues>(
     (fields as readonly string[]).includes(field);
 
   const shown = fieldErrors.filter(
-    (fieldError): fieldError is { field: Path<TValues>; messages: string[] } =>
+    (fieldError): fieldError is ServerFieldError & { field: Path<TValues> } =>
       isFormField(fieldError.field),
   );
-  shown.forEach(({ field }, index) => {
-    setError(field, { type: "server", message: getMessage(field) }, { shouldFocus: index === 0 });
+  shown.forEach(({ field, reasons = [] }, index) => {
+    setError(
+      field,
+      { type: "server", message: getMessage(field, reasons) },
+      { shouldFocus: index === 0 },
+    );
   });
 
   return fieldErrors.length > 0 && shown.length === fieldErrors.length;
