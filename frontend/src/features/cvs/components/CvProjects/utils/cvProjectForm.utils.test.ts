@@ -15,9 +15,11 @@ import {
 const messages: CvProjectFormMessages = {
   projectRequired: "project required",
   startDateRequired: "start required",
-  startDateOutOfRange: "start outside",
-  endDateOutOfRange: "end outside",
-  endDateBeforeStart: "end before start",
+  dateTexts: {
+    START_OUTSIDE_PROJECT: "start outside",
+    END_OUTSIDE_PROJECT: "end outside",
+    END_BEFORE_START: "end before start",
+  },
   rolesRequired: "roles required",
   rolesTooMany: "too many roles",
   responsibilitiesTooLong: "responsibilities long",
@@ -89,6 +91,21 @@ describe("cvProjectFormSchema", () => {
   it("refuses an end date earlier than the start date, on the end date", () => {
     expect(issues({ ...valid, endDate: new Date(2025, 0, 15) })).toEqual({
       endDate: "end before start",
+    });
+  });
+
+  it("shows every broken rule of the end date, like the backend", () => {
+    expect(
+      issues({ ...valid, startDate: new Date(2025, 5, 10), endDate: new Date(2024, 5, 1) }),
+    ).toEqual({
+      endDate: "end before start. end outside",
+    });
+  });
+
+  it("counts calendar days: a time late on the last day of the project is inside it", () => {
+    expect(issues({ ...valid, endDate: new Date(2026, 11, 31, 23, 30) })).toEqual({});
+    expect(issues({ ...valid, startDate: new Date(2027, 0, 1, 0, 30), endDate: null })).toEqual({
+      startDate: "start outside",
     });
   });
 

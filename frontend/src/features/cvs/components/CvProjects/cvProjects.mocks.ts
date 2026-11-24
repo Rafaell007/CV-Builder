@@ -164,11 +164,23 @@ export const addCvProjectMock = (
   result: { data: { addCvProject: added } },
 });
 
+/** A field the backend rejected: its name, or its name with the stable `reasons` the backend sends for it. */
+export type RejectedField = string | { field: string; reasons: string[] };
+
 /** The extensions of a refused request: the code and, for `BAD_USER_INPUT`, the fields the backend rejected. */
-const refusal = (code: string, fields: string[] = []) => ({
+const refusal = (code: string, fields: RejectedField[] = []) => ({
   code,
   ...(fields.length > 0
-    ? { fieldErrors: fields.map((field) => ({ field, messages: [`${field} is invalid`] })) }
+    ? {
+        fieldErrors: fields.map((item) => {
+          const { field, reasons } = typeof item === "string" ? { field: item, reasons: [] } : item;
+          return {
+            field,
+            messages: [`${field} is invalid`],
+            ...(reasons.length > 0 ? { reasons } : {}),
+          };
+        }),
+      }
     : {}),
 });
 
@@ -176,7 +188,7 @@ const refusal = (code: string, fields: string[] = []) => ({
 export const addCvProjectRefusedMock = (
   input: AddCvProjectInput,
   code: string,
-  fields?: string[],
+  fields?: RejectedField[],
 ): MockLink.MockedResponse => ({
   request: { query: AddCvProjectDocument, variables: { input } },
   result: { errors: [{ message: code, extensions: refusal(code, fields) }] },
@@ -203,7 +215,7 @@ export const updateCvProjectMock = (
 export const updateCvProjectRefusedMock = (
   input: UpdateCvProjectInput,
   code: string,
-  fields?: string[],
+  fields?: RejectedField[],
 ): MockLink.MockedResponse => ({
   request: { query: UpdateCvProjectDocument, variables: { input } },
   result: { errors: [{ message: code, extensions: refusal(code, fields) }] },

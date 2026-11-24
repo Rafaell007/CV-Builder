@@ -74,6 +74,14 @@ Invalid input returns `BAD_USER_INPUT` with one entry per field:
 
 For a rule that only the service can check, throw `ValidationFailedException` with the same shape.
 
+A service can add `reasons` to a field error. It is a list of stable codes with one code for each entry of `messages`, in the same order. The client shows its own translated text for each code and does not show the English `messages`. Other modules leave `reasons` out, and their errors do not change. The CV project date rule uses it:
+
+```json
+{ "field": "endDate",
+  "messages": ["End date cannot be earlier than start date", "End date must be within project duration"],
+  "reasons": ["END_BEFORE_START", "END_OUTSIDE_PROJECT"] }
+```
+
 ### 3. Throw errors
 
 Throw Nest exceptions in the service. The global exception filter maps them (D7):

@@ -45,6 +45,22 @@ describe("getServerFieldErrors", () => {
     ).toEqual([]);
   });
 
+  it("returns the reasons of a field error when the server sends them", () => {
+    const withReasons = { ...EMAIL_ERROR, reasons: ["EMAIL_TAKEN"] };
+    const error = graphQLErrors({ code: "BAD_USER_INPUT", fieldErrors: [withReasons, SIZE_ERROR] });
+
+    expect(getServerFieldErrors(error)).toEqual([withReasons, SIZE_ERROR]);
+  });
+
+  it("keeps the field error and drops reasons that are not a list of texts", () => {
+    const error = graphQLErrors({
+      code: "BAD_USER_INPUT",
+      fieldErrors: [{ ...EMAIL_ERROR, reasons: "EMAIL_TAKEN" }],
+    });
+
+    expect(getServerFieldErrors(error)).toEqual([EMAIL_ERROR]);
+  });
+
   it("returns nothing for an error that is not a GraphQL answer", () => {
     expect(getServerFieldErrors(new TypeError("Failed to fetch"))).toEqual([]);
     expect(getServerFieldErrors(undefined)).toEqual([]);

@@ -5,7 +5,12 @@ import { useMemo, useRef, useState, type BaseSyntheticEvent } from "react";
 import { readFailure } from "@/shared/failures";
 import { applyServerFieldErrors, useZodForm } from "@/shared/forms";
 import type { CvProjectFormSubmit, CvProjectFormValues, ProjectRange } from "../cvProjects.types";
-import { cvProjectFormSchema, EMPTY_CV_PROJECT_FORM_VALUES } from "../utils";
+import {
+  cvProjectFormSchema,
+  EMPTY_CV_PROJECT_FORM_VALUES,
+  toCvProjectDateText,
+  type CvProjectDateTexts,
+} from "../utils";
 
 // The fields the backend validates (`AddCvProjectInput`, `UpdateCvProjectInput`); each one can show a server error inline.
 const SERVER_FIELDS = ["projectId", "startDate", "endDate", "roleIds", "responsibilities"] as const;
@@ -29,22 +34,30 @@ export function useCvProjectForm(rangeOf: (projectId: string) => ProjectRange | 
   // A ref changes at once: two submits in the same tick cannot both pass (page 23, Mutation States).
   const sending = useRef(false);
 
+  // One text for each code of the date rule: the form rules and the answer of the backend show the same texts.
+  const dateTexts = useMemo<CvProjectDateTexts>(
+    () => ({
+      START_OUTSIDE_PROJECT: t("startDateOutOfRange"),
+      END_OUTSIDE_PROJECT: t("endDateOutOfRange"),
+      END_BEFORE_START: t("endDateBeforeStart"),
+    }),
+    [t],
+  );
+
   const schema = useMemo(
     () =>
       cvProjectFormSchema(
         {
           projectRequired: t("projectRequired"),
           startDateRequired: t("startDateRequired"),
-          startDateOutOfRange: t("startDateOutOfRange"),
-          endDateOutOfRange: t("endDateOutOfRange"),
-          endDateBeforeStart: t("endDateBeforeStart"),
+          dateTexts,
           rolesRequired: t("rolesRequired"),
           rolesTooMany: t("rolesTooMany"),
           responsibilitiesTooLong: t("responsibilitiesTooLong"),
         },
         rangeOf,
       ),
-    [t, rangeOf],
+    [t, dateTexts, rangeOf],
   );
   const form = useZodForm<CvProjectFormValues, CvProjectFormSubmit>(schema, {
     defaultValues: EMPTY_CV_PROJECT_FORM_VALUES,
@@ -60,14 +73,14 @@ export function useCvProjectForm(rangeOf: (projectId: string) => ProjectRange | 
   function showError(failure: unknown) {
     const allShown = applyServerFieldErrors(failure, form.setError, {
       fields: SERVER_FIELDS,
-      getMessage: (field) => {
+      getMessage: (field, reasons) => {
         switch (field) {
           case "projectId":
             return t("server.projectId");
           case "startDate":
-            return t("server.startDate");
+            return toCvProjectDateText(reasons, dateTexts) ?? t("server.startDate");
           case "endDate":
-            return t("server.endDate");
+            return toCvProjectDateText(reasons, dateTexts) ?? t("server.endDate");
           case "roleIds":
             return t("server.roleIds");
           default:

@@ -2,14 +2,28 @@ import { ValidationFailedException } from "../../../common/errors";
 import type { FieldError } from "../../../common/errors";
 import { toDateOnly } from "../../projects/project-dates";
 
-const START_OUTSIDE = "Start date must be within project duration";
-const END_OUTSIDE = "End date must be within project duration";
-const END_BEFORE_START = "End date cannot be earlier than start date";
+/** The codes of the date rule. The frontend maps each one to a translated text, so a rename is a contract change. */
+export const CvProjectDateReason = {
+  StartOutsideProject: "START_OUTSIDE_PROJECT",
+  EndOutsideProject: "END_OUTSIDE_PROJECT",
+  EndBeforeStart: "END_BEFORE_START",
+} as const;
+type CvProjectDateReason = (typeof CvProjectDateReason)[keyof typeof CvProjectDateReason];
+
+const MESSAGE_BY_REASON: Record<CvProjectDateReason, string> = {
+  START_OUTSIDE_PROJECT: "Start date must be within project duration",
+  END_OUTSIDE_PROJECT: "End date must be within project duration",
+  END_BEFORE_START: "End date cannot be earlier than start date",
+};
+
+function toFieldError(field: string, reasons: CvProjectDateReason[]): FieldError {
+  return { field, messages: reasons.map((reason) => MESSAGE_BY_REASON[reason]), reasons };
+}
 
 /**
  * The dates of a CV project as stored: whole days (UTC), and an empty end date as `null`
  * ("Present"). They must stay within the dates of the project (CV projects page AC-15, AC-34, D25).
- * The error lists every broken rule, so the form can show all of them at once.
+ * The error lists every broken rule, each with a `reason` code, so the form can show all of them at once.
  */
 export function resolveCvProjectDates(
   { startDate, endDate }: { startDate: Date; endDate?: Date | null },
@@ -20,13 +34,15 @@ export function resolveCvProjectDates(
   const errors: FieldError[] = [];
 
   if (start < project.startDate || start > project.endDate) {
-    errors.push({ field: "startDate", messages: [START_OUTSIDE] });
+    errors.push(toFieldError("startDate", [CvProjectDateReason.StartOutsideProject]));
   }
   if (end !== null) {
-    const messages: string[] = [];
-    if (end < start) messages.push(END_BEFORE_START);
-    if (end < project.startDate || end > project.endDate) messages.push(END_OUTSIDE);
-    if (messages.length > 0) errors.push({ field: "endDate", messages });
+    const reasons: CvProjectDateReason[] = [];
+    if (end < start) reasons.push(CvProjectDateReason.EndBeforeStart);
+    if (end < project.startDate || end > project.endDate) {
+      reasons.push(CvProjectDateReason.EndOutsideProject);
+    }
+    if (reasons.length > 0) errors.push(toFieldError("endDate", reasons));
   }
 
   if (errors.length > 0) throw new ValidationFailedException(errors);

@@ -1,6 +1,6 @@
 import { CombinedGraphQLErrors } from "@apollo/client";
 import { useState } from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import { TextField } from "@/shared/components";
 import { renderWithProviders, screen } from "@/shared/testing";
@@ -108,5 +108,29 @@ describe("applyServerFieldErrors", () => {
 
     expect(screen.getByRole("textbox", { name: "Email" })).toBeValid();
     expect(screen.getByText("General error")).toBeInTheDocument();
+  });
+
+  it("gives the reasons of the field error to getMessage, and an empty list when there are none", () => {
+    const setError = vi.fn();
+    const getMessage = vi.fn(() => "text");
+    const error = new CombinedGraphQLErrors({
+      errors: [
+        {
+          message: "Bad input",
+          extensions: {
+            code: "BAD_USER_INPUT",
+            fieldErrors: [
+              { field: "email", messages: ["x"], reasons: ["EMAIL_TAKEN"] },
+              { field: "name", messages: ["y"] },
+            ],
+          },
+        },
+      ],
+    });
+
+    applyServerFieldErrors(error, setError, { fields: ["email", "name"], getMessage });
+
+    expect(getMessage).toHaveBeenNthCalledWith(1, "email", ["EMAIL_TAKEN"]);
+    expect(getMessage).toHaveBeenNthCalledWith(2, "name", []);
   });
 });

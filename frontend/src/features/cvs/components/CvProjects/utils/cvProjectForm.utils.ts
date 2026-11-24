@@ -9,14 +9,17 @@ import type {
   CvProjectItem,
   ProjectRange,
 } from "../cvProjects.types";
+import {
+  toCvProjectDateReasons,
+  toCvProjectDateText,
+  type CvProjectDateTexts,
+} from "./cvProjectDates.utils";
 
 /** The translated texts of the validation messages (page 23, Add Project Validation). */
 export interface CvProjectFormMessages {
   projectRequired: string;
   startDateRequired: string;
-  startDateOutOfRange: string;
-  endDateOutOfRange: string;
-  endDateBeforeStart: string;
+  dateTexts: CvProjectDateTexts;
   rolesRequired: string;
   rolesTooMany: string;
   responsibilitiesTooLong: string;
@@ -103,30 +106,10 @@ export function cvProjectFormSchema(
         .max(MAX_RESPONSIBILITIES_LENGTH, messages.responsibilitiesTooLong),
     })
     .superRefine(({ projectId, startDate, endDate }, context) => {
-      const range = rangeOf(projectId);
-      const outside = (date: Date) =>
-        range !== undefined && (date < range.start || date > range.end);
-
-      if (outside(startDate)) {
-        context.addIssue({
-          code: "custom",
-          message: messages.startDateOutOfRange,
-          path: ["startDate"],
-        });
-      }
-      if (endDate === null) return;
-      if (outside(endDate)) {
-        context.addIssue({
-          code: "custom",
-          message: messages.endDateOutOfRange,
-          path: ["endDate"],
-        });
-      } else if (endDate < startDate) {
-        context.addIssue({
-          code: "custom",
-          message: messages.endDateBeforeStart,
-          path: ["endDate"],
-        });
+      const reasons = toCvProjectDateReasons({ startDate, endDate }, rangeOf(projectId));
+      for (const field of ["startDate", "endDate"] as const) {
+        const message = toCvProjectDateText(reasons[field], messages.dateTexts);
+        if (message !== undefined) context.addIssue({ code: "custom", message, path: [field] });
       }
     });
 }
