@@ -4,25 +4,25 @@ import type { Page } from "@playwright/test";
 
 type WindowWithCount = Window & { maxCopies?: number };
 
-// The text of the part of the page that React streams in after the first HTML (`HealthStatus` in frontend/src/features/health).
-const STREAMED_TEXT = "Backend health (server)";
+// The page title of /users (the route's PageHeader, rendered on the server). A doubled page holds it twice.
+const PAGE_TITLE = "Employees";
 
 /**
- * Call before `page.goto`. A MutationObserver records the highest number of copies of the streamed part that
- * the DOM ever held, hidden ones included (`getByRole` and `toBeVisible` ignore those). A check made at one
- * moment can miss the ~300 ms window in which a bug leaves two copies; this cannot.
+ * Call before `page.goto`. A MutationObserver records the highest number of copies of the page title that the DOM
+ * ever held, hidden ones included (`getByRole` and `toBeVisible` ignore those). A check made at one moment can miss
+ * the ~300 ms window in which a bug leaves two copies; this cannot.
  */
 export async function startCountingPageCopies(page: Page) {
-  await page.addInitScript((text) => {
+  await page.addInitScript((title) => {
     const win: WindowWithCount = window;
     win.maxCopies = 0;
     new MutationObserver(() => {
-      const copies = Array.from(document.querySelectorAll("p")).filter((paragraph) =>
-        paragraph.textContent?.includes(text),
+      const copies = Array.from(document.querySelectorAll("h1")).filter(
+        (heading) => heading.textContent?.trim() === title,
       ).length;
       win.maxCopies = Math.max(win.maxCopies ?? 0, copies);
     }).observe(document, { childList: true, subtree: true });
-  }, STREAMED_TEXT);
+  }, PAGE_TITLE);
 }
 
 /** Waits until React has removed its hidden streaming copy (`div#S:n`), then returns the highest count seen. */

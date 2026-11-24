@@ -39,8 +39,13 @@ test.describe("with a session", () => {
 
     await expect(page.locator("html")).toHaveAttribute("lang", "pl");
     await expect(page.getByRole("heading", { name: "Pracownicy" })).toBeVisible();
-    await expect(page.getByText("Stan backendu (serwer): ok")).toBeVisible();
-    await expect(page.getByText("Stan backendu (klient): ok")).toBeVisible();
+    // The table name is Polish and the seeded admin's row loaded, so the page got its data in Polish.
+    await expect(
+      page
+        .getByRole("table", { name: "Lista pracowników" })
+        .getByRole("cell", { name: "Ada", exact: true })
+        .first(),
+    ).toBeVisible();
   });
 
   test("the chosen language stays after a refresh and on links without a language", async ({
