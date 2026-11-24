@@ -17,7 +17,7 @@ Node 24, pnpm 12, Docker, and the Playwright browser, installed once as the [e2e
 
 It does five things:
 
-1. Starts PostgreSQL and Mailpit (`docker compose up -d --wait`).
+1. Starts PostgreSQL and Mailpit (`docker compose up -d --wait`). Set `RUN_SKIP_DOCKER=1` to skip this when a database already runs on port 5432, as in CI.
 2. Copies the scenario into `e2e/zz-run-skill/`, because `e2e/playwright.config.ts` has `testDir: "."`. It removes the folder on exit.
 3. Empties and seeds `cv_builder_test`, builds both apps, and starts the backend on port 4100 and the frontend on port 3100. A running `pnpm dev` (ports 3000 and 4000) is never touched.
 4. Runs the scenario in Chromium. `--no-deps` skips the `cvs-list` project.
@@ -52,6 +52,8 @@ Pass one file to run one scenario. A scenario that only observes writes what it 
 | `admin-creates-cv.spec.ts` | KAN-144 | An admin creates a CV on the User CVs tab of an employee. Records who owns the new CV. |
 | `date-reasons.spec.ts` | KAN-170 | The Add project modal after the project was narrowed (stale form), in English and Polish, and the days sent and shown in `Pacific/Auckland` and `America/Los_Angeles`. It asserts, because the results are known. |
 | `auth-and-language.spec.ts` | none | Signs in through the sign-in page, opens a page in Polish, logs out and checks that the session cookie is gone. |
+
+CI runs all of them in the `scenarios` job of `.github/workflows/ci.yml`, in parallel with the `e2e` job. It uploads the screenshots and `observations.jsonl` as the artifact `run-skill-output`. A scenario that only observes cannot fail on a regression, so open the artifact when you review a change that touches these pages. I could not run this job locally. It ran only as far as the same script with `RUN_SKIP_DOCKER=1`.
 
 The last run of these scenarios gave three results that differ from the ticket texts. Check them before you rely on a ticket: a row click and View open `/preview`, not `/details` (KAN-146). A CV that an admin creates on the User CVs tab belongs to the employee (KAN-144). All focus returns to the trigger after a menu or modal closes (KAN-145).
 
