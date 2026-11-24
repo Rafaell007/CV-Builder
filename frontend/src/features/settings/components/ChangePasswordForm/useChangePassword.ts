@@ -4,6 +4,7 @@ import { useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useToast } from "@/shared/components/Toast";
+import { readFailure } from "@/shared/failures";
 import { ChangePasswordDocument } from "@/shared/graphql";
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "@/shared/utils";
 import type {
@@ -11,13 +12,28 @@ import type {
   ChangePasswordField,
   ChangePasswordValues,
 } from "./change-password.types";
-import { FIELD_FAILURES, toChangePasswordFailure, validateChangePassword } from "./utils";
+import { FIELD_FAILURES, validateChangePassword } from "./utils";
 
 const EMPTY_VALUES: ChangePasswordValues = {
   currentPassword: "",
   newPassword: "",
   confirmPassword: "",
 };
+
+// `extensions.reason` of the backend's BAD_USER_INPUT (backend auth README) → the field it belongs to.
+const REASONS: Record<string, ChangePasswordErrorKey> = {
+  CURRENT_PASSWORD_INCORRECT: "currentPasswordIncorrect",
+  NEW_PASSWORD_SAME: "newPasswordSame",
+};
+
+// Turns the failure of the changePassword mutation into the message key the user sees. The passwords are never part of it.
+function toChangePasswordFailure(error: unknown): ChangePasswordErrorKey {
+  const { kind, reason } = readFailure(error);
+  if (kind === "invalid") {
+    return (reason === undefined ? undefined : REASONS[reason]) ?? "invalidInput";
+  }
+  return kind === "tooManyRequests" ? "tooManyRequests" : "unexpected";
+}
 
 export type ChangePasswordFieldProps = {
   value: string;

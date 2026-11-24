@@ -1,4 +1,3 @@
-import { CombinedGraphQLErrors } from "@apollo/client";
 import { passwordProblem, type PasswordProblem } from "@/shared/utils";
 import type {
   ChangePasswordErrorKey,
@@ -35,29 +34,8 @@ export function validateChangePassword({
   return errors;
 }
 
-// `extensions.reason` of the backend's BAD_USER_INPUT (backend auth README) → the field it belongs to.
-const REASONS: Record<string, ChangePasswordErrorKey> = {
-  CURRENT_PASSWORD_INCORRECT: "currentPasswordIncorrect",
-  NEW_PASSWORD_SAME: "newPasswordSame",
-};
-
 // Server failures shown under a field instead of under the form.
 export const FIELD_FAILURES: Partial<Record<ChangePasswordErrorKey, ChangePasswordField>> = {
   currentPasswordIncorrect: "currentPassword",
   newPasswordSame: "newPassword",
 };
-
-// Turns an error of the changePassword mutation into the message key the user sees. The passwords are never part of it.
-export function toChangePasswordFailure(error: unknown): ChangePasswordErrorKey {
-  if (CombinedGraphQLErrors.is(error)) {
-    const extensions = error.errors[0]?.extensions;
-    const code = extensions?.["code"];
-    const reason = extensions?.["reason"];
-
-    if (code === "BAD_USER_INPUT") {
-      return (typeof reason === "string" ? REASONS[reason] : undefined) ?? "invalidInput";
-    }
-    if (code === "TOO_MANY_REQUESTS") return "tooManyRequests";
-  }
-  return "unexpected";
-}
