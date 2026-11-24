@@ -8,5 +8,18 @@
       "Read(./coverage/**)",
       "Read(./.env)"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect-plan.mjs\""
+          }
+        ]
+      }
+    ]
   }
 }
