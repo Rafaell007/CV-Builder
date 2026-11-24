@@ -2,19 +2,15 @@
 
 import { useTranslations } from "next-intl";
 import { useMemo, useRef, useState, type BaseSyntheticEvent } from "react";
+import { readFailure, type FailureKind } from "@/shared/failures";
 import { applyServerFieldErrors, useZodForm } from "@/shared/forms";
 import type { CvProjectFormSubmit, CvProjectFormValues, ProjectRange } from "../cvProjects.types";
-import {
-  cvProjectFormSchema,
-  EMPTY_CV_PROJECT_FORM_VALUES,
-  toCvProjectFailure,
-  type CvProjectFailure,
-} from "../utils";
+import { cvProjectFormSchema, EMPTY_CV_PROJECT_FORM_VALUES } from "../utils";
 
 // The fields the backend validates (`AddCvProjectInput`, `UpdateCvProjectInput`); each one can show a server error inline.
 const SERVER_FIELDS = ["projectId", "startDate", "endDate", "roleIds", "responsibilities"] as const;
 
-type FormError = CvProjectFailure | "failed";
+type FormError = Exclude<FailureKind, "unknown"> | "failed";
 
 /**
  * The form that Add project and Update project share (page 23: "Validation rules are identical to Add Project"):
@@ -76,7 +72,8 @@ export function useCvProjectForm(rangeOf: (projectId: string) => ProjectRange | 
         }
       },
     });
-    setError(allShown ? undefined : (toCvProjectFailure(failure) ?? "failed"));
+    const { kind } = readFailure(failure);
+    setError(allShown ? undefined : kind === "unknown" ? "failed" : kind);
   }
 
   /**

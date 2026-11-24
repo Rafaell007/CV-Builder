@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
+import { readFailure } from "@/shared/failures";
 import { renderWithProviders, type RenderWithProvidersOptions } from "@/shared/testing";
-import { isCatalogConflict } from "../../../utils";
 import {
   updatePositionMock as updateMock,
   updatePositionRefusedMock as refusedMock,
@@ -33,6 +33,6 @@ describe("useUpdatePosition", () => {
       .update("7", "Finance")
       .catch((caught: unknown) => caught);
 
-    expect(isCatalogConflict(error)).toBe(true);
+    expect(readFailure(error).kind).toBe("conflict");
   });
 });

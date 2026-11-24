@@ -1,15 +1,6 @@
-import { CombinedGraphQLErrors } from "@apollo/client";
 import { describe, expect, it } from "vitest";
 import { DEFAULT_CV_PROJECTS_SORT } from "../cvProjects.constants";
-import {
-  toCvProjectFailure,
-  toCvProjectsVariables,
-  toResponsibilityTags,
-} from "./cvProjects.utils";
-
-function graphQlError(code: string): CombinedGraphQLErrors {
-  return new CombinedGraphQLErrors({ errors: [{ message: code, extensions: { code } }] });
-}
+import { toCvProjectsVariables, toResponsibilityTags } from "./cvProjects.utils";
 
 describe("toCvProjectsVariables", () => {
   it("always sends the CV and the sort, and leaves an empty search out", () => {
@@ -32,36 +23,6 @@ describe("toCvProjectsVariables", () => {
         sort: { field: "endDate", direction: "DESC" },
       }),
     ).toEqual({ cvId: "cv-1", search: "bank", sort: { field: "endDate", direction: "DESC" } });
-  });
-});
-
-describe("toCvProjectFailure", () => {
-  it.each([
-    ["NOT_FOUND", "notFound"],
-    ["FORBIDDEN", "forbidden"],
-    ["CONFLICT", "conflict"],
-    ["BAD_USER_INPUT", "invalid"],
-  ] as const)("reads %s as %s", (code, expected) => {
-    expect(toCvProjectFailure(graphQlError(code))).toBe(expected);
-  });
-
-  it("returns undefined for a code the user cannot act on", () => {
-    expect(toCvProjectFailure(graphQlError("INTERNAL_SERVER_ERROR"))).toBeUndefined();
-  });
-
-  it("returns undefined for a network error", () => {
-    expect(toCvProjectFailure(new Error("Failed to fetch"))).toBeUndefined();
-  });
-
-  it("prefers NOT_FOUND when the answer holds several codes", () => {
-    const error = new CombinedGraphQLErrors({
-      errors: [
-        { message: "a", extensions: { code: "CONFLICT" } },
-        { message: "b", extensions: { code: "NOT_FOUND" } },
-      ],
-    });
-
-    expect(toCvProjectFailure(error)).toBe("notFound");
   });
 });
 

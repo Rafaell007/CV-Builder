@@ -1,6 +1,5 @@
-import { CombinedGraphQLErrors } from "@apollo/client";
 import { describe, expect, it } from "vitest";
-import { isIsoTaken, languageFormSchema, normalizeIso } from "./languages.utils";
+import { languageFormSchema, normalizeIso } from "./languages.utils";
 
 const schema = languageFormSchema({
   nameRequired: "name required",
@@ -19,9 +18,6 @@ function errorOf(values: typeof valid, field: keyof typeof valid) {
   const result = schema.safeParse(values);
   return result.error?.issues.find((issue) => issue.path[0] === field)?.message;
 }
-
-const refused = (extensions: Record<string, unknown>) =>
-  new CombinedGraphQLErrors({ errors: [{ message: "Refused", extensions }] });
 
 describe("normalizeIso", () => {
   it("trims and uppercases", () => {
@@ -69,14 +65,5 @@ describe("languageFormSchema", () => {
 
   it.each(["EN", "en", "PT-BR", "zh-cn"])("accepts the ISO code %j", (iso) => {
     expect(errorOf({ ...valid, iso }, "iso")).toBeUndefined();
-  });
-});
-
-describe("isIsoTaken", () => {
-  it("is true only for CONFLICT with reason ISO_TAKEN", () => {
-    expect(isIsoTaken(refused({ code: "CONFLICT", reason: "ISO_TAKEN" }))).toBe(true);
-    expect(isIsoTaken(refused({ code: "CONFLICT" }))).toBe(false);
-    expect(isIsoTaken(refused({ code: "BAD_USER_INPUT", reason: "ISO_TAKEN" }))).toBe(false);
-    expect(isIsoTaken(new Error("Failed to fetch"))).toBe(false);
   });
 });

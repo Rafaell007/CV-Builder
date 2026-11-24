@@ -3,10 +3,11 @@
 import { useTranslations } from "next-intl";
 import { useMemo, useRef, useState, type BaseSyntheticEvent } from "react";
 import { useWatch } from "react-hook-form";
+import { readFailure } from "@/shared/failures";
 import { applyServerFieldErrors, useZodForm } from "@/shared/forms";
-import { isCatalogConflict } from "../../../utils";
+import { ISO_TAKEN_REASON } from "../languages.constants";
 import type { LanguageFormValues, LanguageInput } from "../languages.types";
-import { isIsoTaken, languageFormSchema, normalizeIso } from "../utils";
+import { languageFormSchema, normalizeIso } from "../utils";
 
 const NAMESPACE = "catalogs.languages";
 const EMPTY_VALUES: LanguageFormValues = { name: "", iso: "", nativeName: "" };
@@ -75,7 +76,8 @@ export function useLanguageForm() {
 
   /** Shows a failed request: a taken ISO code or name or a field error under its field, anything else as the general message. */
   function showError(error: unknown) {
-    if (isIsoTaken(error)) {
+    const { kind, reason } = readFailure(error);
+    if (kind === "conflict" && reason === ISO_TAKEN_REASON) {
       form.setError(
         "iso",
         { type: "server", message: t("form.errors.isoTaken") },
@@ -84,7 +86,7 @@ export function useLanguageForm() {
       setFailed(false);
       return;
     }
-    if (isCatalogConflict(error)) {
+    if (kind === "conflict") {
       form.setError(
         "name",
         { type: "server", message: t("form.errors.nameTaken") },
