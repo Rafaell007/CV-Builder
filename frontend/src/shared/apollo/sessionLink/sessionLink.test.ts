@@ -22,7 +22,8 @@ function backendAnswering(...results: unknown[]) {
 
 function setup(outcome: RefreshOutcome, ...results: unknown[]) {
   const refresh = vi.fn().mockResolvedValue(outcome);
-  const onSessionEnded = vi.fn();
+  // The redirect is not under way by default, so a test that ends the session still gets the error.
+  const onSessionEnded = vi.fn(() => false);
   const backend = backendAnswering(...results);
   const client = new ApolloClient({
     cache: new InMemoryCache(),
@@ -69,6 +70,30 @@ describe("createSessionLink", () => {
     expect(refresh).toHaveBeenCalledTimes(1);
     expect(backendCalls).toHaveBeenCalledTimes(2);
     expect(onSessionEnded).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the request pending while the redirect to sign-in is under way, after a second failure", async () => {
+    const { client, onSessionEnded } = setup("refreshed", UNAUTHENTICATED, UNAUTHENTICATED);
+    onSessionEnded.mockReturnValue(true);
+    const settled = vi.fn();
+
+    void client.query({ query: HealthDocument, errorPolicy: "all" }).then(settled, settled);
+    await vi.waitFor(() => expect(onSessionEnded).toHaveBeenCalledTimes(1));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    expect(settled).not.toHaveBeenCalled();
+  });
+
+  it("keeps the request pending while the redirect to sign-in is under way, after a refused refresh", async () => {
+    const { client, onSessionEnded } = setup("rejected", UNAUTHENTICATED);
+    onSessionEnded.mockReturnValue(true);
+    const settled = vi.fn();
+
+    void client.query({ query: HealthDocument }).then(settled, settled);
+    await vi.waitFor(() => expect(onSessionEnded).toHaveBeenCalledTimes(1));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    expect(settled).not.toHaveBeenCalled();
   });
 
   it("ends the session when the refresh is refused and passes the error on", async () => {
