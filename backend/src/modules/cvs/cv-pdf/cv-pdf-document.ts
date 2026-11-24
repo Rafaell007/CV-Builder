@@ -57,7 +57,8 @@ function twoColumns(left: Content[], right: Content[], sideWidth: number): Conte
       vLineWidth: (index) => (index === 1 ? LINE_WIDTH : 0),
       vLineColor: () => COLOR_ACCENT,
       paddingLeft: (index) => (index === 1 ? COLUMN_GAP : 0),
-      paddingRight: () => 0,
+      // The text of the left column stops before the red line.
+      paddingRight: (index) => (index === 0 ? COLUMN_GAP : 0),
       paddingTop: () => 10,
       paddingBottom: () => 0,
     },
