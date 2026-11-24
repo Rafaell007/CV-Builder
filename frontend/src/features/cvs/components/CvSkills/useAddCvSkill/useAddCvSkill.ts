@@ -4,15 +4,18 @@ import { useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { useToast } from "@/shared/components";
+import { readFailure } from "@/shared/failures";
 import { AddCvSkillDocument, CvSkillsDocument } from "@/shared/graphql";
 import { useAvailableCvSkills } from "../useAvailableCvSkills";
 import type { CvSkillMastery } from "../cvSkills.types";
-import { toCvSkillFailure } from "../utils";
 
 /** What can be wrong after a press on ADD. The first three belong to the Skill field, the others to the whole modal. */
 type AddError = "required" | "conflict" | "invalid" | "notFound" | "forbidden" | "failed";
 
 const FIELD_ERRORS: readonly AddError[] = ["required", "conflict", "invalid"];
+
+// The kinds of `readFailure` with an own text. Every other kind shows the general `failed` text.
+const OWN_TEXT_KINDS = ["notFound", "forbidden", "conflict", "invalid"] as const;
 
 type MasteryChoice = CvSkillMastery | "";
 
@@ -75,10 +78,11 @@ export function useAddCvSkill(cvId: string) {
         description: t("success.text", { name: data?.addCvSkill.name ?? "" }),
       });
     } catch (failure) {
+      const { kind } = readFailure(failure);
       // Nothing resets the chosen skill here, so the value stays.
-      setError(toAddError(toCvSkillFailure(failure)));
+      setError(OWN_TEXT_KINDS.find((item) => item === kind) ?? "failed");
       // The skill is already in the CV, or the owner lost it: the options are old, so load them again.
-      if (toCvSkillFailure(failure) === "conflict") available.retry();
+      if (kind === "conflict") available.retry();
     } finally {
       sending.current = false;
     }
@@ -109,7 +113,3 @@ export function useAddCvSkill(cvId: string) {
 }
 
 export type UseAddCvSkillResult = ReturnType<typeof useAddCvSkill>;
-
-function toAddError(failure: ReturnType<typeof toCvSkillFailure>): AddError {
-  return failure ?? "failed";
-}

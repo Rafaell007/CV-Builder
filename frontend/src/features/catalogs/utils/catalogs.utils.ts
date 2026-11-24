@@ -1,4 +1,3 @@
-import { CombinedGraphQLErrors } from "@apollo/client";
 import { z } from "zod";
 import { MAX_CATALOG_NAME_LENGTH } from "../catalogs.constants";
 import type { CatalogNameFormValues } from "../catalogs.types";
@@ -26,13 +25,4 @@ export function catalogNameSchema(
   messages: CatalogNameMessages,
 ): z.ZodType<CatalogNameFormValues, CatalogNameFormValues> {
   return z.object({ name: catalogNameRule(messages) });
-}
-
-/**
- * True when the backend refused the request with `CONFLICT`. For departments, positions and skills it has one cause per request
- * (backend READMEs): on create or update the name is taken; on delete the item is in use.
- */
-export function isCatalogConflict(error: unknown): boolean {
-  if (!CombinedGraphQLErrors.is(error)) return false;
-  return error.errors.some((item) => item.extensions?.["code"] === "CONFLICT");
 }

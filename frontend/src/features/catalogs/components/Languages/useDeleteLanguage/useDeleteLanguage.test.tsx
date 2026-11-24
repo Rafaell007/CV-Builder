@@ -2,8 +2,8 @@ import type { ApolloClient } from "@apollo/client";
 import { useApolloClient } from "@apollo/client/react";
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
+import { readFailure } from "@/shared/failures";
 import { renderWithProviders, type RenderWithProvidersOptions } from "@/shared/testing";
-import { isCatalogConflict } from "../../../utils";
 import {
   deleteLanguageMock as deleteMock,
   deleteLanguageRefusedMock as refusedMock,
@@ -42,6 +42,6 @@ describe("useDeleteLanguage", () => {
       .remove("7")
       .catch((caught: unknown) => caught);
 
-    expect(isCatalogConflict(error)).toBe(true);
+    expect(readFailure(error).kind).toBe("conflict");
   });
 });

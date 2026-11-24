@@ -4,9 +4,9 @@ import { useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { useToast } from "@/shared/components";
+import { readFailure } from "@/shared/failures";
 import { DeleteProjectDocument, ProjectsDocument } from "@/shared/graphql";
 import type { ProjectListItem } from "../projects.types";
-import { toDeleteProjectFailure } from "../utils";
 
 export type UseDeleteProjectResult = {
   /** The project the user chose to delete. The modal is open while this is set. */
@@ -58,7 +58,8 @@ export function useDeleteProject(): UseDeleteProjectResult {
       setProject(null);
       toast.error({
         title: t("failedTitle"),
-        description: toDeleteProjectFailure(error) === "inUse" ? t("inUseText") : t("failedText"),
+        // The backend sends `CONFLICT` only when a CV uses the project (PLAN D18).
+        description: readFailure(error).kind === "conflict" ? t("inUseText") : t("failedText"),
       });
       return false;
     } finally {

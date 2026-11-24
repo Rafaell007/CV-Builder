@@ -1,11 +1,6 @@
-import { CombinedGraphQLErrors } from "@apollo/client";
 import { z } from "zod";
 import { catalogNameRule, type CatalogNameMessages } from "../../../utils";
-import {
-  ISO_TAKEN_REASON,
-  LANGUAGE_ISO_PATTERN,
-  MAX_LANGUAGE_ISO_LENGTH,
-} from "../languages.constants";
+import { LANGUAGE_ISO_PATTERN, MAX_LANGUAGE_ISO_LENGTH } from "../languages.constants";
 import type { LanguageFormValues } from "../languages.types";
 
 /** The translated texts of the language form rules. */
@@ -46,16 +41,4 @@ export function languageFormSchema(
       nameTooLong: messages.nativeNameTooLong,
     }),
   });
-}
-
-/**
- * True when the backend refused a create or update because the ISO code is taken: `CONFLICT` with reason
- * `ISO_TAKEN`. A `CONFLICT` without it means the name is taken (backend languages README).
- */
-export function isIsoTaken(error: unknown): boolean {
-  if (!CombinedGraphQLErrors.is(error)) return false;
-  return error.errors.some(
-    (item) =>
-      item.extensions?.["code"] === "CONFLICT" && item.extensions["reason"] === ISO_TAKEN_REASON,
-  );
 }

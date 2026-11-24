@@ -1,6 +1,5 @@
-import { CombinedGraphQLErrors } from "@apollo/client";
 import { describe, expect, it } from "vitest";
-import { createSignInSchema, getSignInErrorKind } from "./sign-in.utils";
+import { createSignInSchema } from "./sign-in.utils";
 
 const messages = {
   emailRequired: "Email is required",
@@ -54,27 +53,5 @@ describe("createSignInSchema", () => {
     const result = schema.safeParse({ email: "user@example.com", password: "  abcd  " });
 
     expect(result.data?.password).toBe("  abcd  ");
-  });
-});
-
-describe("getSignInErrorKind", () => {
-  it("treats UNAUTHENTICATED as wrong credentials", () => {
-    const error = new CombinedGraphQLErrors({
-      errors: [{ message: "Invalid email or password", extensions: { code: "UNAUTHENTICATED" } }],
-    });
-
-    expect(getSignInErrorKind(error)).toBe("invalidCredentials");
-  });
-
-  it("treats other GraphQL errors as unexpected", () => {
-    const error = new CombinedGraphQLErrors({
-      errors: [{ message: "Too many requests", extensions: { code: "TOO_MANY_REQUESTS" } }],
-    });
-
-    expect(getSignInErrorKind(error)).toBe("unexpected");
-  });
-
-  it("treats network errors as unexpected", () => {
-    expect(getSignInErrorKind(new TypeError("Failed to fetch"))).toBe("unexpected");
   });
 });

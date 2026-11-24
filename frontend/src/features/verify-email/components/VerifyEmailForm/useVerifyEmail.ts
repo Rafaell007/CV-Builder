@@ -4,11 +4,32 @@ import { useApolloClient, useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState, type FormEvent } from "react";
 import { useCurrentUser } from "@/shared/currentUser";
+import { readFailure } from "@/shared/failures";
 import { MeDocument, VerifyEmailDocument } from "@/shared/graphql";
 import { useRouter } from "@/shared/i18n";
 import { HOME_PATH } from "@/shared/session";
-import type { VerifyEmailErrorKey } from "./verify-email.types";
-import { toVerifyEmailFailure, validateCode } from "./utils";
+import type { VerifyEmailErrorKey, VerifyEmailFailure } from "./verify-email.types";
+import { validateCode } from "./utils";
+
+// `extensions.reason` of the backend's verification errors (backend auth README).
+const CODE_REASONS: Record<string, VerifyEmailErrorKey> = {
+  CODE_INVALID: "codeInvalid",
+  CODE_EXPIRED: "codeExpired",
+  CODE_USED: "codeUsed",
+  TOO_MANY_ATTEMPTS: "tooManyAttempts",
+};
+
+// Turns the failure of the verifyEmail mutation into what the page shows. The code is never part of it.
+function toVerifyEmailFailure(error: unknown): VerifyEmailFailure {
+  const { kind, reason } = readFailure(error);
+  const known = reason === undefined ? undefined : CODE_REASONS[reason];
+
+  if (kind === "conflict" && reason === "ALREADY_VERIFIED") return "alreadyVerified";
+  if (kind === "invalid" && known !== undefined) return known;
+  // TOO_MANY_ATTEMPTS has the code TOO_MANY_REQUESTS too. The throttler answers without a reason.
+  if (kind === "tooManyRequests") return known ?? "tooManyRequests";
+  return "unexpected";
+}
 
 /**
  * State of the verification form. A client-side error (empty or incomplete code) shows after a submit.

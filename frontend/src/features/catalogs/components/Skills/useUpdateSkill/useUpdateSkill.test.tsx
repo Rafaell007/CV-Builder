@@ -3,8 +3,8 @@ import { useApolloClient } from "@apollo/client/react";
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import { EnvironmentOptionsDocument } from "@/shared/graphql";
+import { readFailure } from "@/shared/failures";
 import { renderWithProviders, type RenderWithProvidersOptions } from "@/shared/testing";
-import { isCatalogConflict } from "../../../utils";
 import {
   databasesCategory,
   updateSkillMock as updateMock,
@@ -45,7 +45,7 @@ describe("useUpdateSkill", () => {
       .update("1", input)
       .catch((caught: unknown) => caught);
 
-    expect(isCatalogConflict(error)).toBe(true);
+    expect(readFailure(error).kind).toBe("conflict");
   });
 
   it("forgets the cached skills of the Environment field when it updates a skill", async () => {

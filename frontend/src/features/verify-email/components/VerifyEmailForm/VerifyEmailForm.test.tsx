@@ -167,6 +167,25 @@ describe("VerifyEmailForm", () => {
     expect(box(6)).toHaveValue("6");
   });
 
+  it.each([
+    ["BAD_USER_INPUT", "CODE_INVALID", "Invalid verification code"],
+    ["BAD_USER_INPUT", "CODE_EXPIRED", "Verification code has expired"],
+    ["BAD_USER_INPUT", "CODE_USED", "Verification code has already been used"],
+    ["TOO_MANY_REQUESTS", "TOO_MANY_ATTEMPTS", "Too many wrong codes. Request a new code"],
+    ["TOO_MANY_REQUESTS", undefined, "Too many attempts, try again later"],
+    ["BAD_USER_INPUT", "SOMETHING_NEW", "Something went wrong. Please try again later"],
+    ["INTERNAL_SERVER_ERROR", undefined, "Something went wrong. Please try again later"],
+  ])("shows the text for %s with the reason %s", async (code, reason, text) => {
+    const { user } = renderWithProviders(<VerifyEmailForm />, {
+      mocks: [verifyMock(failure(code, reason))],
+    });
+
+    await enterCode(user);
+    await user.click(confirm());
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(text);
+  });
+
   it("replaces the backend failure with the client check as soon as the user changes the code", async () => {
     const { user } = renderWithProviders(<VerifyEmailForm />, {
       mocks: [verifyMock(failure("BAD_USER_INPUT", "CODE_INVALID"))],

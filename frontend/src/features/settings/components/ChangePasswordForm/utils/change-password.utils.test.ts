@@ -1,15 +1,8 @@
-import { CombinedGraphQLErrors } from "@apollo/client";
 import { describe, expect, it } from "vitest";
-import { toChangePasswordFailure, validateChangePassword } from "./change-password.utils";
+import { validateChangePassword } from "./change-password.utils";
 
 const PASSWORD = "Password123!";
 const VALID = { currentPassword: "OldPassword1", newPassword: PASSWORD, confirmPassword: PASSWORD };
-
-function graphQLError(code: string, reason?: string): CombinedGraphQLErrors {
-  return new CombinedGraphQLErrors({
-    errors: [{ message: "failed", extensions: { code, ...(reason && { reason }) } }],
-  });
-}
 
 describe("validateChangePassword", () => {
   it("accepts a current password and a valid, confirmed new one", () => {
@@ -63,31 +56,4 @@ describe("validateChangePassword", () => {
       }),
     ).toEqual({ newPassword: "newPasswordTooShort" });
   });
-});
-
-describe("toChangePasswordFailure", () => {
-  it.each([
-    ["CURRENT_PASSWORD_INCORRECT", "currentPasswordIncorrect"],
-    ["NEW_PASSWORD_SAME", "newPasswordSame"],
-  ])("maps the reason %s to %s", (reason, key) => {
-    expect(toChangePasswordFailure(graphQLError("BAD_USER_INPUT", reason))).toBe(key);
-  });
-
-  it.each([undefined, "SOMETHING_ELSE"])(
-    "maps other bad input (reason %s) to invalidInput",
-    (reason) => {
-      expect(toChangePasswordFailure(graphQLError("BAD_USER_INPUT", reason))).toBe("invalidInput");
-    },
-  );
-
-  it("maps a throttled request", () => {
-    expect(toChangePasswordFailure(graphQLError("TOO_MANY_REQUESTS"))).toBe("tooManyRequests");
-  });
-
-  it.each([graphQLError("INTERNAL_SERVER_ERROR"), new Error("Failed to fetch")])(
-    "maps any other error to unexpected",
-    (error) => {
-      expect(toChangePasswordFailure(error)).toBe("unexpected");
-    },
-  );
 });

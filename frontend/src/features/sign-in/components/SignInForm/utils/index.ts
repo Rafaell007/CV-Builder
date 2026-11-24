@@ -1,1 +1,1 @@
-export { createSignInSchema, getSignInErrorKind, MIN_PASSWORD_LENGTH } from "./sign-in.utils";
+export { createSignInSchema, MIN_PASSWORD_LENGTH } from "./sign-in.utils";

@@ -3,8 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useMemo, useRef, useState, type BaseSyntheticEvent } from "react";
 import { useWatch } from "react-hook-form";
+import { readFailure } from "@/shared/failures";
 import { applyServerFieldErrors, useZodForm } from "@/shared/forms";
-import { isCatalogConflict } from "../../../utils";
 import type { SkillFormValues, SkillInput } from "../skills.types";
 import { skillFormSchema } from "../utils";
 
@@ -53,7 +53,7 @@ export function useSkillForm() {
 
   /** Shows a failed request: a taken name or a field error under its field, anything else as the general message. */
   function showError(error: unknown) {
-    if (isCatalogConflict(error)) {
+    if (readFailure(error).kind === "conflict") {
       form.setError(
         "name",
         { type: "server", message: t("form.errors.nameTaken") },

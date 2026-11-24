@@ -3,14 +3,27 @@
 import { useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
 import { useState, type ChangeEvent, type FormEvent } from "react";
+import { readFailure } from "@/shared/failures";
 import { MeDocument, SignUpDocument } from "@/shared/graphql";
 import { useRouter } from "@/shared/i18n";
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "@/shared/utils";
 import type { SignUpErrorKey, SignUpField, SignUpFailure, SignUpValues } from "./sign-up.types";
-import { toSignUpFailure, validateSignUp } from "./utils";
+import { EMAIL_TAKEN_REASON, validateSignUp } from "./utils";
 
 const FIELDS: readonly SignUpField[] = ["email", "password", "confirmPassword"];
 const EMPTY_VALUES: SignUpValues = { email: "", password: "", confirmPassword: "" };
+
+// Turns the failure of the signUp mutation into the message key the user sees. The password is never part of it.
+function toSignUpFailure(error: unknown): SignUpFailure {
+  const { kind, reason } = readFailure(error);
+  if (kind === "conflict" && reason === EMAIL_TAKEN_REASON) {
+    return { field: "email", errorKey: "emailTaken" };
+  }
+  if (kind === "tooManyRequests") return { field: null, errorKey: "tooManyRequests" };
+  if (kind === "invalid") return { field: null, errorKey: "invalidInput" };
+  // Includes a CONFLICT with another reason: the user cannot fix it by changing the email.
+  return { field: null, errorKey: "unexpected" };
+}
 
 // The new user is signed in but not verified yet; the code is in their mailbox. The router adds the language.
 export const VERIFY_EMAIL_PATH = "/verify-email";

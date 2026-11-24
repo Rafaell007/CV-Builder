@@ -210,4 +210,21 @@ describe("ResetPasswordForm", () => {
       "Too many attempts, try again later",
     );
   });
+
+  it.each([
+    ["RESET_TOKEN_INVALID", "This password reset link is invalid"],
+    ["RESET_TOKEN_EXPIRED", "This password reset link has expired"],
+    ["RESET_TOKEN_USED", "This password reset link has already been used"],
+    ["SOMETHING_ELSE", "Please check the entered values and try again"],
+    [undefined, "Please check the entered values and try again"],
+  ])("shows the text for BAD_USER_INPUT with the reason %s", async (reason, text) => {
+    const { user } = renderWithProviders(<ResetPasswordForm token={TOKEN} />, {
+      mocks: [resetPasswordMock(failure("BAD_USER_INPUT", reason))],
+    });
+
+    await fillForm(user);
+    await user.click(submit());
+
+    expect(await screen.findByText(text)).toBeInTheDocument();
+  });
 });

@@ -2,9 +2,9 @@
 
 import { useQuery } from "@apollo/client/react";
 import { useLocale } from "next-intl";
+import { readFailure } from "@/shared/failures";
 import { CvPreviewDocument } from "@/shared/graphql";
 import type { CvPreviewData } from "../cvs.types";
-import { toCvLoadFailure } from "../utils";
 
 export type UseCvPreviewResult = {
   /** The whole CV as the backend put it together. `undefined` while it loads and after a failure. */
@@ -31,13 +31,15 @@ export function useCvPreview(cvId: string): UseCvPreviewResult {
     notifyOnNetworkStatusChange: true,
   });
 
-  const failure = error === undefined ? undefined : toCvLoadFailure(error);
+  const kind = error === undefined ? undefined : readFailure(error).kind;
+  const unauthorized = kind === "notFound" || kind === "forbidden";
 
   return {
     preview: data?.cvPreview,
     loading,
-    failed: failure === "failed",
-    unauthorized: failure === "notFound" || failure === "forbidden",
+    // Network and server errors are the only ones where Retry can help.
+    failed: kind !== undefined && !unauthorized,
+    unauthorized,
     // The error is already in the hook state, so the rejected promise of refetch needs no second handler.
     retry: () => void refetch().catch(() => undefined),
   };

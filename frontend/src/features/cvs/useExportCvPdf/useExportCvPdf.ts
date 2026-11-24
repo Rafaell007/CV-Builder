@@ -4,9 +4,10 @@ import { useApolloClient } from "@apollo/client/react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { useToast } from "@/shared/components";
+import { readFailure } from "@/shared/failures";
 import { ExportCvPdfDocument } from "@/shared/graphql";
 import { useSaveFile } from "../useSaveFile";
-import { base64ToPdfBlob, toCvLoadFailure } from "../utils";
+import { base64ToPdfBlob } from "../utils";
 
 export type UseExportCvPdfResult = {
   /** The PDF is being made. The button shows its spinner and a second request cannot start. */
@@ -48,10 +49,10 @@ export function useExportCvPdf(cvId: string): UseExportCvPdfResult {
       if (!data) throw new Error("The answer has no PDF");
       saveFile(base64ToPdfBlob(data.exportCvPdf.base64), data.exportCvPdf.fileName);
     } catch (failure) {
-      const reason = toCvLoadFailure(failure);
+      const { kind } = readFailure(failure);
       toast.error({
         title: t("failedTitle"),
-        description: t(reason === "failed" ? "failedText" : reason),
+        description: kind === "notFound" || kind === "forbidden" ? t(kind) : t("failedText"),
       });
     } finally {
       inFlight.current = false;

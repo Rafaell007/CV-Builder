@@ -5,9 +5,9 @@ import { useApolloClient, useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { useToast } from "@/shared/components";
+import { readFailure } from "@/shared/failures";
 import { CvProjectsDocument, RemoveCvProjectsDocument } from "@/shared/graphql";
 import type { CvProjectItem } from "../cvProjects.types";
-import { toCvProjectFailure } from "../utils";
 
 /**
  * The Remove project flow (page 23, Delete Project): the project that waits for the confirmation and the
@@ -56,12 +56,12 @@ export function useRemoveCvProject(cvId: string) {
       return true;
     } catch (failure) {
       setCvProject(null);
-      const reason = toCvProjectFailure(failure);
+      const { kind } = readFailure(failure);
       // The entry is already gone (or the CV is not visible any more): load the list again so it leaves it.
-      if (reason === "notFound") void client.refetchQueries({ include: [CvProjectsDocument] });
+      if (kind === "notFound") void client.refetchQueries({ include: [CvProjectsDocument] });
       toast.error({
         title: t("failedTitle"),
-        description: t(reason === "notFound" || reason === "forbidden" ? reason : "failedText"),
+        description: t(kind === "notFound" || kind === "forbidden" ? kind : "failedText"),
       });
       return false;
     } finally {

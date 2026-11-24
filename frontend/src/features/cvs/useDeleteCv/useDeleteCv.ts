@@ -4,9 +4,10 @@ import { useApolloClient, useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { useToast } from "@/shared/components";
+import { readFailure } from "@/shared/failures";
 import { CvsDocument, DeleteCvDocument } from "@/shared/graphql";
 import type { CvListItem } from "../cvs.types";
-import { toDeleteCvFailure, withScope } from "../utils";
+import { withScope } from "../utils";
 
 export type UseDeleteCvOptions = {
   /** The page the list shows now (starts at 1). */
@@ -80,12 +81,12 @@ export function useDeleteCv({
       return true;
     } catch (error) {
       setCv(null);
-      const failure = toDeleteCvFailure(error);
+      const { kind } = readFailure(error);
       // The CV is already gone (or not visible to this user): load the list again so the stale row leaves it.
-      if (failure === "notFound") void client.refetchQueries({ include: [CvsDocument] });
+      if (kind === "notFound") void client.refetchQueries({ include: [CvsDocument] });
       toast.error({
         title: t("failedTitle"),
-        description: failure === undefined ? t("failedText") : t(failure),
+        description: kind === "notFound" || kind === "forbidden" ? t(kind) : t("failedText"),
       });
       return false;
     } finally {
