@@ -1,29 +1,51 @@
+import type { MockLink } from "@apollo/client/testing";
 import { act, screen, within } from "@testing-library/react";
-import { Suspense } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { Component, Suspense, type ReactNode } from "react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "@/shared/testing";
-import { meMock, userMock } from "../../user-details.mocks";
+import { meMock, userErrorMock, userMock } from "../../user-details.mocks";
 import { UserLayout } from "./UserLayout";
 import { UserLayoutSkeleton } from "./UserLayoutSkeleton";
+
+// `notFound()` throws to the nearest not-found page; here it throws an error the boundary below can show.
+vi.mock("next/navigation", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("next/navigation")>()),
+  notFound: () => {
+    throw new Error("NEXT_NOT_FOUND");
+  },
+}));
 
 vi.mock("@/shared/i18n", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/shared/i18n")>()),
   usePathname: () => "/users/10/cvs",
 }));
 
+/** Stands in for `error.tsx` and `not-found.tsx`: shows what the layout threw. */
+class CaughtError extends Component<{ children: ReactNode }, { message: string | null }> {
+  state = { message: null };
+  static getDerivedStateFromError(error: Error) {
+    return { message: error.message };
+  }
+  render() {
+    return this.state.message ? <p>Caught: {this.state.message}</p> : this.props.children;
+  }
+}
+
 // The layout reads its queries with useSuspenseQuery; on the page the route layout preloads them on the server.
 const render = (role: "ADMIN" | "USER", user = userMock("10")) =>
   renderWithProviders(
-    <Suspense fallback={<p>Suspended</p>}>
-      <UserLayout userId="10">
-        <p>Tab page</p>
-      </UserLayout>
-    </Suspense>,
+    <CaughtError>
+      <Suspense fallback={<p>Suspended</p>}>
+        <UserLayout userId="10">
+          <p>Tab page</p>
+        </UserLayout>
+      </Suspense>
+    </CaughtError>,
     { mocks: [meMock(role), user] },
   );
 
 // React 19 shows a suspended tree only inside an awaited act(); without it the fallback never leaves.
-const setup = async (role: "ADMIN" | "USER", user?: ReturnType<typeof userMock>) => {
+const setup = async (role: "ADMIN" | "USER", user?: MockLink.MockedResponse) => {
   await act(async () => {
     render(role, user);
   });
@@ -84,6 +106,33 @@ describe("UserLayout", () => {
     expect(screen.getByText("Suspended")).toBeInTheDocument();
     expect(await screen.findByText("Tab page")).toBeInTheDocument();
     expect(screen.queryByText("Suspended")).not.toBeInTheDocument();
+  });
+
+  describe("when the user cannot be loaded", () => {
+    // React logs every error that a boundary catches; the boundary is what these tests check.
+    beforeEach(() => {
+      vi.spyOn(console, "error").mockImplementation(() => undefined);
+    });
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it.each(["NOT_FOUND", "BAD_USER_INPUT"])(
+      "shows the not-found page for %s, not the shell",
+      async (code) => {
+        await setup("ADMIN", userErrorMock("10", code));
+
+        expect(await screen.findByText("Caught: NEXT_NOT_FOUND")).toBeInTheDocument();
+        expect(screen.queryByText("Tab page")).not.toBeInTheDocument();
+      },
+    );
+
+    it("throws any other failure to the error page", async () => {
+      await setup("ADMIN", userErrorMock("10", "INTERNAL_SERVER_ERROR"));
+
+      expect(await screen.findByText("Caught: INTERNAL_SERVER_ERROR")).toBeInTheDocument();
+      expect(screen.queryByText("Tab page")).not.toBeInTheDocument();
+    });
   });
 });
 

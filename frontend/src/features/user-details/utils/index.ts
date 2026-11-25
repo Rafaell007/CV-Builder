@@ -1,1 +1,1 @@
-export { getUserTabs, toUserLayoutView, toUserTabPath } from "./userDetails.utils";
+export { getUserTabs, isUserNotFound, toUserTabPath } from "./userDetails.utils";

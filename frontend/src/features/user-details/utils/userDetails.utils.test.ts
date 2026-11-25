@@ -1,6 +1,6 @@
 import { CombinedGraphQLErrors } from "@apollo/client";
 import { describe, expect, it } from "vitest";
-import { getUserTabs, toUserLayoutView, toUserTabPath } from "./userDetails.utils";
+import { getUserTabs, isUserNotFound, toUserTabPath } from "./userDetails.utils";
 
 const graphQLError = (code: string) =>
   new CombinedGraphQLErrors({ errors: [{ message: code, extensions: { code } }] });
@@ -21,19 +21,15 @@ describe("getUserTabs", () => {
   });
 });
 
-describe("toUserLayoutView", () => {
-  it("shows the page when the user is there, even after a failed refresh", () => {
-    expect(toUserLayoutView(true, undefined)).toBe("ready");
-    expect(toUserLayoutView(true, new Error("Failed to fetch"))).toBe("ready");
+describe("isUserNotFound", () => {
+  it("is true for an unknown id and for an id that is not a UUID", () => {
+    expect(isUserNotFound(graphQLError("NOT_FOUND"))).toBe(true);
+    expect(isUserNotFound(graphQLError("BAD_USER_INPUT"))).toBe(true);
   });
 
-  it("shows not found for an unknown id and for an id that is not a UUID", () => {
-    expect(toUserLayoutView(false, graphQLError("NOT_FOUND"))).toBe("notFound");
-    expect(toUserLayoutView(false, graphQLError("BAD_USER_INPUT"))).toBe("notFound");
-  });
-
-  it("shows a failure that can be retried for any other error", () => {
-    expect(toUserLayoutView(false, new Error("Failed to fetch"))).toBe("failed");
-    expect(toUserLayoutView(false, graphQLError("INTERNAL_SERVER_ERROR"))).toBe("failed");
+  it("is false for any other failure, which can be retried", () => {
+    expect(isUserNotFound(new Error("Failed to fetch"))).toBe(false);
+    expect(isUserNotFound(graphQLError("INTERNAL_SERVER_ERROR"))).toBe(false);
+    expect(isUserNotFound(undefined)).toBe(false);
   });
 });

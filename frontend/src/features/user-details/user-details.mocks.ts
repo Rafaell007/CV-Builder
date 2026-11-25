@@ -74,3 +74,9 @@ export const userCvsMock = (
     },
   },
 });
+
+/** The `user` query fails with this GraphQL error code (for example `NOT_FOUND`). */
+export const userErrorMock = (id: string, code: string): MockLink.MockedResponse => ({
+  request: { query: UserDocument, variables: { id } },
+  result: { errors: [{ message: code, extensions: { code } }] },
+});

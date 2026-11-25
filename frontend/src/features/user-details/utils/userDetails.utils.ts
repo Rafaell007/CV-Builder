@@ -1,6 +1,6 @@
 import { readFailure } from "@/shared/failures";
 import { USER_TABS } from "../user-details.constants";
-import type { UserLayoutView, UserTab } from "../user-details.types";
+import type { UserTab } from "../user-details.types";
 
 /** The route of one tab of a user. The locale-aware router adds the language. */
 export function toUserTabPath(userId: string, tab: UserTab): string {
@@ -13,12 +13,10 @@ export function getUserTabs(isAdmin: boolean): UserTab[] {
 }
 
 /**
- * What the shell shows after the `user(id)` query. Data first: a failed refresh must not replace a page that is
- * already shown. `NOT_FOUND` and `BAD_USER_INPUT` (an id that is not a UUID, so no user can have it) are "not
- * found"; any other failure (network, server) can be retried.
+ * Whether a failed `user(id)` query means there is no such user: `NOT_FOUND`, or `BAD_USER_INPUT` (an id that is not
+ * a UUID, so no user can have it). Any other failure (network, server) is not "not found" and can be retried.
  */
-export function toUserLayoutView(hasUser: boolean, error: unknown): UserLayoutView {
-  if (hasUser) return "ready";
+export function isUserNotFound(error: unknown): boolean {
   const { kind } = readFailure(error);
-  return kind === "notFound" || kind === "invalid" ? "notFound" : "failed";
+  return kind === "notFound" || kind === "invalid";
 }
