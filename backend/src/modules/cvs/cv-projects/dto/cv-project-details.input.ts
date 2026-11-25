@@ -27,7 +27,7 @@ export class CvProjectDetailsInput {
   @IsDate({ message: "Start date is required" })
   startDate!: Date;
 
-  /** Empty means "Present". */
+  /** Empty means "Till now". */
   @Field(() => Date, { nullable: true })
   @IsOptional()
   @IsDate()

@@ -28,7 +28,7 @@ export interface ProjectRange {
 
 /**
  * What the CV project form holds while the user types. A date is `null` while the field is empty and when the
- * typed text is not a date. The end date may stay empty: the person still works on the project (shown as Present).
+ * typed text is not a date. The end date may stay empty: the person still works on the project (shown as Till now).
  */
 export interface CvProjectFormValues {
   projectId: string;

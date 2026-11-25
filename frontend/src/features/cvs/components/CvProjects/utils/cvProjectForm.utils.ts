@@ -83,7 +83,7 @@ const requiredDate = (message: string) =>
 /**
  * The rules of the CV project form (Add and Update): a project is required, the start date is required, both
  * dates stay inside the days of the project, the end date is not earlier than the start date (the same day is
- * allowed, like the backend) and at least one role is chosen. The end date may stay empty (Present).
+ * allowed, like the backend) and at least one role is chosen. The end date may stay empty (Till now).
  * Responsibilities are optional. `rangeOf` gives the days of the chosen project; the form is rebuilt when the
  * catalog changes. The backend checks everything again. Texts are trimmed.
  */
