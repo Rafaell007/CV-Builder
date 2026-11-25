@@ -4,6 +4,7 @@ import {
   deleteLanguagesByIsoPrefix,
   deleteLanguagesByName,
 } from "../support/languages";
+import { serverRows } from "../support/serverRows";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
 
 // The Languages page is the shared CatalogPage (support/catalogPage.ts tests it with Departments and Positions) with
@@ -111,6 +112,18 @@ test.describe("language list, as an admin", () => {
     await expect(page.getByRole("heading", { name: "Języki" })).toBeVisible();
     await expect(columnHeader(page, "Nazwa rodzima")).toBeVisible();
     await expect(dataRows(page)).toHaveCount(PAGE_SIZE);
+  });
+});
+
+test.describe("language list, as the server renders it (no client code)", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("has the first page of languages in the HTML", async ({ context, page }) => {
+    await signIn(context, ADMIN_EMAIL);
+
+    await page.goto("/en/admin/languages");
+
+    await expect(serverRows(page).first()).toContainText("Chinese");
   });
 });
 

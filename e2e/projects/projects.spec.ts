@@ -5,6 +5,7 @@ import {
   deleteProjects,
   deleteProjectsByName,
 } from "../support/projects";
+import { serverRows } from "../support/serverRows";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
 
 // The seed holds 9 projects (backend/prisma/seed/projects.data.ts). The page shows 10 rows (PLAN D19).
@@ -107,6 +108,18 @@ test.describe("projects page, as an admin", () => {
 
     await expect(page.getByRole("heading", { name: "Projekty" })).toBeVisible();
     await expect(dataRows(page)).toHaveCount(SEED_COUNT);
+  });
+});
+
+test.describe("projects page, as the server renders it (no client code)", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("has the first page of projects in the HTML", async ({ context, page }) => {
+    await signIn(context, ADMIN_EMAIL);
+
+    await page.goto("/en/admin/projects");
+
+    await expect(serverRows(page).first()).toContainText("Banking Portal");
   });
 });
 

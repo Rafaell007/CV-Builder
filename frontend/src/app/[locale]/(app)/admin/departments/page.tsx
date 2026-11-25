@@ -1,10 +1,14 @@
+import { Suspense } from "react";
 import { useTranslations } from "next-intl";
-import { Departments } from "@/features/catalogs";
+import { CATALOG_FIRST_PAGE, Departments } from "@/features/catalogs";
+import { PrefetchQuery } from "@/shared/apollo/server";
 import { PageHeader } from "@/shared/components/PageHeader";
+import { PageState } from "@/shared/components/PageState";
+import { DepartmentsDocument } from "@/shared/graphql";
 
-// RequireAdmin (admin/layout.tsx) shows a loading state until the user is known, so this page is not rendered
-// during prerender and Next.js cannot check it for instant navigation. That is intended: the page must not
-// start its requests before the role is known. https://nextjs.org/docs/messages/instant-unrendered-segment
+// The admin layout waits for the current user on the server before RequireAdmin renders this page, so the page is not
+// rendered during prerender and Next.js cannot check it for instant navigation. That is intended: only an Admin may
+// see it. https://nextjs.org/docs/messages/instant-unrendered-segment
 export const instant = false;
 
 export default function AdminDepartmentsPage() {
@@ -18,7 +22,19 @@ export default function AdminDepartmentsPage() {
         breadcrumbs={[{ label: title }]}
         breadcrumbsLabel={t("common.breadcrumbs")}
       />
-      <Departments />
+      {/* The first page is rendered on the server per request (PLAN D6). The backend refuses it to a non-admin. */}
+      <Suspense
+        fallback={
+          <PageState
+            kind="loading"
+            labels={{ loading: t("catalogs.departments.states.loading") }}
+          />
+        }
+      >
+        <PrefetchQuery query={DepartmentsDocument} variables={CATALOG_FIRST_PAGE}>
+          <Departments />
+        </PrefetchQuery>
+      </Suspense>
     </>
   );
 }
