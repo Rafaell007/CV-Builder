@@ -26,6 +26,8 @@ export type SelectProps = {
   helperText?: string | undefined;
   error?: string | undefined;
   disabled?: boolean;
+  // Shows the value but never opens or changes; unlike disabled it stays focusable and is read by screen readers.
+  readOnly?: boolean;
   required?: boolean;
   className?: string | undefined;
   "aria-describedby"?: string | undefined;
@@ -45,6 +47,7 @@ export function Select({
   helperText,
   error,
   disabled = false,
+  readOnly = false,
   required = false,
   className,
   "aria-describedby": ariaDescribedBy,
@@ -60,8 +63,10 @@ export function Select({
   return (
     <RadixSelect.Root
       value={value}
-      onValueChange={onValueChange}
-      onOpenChange={onOpenChange}
+      // Radix has no read-only mode: the list stays closed, and typeahead on the closed trigger changes nothing.
+      {...(readOnly
+        ? { open: false, onValueChange: ignoreValueChange }
+        : { onValueChange, onOpenChange })}
       name={name}
       disabled={disabled}
       required={required}
@@ -80,7 +85,8 @@ export function Select({
         <RadixSelect.Trigger
           {...controlProps}
           ref={ref}
-          onBlur={onTriggerBlur}
+          aria-readonly={readOnly || undefined}
+          onBlur={readOnly ? onBlur : onTriggerBlur}
           className={styles.trigger}
         >
           {/* Radix asks not to style Value itself; the wrapper truncates long names */}
@@ -117,3 +123,5 @@ export function Select({
     </RadixSelect.Root>
   );
 }
+
+function ignoreValueChange() {}

@@ -57,6 +57,20 @@ describe("TextField", () => {
     );
   });
 
+  it("stays focusable but cannot be changed when read-only", async () => {
+    const { user } = renderWithProviders(
+      <TextField label="First name" defaultValue="Ann" readOnly />,
+    );
+    const input = screen.getByRole("textbox", { name: "First name" });
+
+    await user.tab();
+    await user.keyboard("x");
+
+    expect(input).toHaveFocus();
+    expect(input).toHaveAttribute("readonly");
+    expect(input).toHaveValue("Ann");
+  });
+
   it("can be disabled", () => {
     renderWithProviders(<TextField label="Email" disabled />);
 
