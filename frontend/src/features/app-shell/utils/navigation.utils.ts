@@ -25,13 +25,3 @@ export function toSidebarLinks(
     active: isPathActive(href, pathname),
   }));
 }
-
-/** "First Last", or the email while the user has not filled in a name (both are optional). */
-export function getDisplayName(user: {
-  email: string;
-  firstName?: string | null;
-  lastName?: string | null;
-}): string {
-  const name = [user.firstName, user.lastName].filter(Boolean).join(" ");
-  return name || user.email;
-}

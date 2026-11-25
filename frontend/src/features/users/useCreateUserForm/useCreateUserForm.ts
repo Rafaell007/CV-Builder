@@ -3,12 +3,12 @@
 import { useTranslations } from "next-intl";
 import { useMemo, useState, type BaseSyntheticEvent } from "react";
 import { useToast } from "@/shared/components";
-import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "@/shared/utils";
+import { getUserDisplayName, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "@/shared/utils";
 import { DEFAULT_USER_ROLE, MAX_NAME_LENGTH } from "../users.constants";
 import type { UserFormSubmit, UserFormValues } from "../users.types";
 import { useCreateUser } from "../useCreateUser";
 import { useUserForm } from "../useUserForm";
-import { createUserFormSchema, getUserDisplayName, toCreateUserInput } from "../utils";
+import { createUserFormSchema, toCreateUserInput } from "../utils";
 
 const EMPTY_VALUES: UserFormValues = {
   email: "",

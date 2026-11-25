@@ -2,7 +2,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { ConfirmModal } from "@/shared/components";
 import type { UserListItem } from "../../users.types";
-import { getUserDisplayName } from "../../utils";
+import { getUserDisplayName } from "@/shared/utils";
 
 export interface DeleteUserModalProps {
   /** The user to delete. The modal is open while this is set. */

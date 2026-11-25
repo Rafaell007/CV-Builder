@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getDisplayName, getNavItems, toSidebarLinks } from "./navigation.utils";
+import { getNavItems, toSidebarLinks } from "./navigation.utils";
 
 describe("getNavItems", () => {
   it("gives a user the 4 main links and no extra links", () => {
@@ -56,25 +56,5 @@ describe("toSidebarLinks", () => {
     const links = toSidebarLinks(mainItems, "/settings", translate);
 
     expect(links.some((link) => link.active)).toBe(false);
-  });
-});
-
-describe("getDisplayName", () => {
-  it("joins the first and the last name", () => {
-    expect(getDisplayName({ email: "ann@example.com", firstName: "Ann", lastName: "Lee" })).toBe(
-      "Ann Lee",
-    );
-  });
-
-  it("uses the part that is filled in", () => {
-    expect(getDisplayName({ email: "ann@example.com", firstName: "Ann", lastName: null })).toBe(
-      "Ann",
-    );
-  });
-
-  it("falls back to the email without a name", () => {
-    expect(getDisplayName({ email: "ann@example.com", firstName: null, lastName: null })).toBe(
-      "ann@example.com",
-    );
   });
 });

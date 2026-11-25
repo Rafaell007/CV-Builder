@@ -3,16 +3,12 @@
 import { useTranslations } from "next-intl";
 import { useMemo, useState, type BaseSyntheticEvent } from "react";
 import { useToast } from "@/shared/components";
+import { getUserDisplayName } from "@/shared/utils";
 import { DEFAULT_USER_ROLE, MAX_NAME_LENGTH } from "../users.constants";
 import type { UserFormSubmit, UserFormValues, UserListItem } from "../users.types";
 import { useUpdateUser } from "../useUpdateUser";
 import { useUserForm } from "../useUserForm";
-import {
-  getUserDisplayName,
-  toUpdateUserInput,
-  toUserFormValues,
-  updateUserFormSchema,
-} from "../utils";
+import { toUpdateUserInput, toUserFormValues, updateUserFormSchema } from "../utils";
 
 // The form needs values before a user is chosen; `open` replaces them with the data of the user.
 const EMPTY_VALUES: UserFormValues = {

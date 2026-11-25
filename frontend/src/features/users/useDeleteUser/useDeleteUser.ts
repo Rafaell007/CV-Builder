@@ -5,8 +5,9 @@ import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { useToast } from "@/shared/components";
 import { DeleteUserDocument, UsersDocument } from "@/shared/graphql";
+import { getUserDisplayName } from "@/shared/utils";
 import type { UserListItem } from "../users.types";
-import { getUserDisplayName, toDeleteUserFailure } from "../utils";
+import { toDeleteUserFailure } from "../utils";
 
 export type UseDeleteUserResult = {
   /** The user the admin chose to delete. The modal is open while this is set. */

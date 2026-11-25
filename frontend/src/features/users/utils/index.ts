@@ -1,4 +1,4 @@
-export { getUserDisplayName, toDeleteUserFailure, toUserProfilePath } from "./users.utils";
+export { toDeleteUserFailure, toUserProfilePath } from "./users.utils";
 export type { DeleteUserFailure } from "./users.utils";
 export {
   createUserFormSchema,

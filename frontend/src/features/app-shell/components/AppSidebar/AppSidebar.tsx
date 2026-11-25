@@ -3,9 +3,10 @@
 import { useTranslations } from "next-intl";
 import { useCurrentUser } from "@/shared/currentUser";
 import { usePathname } from "@/shared/i18n";
+import { getUserDisplayName } from "@/shared/utils";
 import { useSignOut } from "../../hooks";
 import type { NavItems, NavLabelKey } from "../../navigation.types";
-import { getDisplayName, getNavItems, toSidebarLinks } from "../../utils";
+import { getNavItems, toSidebarLinks } from "../../utils";
 import { ProfileMenu } from "../ProfileMenu";
 import { Sidebar } from "../Sidebar";
 
@@ -39,7 +40,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
       footer={
         user && (
           <ProfileMenu
-            name={getDisplayName(user)}
+            name={getUserDisplayName(user)}
             profileHref={`/users/${user.id}/profile`}
             settingsHref="/settings"
             labels={{ profile: t("profile"), settings: t("settings"), logout: t("logout") }}
