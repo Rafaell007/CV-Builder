@@ -1,6 +1,22 @@
+import { NextResponse } from "next/server";
 import { ACCESS_COOKIE, REFRESH_COOKIE } from "@/shared/session";
 
 export type CookieUpdate = { name: string; value: string };
+
+/**
+ * The cookies of `Set-Cookie` headers with all their attributes, for `response.cookies.set`. A proxy must hand cookies
+ * to the browser that way: Next.js drops `Set-Cookie` headers added by hand when the page is streamed after its static
+ * shell (Partial Prerendering, PLAN D6), and keeps `response.cookies` (seen with Next.js 16.4, KAN-172).
+ */
+export function toResponseCookies(headers: readonly string[]) {
+  // NextResponse parses its own Set-Cookie headers into `cookies`; Next.js does not export that parser by itself.
+  const init = headers.map((header): [string, string] => ["set-cookie", header]);
+  // An empty value means the cookie was cleared. The parser drops `Max-Age=0` (a falsy value), so the deletion is
+  // made explicit with an expiry in the past.
+  return new NextResponse(null, { headers: init }).cookies
+    .getAll()
+    .map((cookie) => (cookie.value ? cookie : { ...cookie, value: "", expires: new Date(0) }));
+}
 
 /** Reads the name and value of a `Set-Cookie` header; the attributes (Path, Max-Age, ...) are not needed here. */
 export function parseSetCookie(header: string): CookieUpdate | null {

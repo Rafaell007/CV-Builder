@@ -2,7 +2,7 @@
 
 The `/cvs` page (PLAN S7.1b, KAN-112): the list of CVs. An Employee sees own CVs, an Admin sees all CVs. The backend decides which rows each role gets.
 
-- Exports: `Cvs` (the page content). The route renders the `PageHeader` (top bar with `CVs`) above it; `Cvs` uses the shared `ListPage` (sticky toolbar with search and CREATE CV, page buttons; KAN-96). As in Figma, the CVs create button centres its icon and text (8 apart), and on `/cvs` it is 120 from the right edge (the User CVs tab: 20), set with the `ListPage` CSS variables in `Cvs.module.css`. Optional props: `userId` (the CVs of one user, for the User CVs tab) and `onView(cv)`. `Cvs` owns the Create, Update and Delete modals (see below).
+- Exports: `Cvs` (the page content) and `CVS_FIRST_PAGE` (see Server render below). The route renders the `PageHeader` (top bar with `CVs`) above it; `Cvs` uses the shared `ListPage` (sticky toolbar with search and CREATE CV, page buttons; KAN-96). As in Figma, the CVs create button centres its icon and text (8 apart), and on `/cvs` it is 120 from the right edge (the User CVs tab: 20), set with the `ListPage` CSS variables in `Cvs.module.css`. Optional props: `userId` (the CVs of one user, for the User CVs tab) and `onView(cv)`. `Cvs` owns the Create, Update and Delete modals (see below).
 - List state: the shared `useListState(DEFAULT_CVS_SORT)` (`@/shared/lists`) holds the choices of the user: `search`, `sort` and `page`. A new search or sort goes back to page 1. Nothing is filtered or sorted in the frontend.
 - `utils/toCvsVariables`: the shared `toListVariables` (always `page: { number, size: 10 }` and the sort, the trimmed search, no empty search) plus `userId` when it is given. `utils/toCvDetailsPath` gives `/cvs/{id}/details`.
 - `useCvs`: sends the `Cvs` query (`useCvs/cvs.graphql`) through the shared `usePagedList` and returns `cvs`, `total`, `loading`, `failed` and `retry`. `failed` hides the list, so a failed request never looks like an empty list. `retry` repeats the same request, so search, sort and page stay.
@@ -16,6 +16,7 @@ The `/cvs` page (PLAN S7.1b, KAN-112): the list of CVs. An Employee sees own CVs
 - `cvs.mocks.ts` and `cvForm.mocks.ts` (the form), `useDeleteCv/deleteCv.mocks.ts`: sample CVs, mocks of the `Cvs` query and `fakeBackendMock` (a stand-in backend for stories). For tests and stories only.
 - Texts: `messages/` (`cvs` namespace, `en` and `pl`).
 - Storybook: `Cvs.stories.tsx` (`Features/CVs/Cvs`): Desktop (1440px), Tablet (768px), ManyPages, SearchAndSort, NoResults, OfOneUser, Loading, Empty, LoadFailed and Polish.
+- Server render (PLAN D6, KAN-172): the route `app/[locale]/(app)/cvs/page.tsx` prefetches `me` and the first page (`CVS_FIRST_PAGE` in `utils/cvs.utils.ts`, exported: `toCvsVariables` of the start state, so it always matches the list's own first request) with `PrefetchQuery` (`@/shared/apollo/server`), then renders `Cvs`. Its hooks find both in the Apollo cache, so the server HTML already has the rows and the right empty text, and the browser does not ask again. Search, sort and page changes go to the backend from the browser. E2E: `e2e/cvs/cvs.spec.ts`, "as the server renders it".
 - Used by: `app/[locale]/(app)/cvs/page.tsx`. Backend: `cvs` query (`backend/src/modules/cvs/README.md`).
 - Docs: [docs/pages/20-cvs-page.md](../../../../docs/pages/20-cvs-page.md).
 

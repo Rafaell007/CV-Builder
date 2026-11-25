@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_CVS_SORT } from "../cvs.constants";
 import {
+  CVS_FIRST_PAGE,
   toActiveTabHref,
   toCvOpenPath,
   toCvReturnPath,
@@ -21,6 +22,14 @@ describe("toCvsVariables", () => {
       page: { number: 3, size: 10 },
       sort: { field: "name", direction: "ASC" },
       search: "anna@",
+    });
+  });
+
+  it("gives CVS_FIRST_PAGE the first request of /cvs: page 1, the default sort, no search, no user id", () => {
+    expect(CVS_FIRST_PAGE).toEqual(toCvsVariables(state));
+    expect(CVS_FIRST_PAGE).toEqual({
+      page: { number: 1, size: 10 },
+      sort: { field: "name", direction: "ASC" },
     });
   });
 

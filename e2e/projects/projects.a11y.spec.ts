@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { waitForHydration } from "../support/hydration";
 import { ADMIN_EMAIL, signIn } from "../support/signIn";
 
 // Accessibility checks of the projects page (KAN-134, AC-48 to AC-52): keyboard use, focus return, the two
@@ -30,9 +31,10 @@ const focusedIn = (container: ReturnType<typeof dialog>) => container.locator(":
 async function openProjectsPage(page: Page) {
   await page.goto("/en/admin/projects");
   await expect(page.getByRole("heading", { name: "Projects" })).toBeVisible();
-  // The heading shows before the rows. Wait for the first row, or a test that presses Tab at once finds only the
-  // loading state, and a row menu that opens can be replaced when the list arrives.
+  // The rows come with the server HTML (PLAN D6), before React takes them over. A key press before that is lost, so
+  // wait until the first row menu button is hydrated.
   await expect(actionsButton(page, "Banking Portal")).toBeVisible();
+  await waitForHydration(actionsButton(page, "Banking Portal"));
 }
 
 test.describe("projects page, keyboard and focus", () => {
@@ -331,6 +333,9 @@ test.describe("projects page, tablet width", () => {
   }) => {
     await createButton(page).click();
     await expect(dialog(page)).toBeVisible();
+    // The Technologies field loads its options when the modal opens and shows a helper line meanwhile. The modal is
+    // centred, so it moves up when that line goes; boxes read before and after would differ by half a line (8.5 px).
+    await expect(dialog(page).getByText("Loading technologies")).toBeHidden();
 
     const modal = await dialog(page).boundingBox();
     const start = await dialog(page).getByRole("textbox", { name: "Start Date" }).boundingBox();

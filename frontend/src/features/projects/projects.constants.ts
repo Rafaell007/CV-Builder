@@ -1,4 +1,5 @@
 import type { SortState } from "@/shared/components";
+import { firstPageVariables } from "@/shared/lists";
 
 /** Backend sort fields of the projects query. They are the `sortField` of the sortable columns. */
 export const PROJECT_SORT_FIELDS = {
@@ -15,6 +16,9 @@ export const DEFAULT_PROJECTS_SORT: SortState = {
   field: PROJECT_SORT_FIELDS.name,
   direction: "ASC",
 };
+
+/** The variables of the first `Projects` request of the page. The route prefetches them on the server (PLAN D6). */
+export const PROJECTS_FIRST_PAGE = firstPageVariables(DEFAULT_PROJECTS_SORT);
 
 // The longest values the project form allows (page document: name 100, domain 100, description 2000 characters).
 export const MAX_NAME_LENGTH = 100;

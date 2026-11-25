@@ -1,4 +1,5 @@
 import type { SortState } from "@/shared/components";
+import { firstPageVariables } from "@/shared/lists";
 
 /** Backend sort fields of the departments, positions and skills queries: all sort by name only. */
 export const CATALOG_SORT_FIELDS = {
@@ -10,6 +11,9 @@ export const DEFAULT_CATALOG_SORT: SortState = {
   field: CATALOG_SORT_FIELDS.name,
   direction: "ASC",
 };
+
+/** The variables of the first request of every catalog page. The routes prefetch them on the server (PLAN D6). */
+export const CATALOG_FIRST_PAGE = firstPageVariables(DEFAULT_CATALOG_SORT);
 
 /** The longest department, position or skill name: the page form and the backend allow 100 characters. */
 export const MAX_CATALOG_NAME_LENGTH = 100;
