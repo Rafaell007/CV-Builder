@@ -3,9 +3,6 @@ import type { Role, UsersQuery } from "@/shared/graphql";
 /** One row of the users list, as the `Users` query returns it. Names, department and position can be empty for a user who signed up. */
 export type UserListItem = UsersQuery["users"]["items"][number];
 
-/** One option of the Department or Position field. */
-export type CatalogOption = { id: string; name: string };
-
 /**
  * What the Create user and Update user fields hold. A select holds "" while nothing is chosen. In Update, Email holds
  * the user's email (shown, not sent) and Password stays "" (a password is never loaded).

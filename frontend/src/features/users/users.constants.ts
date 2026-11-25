@@ -18,12 +18,6 @@ export const DEFAULT_USERS_SORT: SortState = {
   direction: "ASC",
 };
 
-/** Department and Position options load in pages of this size: the most the backend sends per request. */
-export const OPTIONS_PAGE_SIZE = 100;
-
-/** Department and Position options are listed by name, A to Z (the backend sorts). */
-export const OPTIONS_SORT = { field: "name", direction: "ASC" } as const;
-
 /** First and last name: at most 100 characters, like the backend `CreateUserInput`. */
 export const MAX_NAME_LENGTH = 100;
 

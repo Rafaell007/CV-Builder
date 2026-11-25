@@ -9,7 +9,7 @@ import {
   TextField,
   type SelectOption,
 } from "@/shared/components";
-import type { UseCatalogOptionsResult } from "../../useCatalogOptions";
+import type { UseCatalogOptionsResult } from "@/shared/catalogOptions";
 import type { UseUserFormResult } from "../../useUserForm";
 import type { UserFormSubmit, UserFormValues } from "../../users.types";
 import styles from "./UserFormFields.module.css";

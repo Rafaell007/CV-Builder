@@ -1,8 +1,7 @@
 import { useTranslations } from "next-intl";
 import { FormModal } from "@/shared/components";
+import { useDepartmentOptions, usePositionOptions } from "@/shared/catalogOptions";
 import type { UseCreateUserFormResult } from "../../useCreateUserForm";
-import { useDepartmentOptions } from "../../useDepartmentOptions";
-import { usePositionOptions } from "../../usePositionOptions";
 import { UserFormFields } from "../UserFormFields";
 
 export interface CreateUserModalProps {

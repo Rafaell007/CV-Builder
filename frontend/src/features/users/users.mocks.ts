@@ -3,16 +3,16 @@ import {
   CreateUserDocument,
   type CreateUserInput,
   DeleteUserDocument,
-  DepartmentsDocument,
+  DepartmentOptionsDocument,
   MeDocument,
-  PositionsDocument,
+  PositionOptionsDocument,
   UpdateUserDocument,
   type UpdateUserInput,
   UsersDocument,
   type UsersQuery,
   type UsersQueryVariables,
 } from "@/shared/graphql";
-import { DEFAULT_USERS_SORT, OPTIONS_PAGE_SIZE, OPTIONS_SORT } from "./users.constants";
+import { DEFAULT_USERS_SORT } from "./users.constants";
 import type { UserListItem } from "./users.types";
 
 const department = (id: string, name: string) => ({
@@ -316,55 +316,24 @@ export const deleteUserNetworkErrorMock = (id: string): MockLink.MockedResponse 
   error: new Error("Failed to fetch"),
 });
 
-/** Variables of one Department / Position options request (page `number`, by name). */
-const optionsVariables = (number: number) => ({
-  page: { number, size: OPTIONS_PAGE_SIZE },
-  sort: OPTIONS_SORT,
-});
-
-type OptionsMockOptions = {
-  /** The page number of the request. Default 1. */
-  page?: number;
-  /** The `total` of the answer. Default: the items of this page. */
-  total?: number;
-};
-
-/** MockedProvider response of one page of Department options. */
+/** MockedProvider response of the Department options (`departmentOptions`, every department by name). */
 export const departmentOptionsMock = (
   items: { id: string; name: string }[],
-  { page = 1, total = items.length }: OptionsMockOptions = {},
 ): MockLink.MockedResponse => ({
-  request: { query: DepartmentsDocument, variables: optionsVariables(page) },
-  result: {
-    data: {
-      departments: {
-        __typename: "DepartmentPage",
-        items: items.map((item) => department(item.id, item.name)),
-        total,
-      },
-    },
-  },
+  request: { query: DepartmentOptionsDocument },
+  result: { data: { departmentOptions: items.map((item) => department(item.id, item.name)) } },
 });
 
-/** MockedProvider response for a page of Department options that fails. */
-export const departmentOptionsErrorMock = (page = 1): MockLink.MockedResponse => ({
-  request: { query: DepartmentsDocument, variables: optionsVariables(page) },
+/** MockedProvider response of Department options that fail. */
+export const departmentOptionsErrorMock = (): MockLink.MockedResponse => ({
+  request: { query: DepartmentOptionsDocument },
   error: new Error("Failed to fetch"),
 });
 
-/** MockedProvider response of one page of Position options. */
+/** MockedProvider response of the Position options (`positionOptions`, every position by name). */
 export const positionOptionsMock = (
   items: { id: string; name: string }[],
-  { page = 1, total = items.length }: OptionsMockOptions = {},
 ): MockLink.MockedResponse => ({
-  request: { query: PositionsDocument, variables: optionsVariables(page) },
-  result: {
-    data: {
-      positions: {
-        __typename: "PositionPage",
-        items: items.map((item) => position(item.id, item.name)),
-        total,
-      },
-    },
-  },
+  request: { query: PositionOptionsDocument },
+  result: { data: { positionOptions: items.map((item) => position(item.id, item.name)) } },
 });

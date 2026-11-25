@@ -1,7 +1,6 @@
 import { useTranslations } from "next-intl";
 import { FormModal } from "@/shared/components";
-import { useDepartmentOptions } from "../../useDepartmentOptions";
-import { usePositionOptions } from "../../usePositionOptions";
+import { useDepartmentOptions, usePositionOptions } from "@/shared/catalogOptions";
 import type { UseUpdateUserFormResult } from "../../useUpdateUserForm";
 import { UserFormFields } from "../UserFormFields";
 
