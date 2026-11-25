@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { deleteCvsByName } from "../support/cvs";
+import { waitForHydration } from "../support/hydration";
 import { ADMIN_EMAIL, PASSWORD } from "../support/signIn";
 
 // The smoke flow of the whole product (PLAN S8.1): sign in, create a CV, add a skill and a project, open the preview.
@@ -25,6 +26,8 @@ test.describe("smoke flow: sign in, create a CV, add a skill and a project, prev
 
     // 2. Create a CV.
     await page.goto("/en/cvs");
+    // The list comes with the server HTML; a click before React takes it over is lost.
+    await waitForHydration(page.getByRole("searchbox"));
     await page.getByRole("button", { name: "CREATE CV" }).click();
     const createDialog = page.getByRole("dialog");
     await createDialog.getByRole("textbox", { name: "Name" }).fill(CV_NAME);

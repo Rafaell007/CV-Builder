@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { waitForHydration } from "../support/hydration";
 import { serverRows } from "../support/serverRows";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
 import { createCvs, deleteCvsByName } from "../support/cvs";
@@ -51,6 +52,8 @@ async function chooseCategory(page: Page, name: string) {
 async function open(page: Page) {
   await page.goto("/en/admin/skills");
   await expect(page.getByRole("heading", { name: "Skills" })).toBeVisible();
+  // The rows come with the server HTML; wait for React before the test types or clicks.
+  await waitForHydration(search(page));
 }
 
 test.describe("skill list, as an admin", () => {

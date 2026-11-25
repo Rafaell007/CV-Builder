@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { createCvs, deleteCvsByName } from "../support/cvs";
+import { waitForHydration } from "../support/hydration";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
 
 // Every CV that a test makes has this prefix, so `afterEach` can remove it, also after a test failed halfway.
@@ -113,7 +114,8 @@ test.describe("CV Details page, access", () => {
     await signIn(context, ADMIN_EMAIL);
     await page.goto("/en/cvs");
 
-    await page.getByRole("button", { name: "Name" }).waitFor();
+    // The rows come with the server HTML; a click before React takes them over is lost.
+    await waitForHydration(page.getByRole("searchbox"));
     await page.getByRole("cell", { name: "Frontend Developer", exact: true }).click();
 
     // A click on a row opens the preview tab; the Details tab is one click away.

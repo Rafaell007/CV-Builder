@@ -5,6 +5,7 @@ import {
   deleteProjects,
   deleteProjectsByName,
 } from "../support/projects";
+import { waitForHydration } from "../support/hydration";
 import { serverRows } from "../support/serverRows";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
 
@@ -25,6 +26,8 @@ test.describe("projects page, as an admin", () => {
     await signIn(context, ADMIN_EMAIL);
     await page.goto("/en/admin/projects");
     await expect(page.getByRole("heading", { name: "Projects" })).toBeVisible();
+    // The rows come with the server HTML; wait for React before the test types or clicks.
+    await waitForHydration(search(page));
   });
 
   test("lists the seeded projects, sorted by name ascending, with the Name arrow shown", async ({
@@ -133,6 +136,8 @@ test.describe("projects page, with more than one page", () => {
     createdIds = await createProjects(context, PREFIX, EXTRA_COUNT);
     await page.goto("/en/admin/projects");
     await expect(page.getByRole("heading", { name: "Projects" })).toBeVisible();
+    // The rows come with the server HTML; wait for React before the test types or clicks.
+    await waitForHydration(search(page));
   });
 
   // The extra projects are removed, so the other specs see the seed data only.
@@ -253,6 +258,8 @@ test.describe("projects page, create, update and delete", () => {
     await signIn(context, ADMIN_EMAIL);
     await page.goto("/en/admin/projects");
     await expect(page.getByRole("heading", { name: "Projects" })).toBeVisible();
+    // The rows come with the server HTML; wait for React before the test types or clicks.
+    await waitForHydration(search(page));
   });
 
   test.afterEach(async ({ context }) => {

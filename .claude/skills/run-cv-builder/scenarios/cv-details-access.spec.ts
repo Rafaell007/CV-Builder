@@ -1,6 +1,7 @@
 import { appendFileSync, mkdirSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import { createCvs, deleteCvsByName } from "../support/cvs";
+import { waitForHydration } from "../support/hydration";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
 
 // KAN-147 and KAN-146: who can open the CV Details page, how a user gets there, and how they get back.
@@ -27,6 +28,8 @@ test("an employee reaches the Details page of their CV from the list and goes ba
   const name = `${PREFIX} 1`;
   await page.goto("/en/cvs");
   const search = page.getByRole("searchbox", { name: "Search CVs" });
+  // The list comes with the server HTML; a key press before React takes it over is lost.
+  await waitForHydration(search);
   await search.fill(name);
   await search.press("Enter");
   const row = page.locator("tbody tr:not([data-row-detail])").filter({ hasText: name });

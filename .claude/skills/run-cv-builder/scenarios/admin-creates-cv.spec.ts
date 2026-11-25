@@ -2,6 +2,7 @@ import { appendFileSync, mkdirSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import { deleteCvsByName } from "../support/cvs";
 import { graphql } from "../support/graphql";
+import { waitForHydration } from "../support/hydration";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
 
 // KAN-144: an admin creates a CV on the User CVs tab of an employee. The ticket says the Create form sends no
@@ -44,6 +45,8 @@ test("the owner of a CV that an admin creates on the User CVs tab", async ({ pag
 
   await page.goto("/en/cvs");
   const listSearch = page.getByRole("searchbox", { name: "Search CVs" });
+  // The list comes with the server HTML; a key press before React takes it over is lost.
+  await waitForHydration(listSearch);
   await listSearch.fill(PREFIX);
   await listSearch.press("Enter");
   const row = page.locator("tbody tr:not([data-row-detail])").filter({ hasText: `${PREFIX} 1` });

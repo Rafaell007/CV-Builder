@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { createCvs, deleteCvsByName } from "../support/cvs";
+import { waitForHydration } from "../support/hydration";
 import { serverRows } from "../support/serverRows";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
 
@@ -38,6 +39,8 @@ test.describe("CVs page, as an admin", () => {
     await signIn(context, ADMIN_EMAIL);
     await page.goto("/en/cvs");
     await expect(page.getByRole("heading", { name: "CVs" })).toBeVisible();
+    // The rows come with the server HTML; wait for React before the test types or clicks.
+    await waitForHydration(search(page));
   });
 
   test("lists the CVs of all users, sorted by name ascending, with the owner email", async ({
@@ -108,6 +111,8 @@ test.describe("CVs page, as a user", () => {
     await signIn(context, USER_EMAIL);
     await page.goto("/en/cvs");
     await expect(page.getByRole("heading", { name: "CVs" })).toBeVisible();
+    // The rows come with the server HTML; wait for React before the test types or clicks.
+    await waitForHydration(search(page));
   });
 
   test("lists only the own CVs", async ({ page }) => {
@@ -154,6 +159,8 @@ test.describe("CVs page, create, update and delete (as a user)", () => {
     await signIn(context, USER_EMAIL);
     await page.goto("/en/cvs");
     await expect(page.getByRole("heading", { name: "CVs" })).toBeVisible();
+    // The rows come with the server HTML; wait for React before the test types or clicks.
+    await waitForHydration(search(page));
   });
 
   test.afterEach(async ({ context }) => {

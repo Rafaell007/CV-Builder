@@ -1,6 +1,7 @@
 import { appendFileSync, mkdirSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 import { createCvs, deleteCvsByName } from "../support/cvs";
+import { waitForHydration } from "../support/hydration";
 import { ADMIN_EMAIL, signIn } from "../support/signIn";
 
 // KAN-145: the CVs page at desktop and tablet width, in both themes, with the row menu and the three modals open.
@@ -43,6 +44,8 @@ for (const [sizeName, viewport] of Object.entries(SIZES)) {
         await createCvs(context, name, 1);
         await page.goto("/en/cvs");
         const search = page.getByRole("searchbox", { name: "Search CVs" });
+        // The list comes with the server HTML; a key press before React takes it over is lost.
+        await waitForHydration(search);
         await search.fill(name);
         await search.press("Enter");
         await expect(page.getByText(`${name} 1`)).toBeVisible();

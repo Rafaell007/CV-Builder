@@ -4,6 +4,7 @@ import {
   deleteLanguagesByIsoPrefix,
   deleteLanguagesByName,
 } from "../support/languages";
+import { waitForHydration } from "../support/hydration";
 import { serverRows } from "../support/serverRows";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
 
@@ -63,6 +64,8 @@ async function fillForm(page: Page, name: string, iso: string, nativeName: strin
 async function open(page: Page) {
   await page.goto("/en/admin/languages");
   await expect(page.getByRole("heading", { name: "Languages" })).toBeVisible();
+  // The rows come with the server HTML; wait for React before the test types or clicks.
+  await waitForHydration(search(page));
 }
 
 test.describe("language list, as an admin", () => {

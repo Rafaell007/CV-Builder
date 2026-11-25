@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { waitForHydration } from "../support/hydration";
 import { serverRows } from "../support/serverRows";
 import { ADMIN_EMAIL, PASSWORD, signIn, USER_EMAIL } from "../support/signIn";
 import { createUser, deleteUsersByName, testUserEmail, type TestUser } from "../support/users";
@@ -35,6 +36,8 @@ async function open(page: Page, locale: "en" | "pl" = "en") {
   await expect(
     page.getByRole("heading", { name: locale === "en" ? "Employees" : "Pracownicy" }),
   ).toBeVisible();
+  // The rows come with the server HTML; wait for React before the test types or clicks.
+  await waitForHydration(page.getByRole("searchbox"));
 }
 
 async function find(page: Page, text: string) {

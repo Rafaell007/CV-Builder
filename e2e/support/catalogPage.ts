@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { createCatalogItem, deleteCatalogItemsByName, type Catalog } from "./catalogs";
+import { waitForHydration } from "./hydration";
 import { serverRows } from "./serverRows";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "./signIn";
 
@@ -54,6 +55,8 @@ export function describeCatalogPage(c: CatalogPageCase): void {
   async function open(page: Page) {
     await page.goto(`/en${c.path}`);
     await expect(page.getByRole("heading", { name: c.title })).toBeVisible();
+    // The rows come with the server HTML; wait for React before the test types or clicks.
+    await waitForHydration(search(page));
   }
 
   test.describe(`${lower} list, as an admin`, () => {
