@@ -101,7 +101,10 @@ test("an Admin edits an employee's profile", async ({ page }) => {
   await page.getByRole("option", { name: "QA Engineer", exact: true }).click();
   await updateButton(page).click();
 
-  await expect(page.getByText(`Beta ${PREFIX}'s profile was saved.`)).toBeVisible();
+  // `exact`: Radix also copies the toast text into a screen-reader status line.
+  await expect(
+    page.getByText(`Beta ${PREFIX}'s profile was saved.`, { exact: true }),
+  ).toBeVisible();
   await page.reload();
   await expect(position(page)).toHaveText("QA Engineer");
 });
