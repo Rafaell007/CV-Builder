@@ -2,18 +2,28 @@ import { act, screen } from "@testing-library/react";
 import { Suspense } from "react";
 import { describe, expect, it } from "vitest";
 import { renderWithProviders } from "@/shared/testing";
-import { meMock, userMock } from "../../user-details.mocks";
+import {
+  departmentOptionsMock,
+  meMock,
+  positionOptionsMock,
+  userMock,
+} from "../../user-details.mocks";
 import { UserProfile } from "./UserProfile";
 
-// The tab reads `me` and `user(id)` with useSuspenseQuery; on the page the route layout preloads both on the server.
-// React 19 shows a suspended tree only inside an awaited act(); without it the fallback never leaves.
-const setup = async (user = userMock("10"), locale: "en" | "pl" = "en") => {
+// The tab reads `me`, `user(id)` and the form options with useSuspenseQuery; on the page the route preloads them on
+// the server. React 19 shows a suspended tree only inside an awaited act(); without it the fallback never leaves.
+// The signed-in user of `meMock` has id "1"; the page shows user "10".
+const setup = async (
+  user = userMock("10"),
+  locale: "en" | "pl" = "en",
+  role: "ADMIN" | "USER" = "USER",
+) => {
   await act(async () => {
     renderWithProviders(
       <Suspense fallback={<p>Suspended</p>}>
         <UserProfile userId="10" />
       </Suspense>,
-      { mocks: [meMock("USER"), user], locale },
+      { mocks: [meMock(role), user, departmentOptionsMock(), positionOptionsMock()], locale },
     );
   });
 };
@@ -43,5 +53,19 @@ describe("UserProfile", () => {
     await setup(userMock("10"), "pl");
 
     expect(await screen.findByText("Członek od niedz., 14 sty 2024")).toBeInTheDocument();
+  });
+
+  it("shows another employee's profile read-only", async () => {
+    await setup();
+
+    expect(await screen.findByRole("textbox", { name: /First Name/ })).toHaveAttribute("readonly");
+  });
+
+  it("lets an Admin edit any profile", async () => {
+    await setup(userMock("10"), "en", "ADMIN");
+
+    expect(await screen.findByRole("textbox", { name: /First Name/ })).not.toHaveAttribute(
+      "readonly",
+    );
   });
 });

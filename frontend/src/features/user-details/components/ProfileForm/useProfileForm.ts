@@ -11,6 +11,8 @@ import { toProfileFormValues } from "../../utils";
 /**
  * The form of the Profile tab: First Name, Last Name, Department and Position with the shared profile rules (all
  * required, names at most 100 characters), filled with the user's current values. The backend checks them again.
+ * `initialValues` go to the inputs as `defaultValue` too: `register` fills an input only in the browser, so without it
+ * the server HTML would show empty names until hydration (PLAN D6).
  */
 export function useProfileForm(user: ProfileUser) {
   const t = useTranslations("userDetails.profile.form.errors");
@@ -29,7 +31,9 @@ export function useProfileForm(user: ProfileUser) {
     [t],
   );
 
-  return useZodForm<ProfileFormValues, ProfileFormValues>(schema, {
-    defaultValues: toProfileFormValues(user),
+  const initialValues = toProfileFormValues(user);
+  const form = useZodForm<ProfileFormValues, ProfileFormValues>(schema, {
+    defaultValues: initialValues,
   });
+  return { form, initialValues };
 }

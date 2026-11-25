@@ -1,5 +1,11 @@
 import type { MockLink } from "@apollo/client/testing";
-import { CvsDocument, MeDocument, UserDocument } from "@/shared/graphql";
+import {
+  CvsDocument,
+  DepartmentOptionsDocument,
+  MeDocument,
+  PositionOptionsDocument,
+  UserDocument,
+} from "@/shared/graphql";
 
 // Mock data for tests. The page itself never uses it: all data comes from the backend.
 
@@ -21,12 +27,21 @@ export const meMock = (role: "ADMIN" | "USER"): MockLink.MockedResponse => ({
   },
 });
 
-/** MockedProvider response of the `user` query: the employee of the page. Names are `null` for a user who signed up. */
+type CatalogItem = { id: string; name: string } | null;
+
+/**
+ * MockedProvider response of the `user` query: the employee of the page. Names are `null` for a user who signed up;
+ * department and position are `null` until someone sets them.
+ */
 export const userMock = (
   id: string,
   name: { firstName: string | null; lastName: string | null } = {
     firstName: "Emma",
     lastName: "Employee",
+  },
+  assigned: { department: CatalogItem; position: CatalogItem } = {
+    department: null,
+    position: null,
   },
 ): MockLink.MockedResponse => ({
   request: { query: UserDocument, variables: { id } },
@@ -39,8 +54,8 @@ export const userMock = (
         ...name,
         role: "USER",
         createdAt: "2024-01-14T10:00:00.000Z",
-        department: null,
-        position: null,
+        department: assigned.department && { __typename: "Department", ...assigned.department },
+        position: assigned.position && { __typename: "Position", ...assigned.position },
       },
     },
   },
@@ -79,4 +94,37 @@ export const userCvsMock = (
 export const userErrorMock = (id: string, code: string): MockLink.MockedResponse => ({
   request: { query: UserDocument, variables: { id } },
   result: { errors: [{ message: code, extensions: { code } }] },
+});
+
+/** MockedProvider response of the Department options of the Profile form: `.NET`, `Java` and `React`, by name. */
+export const departmentOptionsMock = (): MockLink.MockedResponse => ({
+  request: { query: DepartmentOptionsDocument },
+  result: {
+    data: {
+      departmentOptions: [
+        { __typename: "Department", id: "d2", name: ".NET" },
+        { __typename: "Department", id: "d3", name: "Java" },
+        { __typename: "Department", id: "d1", name: "React" },
+      ],
+    },
+  },
+});
+
+/** Department options that fail (no network). */
+export const departmentOptionsErrorMock = (): MockLink.MockedResponse => ({
+  request: { query: DepartmentOptionsDocument },
+  error: new Error("Failed to fetch"),
+});
+
+/** MockedProvider response of the Position options of the Profile form, by name. */
+export const positionOptionsMock = (): MockLink.MockedResponse => ({
+  request: { query: PositionOptionsDocument },
+  result: {
+    data: {
+      positionOptions: [
+        { __typename: "Position", id: "p2", name: "Data Analyst" },
+        { __typename: "Position", id: "p1", name: "Software Engineer" },
+      ],
+    },
+  },
 });

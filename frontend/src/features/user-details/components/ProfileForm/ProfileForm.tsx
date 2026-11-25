@@ -26,7 +26,7 @@ export interface ProfileFormProps {
  */
 export function ProfileForm({ user, canEdit }: ProfileFormProps) {
   const t = useTranslations("userDetails.profile.form");
-  const form = useProfileForm(user);
+  const { form, initialValues } = useProfileForm(user);
   const { register, control } = form;
   const { errors } = form.formState;
   const readOnly = !canEdit;
@@ -39,6 +39,7 @@ export function ProfileForm({ user, canEdit }: ProfileFormProps) {
       <div className={styles.fields}>
         <TextField
           {...register("firstName")}
+          defaultValue={initialValues.firstName}
           label={t("fields.firstName")}
           autoComplete="given-name"
           required={canEdit}
@@ -47,6 +48,7 @@ export function ProfileForm({ user, canEdit }: ProfileFormProps) {
         />
         <TextField
           {...register("lastName")}
+          defaultValue={initialValues.lastName}
           label={t("fields.lastName")}
           autoComplete="family-name"
           required={canEdit}
