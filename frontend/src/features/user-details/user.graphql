@@ -1,0 +1,20 @@
+# One user for User Details (any signed-in user, backend). The layout preloads it on the server (PLAN D6) and shows
+# the name in the breadcrumbs; the Profile tab reads the same cached result. NOT_FOUND for an unknown id.
+query User($id: ID!) {
+  user(id: $id) {
+    id
+    email
+    firstName
+    lastName
+    role
+    createdAt
+    department {
+      id
+      name
+    }
+    position {
+      id
+      name
+    }
+  }
+}

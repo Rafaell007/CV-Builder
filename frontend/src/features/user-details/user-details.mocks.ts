@@ -1,5 +1,5 @@
 import type { MockLink } from "@apollo/client/testing";
-import { CvsDocument, MeDocument } from "@/shared/graphql";
+import { CvsDocument, MeDocument, UserDocument } from "@/shared/graphql";
 
 // Mock data for tests. The page itself never uses it: all data comes from the backend.
 
@@ -16,6 +16,31 @@ export const meMock = (role: "ADMIN" | "USER"): MockLink.MockedResponse => ({
         lastName: "Admin",
         role,
         isVerified: true,
+      },
+    },
+  },
+});
+
+/** MockedProvider response of the `user` query: the employee of the page. Names are `null` for a user who signed up. */
+export const userMock = (
+  id: string,
+  name: { firstName: string | null; lastName: string | null } = {
+    firstName: "Emma",
+    lastName: "Employee",
+  },
+): MockLink.MockedResponse => ({
+  request: { query: UserDocument, variables: { id } },
+  result: {
+    data: {
+      user: {
+        __typename: "User",
+        id,
+        email: "emma@example.com",
+        ...name,
+        role: "USER",
+        createdAt: "2024-01-14T10:00:00.000Z",
+        department: null,
+        position: null,
       },
     },
   },

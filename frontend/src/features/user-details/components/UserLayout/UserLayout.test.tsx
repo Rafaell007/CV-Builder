@@ -1,7 +1,8 @@
-import { screen, within } from "@testing-library/react";
+import { act, screen, within } from "@testing-library/react";
+import { Suspense } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "@/shared/testing";
-import { meMock } from "../../user-details.mocks";
+import { meMock, userMock } from "../../user-details.mocks";
 import { UserLayout } from "./UserLayout";
 
 vi.mock("@/shared/i18n", async (importOriginal) => ({
@@ -9,21 +10,36 @@ vi.mock("@/shared/i18n", async (importOriginal) => ({
   usePathname: () => "/users/10/cvs",
 }));
 
-const setup = (role: "ADMIN" | "USER") =>
+// The layout reads its queries with useSuspenseQuery; on the page the route layout preloads them on the server.
+const render = (role: "ADMIN" | "USER", user = userMock("10")) =>
   renderWithProviders(
-    <UserLayout userId="10">
-      <p>Tab page</p>
-    </UserLayout>,
-    { mocks: [meMock(role)] },
+    <Suspense fallback={<p>Suspended</p>}>
+      <UserLayout userId="10">
+        <p>Tab page</p>
+      </UserLayout>
+    </Suspense>,
+    { mocks: [meMock(role), user] },
   );
+
+// React 19 shows a suspended tree only inside an awaited act(); without it the fallback never leaves.
+const setup = async (role: "ADMIN" | "USER", user?: ReturnType<typeof userMock>) => {
+  await act(async () => {
+    render(role, user);
+  });
+};
 
 const tabs = () => screen.getByRole("navigation", { name: "Employee sections" });
 
+const breadcrumbTexts = async () =>
+  within(await screen.findByRole("navigation", { name: "Breadcrumbs" }))
+    .getAllByRole("listitem")
+    .map((item) => item.textContent);
+
 describe("UserLayout", () => {
   it("shows the four tabs to an admin, with links to the routes of the user, and marks CVs", async () => {
-    setup("ADMIN");
+    await setup("ADMIN");
 
-    const cvsTab = await within(tabs()).findByRole("link", { name: "CVs" });
+    const cvsTab = await screen.findByRole("link", { name: "CVs" });
     expect(cvsTab).toHaveAttribute("href", "/en/users/10/cvs");
     expect(cvsTab).toHaveAttribute("aria-current", "page");
     expect(
@@ -34,25 +50,38 @@ describe("UserLayout", () => {
   });
 
   it("hides the CVs tab from anyone who is not an admin", async () => {
-    setup("USER");
+    await setup("USER");
 
-    await within(tabs()).findByRole("link", { name: "Profile" });
+    await screen.findByRole("link", { name: "Profile" });
     expect(within(tabs()).queryByRole("link", { name: "CVs" })).not.toBeInTheDocument();
   });
 
-  it("shows the breadcrumbs Employees and the tab, and the page", async () => {
-    setup("ADMIN");
+  it("shows the breadcrumbs Employees, the name of the user and the tab, and the page", async () => {
+    await setup("ADMIN");
 
     expect(await screen.findByText("Tab page")).toBeInTheDocument();
-    const breadcrumbs = await screen.findByRole("navigation", { name: "Breadcrumbs" });
-    expect(
-      within(breadcrumbs)
-        .getAllByRole("listitem")
-        .map((item) => item.textContent),
-    ).toEqual(["Employees", "CVs"]);
+    expect(await breadcrumbTexts()).toEqual(["Employees", "Emma Employee", "CVs"]);
+    const breadcrumbs = screen.getByRole("navigation", { name: "Breadcrumbs" });
     expect(within(breadcrumbs).getByRole("link", { name: "Employees" })).toHaveAttribute(
       "href",
       "/en/users",
     );
+    expect(
+      within(breadcrumbs).queryByRole("link", { name: "Emma Employee" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows the email in the breadcrumbs for a user who has no name yet", async () => {
+    await setup("ADMIN", userMock("10", { firstName: null, lastName: null }));
+
+    expect(await breadcrumbTexts()).toEqual(["Employees", "emma@example.com", "CVs"]);
+  });
+
+  it("waits for both queries before it draws the shell", async () => {
+    await setup("USER");
+
+    expect(screen.getByText("Suspended")).toBeInTheDocument();
+    expect(await screen.findByText("Tab page")).toBeInTheDocument();
+    expect(screen.queryByText("Suspended")).not.toBeInTheDocument();
   });
 });
