@@ -333,6 +333,9 @@ test.describe("projects page, tablet width", () => {
   }) => {
     await createButton(page).click();
     await expect(dialog(page)).toBeVisible();
+    // The Technologies field loads its options when the modal opens and shows a helper line meanwhile. The modal is
+    // centred, so it moves up when that line goes; boxes read before and after would differ by half a line (8.5 px).
+    await expect(dialog(page).getByText("Loading technologies")).toBeHidden();
 
     const modal = await dialog(page).boundingBox();
     const start = await dialog(page).getByRole("textbox", { name: "Start Date" }).boundingBox();
