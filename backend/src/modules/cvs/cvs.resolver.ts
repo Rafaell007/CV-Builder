@@ -24,8 +24,11 @@ export class CvsResolver {
   cv(
     @CurrentUser() user: AuthUser | undefined,
     @Args("id", { type: () => ID }, ParseUUIDPipe) id: string,
+    // The employee of the User CVs tab: a CV of another employee answers NOT_FOUND.
+    @Args("userId", { type: () => ID, nullable: true }, new ParseUUIDPipe({ optional: true }))
+    userId?: string,
   ): Promise<Cv> {
-    return this.cvsService.get(requireUser(user), id);
+    return this.cvsService.get(requireUser(user), id, userId ?? undefined);
   }
 
   @Verified()
