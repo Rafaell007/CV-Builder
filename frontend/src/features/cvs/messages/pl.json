@@ -190,7 +190,7 @@
       "startDate": "Data rozpoczęcia",
       "endDate": "Data zakończenia"
     },
-    "present": "Obecnie",
+    "tillNow": "Obecnie",
     "dateMissing": "Brak daty",
     "responsibilities": "Obowiązki",
     "actions": {

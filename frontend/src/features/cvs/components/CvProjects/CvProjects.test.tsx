@@ -72,13 +72,13 @@ describe("CvProjects", () => {
       ).toEqual(["Built the pages."]);
     });
 
-    it("shows Present for a project without an end date, and no tags for no responsibilities", async () => {
+    it("shows Till now for a project without an end date, and no tags for no responsibilities", async () => {
       setup();
       await loaded();
 
       const bankRow = screen.getByRole("row", { name: /Online Bank/ });
 
-      expect(within(bankRow).getByText("Present")).toBeInTheDocument();
+      expect(within(bankRow).getByText("Till now")).toBeInTheDocument();
       const bankDetail = screen
         .getByText("An online banking application.")
         .closest("[data-row-detail]");

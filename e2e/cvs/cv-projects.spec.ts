@@ -91,7 +91,7 @@ test.describe("CV Projects page, as a user", () => {
     await expect(banking).toContainText("03/01/2022");
     await expect(banking).toContainText("06/30/2023");
     // The marketplace has no end date: the person still works on it.
-    await expect(row(page, "E-commerce Marketplace")).toContainText("Present");
+    await expect(row(page, "E-commerce Marketplace")).toContainText("Till now");
   });
 
   test("searches by name and by domain without case, and clears the search", async ({ page }) => {
