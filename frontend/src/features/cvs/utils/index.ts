@@ -1,4 +1,5 @@
 export {
+  CVS_FIRST_PAGE,
   toActiveTabHref,
   toCvOpenPath,
   toCvReturnPath,

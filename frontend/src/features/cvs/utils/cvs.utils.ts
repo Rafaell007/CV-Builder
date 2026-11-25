@@ -1,6 +1,6 @@
 import type { CvsQueryVariables } from "@/shared/graphql";
-import { toListVariables, type ListState } from "@/shared/lists";
-import { CV_TABS } from "../cvs.constants";
+import { initialListState, toListVariables, type ListState } from "@/shared/lists";
+import { CV_TABS, DEFAULT_CVS_SORT } from "../cvs.constants";
 import type { CvTab } from "../cvs.types";
 
 /**
@@ -22,6 +22,13 @@ export function toCvsVariables(list: ListState, userId?: string): CvsQueryVariab
     ...withScope(userId),
   };
 }
+
+/**
+ * The variables of the first `Cvs` request of the `/cvs` page. The route prefetches them on the server (PLAN D6).
+ * Built with `toCvsVariables`, like the list's own request, so the two always match and the browser finds the answer
+ * in the Apollo cache.
+ */
+export const CVS_FIRST_PAGE = toCvsVariables(initialListState(DEFAULT_CVS_SORT));
 
 /** The route of one tab of a CV. The locale-aware router adds the language. `from` is the page to return to (see `toCvReturnPath`). */
 export function toCvTabPath(cvId: string, tab: CvTab, from?: string): string {
