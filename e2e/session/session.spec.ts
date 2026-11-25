@@ -1,9 +1,18 @@
-import { expect, test, type BrowserContext } from "@playwright/test";
+import { expect, test, type BrowserContext, type Response } from "@playwright/test";
+import { graphql } from "../support/graphql";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
 import { seededUserCell } from "../support/users";
 
 async function cookieNames(context: BrowserContext): Promise<string[]> {
   return (await context.cookies()).map((cookie) => cookie.name);
+}
+
+/** The names of the cookies that one response sets. */
+async function setCookieNames(response: Response | null): Promise<string[]> {
+  const headers = (await response?.headersArray()) ?? [];
+  return headers
+    .filter((header) => header.name.toLowerCase() === "set-cookie")
+    .map((header) => header.value.split("=")[0] ?? "");
 }
 
 test.describe("without a session", () => {
@@ -66,6 +75,24 @@ test.describe("with a session", () => {
     // The list loads with the new access cookie.
     await expect(seededUserCell(page)).toBeVisible();
     expect(await cookieNames(context)).toContain("access_token");
+  });
+
+  // The profile page is streamed after its static shell (Partial Prerendering), like the list pages (PLAN D6). There
+  // Next.js drops Set-Cookie headers that the proxy adds by hand, so the page response itself is checked: the browser's
+  // own refresh would hide the loss for a while (KAN-172).
+  test("a page streamed after its static shell hands the refreshed cookies to the browser", async ({
+    page,
+    context,
+  }) => {
+    await signIn(context, USER_EMAIL);
+    const { me } = await graphql<{ me: { id: string } }>(context, "query { me { id } }", {});
+    await context.clearCookies({ name: "access_token" });
+
+    const response = await page.goto(`/en/users/${me.id}/profile`);
+
+    expect(await setCookieNames(response)).toEqual(
+      expect.arrayContaining(["access_token", "refresh_token"]),
+    );
   });
 
   test("a dead refresh token ends the session and clears the cookies", async ({

@@ -4,6 +4,7 @@ import {
   clearSessionCookies,
   parseSetCookie,
   toCookieHeader,
+  toResponseCookies,
 } from "./setCookie.utils";
 
 describe("parseSetCookie", () => {
@@ -74,5 +75,37 @@ describe("clearSessionCookies", () => {
 
   it("adds Secure over HTTPS", () => {
     expect(clearSessionCookies(true).every((header) => header.endsWith("; Secure"))).toBe(true);
+  });
+});
+
+describe("toResponseCookies", () => {
+  it("keeps the name, the value and every attribute the backend set", () => {
+    expect(
+      toResponseCookies([
+        "access_token=abc.def-_; Path=/; Max-Age=900; HttpOnly; SameSite=Lax; Secure",
+        "refresh_token=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax",
+      ]),
+    ).toEqual([
+      expect.objectContaining({
+        name: "access_token",
+        value: "abc.def-_",
+        path: "/",
+        maxAge: 900,
+        httpOnly: true,
+        sameSite: "lax",
+        secure: true,
+      }),
+      expect.objectContaining({ name: "refresh_token", value: "" }),
+    ]);
+  });
+
+  it("deletes a cleared cookie with an expiry in the past, also when it was cleared with Max-Age=0", () => {
+    const [cleared] = toResponseCookies(["refresh_token=; Path=/; Max-Age=0; HttpOnly"]);
+
+    expect(cleared).toMatchObject({ value: "", path: "/", expires: new Date(0) });
+  });
+
+  it("returns nothing for no headers", () => {
+    expect(toResponseCookies([])).toEqual([]);
   });
 });
