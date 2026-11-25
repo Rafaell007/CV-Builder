@@ -4,7 +4,8 @@ import { useTranslations } from "next-intl";
 import { useMemo, useState, type BaseSyntheticEvent } from "react";
 import { useToast } from "@/shared/components";
 import { getUserDisplayName } from "@/shared/utils";
-import { DEFAULT_USER_ROLE, MAX_NAME_LENGTH } from "../users.constants";
+import { USER_NAME_MAX_LENGTH } from "@/shared/userProfile";
+import { DEFAULT_USER_ROLE } from "../users.constants";
 import type { UserFormSubmit, UserFormValues, UserListItem } from "../users.types";
 import { useUpdateUser } from "../useUpdateUser";
 import { useUserForm } from "../useUserForm";
@@ -38,9 +39,9 @@ export function useUpdateUserForm() {
     () =>
       updateUserFormSchema({
         firstNameRequired: t("form.errors.firstNameRequired"),
-        firstNameTooLong: t("form.errors.firstNameTooLong", { max: MAX_NAME_LENGTH }),
+        firstNameTooLong: t("form.errors.firstNameTooLong", { max: USER_NAME_MAX_LENGTH }),
         lastNameRequired: t("form.errors.lastNameRequired"),
-        lastNameTooLong: t("form.errors.lastNameTooLong", { max: MAX_NAME_LENGTH }),
+        lastNameTooLong: t("form.errors.lastNameTooLong", { max: USER_NAME_MAX_LENGTH }),
         departmentRequired: t("form.errors.departmentRequired"),
         positionRequired: t("form.errors.positionRequired"),
         roleRequired: t("form.errors.roleRequired"),

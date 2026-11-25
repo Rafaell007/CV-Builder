@@ -18,9 +18,6 @@ export const DEFAULT_USERS_SORT: SortState = {
   direction: "ASC",
 };
 
-/** First and last name: at most 100 characters, like the backend `CreateUserInput`. */
-export const MAX_NAME_LENGTH = 100;
-
 /** The role a new user gets unless the admin picks another one (Figma: Role prefilled "Employee"). */
 export const DEFAULT_USER_ROLE = "USER" satisfies Role;
 
