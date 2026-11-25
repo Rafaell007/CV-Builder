@@ -34,9 +34,11 @@ export function useUpdateProfile(): UseUpdateProfileResult {
         cache.evict({ id: "ROOT_QUERY", fieldName: "users" });
         if (!result) return;
         const saved = result.updateProfile;
+        // The signed-in user's own profile: `me` shows the new names too. When an Admin saves someone else's profile,
+        // there is no `SessionUser` entry with this id, and `modify` changes nothing.
         const me = cache.identify({ __typename: "SessionUser", id: saved.id });
-        if (!me) return;
-        // Changes nothing when the signed-in user is someone else: there is no `SessionUser` with this id.
+        // Only narrows the type: with a typename and an id, `identify` always returns a key (entry or not).
+        if (me === undefined) return;
         cache.modify({
           id: me,
           fields: {

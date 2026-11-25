@@ -48,17 +48,22 @@ describe("useSuspenseDepartmentOptions", () => {
   it("returns a failure instead of throwing it, and retry sends the request again", async () => {
     const { result } = await setup(useSuspenseDepartmentOptions, [
       departmentOptionsErrorMock(),
-      departmentOptionsMock(),
+      // Slow answer, so the test can see the state while it loads.
+      { ...departmentOptionsMock(), delay: 100 },
     ]);
     expect(await screen.findByText("Loaded")).toBeInTheDocument();
     expect(result()).toMatchObject({ options: undefined, loading: false, failed: true });
 
-    await act(async () => {
-      result()?.retry();
-    });
+    act(() => result()?.retry());
+
+    // The retry runs in a transition: the page stays (no Suspense fallback), the select shows it loads.
+    await expect.poll(() => result()?.loading).toBe(true);
+    expect(screen.getByText("Loaded")).toBeInTheDocument();
+    expect(screen.queryByText("Suspended")).not.toBeInTheDocument();
+    expect(result()?.failed).toBe(false);
 
     await expect.poll(() => names(result())).toEqual([".NET", "Java", "React"]);
-    expect(result()?.failed).toBe(false);
+    expect(result()).toMatchObject({ loading: false, failed: false });
   });
 });
 

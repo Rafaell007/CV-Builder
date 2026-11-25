@@ -16,6 +16,8 @@ export interface CatalogSelectProps {
   error?: string | undefined;
   /** Shows the value but never opens (another employee's profile). */
   readOnly?: boolean;
+  /** Default true. False on a read-only form, where nothing can be filled in. */
+  required?: boolean;
   /** Helper text while the options load. */
   loadingText: string;
   /** The error when the options failed to load. */
@@ -24,9 +26,10 @@ export interface CatalogSelectProps {
   retryLabel: string;
 }
 
-/** A required Department or Position select: disabled while its options load, an error and Retry when they failed. */
+/** A Department or Position select (required by default): disabled while its options load, an error and Retry when they failed. */
 export function CatalogSelect({
   catalog,
+  required = true,
   error,
   loadingText,
   failedText,
@@ -40,7 +43,7 @@ export function CatalogSelect({
       <Select
         {...selectProps}
         options={options}
-        required
+        required={required}
         disabled={catalog.loading || catalog.failed}
         helperText={catalog.loading ? loadingText : undefined}
         error={catalog.failed ? failedText : error}

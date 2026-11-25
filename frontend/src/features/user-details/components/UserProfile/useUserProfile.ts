@@ -32,8 +32,10 @@ export function useUserProfile(userId: string) {
     name,
     // A user without a name is already named by the email, so the email line would only repeat it.
     email: name === user.email ? null : user.email,
-    canEdit: canEditProfile(meData.me, userId),
-    canVerifyEmail: canVerifyEmail(meData.me, userId),
+    // `user.id`, not the route's `userId`: the backend accepts a UUID in any letter case, but answers it lower case,
+    // as `me.id` is.
+    canEdit: canEditProfile(meData.me, user.id),
+    canVerifyEmail: canVerifyEmail(meData.me, user.id),
     user,
     memberSince: memberSince === null ? null : t("memberSince", { date: memberSince }),
   };

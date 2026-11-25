@@ -98,6 +98,31 @@ describe("UserProfile", () => {
     expect(await screen.findByRole("button", { name: "Verify email" })).toBeInTheDocument();
   });
 
+  it("knows the owner when the URL has the id in upper case", async () => {
+    // The backend accepts a UUID in any letter case and answers it lower case, as `me.id` is.
+    const id = "6f1d2c3b-0000-4000-8000-00000000000a";
+    const urlId = id.toUpperCase();
+    const user = userMock(id);
+    await act(async () => {
+      renderWithProviders(
+        <Suspense fallback={<p>Suspended</p>}>
+          <UserProfile userId={urlId} />
+        </Suspense>,
+        {
+          mocks: [
+            meMock("USER", false, id),
+            { ...user, request: { ...user.request, variables: { id: urlId } } },
+            departmentOptionsMock(),
+            positionOptionsMock(),
+          ],
+        },
+      );
+    });
+
+    expect(await screen.findByRole("button", { name: "Update" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Verify email" })).toBeInTheDocument();
+  });
+
   it("offers no VERIFY EMAIL to an Admin on another employee's profile", async () => {
     // meMock's Admin is verified; the point is that the button belongs to the owner only.
     await setup(userMock("10"), "en", "ADMIN");

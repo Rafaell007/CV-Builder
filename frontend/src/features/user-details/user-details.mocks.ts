@@ -12,14 +12,18 @@ import {
 
 // Mock data for tests. The page itself never uses it: all data comes from the backend.
 
-/** MockedProvider response of the `me` query: the signed-in user (id "1") with this role, verified unless told. */
-export const meMock = (role: "ADMIN" | "USER", isVerified = true): MockLink.MockedResponse => ({
+/** MockedProvider response of the `me` query: the signed-in user (id "1" unless told) with this role, verified unless told. */
+export const meMock = (
+  role: "ADMIN" | "USER",
+  isVerified = true,
+  id = "1",
+): MockLink.MockedResponse => ({
   request: { query: MeDocument },
   result: {
     data: {
       me: {
         __typename: "SessionUser",
-        id: "1",
+        id,
         email: "admin@example.com",
         firstName: "Ada",
         lastName: "Admin",

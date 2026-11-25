@@ -130,6 +130,7 @@ describe("ProfileForm", () => {
     for (const field of [department(), position()]) {
       expect(field).toHaveAttribute("aria-readonly", "true");
       expect(field).toBeEnabled();
+      expect(field).not.toHaveAttribute("aria-required", "true");
     }
 
     await user.type(firstName(), "x");
