@@ -5,7 +5,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "@/shared/testing";
 import { meMock, userErrorMock, userMock } from "../../user-details.mocks";
 import { UserLayout } from "./UserLayout";
-import { UserLayoutSkeleton } from "./UserLayoutSkeleton";
 
 // `notFound()` throws to the nearest not-found page; here it throws an error the boundary below can show.
 vi.mock("next/navigation", async (importOriginal) => ({
@@ -133,24 +132,5 @@ describe("UserLayout", () => {
       expect(await screen.findByText("Caught: INTERNAL_SERVER_ERROR")).toBeInTheDocument();
       expect(screen.queryByText("Tab page")).not.toBeInTheDocument();
     });
-  });
-});
-
-describe("UserLayoutSkeleton", () => {
-  it("shows the breadcrumbs Employees › Loading employee and a loading skeleton, but no tabs", async () => {
-    renderWithProviders(<UserLayoutSkeleton />);
-
-    expect(screen.getByRole("status", { name: "Loading employee" })).toHaveAttribute(
-      "aria-busy",
-      "true",
-    );
-    expect(await breadcrumbTexts()).toEqual(["Employees", "Loading employee"]);
-    const breadcrumbs = screen.getByRole("navigation", { name: "Breadcrumbs" });
-    expect(within(breadcrumbs).getByRole("link", { name: "Employees" })).toHaveAttribute(
-      "href",
-      "/en/users",
-    );
-    expect(screen.getByRole("heading", { level: 1, name: "Loading employee" })).toBeInTheDocument();
-    expect(screen.queryByRole("navigation", { name: "Employee sections" })).not.toBeInTheDocument();
   });
 });

@@ -50,8 +50,5 @@
         "retry": "Spróbuj ponownie"
       }
     }
-  },
-  "states": {
-    "loading": "Ładowanie pracownika"
   }
 }

@@ -1,19 +1,12 @@
-import { Suspense } from "react";
 import { UserCvs } from "@/features/user-details";
 
-type UserCvsParams = PageProps<"/[locale]/users/[userId]/cvs">["params"];
+// Reading the params is per request, so the page renders inside the one `<Suspense>` of the (app) layout, and a
+// navigation to it waits instead of showing a loading state of its own (see `../layout.tsx`).
+// https://nextjs.org/docs/messages/blocking-prerender-dynamic
+export const instant = false;
 
-// Only reads userId from the params and passes it on. Reading the params is runtime data: Next.js needs it inside Suspense, or the build fails while prerendering.
-async function UserCvsWithUserId({ params }: { params: UserCvsParams }) {
+export default async function UserCvsPage({ params }: PageProps<"/[locale]/users/[userId]/cvs">) {
   const { userId } = await params;
 
   return <UserCvs userId={userId} />;
-}
-
-export default function UserCvsPage({ params }: PageProps<"/[locale]/users/[userId]/cvs">) {
-  return (
-    <Suspense>
-      <UserCvsWithUserId params={params} />
-    </Suspense>
-  );
 }

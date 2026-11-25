@@ -50,8 +50,5 @@
         "retry": "Retry"
       }
     }
-  },
-  "states": {
-    "loading": "Loading employee"
   }
 }
