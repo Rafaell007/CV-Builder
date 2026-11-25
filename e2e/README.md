@@ -139,6 +139,7 @@ Each bullet is one `test()`. The name of the spec file is in bold.
 - Shows No projects found and keeps the typed text when nothing matches.
 - Keeps the search when the sort changes.
 - Shows the page in Polish.
+- Has the first page of projects in the HTML that the server sends (no client code).
 - Shows 10 projects on page 1 and the rest on page 2.
 - Goes back to page 1 when the sort changes.
 - Goes back to page 1 when the search changes, and hides the pages that fit on one.
@@ -253,6 +254,8 @@ Each bullet is one `test()`. The name of the spec file is in bold.
 - Shows the page in Polish.
 - Sees the list without CREATE USER and without row menus (employee).
 - The arrow of a row opens the profile (employee).
+- Has the first page, CREATE USER and the row menus in the HTML that the server sends (admin, no client code).
+- Has the first page without CREATE USER and row menus in the HTML that the server sends (employee, no client code).
 - Sorts by first name both ways and by department (own users).
 - Shows 10 users on page 1 and the rest on page 2 (own users).
 - Creates a user: the modal closes, a toast shows and the row is in the list.
