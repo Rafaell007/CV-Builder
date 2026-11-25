@@ -21,7 +21,16 @@
         "lastNameRequired": "Last name is required",
         "lastNameTooLong": "Last name must be at most {max} characters long",
         "departmentRequired": "Department is required",
-        "positionRequired": "Position is required"
+        "positionRequired": "Position is required",
+        "serverInvalid": "Check this field",
+        "forbidden": "You do not have permission to do this.",
+        "notFound": "This user no longer exists.",
+        "concurrentChange": "Someone changed this user at the same time. Try again.",
+        "failed": "Something went wrong. Try again."
+      },
+      "success": {
+        "title": "Profile updated",
+        "text": "{name}'s profile was saved."
       },
       "options": {
         "loading": "Loading…",

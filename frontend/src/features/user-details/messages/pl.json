@@ -21,7 +21,16 @@
         "lastNameRequired": "Nazwisko jest wymagane",
         "lastNameTooLong": "Nazwisko może mieć najwyżej {max, plural, one {# znak} few {# znaki} other {# znaków}}",
         "departmentRequired": "Dział jest wymagany",
-        "positionRequired": "Stanowisko jest wymagane"
+        "positionRequired": "Stanowisko jest wymagane",
+        "serverInvalid": "Sprawdź to pole",
+        "forbidden": "Nie masz uprawnień do tej operacji.",
+        "notFound": "Ten użytkownik już nie istnieje.",
+        "concurrentChange": "Ktoś w tym samym czasie zmienił tego użytkownika. Spróbuj ponownie.",
+        "failed": "Coś poszło nie tak. Spróbuj ponownie."
+      },
+      "success": {
+        "title": "Profil zaktualizowany",
+        "text": "Profil użytkownika {name} został zapisany."
       },
       "options": {
         "loading": "Ładowanie…",

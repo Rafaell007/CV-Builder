@@ -1,8 +1,43 @@
 import type { CatalogOption, UseCatalogOptionsResult } from "@/shared/catalogOptions";
-import type { ProfileFormValues, ProfileUser } from "../user-details.types";
+import type { Failure } from "@/shared/failures";
+import type { UpdateProfileInput } from "@/shared/graphql";
+import { CONCURRENT_CHANGE_REASON } from "@/shared/userProfile";
+import type { ProfileFormValues, ProfileGeneralError, ProfileUser } from "../user-details.types";
+
+/** The `updateProfile` input: the checked form values (names already trimmed by the rules) of this user. */
+export function toUpdateProfileInput(
+  userId: string,
+  values: ProfileFormValues,
+): UpdateProfileInput {
+  return { id: userId, ...values };
+}
+
+/**
+ * True when the typed values differ from the saved ones. Names are compared trimmed, like the rules send them, so
+ * "Emma " for "Emma" is not a change (UPDATE stays disabled).
+ */
+export function hasProfileChanged(typed: ProfileFormValues, saved: ProfileFormValues): boolean {
+  return (
+    typed.firstName.trim() !== saved.firstName.trim() ||
+    typed.lastName.trim() !== saved.lastName.trim() ||
+    typed.departmentId !== saved.departmentId ||
+    typed.positionId !== saved.positionId
+  );
+}
+
+/**
+ * The general message of a failed save. The caller shows field errors (`invalid`) under their fields first and uses
+ * this only for what is left; so `invalid` here means a field error the form cannot show, which is `failed`.
+ */
+export function toProfileGeneralError({ kind, reason }: Failure): ProfileGeneralError {
+  if (kind === "forbidden") return "forbidden";
+  if (kind === "notFound") return "notFound";
+  if (kind === "conflict" && reason === CONCURRENT_CHANGE_REASON) return "concurrentChange";
+  return "failed";
+}
 
 /** The start values of the Profile form: the user's names, department and position (`""` when not set). */
-export function toProfileFormValues(user: ProfileUser): ProfileFormValues {
+export function toProfileFormValues(user: Omit<ProfileUser, "id">): ProfileFormValues {
   return {
     firstName: user.firstName ?? "",
     lastName: user.lastName ?? "",

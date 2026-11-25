@@ -1,6 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 import type { UseCatalogOptionsResult } from "@/shared/catalogOptions";
-import { toProfileCatalog, toProfileFormValues } from "./profileForm.utils";
+import {
+  hasProfileChanged,
+  toProfileCatalog,
+  toProfileFormValues,
+  toProfileGeneralError,
+  toUpdateProfileInput,
+} from "./profileForm.utils";
 
 const react = { id: "d1", name: "React" };
 const java = { id: "d3", name: "Java" };
@@ -63,5 +69,47 @@ describe("toProfileCatalog", () => {
 
   it("gives a read-only select no items when nothing is chosen", () => {
     expect(toProfileCatalog(catalog(), null, true).options).toEqual([]);
+  });
+});
+
+const saved = { firstName: "Emma", lastName: "Employee", departmentId: "d1", positionId: "p1" };
+
+describe("toUpdateProfileInput", () => {
+  it("sends the checked values with the id of the user", () => {
+    expect(toUpdateProfileInput("7", saved)).toEqual({ id: "7", ...saved });
+  });
+});
+
+describe("hasProfileChanged", () => {
+  it("is false for the saved values", () => {
+    expect(hasProfileChanged({ ...saved }, saved)).toBe(false);
+  });
+
+  it("is false when a name only got spaces around it", () => {
+    expect(
+      hasProfileChanged({ ...saved, firstName: " Emma ", lastName: "Employee  " }, saved),
+    ).toBe(false);
+  });
+
+  it.each([
+    ["firstName", "Emily"],
+    ["lastName", "Engineer"],
+    ["departmentId", "d3"],
+    ["positionId", "p2"],
+  ])("is true when %s changed", (field, value) => {
+    expect(hasProfileChanged({ ...saved, [field]: value }, saved)).toBe(true);
+  });
+});
+
+describe("toProfileGeneralError", () => {
+  it.each([
+    [{ kind: "forbidden" as const }, "forbidden"],
+    [{ kind: "notFound" as const }, "notFound"],
+    [{ kind: "conflict" as const, reason: "CONCURRENT_CHANGE" }, "concurrentChange"],
+    [{ kind: "conflict" as const, reason: "OTHER" }, "failed"],
+    [{ kind: "invalid" as const }, "failed"],
+    [{ kind: "unknown" as const }, "failed"],
+  ])("maps %o to %s", (failure, expected) => {
+    expect(toProfileGeneralError(failure)).toBe(expected);
   });
 });

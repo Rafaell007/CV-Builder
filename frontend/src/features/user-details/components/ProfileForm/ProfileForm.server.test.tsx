@@ -1,8 +1,10 @@
 import { NextIntlClientProvider } from "next-intl";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { loadMessages } from "@/i18n/loadMessages";
 import type { UseCatalogOptionsResult } from "@/shared/catalogOptions";
+import { ToastProvider } from "@/shared/components/Toast";
 import { ProfileForm } from "./ProfileForm";
 
 // The server HTML of the form (PLAN D6): the user's values must be in it, not only after hydration. On the page the
@@ -26,15 +28,21 @@ describe("ProfileForm on the server", () => {
   it.each([true, false])("has the user's values in the HTML (canEdit: %s)", (canEdit) => {
     const html = renderToString(
       <NextIntlClientProvider locale="en" messages={messages}>
-        <ProfileForm
-          canEdit={canEdit}
-          user={{
-            firstName: "Emma",
-            lastName: "Employee",
-            department: { __typename: "Department", id: "d1", name: "React" },
-            position: { __typename: "Position", id: "p1", name: "Software Engineer" },
-          }}
-        />
+        {/* The form's save request and its success toast need these; nothing is sent while rendering. */}
+        <MockedProvider>
+          <ToastProvider closeLabel="Close" label="Notification" viewportLabel="Notifications">
+            <ProfileForm
+              canEdit={canEdit}
+              user={{
+                id: "7",
+                firstName: "Emma",
+                lastName: "Employee",
+                department: { __typename: "Department", id: "d1", name: "React" },
+                position: { __typename: "Position", id: "p1", name: "Software Engineer" },
+              }}
+            />
+          </ToastProvider>
+        </MockedProvider>
       </NextIntlClientProvider>,
     );
 

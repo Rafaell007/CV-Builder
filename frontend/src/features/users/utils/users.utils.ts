@@ -1,5 +1,6 @@
 import { CombinedGraphQLErrors } from "@apollo/client";
-import { CONCURRENT_CHANGE_REASON, SELF_DELETE_REASON } from "../users.constants";
+import { CONCURRENT_CHANGE_REASON } from "@/shared/userProfile";
+import { SELF_DELETE_REASON } from "../users.constants";
 
 /** The profile page of a user (the employee arrow, row click and View). */
 export const toUserProfilePath = (userId: string): string => `/users/${userId}/profile`;

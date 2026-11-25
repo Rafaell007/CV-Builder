@@ -12,6 +12,7 @@ import type { ProfileUser } from "../../user-details.types";
 import { ProfileForm } from "./ProfileForm";
 
 const emma: ProfileUser = {
+  id: "7",
   firstName: "Emma",
   lastName: "Employee",
   department: { __typename: "Department", id: "d1", name: "React" },

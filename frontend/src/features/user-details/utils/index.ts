@@ -5,4 +5,10 @@ export {
   isUserNotFound,
   toUserTabPath,
 } from "./userDetails.utils";
-export { toProfileCatalog, toProfileFormValues } from "./profileForm.utils";
+export {
+  hasProfileChanged,
+  toProfileCatalog,
+  toProfileFormValues,
+  toProfileGeneralError,
+  toUpdateProfileInput,
+} from "./profileForm.utils";

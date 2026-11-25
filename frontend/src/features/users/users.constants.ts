@@ -29,9 +29,3 @@ export const OWN_ROLE_REASON = "OWN_ROLE";
 
 /** `extensions.reason` of the backend CONFLICT when an admin deletes their own account (D24). */
 export const SELF_DELETE_REASON = "SELF_DELETE";
-
-/**
- * `extensions.reason` of the backend CONFLICT when another request changed the same user at the same time. Nothing was
- * saved, so the admin can try again.
- */
-export const CONCURRENT_CHANGE_REASON = "CONCURRENT_CHANGE";

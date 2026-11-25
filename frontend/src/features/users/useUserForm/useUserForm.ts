@@ -6,7 +6,8 @@ import { useRef, useState, type BaseSyntheticEvent } from "react";
 import type { DefaultValues, FieldValues, Path } from "react-hook-form";
 import type { z } from "zod";
 import { applyServerFieldErrors, useZodForm } from "@/shared/forms";
-import { CONCURRENT_CHANGE_REASON, EMAIL_TAKEN_REASON, OWN_ROLE_REASON } from "../users.constants";
+import { CONCURRENT_CHANGE_REASON } from "@/shared/userProfile";
+import { EMAIL_TAKEN_REASON, OWN_ROLE_REASON } from "../users.constants";
 
 /** The message under the fields when a request failed in a way no field can show. */
 export type UserFormGeneralError =
