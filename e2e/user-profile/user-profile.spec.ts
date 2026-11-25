@@ -1,5 +1,6 @@
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 import { graphql } from "../support/graphql";
+import { waitForHydration } from "../support/hydration";
 import { ADMIN_EMAIL, signIn } from "../support/signIn";
 import { signUp } from "../support/signUp";
 import { createUser, deleteUsersByName, testUserEmail, type TestUser } from "../support/users";
@@ -26,6 +27,8 @@ async function currentUserId(context: BrowserContext): Promise<string> {
 async function open(page: Page, id: string) {
   await page.goto(profileUrl(id));
   await expect(firstName(page)).toBeVisible();
+  // The form comes with the server HTML (PLAN D6); wait for React before the test types or clicks.
+  await waitForHydration(firstName(page));
 }
 
 let alphaId: string;
