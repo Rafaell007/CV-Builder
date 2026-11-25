@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_CVS_SORT } from "../cvs.constants";
 import {
+  CVS_FIRST_PAGE,
   toActiveTabHref,
   toCvOpenPath,
   toCvReturnPath,
   toCvsVariables,
   toCvTabLinks,
   toCvTabPath,
+  toScopeUserId,
   toUserCvsPath,
   withScope,
 } from "./cvs.utils";
@@ -20,6 +22,14 @@ describe("toCvsVariables", () => {
       page: { number: 3, size: 10 },
       sort: { field: "name", direction: "ASC" },
       search: "anna@",
+    });
+  });
+
+  it("gives CVS_FIRST_PAGE the first request of /cvs: page 1, the default sort, no search, no user id", () => {
+    expect(CVS_FIRST_PAGE).toEqual(toCvsVariables(state));
+    expect(CVS_FIRST_PAGE).toEqual({
+      page: { number: 1, size: 10 },
+      sort: { field: "name", direction: "ASC" },
     });
   });
 
@@ -43,6 +53,24 @@ describe("toCvTabPath with a return page", () => {
 describe("toUserCvsPath", () => {
   it("gives the User CVs tab of the employee", () => {
     expect(toUserCvsPath("10")).toBe("/users/10/cvs");
+  });
+});
+
+describe("toScopeUserId", () => {
+  it("returns the employee of a User CVs tab path", () => {
+    expect(toScopeUserId("/users/10/cvs")).toBe("10");
+    expect(toScopeUserId("/users/3f2a-9c_1/cvs")).toBe("3f2a-9c_1");
+  });
+
+  it.each([
+    ["another page", "/skills"],
+    ["a path with extra parts", "/users/10/cvs/extra"],
+    ["another site", "https://evil.example/users/10/cvs"],
+    ["an empty value", ""],
+    ["no value", undefined],
+    ["null", null],
+  ])("returns nothing for %s", (_name, value) => {
+    expect(toScopeUserId(value)).toBeUndefined();
   });
 });
 

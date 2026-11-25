@@ -1,4 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
+import { waitForHydration } from "../support/hydration";
+import { serverRows } from "../support/serverRows";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
 import { createCvs, deleteCvsByName } from "../support/cvs";
 import { addCvSkillsByName } from "../support/cvSkills";
@@ -50,6 +52,8 @@ async function chooseCategory(page: Page, name: string) {
 async function open(page: Page) {
   await page.goto("/en/admin/skills");
   await expect(page.getByRole("heading", { name: "Skills" })).toBeVisible();
+  // The rows come with the server HTML; wait for React before the test types or clicks.
+  await waitForHydration(search(page));
 }
 
 test.describe("skill list, as an admin", () => {
@@ -100,6 +104,20 @@ test.describe("skill list, as an admin", () => {
     await expect(page.getByRole("heading", { name: "Umiejętności" })).toBeVisible();
     await expect(page.getByRole("columnheader", { name: "Kategoria" })).toBeVisible();
     await expect(dataRows(page)).toHaveCount(PAGE_SIZE);
+  });
+});
+
+test.describe("skill list, as the server renders it (no client code)", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("has the first page of skills in the HTML", async ({ context, page }) => {
+    await signIn(context, ADMIN_EMAIL);
+
+    await page.goto("/en/admin/skills");
+
+    // By name, the seed's first skill is Angular (backend/prisma/seed/catalogs.data.ts).
+    await expect(serverRows(page).first()).toContainText("Angular");
+    await expect(serverRows(page).first()).toContainText("Frontend");
   });
 });
 

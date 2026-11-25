@@ -1,6 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { SortState } from "@/shared/components";
+import { firstPageVariables, toListVariables } from "../utils";
 import { useListState } from "./useListState";
 
 const NAME_ASC: SortState = { field: "name", direction: "ASC" };
@@ -10,6 +11,14 @@ describe("useListState", () => {
     const { result } = renderHook(() => useListState(NAME_ASC));
 
     expect(result.current).toMatchObject({ search: "", sort: NAME_ASC, page: 1 });
+  });
+
+  // The server prefetches firstPageVariables (PLAN D6). Other variables would miss the Apollo cache, and the page
+  // would show its loading state first and ask the backend again.
+  it("starts with the variables that the server prefetches", () => {
+    const { result } = renderHook(() => useListState(NAME_ASC));
+
+    expect(toListVariables(result.current)).toEqual(firstPageVariables(NAME_ASC));
   });
 
   it("keeps its sort when the initial sort changes on a later render", () => {

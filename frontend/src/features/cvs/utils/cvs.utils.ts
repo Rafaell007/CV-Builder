@@ -1,6 +1,6 @@
 import type { CvsQueryVariables } from "@/shared/graphql";
-import { toListVariables, type ListState } from "@/shared/lists";
-import { CV_TABS } from "../cvs.constants";
+import { initialListState, toListVariables, type ListState } from "@/shared/lists";
+import { CV_TABS, DEFAULT_CVS_SORT } from "../cvs.constants";
 import type { CvTab } from "../cvs.types";
 
 /**
@@ -23,6 +23,13 @@ export function toCvsVariables(list: ListState, userId?: string): CvsQueryVariab
   };
 }
 
+/**
+ * The variables of the first `Cvs` request of the `/cvs` page. The route prefetches them on the server (PLAN D6).
+ * Built with `toCvsVariables`, like the list's own request, so the two always match and the browser finds the answer
+ * in the Apollo cache.
+ */
+export const CVS_FIRST_PAGE = toCvsVariables(initialListState(DEFAULT_CVS_SORT));
+
 /** The route of one tab of a CV. The locale-aware router adds the language. `from` is the page to return to (see `toCvReturnPath`). */
 export function toCvTabPath(cvId: string, tab: CvTab, from?: string): string {
   const path = `/cvs/${cvId}/${tab}`;
@@ -36,11 +43,16 @@ export function toUserCvsPath(userId: string): string {
 
 // Only the User CVs tab may be a return target. The value comes from the address, so anything else
 // (another site, another page, a path with extra parts) is dropped: the link would be an open redirect.
-const USER_CVS_PATH = /^\/users\/[A-Za-z0-9_-]+\/cvs$/;
+const USER_CVS_PATH = /^\/users\/([A-Za-z0-9_-]+)\/cvs$/;
 
 /** The `from` value of the address if it is a User CVs tab path, otherwise `undefined`. */
 export function toCvReturnPath(value: string | null | undefined): string | undefined {
   return typeof value === "string" && USER_CVS_PATH.test(value) ? value : undefined;
+}
+
+/** The employee of a User CVs tab path (a checked `from` value), or `undefined` for anything else. */
+export function toScopeUserId(from: string | null | undefined): string | undefined {
+  return typeof from === "string" ? USER_CVS_PATH.exec(from)?.[1] : undefined;
 }
 
 /** The route that opens a CV from the list. On the User CVs tab (`userId`) it remembers the tab, so the CV page can lead back to it. */

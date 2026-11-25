@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { createCvs, deleteCvsByName } from "../support/cvs";
+import { waitForHydration } from "../support/hydration";
+import { serverRows } from "../support/serverRows";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
 
 // The seed holds 5 CVs (backend/prisma/seed/cvs.data.ts): user1 owns 2, the others 1 each. The page shows 10 rows (PLAN D19).
@@ -37,6 +39,8 @@ test.describe("CVs page, as an admin", () => {
     await signIn(context, ADMIN_EMAIL);
     await page.goto("/en/cvs");
     await expect(page.getByRole("heading", { name: "CVs" })).toBeVisible();
+    // The rows come with the server HTML; wait for React before the test types or clicks.
+    await waitForHydration(search(page));
   });
 
   test("lists the CVs of all users, sorted by name ascending, with the owner email", async ({
@@ -107,6 +111,8 @@ test.describe("CVs page, as a user", () => {
     await signIn(context, USER_EMAIL);
     await page.goto("/en/cvs");
     await expect(page.getByRole("heading", { name: "CVs" })).toBeVisible();
+    // The rows come with the server HTML; wait for React before the test types or clicks.
+    await waitForHydration(search(page));
   });
 
   test("lists only the own CVs", async ({ page }) => {
@@ -119,6 +125,21 @@ test.describe("CVs page, as a user", () => {
     await find(page, "user3@example");
 
     await expect(page.getByText("No CVs found")).toBeVisible();
+  });
+});
+
+test.describe("CVs page, as the server renders it (no client code)", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("has the first page of CVs in the HTML", async ({ context, page }) => {
+    await signIn(context, ADMIN_EMAIL);
+
+    await page.goto("/en/cvs");
+
+    await expect(serverRows(page).first()).toContainText("Backend Developer");
+    await expect(serverRows(page).filter({ hasText: "QA Engineer" })).toContainText(
+      "user3@example.com",
+    );
   });
 });
 
@@ -138,6 +159,8 @@ test.describe("CVs page, create, update and delete (as a user)", () => {
     await signIn(context, USER_EMAIL);
     await page.goto("/en/cvs");
     await expect(page.getByRole("heading", { name: "CVs" })).toBeVisible();
+    // The rows come with the server HTML; wait for React before the test types or clicks.
+    await waitForHydration(search(page));
   });
 
   test.afterEach(async ({ context }) => {

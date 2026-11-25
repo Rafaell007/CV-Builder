@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { createCatalogItem, deleteCatalogItemsByName, type Catalog } from "./catalogs";
+import { waitForHydration } from "./hydration";
+import { serverRows } from "./serverRows";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "./signIn";
 
 /** What differs between the Departments and the Positions page. Everything else is the shared CatalogPage. */
@@ -53,6 +55,8 @@ export function describeCatalogPage(c: CatalogPageCase): void {
   async function open(page: Page) {
     await page.goto(`/en${c.path}`);
     await expect(page.getByRole("heading", { name: c.title })).toBeVisible();
+    // The rows come with the server HTML; wait for React before the test types or clicks.
+    await waitForHydration(search(page));
   }
 
   test.describe(`${lower} list, as an admin`, () => {
@@ -95,6 +99,18 @@ export function describeCatalogPage(c: CatalogPageCase): void {
 
       await expect(page.getByRole("heading", { name: c.polishTitle })).toBeVisible();
       await expect(dataRows(page)).toHaveCount(c.seed.length);
+    });
+  });
+
+  test.describe(`${lower} list, as the server renders it (no client code)`, () => {
+    test.use({ javaScriptEnabled: false });
+
+    test("has the first page in the HTML", async ({ context, page }) => {
+      await signIn(context, ADMIN_EMAIL);
+
+      await page.goto(`/en${c.path}`);
+
+      await expect(serverRows(page).first()).toContainText(c.seed[0]!);
     });
   });
 

@@ -1,4 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
+import { waitForHydration } from "../support/hydration";
+import { serverRows } from "../support/serverRows";
 import { ADMIN_EMAIL, PASSWORD, signIn, USER_EMAIL } from "../support/signIn";
 import { createUser, deleteUsersByName, testUserEmail, type TestUser } from "../support/users";
 
@@ -34,6 +36,8 @@ async function open(page: Page, locale: "en" | "pl" = "en") {
   await expect(
     page.getByRole("heading", { name: locale === "en" ? "Employees" : "Pracownicy" }),
   ).toBeVisible();
+  // The rows come with the server HTML; wait for React before the test types or clicks.
+  await waitForHydration(page.getByRole("searchbox"));
 }
 
 async function find(page: Page, text: string) {
@@ -162,6 +166,76 @@ test.describe("users page, as an employee", () => {
     await page.getByRole("link", { name: "Open profile of Jan Kowalski" }).click();
 
     await expect(page).toHaveURL(PROFILE_URL);
+  });
+});
+
+// A saved theme used to reach the page as a blocking update before the list hydrated, and React rendered the list
+// again: rows, then the loading state, then rows (KAN-172). The observer records whether the loading state comes back.
+test.describe("users page, while it hydrates", () => {
+  test("keeps the rows from the server, also with a saved theme", async ({
+    context,
+    page,
+    baseURL,
+  }) => {
+    await signIn(context, ADMIN_EMAIL);
+    await context.addCookies([{ name: "theme", value: "dark", url: baseURL ?? "" }]);
+    await page.addInitScript(() => {
+      const record = window as unknown as { rowsShown?: boolean; loadingAgain?: boolean };
+      new MutationObserver(() => {
+        const main = document.querySelector("main");
+        if (!main) return;
+        const rows = Array.from(main.querySelectorAll("tbody tr"));
+        if (rows.some((row) => (row as HTMLElement).offsetParent !== null)) record.rowsShown = true;
+        else if (record.rowsShown && main.querySelector('[aria-busy="true"]'))
+          record.loadingAgain = true;
+      }).observe(document, { subtree: true, childList: true, attributes: true });
+    });
+
+    await open(page);
+
+    const record = await page.evaluate(() => {
+      const { rowsShown, loadingAgain } = window as unknown as {
+        rowsShown?: boolean;
+        loadingAgain?: boolean;
+      };
+      return { rowsShown: rowsShown ?? false, loadingAgain: loadingAgain ?? false };
+    });
+    expect(record).toEqual({ rowsShown: true, loadingAgain: false });
+  });
+});
+
+// The role decides CREATE USER and the row menus, so the server HTML must already have the right ones (PLAN D6).
+test.describe("users page, as the server renders it (no client code)", () => {
+  test.use({ javaScriptEnabled: false });
+
+  // CSS locators, not roles: the streamed part of the page is hidden until a script reveals it (support/serverRows.ts).
+  const createInHtml = (page: Page) => page.locator("button", { hasText: "CREATE USER" });
+  const rowMenusInHtml = (page: Page) => page.locator('button[aria-label^="Actions for "]');
+
+  test("has the first page, CREATE USER and the row menus for an admin", async ({
+    context,
+    page,
+  }) => {
+    await signIn(context, ADMIN_EMAIL);
+
+    await page.goto("/en/users");
+
+    await expect(serverRows(page).first()).toContainText("admin@example.com");
+    await expect(createInHtml(page)).toHaveCount(1);
+    await expect(rowMenusInHtml(page).first()).toBeAttached();
+  });
+
+  test("has the first page without CREATE USER and row menus for an employee", async ({
+    context,
+    page,
+  }) => {
+    await signIn(context, USER_EMAIL);
+
+    await page.goto("/en/users");
+
+    await expect(serverRows(page).first()).toContainText("admin@example.com");
+    await expect(createInHtml(page)).toHaveCount(0);
+    await expect(rowMenusInHtml(page)).toHaveCount(0);
   });
 });
 

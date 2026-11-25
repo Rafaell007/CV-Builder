@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { SortState } from "@/shared/components";
 import type { ListState } from "../lists.types";
+import { initialListState } from "../utils";
 
 export type UseListStateResult = ListState & {
   /** A new search shows the first page of the new result. The same search again (also with other spaces around it) changes nothing. */
@@ -18,7 +19,7 @@ export type UseListStateResult = ListState & {
  */
 export function useListState(initialSort: SortState): UseListStateResult {
   // The initializer runs only on the first render, so a new `initialSort` later does not reset the list.
-  const [state, setState] = useState<ListState>(() => ({ search: "", sort: initialSort, page: 1 }));
+  const [state, setState] = useState<ListState>(() => initialListState(initialSort));
 
   return {
     ...state,

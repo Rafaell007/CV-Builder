@@ -1,10 +1,12 @@
 import { useTranslations } from "next-intl";
-import { Projects } from "@/features/projects";
+import { Projects, PROJECTS_FIRST_PAGE } from "@/features/projects";
+import { PrefetchQuery } from "@/shared/apollo/server";
 import { PageHeader } from "@/shared/components/PageHeader";
+import { ProjectsDocument } from "@/shared/graphql";
 
-// RequireAdmin (admin/layout.tsx) shows a loading state until the user is known, so this page is not rendered
-// during prerender and Next.js cannot check it for instant navigation. That is intended: the page must not
-// start its requests before the role is known. https://nextjs.org/docs/messages/instant-unrendered-segment
+// The admin layout waits for the current user on the server before RequireAdmin renders this page, so the page is not
+// rendered during prerender and Next.js cannot check it for instant navigation. That is intended: only an Admin may
+// see it. https://nextjs.org/docs/messages/instant-unrendered-segment
 export const instant = false;
 
 export default function AdminProjectsPage() {
@@ -18,7 +20,11 @@ export default function AdminProjectsPage() {
         breadcrumbs={[{ label: title }]}
         breadcrumbsLabel={t("common.breadcrumbs")}
       />
-      <Projects />
+      {/* The first page is rendered on the server per request (PLAN D6), inside the <Suspense> of the (app) layout.
+          The backend refuses it to a non-admin. */}
+      <PrefetchQuery query={ProjectsDocument} variables={PROJECTS_FIRST_PAGE}>
+        <Projects />
+      </PrefetchQuery>
     </>
   );
 }

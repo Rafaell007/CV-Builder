@@ -120,6 +120,20 @@ describe("handleRequest", () => {
     expect(response.headers.getSetCookie()).toEqual(newCookies);
   });
 
+  // Next.js keeps only these on a page streamed after its static shell (KAN-172): Set-Cookie headers added by hand
+  // never reach the browser there.
+  it("hands the refreshed cookies to the browser through response.cookies", async () => {
+    mockBackend({
+      body: { data: { refresh: true } },
+      setCookies: ["access_token=new; Path=/; HttpOnly", "refresh_token=r2; Path=/; HttpOnly"],
+    });
+
+    const response = await proxy(requestFor("/cvs", { access: EXPIRED, refresh: "r1" }));
+
+    expect(response.cookies.get("access_token")).toMatchObject({ value: "new", httpOnly: true });
+    expect(response.cookies.get("refresh_token")).toMatchObject({ value: "r2", httpOnly: true });
+  });
+
   it("sends the page the refreshed cookies", async () => {
     mockBackend({
       body: { data: { refresh: true } },
@@ -154,7 +168,9 @@ describe("handleRequest", () => {
     const response = await proxy(requestFor("/users", { access: EXPIRED, refresh: "dead" }));
 
     expect(location(response)).toBe("http://localhost:3000/en/sign-in");
-    expect(response.headers.getSetCookie()).toEqual(cleared);
+    for (const name of ["access_token", "refresh_token"]) {
+      expect(response.cookies.get(name)).toMatchObject({ value: "", expires: new Date(0) });
+    }
   });
 
   it("does not sign the user out when the backend cannot be reached", async () => {

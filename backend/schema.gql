@@ -299,7 +299,7 @@ type ProjectRole {
 type Query {
   availableCvProjects(cvId: ID!): [Project!]!
   availableCvSkills(cvId: ID!): [AvailableCvSkill!]!
-  cv(id: ID!): Cv!
+  cv(id: ID!, userId: ID): Cv!
   cvPreview(cvId: ID!, locale: String = "en"): CvPreview!
   cvProjects(cvId: ID!, search: String, sort: SortInput): [CvProject!]!
   cvSkills(cvId: ID!): [CvSkill!]!

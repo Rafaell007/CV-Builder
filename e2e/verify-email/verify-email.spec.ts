@@ -1,4 +1,5 @@
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
+import { waitForHydration } from "../support/hydration";
 import { findVerificationCode } from "../support/mailpit";
 import { signUp } from "../support/signUp";
 
@@ -9,20 +10,9 @@ async function openAsUnverifiedUser(page: Page, context: BrowserContext): Promis
   return email;
 }
 
-// Digits typed before React has hydrated the boxes are lost, so wait until the first box is interactive.
-async function waitForHydration(page: Page) {
-  await page.getByRole("textbox", { name: "Digit 1 of 6" }).evaluate(
-    (box) =>
-      new Promise<void>((resolve) => {
-        const hydrated = () => Object.keys(box).some((key) => key.startsWith("__reactProps"));
-        const check = () => (hydrated() ? resolve() : setTimeout(check, 50));
-        check();
-      }),
-  );
-}
-
 async function enterCode(page: Page, code: string) {
-  await waitForHydration(page);
+  // Digits typed before React has hydrated the boxes are lost, so wait until the first box is interactive.
+  await waitForHydration(page.getByRole("textbox", { name: "Digit 1 of 6" }));
   await page.getByRole("textbox", { name: "Digit 1 of 6" }).click();
   await page.keyboard.type(code);
 }

@@ -1,10 +1,12 @@
 export {
+  CVS_FIRST_PAGE,
   toActiveTabHref,
   toCvOpenPath,
   toCvReturnPath,
   toCvsVariables,
   toCvTabLinks,
   toCvTabPath,
+  toScopeUserId,
   toUserCvsPath,
   withScope,
   type CvTabLink,

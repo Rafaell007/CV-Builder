@@ -11,7 +11,7 @@ const CV_FIELDS = "id name education description userId ownerEmail";
 const LIST = `query ($search: String, $sort: SortInput, $page: PageInput!, $userId: ID) {
   cvs(search: $search, sort: $sort, page: $page, userId: $userId) { total items { ${CV_FIELDS} } }
 }`;
-const GET = `query ($id: ID!) { cv(id: $id) { ${CV_FIELDS} } }`;
+const GET = `query ($id: ID!, $userId: ID) { cv(id: $id, userId: $userId) { ${CV_FIELDS} } }`;
 const CREATE = `mutation ($input: CreateCvInput!) { createCv(input: $input) { ${CV_FIELDS} } }`;
 const UPDATE = `mutation ($input: UpdateCvInput!) { updateCv(input: $input) { ${CV_FIELDS} } }`;
 const DELETE = `mutation ($id: ID!, $userId: ID) { deleteCv(id: $id, userId: $userId) { id name } }`;
@@ -185,6 +185,24 @@ describe("cvs", () => {
       const { body } = await call(admin, GET, { id: benCvId });
 
       expect(body.data?.["cv"]).toMatchObject({ id: benCvId, ownerEmail: "ben@example.com" });
+    });
+
+    it("returns the CV to an admin who names its owner as the employee (AC-12)", async () => {
+      const { body } = await call(admin, GET, { id: benCvId, userId: ben.id });
+
+      expect(body.data?.["cv"]).toMatchObject({ id: benCvId, userId: ben.id });
+    });
+
+    it("answers NOT_FOUND to an admin who names another employee than the owner (AC-12)", async () => {
+      const { body } = await call(admin, GET, { id: benCvId, userId: ann.id });
+
+      expect(errorOf(body)?.extensions.code).toBe("NOT_FOUND");
+    });
+
+    it("rejects a userId that is not a UUID", async () => {
+      const { body } = await call(admin, GET, { id: benCvId, userId: "not-a-uuid" });
+
+      expect(errorOf(body)?.extensions.code).toBe("BAD_USER_INPUT");
     });
 
     it("rejects an id that is not a UUID instead of failing in the database", async () => {
