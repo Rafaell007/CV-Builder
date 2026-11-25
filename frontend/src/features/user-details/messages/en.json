@@ -5,5 +5,8 @@
     "skills": "Skills",
     "languages": "Languages",
     "cvs": "CVs"
+  },
+  "states": {
+    "loading": "Loading employee"
   }
 }

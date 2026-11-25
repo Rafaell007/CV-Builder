@@ -1,6 +1,6 @@
 import { connection } from "next/server";
 import { Suspense, type ReactNode } from "react";
-import { UserLayout } from "@/features/user-details";
+import { UserLayout, UserLayoutSkeleton } from "@/features/user-details";
 import { PreloadQuery } from "@/shared/apollo/server";
 import { MeDocument, UserDocument } from "@/shared/graphql";
 
@@ -29,13 +29,14 @@ async function UserLayoutWithUserId({
 }
 
 // The shell of every tab of a user (PLAN S6.2): header, breadcrumbs and tabs. Reading the params and the data is
-// per request: Next.js needs it inside Suspense, or the build fails while prerendering.
+// per request: Next.js needs it inside Suspense, or the build fails while prerendering. The skeleton shows until the
+// data is there.
 export default function UserRouteLayout({
   children,
   params,
 }: LayoutProps<"/[locale]/users/[userId]">) {
   return (
-    <Suspense>
+    <Suspense fallback={<UserLayoutSkeleton />}>
       <UserLayoutWithUserId params={params}>{children}</UserLayoutWithUserId>
     </Suspense>
   );

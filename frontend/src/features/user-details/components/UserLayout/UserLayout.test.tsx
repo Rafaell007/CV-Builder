@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "@/shared/testing";
 import { meMock, userMock } from "../../user-details.mocks";
 import { UserLayout } from "./UserLayout";
+import { UserLayoutSkeleton } from "./UserLayoutSkeleton";
 
 vi.mock("@/shared/i18n", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/shared/i18n")>()),
@@ -83,5 +84,24 @@ describe("UserLayout", () => {
     expect(screen.getByText("Suspended")).toBeInTheDocument();
     expect(await screen.findByText("Tab page")).toBeInTheDocument();
     expect(screen.queryByText("Suspended")).not.toBeInTheDocument();
+  });
+});
+
+describe("UserLayoutSkeleton", () => {
+  it("shows the breadcrumbs Employees › Loading employee and a loading skeleton, but no tabs", async () => {
+    renderWithProviders(<UserLayoutSkeleton />);
+
+    expect(screen.getByRole("status", { name: "Loading employee" })).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
+    expect(await breadcrumbTexts()).toEqual(["Employees", "Loading employee"]);
+    const breadcrumbs = screen.getByRole("navigation", { name: "Breadcrumbs" });
+    expect(within(breadcrumbs).getByRole("link", { name: "Employees" })).toHaveAttribute(
+      "href",
+      "/en/users",
+    );
+    expect(screen.getByRole("heading", { level: 1, name: "Loading employee" })).toBeInTheDocument();
+    expect(screen.queryByRole("navigation", { name: "Employee sections" })).not.toBeInTheDocument();
   });
 });

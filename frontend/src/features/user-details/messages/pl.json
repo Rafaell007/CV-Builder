@@ -5,5 +5,8 @@
     "skills": "Umiejętności",
     "languages": "Języki",
     "cvs": "CV"
+  },
+  "states": {
+    "loading": "Ładowanie pracownika"
   }
 }
