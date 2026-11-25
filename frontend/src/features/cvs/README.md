@@ -66,7 +66,7 @@ Rules (the same in the backend):
 
 Spec: [docs/pages/21-cv-details-page.md](../../../../docs/pages/21-cv-details-page.md) (PLAN S7.2, KAN-113). The page is built in steps; this is the data part.
 
-- `useCv(id)` sends the `Cv` query (`useCv/cv.graphql`) and returns `cv`, `loading`, `failure` and `retry`. `failure` is `undefined` when the request worked. `retry` repeats the request for the same id.
+- `useCv(id)` sends the `Cv` query (`useCv/cv.graphql`) and returns `cv`, `loading`, `failure` and `retry`. `failure` is `undefined` when the request worked. `retry` repeats the request for the same id. When the address has `?from=/users/{id}/cvs` (a CV opened from the User CVs tab), the hook sends that employee as `userId` (`toScopeUserId(toCvReturnPath(from))`), so the backend answers `NOT_FOUND` for a CV of another employee, also for an admin (AC-12, KAN-173). The hook reads `from` itself, so `CvLayout` and `CvDetails` send the same variables and share one cache entry.
 - `useCv` reads a failed request with `readFailure` (`shared/failures`) and returns `notFound`, `forbidden` or `failed`:
   - `notFound`: the backend code `NOT_FOUND`. It also means the CV belongs to another user (the backend gives the same answer, so a user cannot learn which ids exist). The page must not try to tell the two cases apart.
   - `forbidden`: the backend code `FORBIDDEN`. The `cv` query does not send it today; the page is ready for it.
