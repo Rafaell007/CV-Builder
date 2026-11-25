@@ -30,7 +30,7 @@ describe("resolveCvProjectDates", () => {
     });
   });
 
-  it("stores a missing end date as null (Present)", () => {
+  it("stores a missing end date as null (Till now)", () => {
     const { endDate } = resolveCvProjectDates({ startDate: new Date("2026-03-01") }, PROJECT);
 
     expect(endDate).toBeNull();

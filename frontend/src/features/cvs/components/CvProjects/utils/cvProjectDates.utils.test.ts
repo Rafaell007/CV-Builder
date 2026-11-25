@@ -25,7 +25,7 @@ describe("toCvProjectDateReasons", () => {
     ).toEqual({ startDate: [], endDate: [] });
   });
 
-  it("gives no reason for an empty end date (Present)", () => {
+  it("gives no reason for an empty end date (Till now)", () => {
     expect(
       toCvProjectDateReasons({ startDate: new Date(2026, 2, 1), endDate: null }, range),
     ).toEqual({ startDate: [], endDate: [] });
