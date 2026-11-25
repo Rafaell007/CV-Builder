@@ -1,5 +1,6 @@
 import type { Locale } from "next-intl";
 import { readFailure } from "@/shared/failures";
+import type { Role } from "@/shared/graphql";
 import { USER_TABS } from "../user-details.constants";
 import type { UserTab } from "../user-details.types";
 
@@ -11,6 +12,18 @@ export function toUserTabPath(userId: string, tab: UserTab): string {
 /** The tabs this role may open: only an Admin sees the CVs tab. Hiding a tab is only a convenience: the backend checks every request. */
 export function getUserTabs(isAdmin: boolean): UserTab[] {
   return USER_TABS.filter((tab) => isAdmin || tab !== "cvs");
+}
+
+/**
+ * Whether the signed-in user may change this profile (PLAN §8): the owner, or any Admin. `null` when no one is signed
+ * in. Hiding the form controls is only a convenience: the backend checks every `updateProfile` itself.
+ */
+export function canEditProfile(
+  me: { id: string; role: Role } | null | undefined,
+  userId: string,
+): boolean {
+  if (!me) return false;
+  return me.id === userId || me.role === "ADMIN";
 }
 
 /**

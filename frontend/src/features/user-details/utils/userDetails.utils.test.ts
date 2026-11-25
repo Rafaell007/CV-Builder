@@ -1,6 +1,12 @@
 import { CombinedGraphQLErrors } from "@apollo/client";
 import { describe, expect, it } from "vitest";
-import { formatMemberSince, getUserTabs, isUserNotFound, toUserTabPath } from "./userDetails.utils";
+import {
+  canEditProfile,
+  formatMemberSince,
+  getUserTabs,
+  isUserNotFound,
+  toUserTabPath,
+} from "./userDetails.utils";
 
 const graphQLError = (code: string) =>
   new CombinedGraphQLErrors({ errors: [{ message: code, extensions: { code } }] });
@@ -18,6 +24,24 @@ describe("getUserTabs", () => {
 
   it("leaves out the CVs tab for anyone else", () => {
     expect(getUserTabs(false)).toEqual(["profile", "skills", "languages"]);
+  });
+});
+
+describe("canEditProfile", () => {
+  it("lets the owner edit their own profile", () => {
+    expect(canEditProfile({ id: "10", role: "USER" }, "10")).toBe(true);
+  });
+
+  it("lets an admin edit any profile", () => {
+    expect(canEditProfile({ id: "1", role: "ADMIN" }, "10")).toBe(true);
+  });
+
+  it("shows another employee's profile read-only", () => {
+    expect(canEditProfile({ id: "20", role: "USER" }, "10")).toBe(false);
+  });
+
+  it("lets no one edit without a signed-in user", () => {
+    expect(canEditProfile(null, "10")).toBe(false);
   });
 });
 

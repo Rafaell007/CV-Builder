@@ -2,10 +2,10 @@ import { act, screen } from "@testing-library/react";
 import { Suspense } from "react";
 import { describe, expect, it } from "vitest";
 import { renderWithProviders } from "@/shared/testing";
-import { userMock } from "../../user-details.mocks";
+import { meMock, userMock } from "../../user-details.mocks";
 import { UserProfile } from "./UserProfile";
 
-// The tab reads `user(id)` with useSuspenseQuery; on the page the route layout preloads it on the server.
+// The tab reads `me` and `user(id)` with useSuspenseQuery; on the page the route layout preloads both on the server.
 // React 19 shows a suspended tree only inside an awaited act(); without it the fallback never leaves.
 const setup = async (user = userMock("10"), locale: "en" | "pl" = "en") => {
   await act(async () => {
@@ -13,7 +13,7 @@ const setup = async (user = userMock("10"), locale: "en" | "pl" = "en") => {
       <Suspense fallback={<p>Suspended</p>}>
         <UserProfile userId="10" />
       </Suspense>,
-      { mocks: [user], locale },
+      { mocks: [meMock("USER"), user], locale },
     );
   });
 };

@@ -2,19 +2,21 @@
 
 import { useSuspenseQuery } from "@apollo/client/react";
 import { useLocale, useTranslations } from "next-intl";
-import { UserDocument } from "@/shared/graphql";
+import { MeDocument, UserDocument } from "@/shared/graphql";
 import { getUserDisplayName } from "@/shared/utils";
-import { formatMemberSince } from "../../utils";
+import { canEditProfile, formatMemberSince } from "../../utils";
 
 /**
- * The data of the Profile tab: the employee's name, email and the day they joined. It reads the same `user(id)` query
- * as the shell, with the same options, so it gets the result that the route layout preloaded on the server (PLAN D6)
- * and sends no request of its own. The shell already turned a failed load into the 404 or the "Oops" page before
+ * The data of the Profile tab: the employee's name, email and the day they joined, and whether the signed-in user may
+ * edit it (`canEdit`: the owner or an Admin). It reads the same `me` and `user(id)` queries as the shell, with the same
+ * options, so it gets the results that the route layout preloaded on the server (PLAN D6) and sends no request of its
+ * own. The shell already turned a failed load into the 404 or the "Oops" page before
  * this tab renders, so a missing user here is a bug and is thrown.
  */
 export function useUserProfile(userId: string) {
   const t = useTranslations("userDetails.profile");
   const locale = useLocale();
+  const { data: meData } = useSuspenseQuery(MeDocument);
   const { data } = useSuspenseQuery(UserDocument, {
     variables: { id: userId },
     errorPolicy: "all",
@@ -29,6 +31,7 @@ export function useUserProfile(userId: string) {
     name,
     // A user without a name is already named by the email, so the email line would only repeat it.
     email: name === user.email ? null : user.email,
+    canEdit: canEditProfile(meData.me, userId),
     memberSince: memberSince === null ? null : t("memberSince", { date: memberSince }),
   };
 }
