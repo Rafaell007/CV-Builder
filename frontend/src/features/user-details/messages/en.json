@@ -9,6 +9,7 @@
   "profile": {
     "memberSince": "A member since {date}",
     "form": {
+      "update": "Update",
       "fields": {
         "firstName": "First Name",
         "lastName": "Last Name",

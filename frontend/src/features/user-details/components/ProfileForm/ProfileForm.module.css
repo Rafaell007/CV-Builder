@@ -4,6 +4,8 @@
  * centred; rows 84 apart (48 field + 36). Tablet 768 (frame-22): one column from x 80 to 744, the edges of the tabs,
  * so the form spans the shell's 16px side padding too (`.content` in UserLayout). The parent centres it, so a wider
  * box overflows both sides equally.
+ * Button row (frame-21, estimate): 36px below the last field box (bottom 560, button top 596), right-aligned; VERIFY
+ * EMAIL (step 5) sits 24px left of UPDATE. The general error is not in Figma: our guess, 24px below the fields.
  */
 .form {
   width: calc(100% + 2 * var(--space-4));
@@ -16,6 +18,17 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 36px var(--space-8);
+}
+
+.generalError {
+  margin-top: var(--space-6);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-6);
+  margin-top: 36px;
 }
 
 @media (min-width: 1024px) {

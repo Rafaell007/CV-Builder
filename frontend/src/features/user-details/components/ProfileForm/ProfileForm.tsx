@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Controller } from "react-hook-form";
-import { TextField } from "@/shared/components";
+import { Button, FormErrorMessage, TextField } from "@/shared/components";
 import {
   CatalogSelect,
   useSuspenseDepartmentOptions,
@@ -26,7 +26,7 @@ export interface ProfileFormProps {
  */
 export function ProfileForm({ user, canEdit }: ProfileFormProps) {
   const t = useTranslations("userDetails.profile.form");
-  const { form, initialValues } = useProfileForm(user);
+  const { form, initialValues, hasChanged, pending, generalError, submit } = useProfileForm(user);
   const { register, control } = form;
   const { errors } = form.formState;
   const readOnly = !canEdit;
@@ -34,8 +34,8 @@ export function ProfileForm({ user, canEdit }: ProfileFormProps) {
   const positions = toProfileCatalog(useSuspensePositionOptions(), user.position, readOnly);
 
   return (
-    // Sent by UPDATE (KAN-105 step 4c). `noValidate`: the Zod rules show the errors, not the browser.
-    <form className={styles.form} noValidate>
+    // `noValidate`: the Zod rules show the errors, not the browser.
+    <form className={styles.form} noValidate onSubmit={submit}>
       <div className={styles.fields}>
         <TextField
           {...register("firstName")}
@@ -96,6 +96,22 @@ export function ProfileForm({ user, canEdit }: ProfileFormProps) {
           )}
         />
       </div>
+      {/* No UPDATE on another employee's profile (ticket: read-only, no button). */}
+      {canEdit && (
+        <>
+          {generalError && (
+            <div className={styles.generalError}>
+              <FormErrorMessage>{t(`errors.${generalError}`)}</FormErrorMessage>
+            </div>
+          )}
+          <div className={styles.actions}>
+            {/* Disabled until a value really changes (spaces around a name do not count). */}
+            <Button type="submit" disabled={!hasChanged} loading={pending}>
+              {t("update")}
+            </Button>
+          </div>
+        </>
+      )}
     </form>
   );
 }

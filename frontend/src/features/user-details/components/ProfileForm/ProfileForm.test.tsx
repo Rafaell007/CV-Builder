@@ -2,11 +2,14 @@ import type { MockLink } from "@apollo/client/testing";
 import { act, screen } from "@testing-library/react";
 import { Suspense } from "react";
 import { describe, expect, it } from "vitest";
+import type { UpdateProfileInput } from "@/shared/graphql";
 import { renderWithProviders } from "@/shared/testing";
 import {
   departmentOptionsErrorMock,
   departmentOptionsMock,
   positionOptionsMock,
+  updateProfileMock,
+  updateProfileNetworkErrorMock,
 } from "../../user-details.mocks";
 import type { ProfileUser } from "../../user-details.types";
 import { ProfileForm } from "./ProfileForm";
@@ -47,6 +50,16 @@ const firstName = () => screen.getByRole("textbox", { name: /First Name/ });
 const lastName = () => screen.getByRole("textbox", { name: /Last Name/ });
 const department = () => screen.getByRole("combobox", { name: /Department/ });
 const position = () => screen.getByRole("combobox", { name: /Position/ });
+const updateButton = () => screen.getByRole("button", { name: "Update" });
+
+// What UPDATE sends after the tests typed "Emily" as the first name.
+const renamed: UpdateProfileInput = {
+  id: "7",
+  firstName: "Emily",
+  lastName: "Employee",
+  departmentId: "d1",
+  positionId: "p1",
+};
 
 describe("ProfileForm", () => {
   it("shows the user's values in the four fields", async () => {
@@ -116,6 +129,49 @@ describe("ProfileForm", () => {
     expect(department()).toHaveTextContent("React");
     expect(screen.getByText("Failed to load departments")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
+  });
+
+  it("keeps UPDATE disabled until a value really changes", async () => {
+    const { user } = await setup();
+    expect(updateButton()).toBeDisabled();
+
+    await user.type(lastName(), " ");
+    expect(updateButton()).toBeDisabled();
+
+    await user.type(lastName(), "s");
+    expect(updateButton()).toBeEnabled();
+  });
+
+  it("saves the changes with UPDATE, shows a toast and disables UPDATE again", async () => {
+    const { user } = await setup({ mocks: [...loadedOptions(), updateProfileMock(renamed)] });
+
+    await user.clear(firstName());
+    await user.type(firstName(), "Emily");
+    await user.click(updateButton());
+
+    expect(await screen.findByText("Profile updated")).toBeInTheDocument();
+    expect(firstName()).toHaveValue("Emily");
+    expect(updateButton()).toBeDisabled();
+  });
+
+  it("shows a general error above UPDATE when the save fails, and keeps the typed values", async () => {
+    const { user } = await setup({
+      mocks: [...loadedOptions(), updateProfileNetworkErrorMock(renamed)],
+    });
+
+    await user.clear(firstName());
+    await user.type(firstName(), "Emily");
+    await user.click(updateButton());
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Something went wrong. Try again.");
+    expect(firstName()).toHaveValue("Emily");
+    expect(updateButton()).toBeEnabled();
+  });
+
+  it("shows no UPDATE on a read-only profile", async () => {
+    await setup({ canEdit: false });
+
+    expect(screen.queryByRole("button", { name: "Update" })).not.toBeInTheDocument();
   });
 
   it("shows no load error on a read-only profile", async () => {
