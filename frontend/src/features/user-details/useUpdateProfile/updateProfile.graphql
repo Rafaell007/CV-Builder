@@ -1,0 +1,20 @@
+# Saves the Profile tab: names, department and position of one user. The owner or an admin (backend); anyone else gets
+# FORBIDDEN. Returns the same fields as the `User` query, so the cached user (header, breadcrumbs, form) updates itself.
+mutation UpdateProfile($input: UpdateProfileInput!) {
+  updateProfile(input: $input) {
+    id
+    email
+    firstName
+    lastName
+    role
+    createdAt
+    department {
+      id
+      name
+    }
+    position {
+      id
+      name
+    }
+  }
+}

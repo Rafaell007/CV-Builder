@@ -4,7 +4,9 @@ import {
   DepartmentOptionsDocument,
   MeDocument,
   PositionOptionsDocument,
+  UpdateProfileDocument,
   UserDocument,
+  type UpdateProfileInput,
 } from "@/shared/graphql";
 
 // Mock data for tests. The page itself never uses it: all data comes from the backend.
@@ -94,6 +96,57 @@ export const userCvsMock = (
 export const userErrorMock = (id: string, code: string): MockLink.MockedResponse => ({
   request: { query: UserDocument, variables: { id } },
   result: { errors: [{ message: code, extensions: { code } }] },
+});
+
+const DEPARTMENT_NAMES: Record<string, string> = { d1: "React", d2: ".NET", d3: "Java" };
+const POSITION_NAMES: Record<string, string> = { p1: "Software Engineer", p2: "Data Analyst" };
+
+/**
+ * MockedProvider response of `updateProfile`: the backend saved `input` (department and position ids of the options
+ * mocks below) and answers with the whole user.
+ */
+export const updateProfileMock = (input: UpdateProfileInput): MockLink.MockedResponse => ({
+  request: { query: UpdateProfileDocument, variables: { input } },
+  result: {
+    data: {
+      updateProfile: {
+        __typename: "User",
+        id: input.id,
+        email: "emma@example.com",
+        firstName: input.firstName,
+        lastName: input.lastName,
+        role: "USER",
+        createdAt: "2024-01-14T10:00:00.000Z",
+        department: {
+          __typename: "Department",
+          id: input.departmentId,
+          name: DEPARTMENT_NAMES[input.departmentId],
+        },
+        position: {
+          __typename: "Position",
+          id: input.positionId,
+          name: POSITION_NAMES[input.positionId],
+        },
+      },
+    },
+  },
+});
+
+/** `updateProfile` refused by the backend with these `extensions` (for example `{ code: "FORBIDDEN" }`). */
+export const updateProfileRefusedMock = (
+  input: UpdateProfileInput,
+  extensions: Record<string, unknown>,
+): MockLink.MockedResponse => ({
+  request: { query: UpdateProfileDocument, variables: { input } },
+  result: { errors: [{ message: String(extensions.code), extensions }] },
+});
+
+/** `updateProfile` that fails without an answer (no network). */
+export const updateProfileNetworkErrorMock = (
+  input: UpdateProfileInput,
+): MockLink.MockedResponse => ({
+  request: { query: UpdateProfileDocument, variables: { input } },
+  error: new Error("Failed to fetch"),
 });
 
 /** MockedProvider response of the Department options of the Profile form: `.NET`, `Java` and `React`, by name. */
