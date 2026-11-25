@@ -6,6 +6,9 @@
     "languages": "Języki",
     "cvs": "CV"
   },
+  "profile": {
+    "memberSince": "Członek od {date}"
+  },
   "states": {
     "loading": "Ładowanie pracownika"
   }

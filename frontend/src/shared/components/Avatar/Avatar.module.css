@@ -25,10 +25,12 @@
   height: var(--space-10);
 }
 
+/* User Details › Profile (Figma): 120px circle, initials 400 40/40, letter spacing 0.15 */
 .large {
-  width: 96px;
-  height: 96px;
-  font: var(--text-heading);
+  width: 120px;
+  height: 120px;
+  font: var(--text-avatar-large);
+  letter-spacing: var(--text-avatar-large-ls);
 }
 
 .image {

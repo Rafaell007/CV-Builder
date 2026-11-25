@@ -1,3 +1,4 @@
+import type { Locale } from "next-intl";
 import { readFailure } from "@/shared/failures";
 import { USER_TABS } from "../user-details.constants";
 import type { UserTab } from "../user-details.types";
@@ -19,4 +20,22 @@ export function getUserTabs(isAdmin: boolean): UserTab[] {
 export function isUserNotFound(error: unknown): boolean {
   const { kind } = readFailure(error);
   return kind === "notFound" || kind === "invalid";
+}
+
+/**
+ * The day a user joined, for "A member since …", with the rules of the language: `Sun, Jan 14, 2024` in English,
+ * `niedz., 14 sty 2024` in Polish. Read in UTC, so the server HTML and the browser show the same day (no hydration
+ * mismatch); near midnight it can be the day before or after the local one. `null` for a value that is not a date.
+ */
+export function formatMemberSince(createdAt: string, locale: Locale): string | null {
+  const date = new Date(createdAt);
+  if (Number.isNaN(date.getTime())) return null;
+
+  return new Intl.DateTimeFormat(locale, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
 }

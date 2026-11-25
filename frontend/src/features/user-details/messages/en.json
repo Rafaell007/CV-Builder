@@ -6,6 +6,9 @@
     "languages": "Languages",
     "cvs": "CVs"
   },
+  "profile": {
+    "memberSince": "A member since {date}"
+  },
   "states": {
     "loading": "Loading employee"
   }

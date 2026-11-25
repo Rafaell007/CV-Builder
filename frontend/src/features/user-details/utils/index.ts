@@ -1,1 +1,1 @@
-export { getUserTabs, isUserNotFound, toUserTabPath } from "./userDetails.utils";
+export { formatMemberSince, getUserTabs, isUserNotFound, toUserTabPath } from "./userDetails.utils";

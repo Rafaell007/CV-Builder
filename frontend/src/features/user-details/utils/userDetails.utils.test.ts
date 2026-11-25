@@ -1,6 +1,6 @@
 import { CombinedGraphQLErrors } from "@apollo/client";
 import { describe, expect, it } from "vitest";
-import { getUserTabs, isUserNotFound, toUserTabPath } from "./userDetails.utils";
+import { formatMemberSince, getUserTabs, isUserNotFound, toUserTabPath } from "./userDetails.utils";
 
 const graphQLError = (code: string) =>
   new CombinedGraphQLErrors({ errors: [{ message: code, extensions: { code } }] });
@@ -31,5 +31,21 @@ describe("isUserNotFound", () => {
     expect(isUserNotFound(new Error("Failed to fetch"))).toBe(false);
     expect(isUserNotFound(graphQLError("INTERNAL_SERVER_ERROR"))).toBe(false);
     expect(isUserNotFound(undefined)).toBe(false);
+  });
+});
+
+describe("formatMemberSince", () => {
+  it("formats the day with the rules of the language", () => {
+    expect(formatMemberSince("2024-01-14T10:00:00.000Z", "en")).toBe("Sun, Jan 14, 2024");
+    expect(formatMemberSince("2024-01-14T10:00:00.000Z", "pl")).toBe("niedz., 14 sty 2024");
+  });
+
+  it("reads the day in UTC, so a time near midnight does not move it", () => {
+    expect(formatMemberSince("2024-01-14T23:30:00.000Z", "en")).toBe("Sun, Jan 14, 2024");
+    expect(formatMemberSince("2024-01-14T00:30:00.000Z", "en")).toBe("Sun, Jan 14, 2024");
+  });
+
+  it("returns null for a value that is not a date", () => {
+    expect(formatMemberSince("not a date", "en")).toBeNull();
   });
 });

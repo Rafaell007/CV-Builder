@@ -71,6 +71,9 @@
   /* Initials of the 40px Avatar (Users list, Figma); letter spacing 0 is a prediction */
   --text-avatar: 400 20px/20px var(--font-family);
   --text-avatar-ls: 0;
+  /* Initials of the 120px Avatar (User Details › Profile, Figma) */
+  --text-avatar-large: 400 40px/40px var(--font-family);
+  --text-avatar-large-ls: 0.15px;
   /* Row menu items (Users list, Figma) */
   --text-menu: 400 14px/24px var(--font-family);
   --text-menu-ls: 0.15px;
