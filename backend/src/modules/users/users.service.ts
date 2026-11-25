@@ -38,6 +38,7 @@ const USER_SELECT = {
   role: true,
   department: { select: { id: true, name: true } },
   position: { select: { id: true, name: true } },
+  createdAt: true,
 } as const satisfies Prisma.UserSelect;
 
 @Injectable()

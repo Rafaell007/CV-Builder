@@ -43,6 +43,7 @@ const USER = {
   role: Role.USER,
   department: { id: DEPARTMENT_ID, name: "Engineering" },
   position: { id: POSITION_ID, name: "Developer" },
+  createdAt: new Date("2024-01-14T09:30:00.000Z"),
 };
 const SELECT = {
   id: true,
@@ -52,6 +53,7 @@ const SELECT = {
   role: true,
   department: { select: { id: true, name: true } },
   position: { select: { id: true, name: true } },
+  createdAt: true,
 };
 
 const prisma = {

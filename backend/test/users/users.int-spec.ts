@@ -282,6 +282,27 @@ describe("users", () => {
         });
       });
 
+      it("returns when the account was created, as an ISO date (Member since, profile AC-14)", async () => {
+        const { createdAt } = await prisma.user.findUniqueOrThrow({
+          where: { id: alphaId },
+          select: { createdAt: true },
+        });
+
+        const { body } = await graphqlRequest(
+          app,
+          `query ($id: ID!) { user(id: $id) { createdAt } }`,
+          {
+            cookies: admin,
+            variables: { id: alphaId },
+          },
+        );
+
+        expect(body.errors).toBeUndefined();
+        expect((body.data as { user: { createdAt: string } }).user.createdAt).toBe(
+          createdAt.toISOString(),
+        );
+      });
+
       it("fails with NOT_FOUND for an unknown id", async () => {
         const { body } = await graphqlRequest(app, USER, {
           cookies: admin,

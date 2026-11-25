@@ -448,6 +448,7 @@ input UpdateUserInput {
 }
 
 type User {
+  createdAt: DateTime!
   department: Department
   email: String!
   firstName: String
