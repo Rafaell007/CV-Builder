@@ -6,10 +6,6 @@ const PREFIX = "E2E Session end";
 const ERROR_TEXT = "Failed to load CV details";
 const IN_DOM_KEY = "cvErrorInDom";
 const PAINTED_KEY = "cvErrorPainted";
-const UNAUTHENTICATED = {
-  errors: [{ message: "Sign in to continue", extensions: { code: "UNAUTHENTICATED" } }],
-  data: null,
-};
 
 test.afterEach(async ({ context }) => {
   // The test ended the session, so sign in again to remove the CV.
@@ -17,23 +13,25 @@ test.afterEach(async ({ context }) => {
   await deleteCvsByName(context, PREFIX);
 });
 
-/** Ends the session in the browser and opens the CV Details page. `signInDelayMs` slows the sign-in page. */
-async function openWithEndedSession(context: BrowserContext, page: Page, signInDelayMs: number) {
+/**
+ * Ends the session for real (no access cookie, a refresh cookie that the backend refuses) and opens a CV page.
+ * No answer is made up: the proxy asks the backend, the backend refuses, and the session ends.
+ * `signInDelayMs` slows the sign-in page, so a flash of an error screen would have time to show.
+ */
+async function openWithDeadSession(
+  context: BrowserContext,
+  page: Page,
+  tab: "details" | "preview",
+  signInDelayMs: number,
+) {
   await signIn(context, USER_EMAIL);
   const [cvId = ""] = await createCvs(context, PREFIX, 1);
+  await context.clearCookies({ name: "access_token" });
+  await context.clearCookies({ name: "refresh_token" });
+  await context.addCookies([
+    { name: "refresh_token", value: "dead", url: "http://localhost:3100" },
+  ]);
 
-  // The cv query and the refresh both answer UNAUTHENTICATED.
-  await page.route("**/graphql", async (route) => {
-    const body = route.request().postDataJSON() as { operationName?: string; query?: string };
-    const name = body.operationName ?? /(?:query|mutation)\s+(\w+)/.exec(body.query ?? "")?.[1];
-    if (name === "Cv" || name === "Refresh") {
-      // Without this the cookies stay valid and the proxy sends the user from sign-in on to /users.
-      if (name === "Refresh") await context.clearCookies();
-      await route.fulfill({ json: UNAUTHENTICATED });
-      return;
-    }
-    await route.continue();
-  });
   if (signInDelayMs > 0) {
     await page.route("**/sign-in", async (route) => {
       await new Promise((resolve) => setTimeout(resolve, signInDelayMs));
@@ -59,7 +57,7 @@ async function openWithEndedSession(context: BrowserContext, page: Page, signInD
     [ERROR_TEXT, IN_DOM_KEY, PAINTED_KEY],
   );
 
-  await page.goto(`/en/cvs/${cvId}/details`);
+  await page.goto(`/en/cvs/${cvId}/${tab}`);
   await expect(page).toHaveURL(/\/en\/sign-in$/);
   return {
     inDom: await page.evaluate((key) => sessionStorage.getItem(key), IN_DOM_KEY),
@@ -67,15 +65,17 @@ async function openWithEndedSession(context: BrowserContext, page: Page, signInD
   };
 }
 
-for (const signInDelayMs of [0, 1000]) {
-  test(`CV Details shows no error screen before the redirect, sign-in delayed ${signInDelayMs} ms`, async ({
-    context,
-    page,
-  }, testInfo) => {
-    const seen = await openWithEndedSession(context, page, signInDelayMs);
-    testInfo.annotations.push({ type: "seen", description: JSON.stringify(seen) });
-    console.log(`delay ${signInDelayMs} ms:`, JSON.stringify(seen));
+// A dead session never reaches a CV page: the proxy sends the user to sign-in before the page is rendered (KAN-174).
+for (const tab of ["details", "preview"] as const) {
+  for (const signInDelayMs of [0, 1000]) {
+    test(`CV ${tab} shows no error screen before the redirect, sign-in delayed ${signInDelayMs} ms`, async ({
+      context,
+      page,
+    }) => {
+      const seen = await openWithDeadSession(context, page, tab, signInDelayMs);
 
-    expect(seen.painted).toBeNull();
-  });
+      expect(seen.painted).toBeNull();
+      await expect(page.getByRole("button", { name: "Retry" })).toHaveCount(0);
+    });
+  }
 }
