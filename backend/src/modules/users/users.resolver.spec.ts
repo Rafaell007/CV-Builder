@@ -24,6 +24,7 @@ function setup() {
     findOne: jest.fn().mockResolvedValue({ id: USER_ID }),
     create: jest.fn().mockResolvedValue({ id: USER_ID }),
     update: jest.fn().mockResolvedValue({ id: USER_ID }),
+    updateProfile: jest.fn().mockResolvedValue({ id: USER_ID }),
     delete: jest.fn().mockResolvedValue(undefined),
   } as unknown as jest.Mocked<UsersService>;
   return { resolver: new UsersResolver(service), service };
@@ -37,7 +38,7 @@ describe("UsersResolver", () => {
     expect(Reflect.getMetadata(ROLES_KEY, UsersResolver)).toBeUndefined();
   });
 
-  it.each(["list", "user"] as const)(
+  it.each(["list", "user", "updateProfile"] as const)(
     "%s is open to every signed-in user, verified or not",
     (name) => {
       expect(Reflect.getMetadata(ROLES_KEY, handler(name) as object)).toBeUndefined();
@@ -83,6 +84,21 @@ describe("UsersResolver", () => {
     await expect(resolver.updateUser(ACTOR, input)).resolves.toEqual({ id: USER_ID });
 
     expect(service.update).toHaveBeenCalledWith(input, ACTOR.id);
+  });
+
+  it("updateProfile passes the input and the signed-in user's id to the service", async () => {
+    const { resolver, service } = setup();
+    const input = {
+      id: USER_ID,
+      firstName: PROFILE.firstName,
+      lastName: PROFILE.lastName,
+      departmentId: PROFILE.departmentId,
+      positionId: PROFILE.positionId,
+    };
+
+    await expect(resolver.updateProfile(ACTOR, input)).resolves.toEqual({ id: USER_ID });
+
+    expect(service.updateProfile).toHaveBeenCalledWith(input, ACTOR.id);
   });
 
   it("deleteUser returns true after the service deleted the user as the signed-in admin", async () => {

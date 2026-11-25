@@ -4,6 +4,7 @@ import { type AuthUser, CurrentUser, requireUser, Roles } from "../../common/aut
 import { ListArgs } from "../../common/pagination";
 import { Role } from "../auth/models/role.enum";
 import { CreateUserInput } from "./dto/create-user.input";
+import { UpdateProfileInput } from "./dto/update-profile.input";
 import { UpdateUserInput } from "./dto/update-user.input";
 import { User } from "./models/user";
 import { UserPage } from "./models/user-page";
@@ -11,7 +12,8 @@ import { UsersService } from "./users.service";
 
 /**
  * Every signed-in user may read users (the global guard refuses anonymous calls); only admins may create,
- * update and delete them (PLAN.md §8, users page AC-12, AC-21, AC-30). Reading needs no verified email (D16).
+ * update and delete them (PLAN.md §8, users page AC-12, AC-21, AC-30). The owner or an admin may update a
+ * profile. Reading and the profile need no verified email (D16).
  */
 @Resolver(() => User)
 export class UsersResolver {
@@ -40,6 +42,15 @@ export class UsersResolver {
     @Args("input") input: UpdateUserInput,
   ): Promise<User> {
     return this.service.update(input, requireUser(actor).id);
+  }
+
+  /** Any signed-in user, verified or not (D16): the service lets only the owner or an admin save. */
+  @Mutation(() => User)
+  updateProfile(
+    @CurrentUser() actor: AuthUser | undefined,
+    @Args("input") input: UpdateProfileInput,
+  ): Promise<User> {
+    return this.service.updateProfile(input, requireUser(actor).id);
   }
 
   @Roles(Role.ADMIN)
