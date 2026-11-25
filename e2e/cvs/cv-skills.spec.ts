@@ -111,13 +111,13 @@ test.describe("CV Skills page, as a user", () => {
     await expect(updateDialog(page)).toBeVisible();
     // The skill itself cannot change.
     await expect(updateDialog(page).getByRole("combobox", { name: /Skill/ })).toBeDisabled();
-    const save = updateDialog(page).getByRole("button", { name: "Save" });
-    await expect(save).toBeDisabled();
+    const update = updateDialog(page).getByRole("button", { name: "Update" });
+    await expect(update).toBeDisabled();
     await updateDialog(page)
       .getByRole("combobox", { name: /Mastery/ })
       .click();
     await page.getByRole("option", { name: "Expert", exact: true }).click();
-    await save.click();
+    await update.click();
 
     await expect(page.getByText("Skill updated", { exact: true })).toBeVisible();
     await expect(skill(page, "TypeScript", "Expert")).toBeVisible();

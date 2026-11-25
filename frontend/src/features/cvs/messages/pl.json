@@ -158,7 +158,7 @@
       "close": "Zamknij",
       "skill": "Umiejętność",
       "mastery": "Poziom",
-      "submit": "Zapisz",
+      "submit": "Zaktualizuj",
       "cancel": "Anuluj",
       "errors": {
         "notFound": "Tej umiejętności nie ma już w CV.",
