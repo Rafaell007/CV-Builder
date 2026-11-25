@@ -5,6 +5,7 @@ export {
   toCvsVariables,
   toCvTabLinks,
   toCvTabPath,
+  toScopeUserId,
   toUserCvsPath,
   withScope,
   type CvTabLink,

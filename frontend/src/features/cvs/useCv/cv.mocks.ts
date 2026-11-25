@@ -4,9 +4,12 @@ import type { CvDetailsData } from "../cvs.types";
 
 // Mock data for tests and stories. The page itself never uses it: all CV data comes from the backend.
 
-/** MockedProvider response of the `Cv` query for the CV with this id. */
-export const cvMock = (cv: CvDetailsData): MockLink.MockedResponse => ({
-  request: { query: CvDocument, variables: { id: cv.id } },
+/** MockedProvider response of the `Cv` query for the CV with this id. `userId`: the employee of the User CVs tab (AC-12). */
+export const cvMock = (cv: CvDetailsData, userId?: string): MockLink.MockedResponse => ({
+  request: {
+    query: CvDocument,
+    variables: { id: cv.id, ...(userId === undefined ? {} : { userId }) },
+  },
   result: { data: { cv } },
 });
 

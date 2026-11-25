@@ -82,7 +82,8 @@ describe("CvLayout", () => {
     it("leads the CVs breadcrumb back to that tab and keeps it in the links of the tabs", async () => {
       route.pathname = "/cvs/1/preview";
       route.search = `from=${from}`;
-      setup({ mocks: [cvMock(frontendCv)] });
+      // The mock answers only when the request carries the employee of the tab as userId (AC-12).
+      setup({ mocks: [cvMock(frontendCv, "10")] });
       await screen.findByText("Tab page");
 
       expect(within(breadcrumbs()).getByRole("link", { name: "CVs" })).toHaveAttribute(

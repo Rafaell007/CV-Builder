@@ -30,13 +30,13 @@ describe("CvsResolver", () => {
     const update = { id: "cv-1", ...input };
 
     await resolver.cvs(USER, args);
-    await resolver.cv(USER, "cv-1");
+    await resolver.cv(USER, "cv-1", "user-2");
     await resolver.createCv(USER, input);
     await resolver.updateCv(USER, update);
     await resolver.deleteCv(USER, "cv-1", "user-2");
 
     expect(service.list).toHaveBeenCalledWith(USER, args);
-    expect(service.get).toHaveBeenCalledWith(USER, "cv-1");
+    expect(service.get).toHaveBeenCalledWith(USER, "cv-1", "user-2");
     expect(service.create).toHaveBeenCalledWith(USER, input);
     expect(service.update).toHaveBeenCalledWith(USER, update);
     expect(service.delete).toHaveBeenCalledWith(USER, "cv-1", "user-2");
@@ -104,8 +104,8 @@ describe("CvsResolver", () => {
       );
     });
 
-    it("deleteCv accepts only a UUID or no value as userId", async () => {
-      const pipe = pipeOf("deleteCv", "userId");
+    it.each(["cv", "deleteCv"])("%s accepts only a UUID or no value as userId", async (method) => {
+      const pipe = pipeOf(method, "userId");
 
       await expect(pipe.transform("not-a-uuid", METADATA)).rejects.toThrow();
       await expect(

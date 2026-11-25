@@ -52,8 +52,9 @@ export class CvsService {
     return { items: items.map(toCv), total };
   }
 
-  async get(user: AuthUser, id: string): Promise<Cv> {
-    return toCv(await this.findAccessible(user, id));
+  /** `userId`: the employee of the User CVs tab; a CV of another employee answers NOT_FOUND (see `update`). */
+  async get(user: AuthUser, id: string, userId?: string): Promise<Cv> {
+    return toCv(await this.findInScope(user, id, userId));
   }
 
   async create(user: AuthUser, { userId, ...data }: CreateCvInput): Promise<Cv> {

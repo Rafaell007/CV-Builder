@@ -225,6 +225,21 @@ describe("CvsService.get", () => {
 
     expect(await rejection(service.get(ADMIN, "cv-1"))).toBeInstanceOf(NotFoundException);
   });
+
+  it("returns the CV to an admin when it belongs to the employee of the scope", async () => {
+    prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-2" }));
+
+    await expect(service.get(ADMIN, "cv-1", "user-2")).resolves.toMatchObject({ id: "cv-1" });
+  });
+
+  it("answers NOT_FOUND to an admin when the CV belongs to another employee than the scope", async () => {
+    prisma.cv.findUnique.mockResolvedValue(storedCv({ userId: "user-2" }));
+
+    const error = await rejection(service.get(ADMIN, "cv-1", "user-3"));
+
+    expect(error).toBeInstanceOf(NotFoundException);
+    expect((error as Error).message).toBe("CV not found");
+  });
 });
 
 describe("CvsService.assertAccessible", () => {
