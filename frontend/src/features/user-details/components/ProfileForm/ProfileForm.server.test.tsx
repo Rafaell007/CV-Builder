@@ -22,6 +22,14 @@ vi.mock("@/shared/catalogOptions", async (importOriginal) => ({
   useSuspensePositionOptions: () => loaded([{ id: "p1", name: "Software Engineer" }]),
 }));
 
+// VERIFY EMAIL reads the router; the page has the App Router, this test does not.
+vi.mock("@/shared/i18n", async (importOriginal) =>
+  (await import("@/shared/testing/withMockedRouter")).withMockedRouter(
+    await importOriginal<typeof import("@/shared/i18n")>(),
+    () => ({ push: vi.fn(), replace: vi.fn() }),
+  ),
+);
+
 const messages = await loadMessages("en");
 
 describe("ProfileForm on the server", () => {

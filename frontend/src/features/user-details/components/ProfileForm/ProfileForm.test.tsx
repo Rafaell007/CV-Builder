@@ -1,18 +1,30 @@
 import type { MockLink } from "@apollo/client/testing";
 import { act, screen } from "@testing-library/react";
 import { Suspense } from "react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { UpdateProfileInput } from "@/shared/graphql";
 import { renderWithProviders } from "@/shared/testing";
 import {
   departmentOptionsErrorMock,
   departmentOptionsMock,
   positionOptionsMock,
+  resendCodeMock,
   updateProfileMock,
   updateProfileNetworkErrorMock,
 } from "../../user-details.mocks";
 import type { ProfileUser } from "../../user-details.types";
 import { ProfileForm } from "./ProfileForm";
+
+// VERIFY EMAIL opens the Email Verification page with the router.
+const push = vi.fn();
+vi.mock("@/shared/i18n", async (importOriginal) =>
+  (await import("@/shared/testing/withMockedRouter")).withMockedRouter(
+    await importOriginal<typeof import("@/shared/i18n")>(),
+    () => ({ push, replace: vi.fn() }),
+  ),
+);
+
+beforeEach(() => push.mockClear());
 
 const emma: ProfileUser = {
   id: "7",
@@ -31,13 +43,19 @@ const loadedOptions = () => [departmentOptionsMock(), positionOptionsMock()];
 async function setup({
   user = emma,
   canEdit = true,
+  canVerifyEmail = false,
   mocks = loadedOptions(),
-}: { user?: ProfileUser; canEdit?: boolean; mocks?: MockLink.MockedResponse[] } = {}) {
+}: {
+  user?: ProfileUser;
+  canEdit?: boolean;
+  canVerifyEmail?: boolean;
+  mocks?: MockLink.MockedResponse[];
+} = {}) {
   let rendered!: ReturnType<typeof renderWithProviders>;
   await act(async () => {
     rendered = renderWithProviders(
       <Suspense fallback={<p>Suspended</p>}>
-        <ProfileForm user={user} canEdit={canEdit} />
+        <ProfileForm user={user} canEdit={canEdit} canVerifyEmail={canVerifyEmail} />
       </Suspense>,
       { mocks },
     );
@@ -172,6 +190,35 @@ describe("ProfileForm", () => {
     await setup({ canEdit: false });
 
     expect(screen.queryByRole("button", { name: "Update" })).not.toBeInTheDocument();
+  });
+
+  it("shows VERIFY EMAIL left of UPDATE when the owner's email is not verified", async () => {
+    await setup({ canVerifyEmail: true });
+
+    const verify = screen.getByRole("button", { name: "Verify email" });
+    expect(verify).toHaveAttribute("type", "button");
+    // Same row, VERIFY EMAIL first (Figma: 24px left of UPDATE).
+    expect(verify.nextElementSibling).toBe(updateButton());
+  });
+
+  it("sends a code with VERIFY EMAIL and opens the Email Verification page, without saving", async () => {
+    // No updateProfile mock: a save would fail and show the general error.
+    const { user } = await setup({
+      canVerifyEmail: true,
+      mocks: [...loadedOptions(), resendCodeMock()],
+    });
+
+    await user.click(screen.getByRole("button", { name: "Verify email" }));
+
+    expect(await screen.findByText("Verification email has been sent")).toBeInTheDocument();
+    expect(push).toHaveBeenCalledWith("/verify-email");
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("shows no VERIFY EMAIL when it is not offered", async () => {
+    await setup();
+
+    expect(screen.queryByRole("button", { name: "Verify email" })).not.toBeInTheDocument();
   });
 
   it("shows no load error on a read-only profile", async () => {

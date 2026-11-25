@@ -1,6 +1,6 @@
 import { act, screen } from "@testing-library/react";
 import { Suspense } from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "@/shared/testing";
 import {
   departmentOptionsMock,
@@ -9,6 +9,14 @@ import {
   userMock,
 } from "../../user-details.mocks";
 import { UserProfile } from "./UserProfile";
+
+// VERIFY EMAIL in the form reads the router; the page has the App Router, this test does not.
+vi.mock("@/shared/i18n", async (importOriginal) =>
+  (await import("@/shared/testing/withMockedRouter")).withMockedRouter(
+    await importOriginal<typeof import("@/shared/i18n")>(),
+    () => ({ push: vi.fn(), replace: vi.fn() }),
+  ),
+);
 
 // The tab reads `me`, `user(id)` and the form options with useSuspenseQuery; on the page the route preloads them on
 // the server. React 19 shows a suspended tree only inside an awaited act(); without it the fallback never leaves.
@@ -67,5 +75,34 @@ describe("UserProfile", () => {
     expect(await screen.findByRole("textbox", { name: /First Name/ })).not.toHaveAttribute(
       "readonly",
     );
+  });
+
+  it("offers VERIFY EMAIL on the owner's own profile while the email is not verified", async () => {
+    // The signed-in user "1" opens their own profile.
+    await act(async () => {
+      renderWithProviders(
+        <Suspense fallback={<p>Suspended</p>}>
+          <UserProfile userId="1" />
+        </Suspense>,
+        {
+          mocks: [
+            meMock("USER", false),
+            userMock("1"),
+            departmentOptionsMock(),
+            positionOptionsMock(),
+          ],
+        },
+      );
+    });
+
+    expect(await screen.findByRole("button", { name: "Verify email" })).toBeInTheDocument();
+  });
+
+  it("offers no VERIFY EMAIL to an Admin on another employee's profile", async () => {
+    // meMock's Admin is verified; the point is that the button belongs to the owner only.
+    await setup(userMock("10"), "en", "ADMIN");
+
+    expect(await screen.findByRole("button", { name: "Update" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Verify email" })).not.toBeInTheDocument();
   });
 });
