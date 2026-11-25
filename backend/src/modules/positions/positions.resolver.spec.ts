@@ -7,6 +7,7 @@ const POSITION_ID = "6f1d3c52-8a0e-4f6c-9a43-2b7d5e1c9a10";
 function setup() {
   const service = {
     list: jest.fn().mockResolvedValue({ items: [], total: 0 }),
+    listOptions: jest.fn(),
     create: jest.fn().mockResolvedValue({ id: POSITION_ID }),
     update: jest.fn().mockResolvedValue({ id: POSITION_ID }),
     delete: jest.fn().mockResolvedValue(undefined),
@@ -15,9 +16,31 @@ function setup() {
 }
 
 describe("PositionsResolver", () => {
-  it("is for admins only", () => {
-    expect(Reflect.getMetadata("auth:roles", PositionsResolver)).toEqual([Role.ADMIN]);
+  it.each(["list", "createPosition", "updatePosition", "deletePosition"] as const)(
+    "%s is for admins only",
+    (method) => {
+      expect(Reflect.getMetadata("auth:roles", PositionsResolver.prototype[method])).toEqual([
+        Role.ADMIN,
+      ]);
+    },
+  );
+
+  it("listOptions is for every signed-in user", () => {
+    expect(
+      Reflect.getMetadata("auth:roles", PositionsResolver.prototype.listOptions),
+    ).toBeUndefined();
+    expect(Reflect.getMetadata("auth:roles", PositionsResolver)).toBeUndefined();
     expect(Reflect.getMetadata("auth:isPublic", PositionsResolver)).toBeUndefined();
+    expect(
+      Reflect.getMetadata("auth:isPublic", PositionsResolver.prototype.listOptions),
+    ).toBeUndefined();
+  });
+
+  it("listOptions returns the service's list", async () => {
+    const { resolver, service } = setup();
+    service.listOptions.mockResolvedValue([{ id: POSITION_ID, name: "Developer" }]);
+
+    await expect(resolver.listOptions()).resolves.toEqual([{ id: POSITION_ID, name: "Developer" }]);
   });
 
   it("list passes the arguments to the service", async () => {

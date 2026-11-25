@@ -99,6 +99,19 @@ describe("PositionsService", () => {
     });
   });
 
+  describe("listOptions", () => {
+    it("returns every position, sorted by name, then by id, without pages", async () => {
+      prisma.position.findMany.mockResolvedValue([POSITION]);
+
+      await expect(createService().listOptions()).resolves.toEqual([POSITION]);
+
+      expect(prisma.position.findMany).toHaveBeenCalledWith({
+        select: SELECT,
+        orderBy: [{ name: "asc" }, { id: "asc" }],
+      });
+    });
+  });
+
   describe("create", () => {
     it("saves the position and returns it", async () => {
       prisma.position.create.mockResolvedValue(POSITION);

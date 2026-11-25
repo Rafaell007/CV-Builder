@@ -33,6 +33,14 @@ export class DepartmentsService {
     return { items, total };
   }
 
+  /** Every department, sorted by name, for the Department select of the user forms (no pages). */
+  listOptions(): Promise<Department[]> {
+    return this.prisma.department.findMany({
+      select: { id: true, name: true },
+      orderBy: [{ name: "asc" }, { id: "asc" }],
+    });
+  }
+
   async create({ name }: CreateDepartmentInput): Promise<Department> {
     try {
       return await this.prisma.department.create({

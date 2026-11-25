@@ -99,6 +99,19 @@ describe("DepartmentsService", () => {
     });
   });
 
+  describe("listOptions", () => {
+    it("returns every department, sorted by name, then by id, without pages", async () => {
+      prisma.department.findMany.mockResolvedValue([DEPARTMENT]);
+
+      await expect(createService().listOptions()).resolves.toEqual([DEPARTMENT]);
+
+      expect(prisma.department.findMany).toHaveBeenCalledWith({
+        select: SELECT,
+        orderBy: [{ name: "asc" }, { id: "asc" }],
+      });
+    });
+  });
+
   describe("create", () => {
     it("saves the department and returns it", async () => {
       prisma.department.create.mockResolvedValue(DEPARTMENT);

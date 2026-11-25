@@ -304,11 +304,13 @@ type Query {
   cvProjects(cvId: ID!, search: String, sort: SortInput): [CvProject!]!
   cvSkills(cvId: ID!): [CvSkill!]!
   cvs(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput, userId: ID): CvPage!
+  departmentOptions: [Department!]!
   departments(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): DepartmentPage!
   exportCvPdf(cvId: ID!, locale: String = "en"): CvPdf!
   health: Health!
   languages(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): LanguagePage!
   me: SessionUser
+  positionOptions: [Position!]!
   positions(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): PositionPage!
   projectRoles: [ProjectRole!]!
   projects(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): ProjectPage!
