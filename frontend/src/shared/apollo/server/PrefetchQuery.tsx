@@ -16,8 +16,8 @@ export interface PrefetchQueryProps<TData, TVariables extends OperationVariables
  * Runs `query` on the server with the user's cookies (PLAN D6) and renders `children` once the result is in the
  * browser's Apollo cache. The children's own `useQuery` (same query, same variables) finds it there, also while the
  * page renders on the server: the server HTML shows the data, and the browser does not ask again.
- * Render it inside `<Suspense>` (the build fails otherwise). Nest two of them inside one `<Suspense>` to show both
- * results in one step.
+ * It must render inside `<Suspense>` (the build fails otherwise): the `(app)` layout has one around every protected
+ * page, so a page needs none of its own. Nest two to have both results.
  */
 export async function PrefetchQuery<TData, TVariables extends OperationVariables>({
   query,
