@@ -169,6 +169,41 @@ test.describe("users page, as an employee", () => {
   });
 });
 
+// A saved theme used to reach the page as a blocking update before the list hydrated, and React rendered the list
+// again: rows, then the loading state, then rows (KAN-172). The observer records whether the loading state comes back.
+test.describe("users page, while it hydrates", () => {
+  test("keeps the rows from the server, also with a saved theme", async ({
+    context,
+    page,
+    baseURL,
+  }) => {
+    await signIn(context, ADMIN_EMAIL);
+    await context.addCookies([{ name: "theme", value: "dark", url: baseURL ?? "" }]);
+    await page.addInitScript(() => {
+      const record = window as unknown as { rowsShown?: boolean; loadingAgain?: boolean };
+      new MutationObserver(() => {
+        const main = document.querySelector("main");
+        if (!main) return;
+        const rows = Array.from(main.querySelectorAll("tbody tr"));
+        if (rows.some((row) => (row as HTMLElement).offsetParent !== null)) record.rowsShown = true;
+        else if (record.rowsShown && main.querySelector('[aria-busy="true"]'))
+          record.loadingAgain = true;
+      }).observe(document, { subtree: true, childList: true, attributes: true });
+    });
+
+    await open(page);
+
+    const record = await page.evaluate(() => {
+      const { rowsShown, loadingAgain } = window as unknown as {
+        rowsShown?: boolean;
+        loadingAgain?: boolean;
+      };
+      return { rowsShown: rowsShown ?? false, loadingAgain: loadingAgain ?? false };
+    });
+    expect(record).toEqual({ rowsShown: true, loadingAgain: false });
+  });
+});
+
 // The role decides CREATE USER and the row menus, so the server HTML must already have the right ones (PLAN D6).
 test.describe("users page, as the server renders it (no client code)", () => {
   test.use({ javaScriptEnabled: false });

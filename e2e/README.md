@@ -254,6 +254,7 @@ Each bullet is one `test()`. The name of the spec file is in bold.
 - Shows the page in Polish.
 - Sees the list without CREATE USER and without row menus (employee).
 - The arrow of a row opens the profile (employee).
+- Keeps the rows from the server while the page hydrates, also with a saved theme (no loading state in between).
 - Has the first page, CREATE USER and the row menus in the HTML that the server sends (admin, no client code).
 - Has the first page without CREATE USER and row menus in the HTML that the server sends (employee, no client code).
 - Sorts by first name both ways and by department (own users).
