@@ -1,4 +1,5 @@
 import { createRef, useState } from "react";
+import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders, screen } from "@/shared/testing";
 import { Select, type SelectProps } from "./Select";
@@ -29,6 +30,14 @@ function TestSelect({ initialValue = "", onValueChange, ...props }: TestSelectPr
 }
 
 describe("Select", () => {
+  it("has the chosen option's label in the server HTML (the list never opened)", () => {
+    const html = renderToString(
+      <Select label="Department" options={DEPARTMENTS} value="qa" onValueChange={vi.fn()} />,
+    );
+
+    expect(html).toContain("Quality assurance");
+  });
+
   it("is a combobox named by its label, empty until a value is chosen", () => {
     renderWithProviders(<TestSelect />);
 

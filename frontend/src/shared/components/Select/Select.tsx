@@ -59,6 +59,7 @@ export function Select({
     ariaDescribedBy,
   });
   const { onOpenChange, onTriggerBlur } = useTriggerBlur(onBlur);
+  const selectedLabel = options.find((option) => option.value === value)?.label;
 
   return (
     <RadixSelect.Root
@@ -89,9 +90,10 @@ export function Select({
           onBlur={readOnly ? onBlur : onTriggerBlur}
           className={styles.trigger}
         >
-          {/* Radix asks not to style Value itself; the wrapper truncates long names */}
+          {/* Radix asks not to style Value itself; the wrapper truncates long names. The label is given as children:
+              on its own, Value finds the chosen item's text only in the browser, so server HTML had an empty field. */}
           <span className={styles.value}>
-            <RadixSelect.Value />
+            <RadixSelect.Value>{selectedLabel}</RadixSelect.Value>
           </span>
           <RadixSelect.Icon className={styles.chevron}>
             <ExpandMoreIcon />
