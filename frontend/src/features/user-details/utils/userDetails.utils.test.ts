@@ -2,6 +2,7 @@ import { CombinedGraphQLErrors } from "@apollo/client";
 import { describe, expect, it } from "vitest";
 import {
   canEditProfile,
+  canVerifyEmail,
   formatMemberSince,
   getUserTabs,
   isUserNotFound,
@@ -24,6 +25,24 @@ describe("getUserTabs", () => {
 
   it("leaves out the CVs tab for anyone else", () => {
     expect(getUserTabs(false)).toEqual(["profile", "skills", "languages"]);
+  });
+});
+
+describe("canVerifyEmail", () => {
+  it("offers it to the owner who is not verified yet", () => {
+    expect(canVerifyEmail({ id: "10", isVerified: false }, "10")).toBe(true);
+  });
+
+  it("does not offer it once the email is verified", () => {
+    expect(canVerifyEmail({ id: "10", isVerified: true }, "10")).toBe(false);
+  });
+
+  it("never offers it on someone else's profile, not even to an unverified Admin", () => {
+    expect(canVerifyEmail({ id: "1", isVerified: false }, "10")).toBe(false);
+  });
+
+  it("does not offer it without a signed-in user", () => {
+    expect(canVerifyEmail(null, "10")).toBe(false);
   });
 });
 

@@ -1,5 +1,6 @@
 export {
   canEditProfile,
+  canVerifyEmail,
   formatMemberSince,
   getUserTabs,
   isUserNotFound,

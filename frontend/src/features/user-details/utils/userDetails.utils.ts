@@ -27,6 +27,18 @@ export function canEditProfile(
 }
 
 /**
+ * Whether VERIFY EMAIL shows on this profile (AC-24, AC-25): only on the owner's own profile, and only while their
+ * email is not verified. Never for an Admin on someone else's profile. The backend acts only on the signed-in user.
+ */
+export function canVerifyEmail(
+  me: { id: string; isVerified: boolean } | null | undefined,
+  userId: string,
+): boolean {
+  if (!me) return false;
+  return me.id === userId && !me.isVerified;
+}
+
+/**
  * Whether a failed `user(id)` query means there is no such user: `NOT_FOUND`, or `BAD_USER_INPUT` (an id that is not
  * a UUID, so no user can have it). Any other failure (network, server) is not "not found" and can be retried.
  */
