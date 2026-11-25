@@ -1,4 +1,5 @@
 import type { SortState } from "@/shared/components";
+import { firstPageVariables } from "@/shared/lists";
 
 /** Backend sort fields of the CVs query. The backend accepts only `name` (`resolveSort`). */
 export const CV_SORT_FIELDS = {
@@ -13,6 +14,9 @@ export const DEFAULT_CVS_SORT: SortState = {
   field: CV_SORT_FIELDS.name,
   direction: "ASC",
 };
+
+/** The variables of the first `Cvs` request of the `/cvs` page. The route prefetches them on the server (PLAN D6). */
+export const CVS_FIRST_PAGE = firstPageVariables(DEFAULT_CVS_SORT);
 
 // The longest values the CV form allows (page document: name 255, education 255; backend: description 2000).
 export const MAX_NAME_LENGTH = 255;

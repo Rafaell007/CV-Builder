@@ -16,6 +16,7 @@ The `/cvs` page (PLAN S7.1b, KAN-112): the list of CVs. An Employee sees own CVs
 - `cvs.mocks.ts` and `cvForm.mocks.ts` (the form), `useDeleteCv/deleteCv.mocks.ts`: sample CVs, mocks of the `Cvs` query and `fakeBackendMock` (a stand-in backend for stories). For tests and stories only.
 - Texts: `messages/` (`cvs` namespace, `en` and `pl`).
 - Storybook: `Cvs.stories.tsx` (`Features/CVs/Cvs`): Desktop (1440px), Tablet (768px), ManyPages, SearchAndSort, NoResults, OfOneUser, Loading, Empty, LoadFailed and Polish.
+- Server render (PLAN D6, KAN-172): the route `app/[locale]/(app)/cvs/page.tsx` prefetches `me` and the first page (`CVS_FIRST_PAGE`, exported: `firstPageVariables(DEFAULT_CVS_SORT)` of `@/shared/lists`) with `PrefetchQuery` (`@/shared/apollo/server`), then renders `Cvs`. Its hooks find both in the Apollo cache, so the server HTML already has the rows and the right empty text, and the browser does not ask again. Search, sort and page changes go to the backend from the browser. E2E: `e2e/cvs/cvs.spec.ts`, "as the server renders it".
 - Used by: `app/[locale]/(app)/cvs/page.tsx`. Backend: `cvs` query (`backend/src/modules/cvs/README.md`).
 - Docs: [docs/pages/20-cvs-page.md](../../../../docs/pages/20-cvs-page.md).
 

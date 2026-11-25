@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ListState } from "../lists.types";
-import { toListVariables } from "./lists.utils";
+import { firstPageVariables, toListVariables } from "./lists.utils";
 
 const nameAscending = { field: "name", direction: "ASC" } as const;
 const state = (changes: Partial<ListState> = {}): ListState => ({
@@ -34,5 +34,14 @@ describe("toListVariables", () => {
     const sort = { field: "startDate", direction: "DESC" } as const;
 
     expect(toListVariables(state({ sort })).sort).toEqual(sort);
+  });
+});
+
+describe("firstPageVariables", () => {
+  it("asks for page 1 of 10 rows in the given order, with no search", () => {
+    expect(firstPageVariables(nameAscending)).toEqual({
+      page: { number: 1, size: 10 },
+      sort: nameAscending,
+    });
   });
 });
