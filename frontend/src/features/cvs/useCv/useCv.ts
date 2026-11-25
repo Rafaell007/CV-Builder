@@ -1,9 +1,11 @@
 "use client";
 
 import { useQuery } from "@apollo/client/react";
+import { useSearchParams } from "next/navigation";
 import { readFailure } from "@/shared/failures";
 import { CvDocument } from "@/shared/graphql";
 import type { CvDetailsData } from "../cvs.types";
+import { toCvReturnPath, toScopeUserId, withScope } from "../utils";
 
 /** Why the `cv` query failed: a CV that is not there, a CV the user may not open, or any other problem. */
 export type CvLoadFailure = "notFound" | "forbidden" | "failed";
@@ -18,11 +20,17 @@ export type UseCvResult = {
   retry: () => void;
 };
 
-/** Loads one CV with the `Cv` query. The backend decides who may see it, so the page never checks the owner itself. */
+/**
+ * Loads one CV with the `Cv` query. The backend decides who may see it, so the page never checks the owner itself.
+ * When the CV was opened from the User CVs tab (`?from=/users/{id}/cvs`), the employee of the tab is sent as
+ * `userId`, so a CV of another employee answers NOT_FOUND (AC-12). The hook reads it itself, so every caller on
+ * one page sends the same variables and shares one cache entry.
+ */
 export function useCv(id: string): UseCvResult {
+  const userId = toScopeUserId(toCvReturnPath(useSearchParams()?.get("from")));
   // notifyOnNetworkStatusChange: `loading` is true again during a retry, so the page shows the skeleton.
   const { data, loading, error, refetch } = useQuery(CvDocument, {
-    variables: { id },
+    variables: { id, ...withScope(userId) },
     notifyOnNetworkStatusChange: true,
   });
 
