@@ -172,7 +172,7 @@
   user-select: none;
 }
 
-/* Decided by Maciek (Figma draws no open list): no grey fill on any row, the checkbox shows whether a row is chosen.
+/* Decided by Maciek, PLAN D39 (Figma draws no open list): no grey fill on any row, the checkbox shows whether a row is chosen.
    The row that has the keyboard focus (and the one under the mouse) gets a 2px outline, inside the row so the
    list's edge does not clip it. */
 .option[data-highlighted] {
