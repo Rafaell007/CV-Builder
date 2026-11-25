@@ -1,5 +1,8 @@
 import { useTranslations } from "next-intl";
-import { PageHeader, PageState } from "@/shared/components";
+// By folder, not the `@/shared/components` barrel: this runs on the server (the route layout's fallback), and the
+// barrel pulls in client-only components.
+import { PageHeader } from "@/shared/components/PageHeader";
+import { PageState } from "@/shared/components/PageState";
 import styles from "./UserLayout.module.css";
 
 /**
