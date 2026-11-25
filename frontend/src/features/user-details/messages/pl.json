@@ -7,7 +7,29 @@
     "cvs": "CV"
   },
   "profile": {
-    "memberSince": "Członek od {date}"
+    "memberSince": "Członek od {date}",
+    "form": {
+      "fields": {
+        "firstName": "Imię",
+        "lastName": "Nazwisko",
+        "department": "Dział",
+        "position": "Stanowisko"
+      },
+      "errors": {
+        "firstNameRequired": "Imię jest wymagane",
+        "firstNameTooLong": "Imię może mieć najwyżej {max, plural, one {# znak} few {# znaki} other {# znaków}}",
+        "lastNameRequired": "Nazwisko jest wymagane",
+        "lastNameTooLong": "Nazwisko może mieć najwyżej {max, plural, one {# znak} few {# znaki} other {# znaków}}",
+        "departmentRequired": "Dział jest wymagany",
+        "positionRequired": "Stanowisko jest wymagane"
+      },
+      "options": {
+        "loading": "Ładowanie…",
+        "departmentsFailed": "Nie udało się wczytać działów",
+        "positionsFailed": "Nie udało się wczytać stanowisk",
+        "retry": "Spróbuj ponownie"
+      }
+    }
   },
   "states": {
     "loading": "Ładowanie pracownika"

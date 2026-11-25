@@ -7,7 +7,29 @@
     "cvs": "CVs"
   },
   "profile": {
-    "memberSince": "A member since {date}"
+    "memberSince": "A member since {date}",
+    "form": {
+      "fields": {
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "department": "Department",
+        "position": "Position"
+      },
+      "errors": {
+        "firstNameRequired": "First name is required",
+        "firstNameTooLong": "First name must be at most {max} characters long",
+        "lastNameRequired": "Last name is required",
+        "lastNameTooLong": "Last name must be at most {max} characters long",
+        "departmentRequired": "Department is required",
+        "positionRequired": "Position is required"
+      },
+      "options": {
+        "loading": "Loading…",
+        "departmentsFailed": "Failed to load departments",
+        "positionsFailed": "Failed to load positions",
+        "retry": "Retry"
+      }
+    }
   },
   "states": {
     "loading": "Loading employee"
