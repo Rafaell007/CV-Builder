@@ -23,10 +23,12 @@ export function useUserProfile(userId: string) {
   if (!user) throw new Error("The user query returned no user");
 
   const memberSince = formatMemberSince(user.createdAt, locale);
+  const name = getUserDisplayName(user);
 
   return {
-    name: getUserDisplayName(user),
-    email: user.email,
+    name,
+    // A user without a name is already named by the email, so the email line would only repeat it.
+    email: name === user.email ? null : user.email,
     memberSince: memberSince === null ? null : t("memberSince", { date: memberSince }),
   };
 }

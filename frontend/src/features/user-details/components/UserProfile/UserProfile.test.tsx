@@ -30,12 +30,13 @@ describe("UserProfile", () => {
     expect(screen.getByText("A member since Sun, Jan 14, 2024")).toBeInTheDocument();
   });
 
-  it("names a user without a name by the email", async () => {
+  it("names a user without a name by the email and does not repeat it", async () => {
     await setup(userMock("10", { firstName: null, lastName: null }));
 
     expect(
       await screen.findByRole("heading", { level: 2, name: "emma@example.com" }),
     ).toBeInTheDocument();
+    expect(screen.getAllByText("emma@example.com")).toHaveLength(1);
   });
 
   it("writes the day in the language of the page", async () => {

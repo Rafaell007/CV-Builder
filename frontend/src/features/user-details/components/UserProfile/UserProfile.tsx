@@ -20,7 +20,7 @@ export function UserProfile({ userId }: UserProfileProps) {
       <h2 id={nameId} className={styles.name}>
         {name}
       </h2>
-      <p className={styles.email}>{email}</p>
+      {email && <p className={styles.email}>{email}</p>}
       {memberSince && <p className={styles.memberSince}>{memberSince}</p>}
     </section>
   );
