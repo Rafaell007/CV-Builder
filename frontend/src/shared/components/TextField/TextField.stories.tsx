@@ -82,6 +82,8 @@ export const Disabled: Story = {
 // Another employee's profile (Figma frame 20): drawn as disabled, but focusable with the focus border.
 export const ReadOnly: Story = {
   args: { label: "First name", defaultValue: "John", readOnly: true },
+  // Figma's grey (about 1.2:1) is below WCAG 4.5:1; kept by the user's choice (docs/design-tokens.md). Warning only.
+  parameters: { a11y: { test: "todo" } },
   play: async ({ canvas, userEvent }) => {
     const input = canvas.getByRole("textbox", { name: "First name" });
     await expect(input).toHaveStyle({ color: GREY_400 });
@@ -97,6 +99,7 @@ export const ReadOnly: Story = {
 
 export const ReadOnlyDark: Story = {
   args: { label: "First name", defaultValue: "John", readOnly: true },
+  parameters: { a11y: { test: "todo" } },
   globals: { theme: "dark" },
   play: async ({ canvas }) => {
     const input = canvas.getByRole("textbox", { name: "First name" });
