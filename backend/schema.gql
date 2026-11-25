@@ -242,6 +242,7 @@ type Mutation {
   updateDepartment(input: UpdateDepartmentInput!): Department!
   updateLanguage(input: UpdateLanguageInput!): Language!
   updatePosition(input: UpdatePositionInput!): Position!
+  updateProfile(input: UpdateProfileInput!): User!
   updateProject(input: UpdateProjectInput!): Project!
   updateSkill(input: UpdateSkillInput!): Skill!
   updateUser(input: UpdateUserInput!): User!
@@ -420,6 +421,14 @@ input UpdateLanguageInput {
 input UpdatePositionInput {
   id: ID!
   name: String!
+}
+
+input UpdateProfileInput {
+  departmentId: ID!
+  firstName: String!
+  id: ID!
+  lastName: String!
+  positionId: ID!
 }
 
 input UpdateProjectInput {
