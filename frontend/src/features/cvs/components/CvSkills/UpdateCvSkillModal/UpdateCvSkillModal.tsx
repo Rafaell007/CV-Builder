@@ -12,7 +12,7 @@ export interface UpdateCvSkillModalProps {
 
 /**
  * The Update skill modal (page 22, Update Skill). The Skill field shows the current skill and is disabled: the
- * requirements do not let a skill change. The mastery is the one value the user can change, so SAVE is enabled only
+ * requirements do not let a skill change. The mastery is the one value the user can change, so UPDATE is enabled only
  * when it differs from the saved one.
  */
 export function UpdateCvSkillModal({ updating }: UpdateCvSkillModalProps) {

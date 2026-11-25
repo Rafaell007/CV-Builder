@@ -99,7 +99,7 @@ Spec: [docs/pages/22-cv-skills-page.md](../../../../docs/pages/22-cv-skills-page
 - Hooks (each one holds a modal flow and its request):
   - `useCvSkills(cvId)`: the `CvSkills` query. `useAvailableCvSkills(cvId, enabled)`: the `AvailableCvSkills` query. It sends nothing while the Add modal is closed and always asks the backend again when it opens (`network-only`).
   - `useAddCvSkill(cvId)`: Add skill. The options come from the backend, so the page never filters them. `Skill is required` shows for an empty choice, `CONFLICT` and `BAD_USER_INPUT` show under the field, other errors show once in the modal. A failed request keeps the chosen skill. Only success closes the modal.
-  - `useUpdateCvSkill()`: Update skill. The Skill field is disabled (page doc). The mastery is the one value that changes, so SAVE is enabled only when it differs from the saved one and no request that changes nothing is sent.
+  - `useUpdateCvSkill()`: Update skill. The Skill field is disabled (page doc). The mastery is the one value that changes, so UPDATE is enabled only when it differs from the saved one and no request that changes nothing is sent.
   - `useRemoveCvSkills(cvId)`: the selection mode and the confirmation. A skill is chosen by the id of its CV-skill link. CANCEL and Escape leave the mode. A failed request keeps the choice. `NOT_FOUND` loads the list again and leaves the mode.
   - `useMasteryLabel()`: the translated level name.
 - `utils/groupSkillsByCategory` (keeps the order of the backend, so no empty category). The hooks read a failed request with `readFailure` (`shared/failures`: `notFound`, `forbidden`, `conflict`, `invalid`; anything else is a friendly general text).

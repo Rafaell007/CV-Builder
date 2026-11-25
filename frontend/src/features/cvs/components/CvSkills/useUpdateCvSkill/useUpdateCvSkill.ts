@@ -11,7 +11,7 @@ import type { CvSkillItem, CvSkillMastery } from "../cvSkills.types";
 /**
  * The Update skill flow: the open state of the modal, the chosen mastery and the `updateCvSkill` request
  * (AC-21 to AC-25). The skill itself cannot change (the Skill field is disabled), so the only value is the mastery.
- * SAVE is possible only when the mastery differs from the saved one: the page sends no request that changes nothing.
+ * UPDATE is possible only when the mastery differs from the saved one: the page sends no request that changes nothing.
  * The list shows the new mastery when the backend has answered (the answer updates the cached skill). A failed
  * request keeps the chosen mastery. Only a successful request closes the modal.
  */
