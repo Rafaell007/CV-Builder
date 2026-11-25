@@ -5,6 +5,7 @@ export {
   REFRESH_COOKIE,
   SESSION_OPERATIONS,
   SIGN_IN_PATH,
+  VERIFY_EMAIL_PATH,
 } from "./session.constants";
 export { getRouteKind, isAccessTokenFresh, resolveRedirect } from "./utils";
 export type { RouteKind } from "./utils";

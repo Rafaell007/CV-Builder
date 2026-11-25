@@ -4,6 +4,7 @@ import {
   DepartmentOptionsDocument,
   MeDocument,
   PositionOptionsDocument,
+  ResendVerificationCodeDocument,
   UpdateProfileDocument,
   UserDocument,
   type UpdateProfileInput,
@@ -11,8 +12,8 @@ import {
 
 // Mock data for tests. The page itself never uses it: all data comes from the backend.
 
-/** MockedProvider response of the `me` query: the signed-in user with this role. */
-export const meMock = (role: "ADMIN" | "USER"): MockLink.MockedResponse => ({
+/** MockedProvider response of the `me` query: the signed-in user (id "1") with this role, verified unless told. */
+export const meMock = (role: "ADMIN" | "USER", isVerified = true): MockLink.MockedResponse => ({
   request: { query: MeDocument },
   result: {
     data: {
@@ -23,7 +24,7 @@ export const meMock = (role: "ADMIN" | "USER"): MockLink.MockedResponse => ({
         firstName: "Ada",
         lastName: "Admin",
         role,
-        isVerified: true,
+        isVerified,
       },
     },
   },
@@ -180,4 +181,25 @@ export const positionOptionsMock = (): MockLink.MockedResponse => ({
       ],
     },
   },
+});
+
+/** `resendVerificationCode` that sent a new code (VERIFY EMAIL). `delay` keeps the request open, in ms. */
+export const resendCodeMock = (delay = 0): MockLink.MockedResponse => ({
+  request: { query: ResendVerificationCodeDocument },
+  result: { data: { resendVerificationCode: true } },
+  delay,
+});
+
+/** `resendVerificationCode` refused by the backend with these `extensions` (for example a `reason`). */
+export const resendCodeRefusedMock = (
+  extensions: Record<string, unknown>,
+): MockLink.MockedResponse => ({
+  request: { query: ResendVerificationCodeDocument },
+  result: { errors: [{ message: String(extensions.code), extensions }] },
+});
+
+/** `resendVerificationCode` that fails without an answer (no network). */
+export const resendCodeNetworkErrorMock = (): MockLink.MockedResponse => ({
+  request: { query: ResendVerificationCodeDocument },
+  error: new Error("Failed to fetch"),
 });

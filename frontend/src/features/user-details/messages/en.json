@@ -8,6 +8,16 @@
   },
   "profile": {
     "memberSince": "A member since {date}",
+    "verifyEmail": {
+      "button": "Verify email",
+      "sent": "Verification email has been sent",
+      "sentRecently": {
+        "title": "Check your email",
+        "text": "A verification code was sent less than a minute ago."
+      },
+      "alreadyVerified": "Your email is already verified",
+      "failed": "Failed to send verification email"
+    },
     "form": {
       "update": "Update",
       "fields": {
