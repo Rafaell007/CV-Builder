@@ -123,8 +123,10 @@ describe("CreateUserModal", () => {
       departmentsMock: { ...departmentOptionsMock(departmentItems), delay: 10_000 },
     });
 
-    expect(within(dialog).getByRole("combobox", { name: "Department" })).toBeDisabled();
-    expect(within(dialog).getByText("Loading…")).toBeInTheDocument();
+    // Position may still be loading too, so check the text that belongs to Department.
+    const department = within(dialog).getByRole("combobox", { name: "Department" });
+    expect(department).toBeDisabled();
+    expect(department).toHaveAccessibleDescription("Loading…");
   });
 
   it("shows an error and Retry when the departments fail, and Retry loads them", async () => {
