@@ -1,0 +1,11 @@
+/* The select and, when its options failed to load, the Retry button under it. */
+.catalogSelect {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.catalogSelect > :first-child {
+  align-self: stretch;
+}
