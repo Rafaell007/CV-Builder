@@ -1,5 +1,6 @@
 import type { SortState } from "@/shared/components";
 import type { Role } from "@/shared/graphql";
+import { firstPageVariables } from "@/shared/lists";
 
 /** Backend sort fields of the users query. They are the `sortField` of the sortable columns; the backend refuses any other. */
 export const USER_SORT_FIELDS = {
@@ -17,6 +18,9 @@ export const DEFAULT_USERS_SORT: SortState = {
   field: USER_SORT_FIELDS.firstName,
   direction: "ASC",
 };
+
+/** The variables of the first `Users` request of the page. The route prefetches them on the server (PLAN D6). */
+export const USERS_FIRST_PAGE = firstPageVariables(DEFAULT_USERS_SORT);
 
 /** Department and Position options load in pages of this size: the most the backend sends per request. */
 export const OPTIONS_PAGE_SIZE = 100;

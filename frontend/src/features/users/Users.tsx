@@ -27,8 +27,8 @@ import styles from "./Users.module.css";
 /**
  * Content of the `/users` page (Employees) under its `PageHeader`: the shared `ListPage` with search, the sortable
  * list of users and the page buttons, with the loading, empty, no results and error states. The backend searches,
- * sorts and cuts the pages. Both roles see the list; only an admin gets CREATE USER and the row menu. The page loads
- * in the browser, like the other list pages, because the role is known only there (PLAN D6 asks for SSR; see README).
+ * sorts and cuts the pages. Both roles see the list; only an admin gets CREATE USER and the row menu. The route renders
+ * it on the server with the current user and the first page already in the Apollo cache (PLAN D6; see README).
  */
 export function Users() {
   const t = useTranslations("users");

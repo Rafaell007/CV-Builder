@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { serverRows } from "../support/serverRows";
 import { ADMIN_EMAIL, PASSWORD, signIn, USER_EMAIL } from "../support/signIn";
 import { createUser, deleteUsersByName, testUserEmail, type TestUser } from "../support/users";
 
@@ -162,6 +163,41 @@ test.describe("users page, as an employee", () => {
     await page.getByRole("link", { name: "Open profile of Jan Kowalski" }).click();
 
     await expect(page).toHaveURL(PROFILE_URL);
+  });
+});
+
+// The role decides CREATE USER and the row menus, so the server HTML must already have the right ones (PLAN D6).
+test.describe("users page, as the server renders it (no client code)", () => {
+  test.use({ javaScriptEnabled: false });
+
+  // CSS locators, not roles: the streamed part of the page is hidden until a script reveals it (support/serverRows.ts).
+  const createInHtml = (page: Page) => page.locator("button", { hasText: "CREATE USER" });
+  const rowMenusInHtml = (page: Page) => page.locator('button[aria-label^="Actions for "]');
+
+  test("has the first page, CREATE USER and the row menus for an admin", async ({
+    context,
+    page,
+  }) => {
+    await signIn(context, ADMIN_EMAIL);
+
+    await page.goto("/en/users");
+
+    await expect(serverRows(page).first()).toContainText("admin@example.com");
+    await expect(createInHtml(page)).toHaveCount(1);
+    await expect(rowMenusInHtml(page).first()).toBeAttached();
+  });
+
+  test("has the first page without CREATE USER and row menus for an employee", async ({
+    context,
+    page,
+  }) => {
+    await signIn(context, USER_EMAIL);
+
+    await page.goto("/en/users");
+
+    await expect(serverRows(page).first()).toContainText("admin@example.com");
+    await expect(createInHtml(page)).toHaveCount(0);
+    await expect(rowMenusInHtml(page)).toHaveCount(0);
   });
 });
 
