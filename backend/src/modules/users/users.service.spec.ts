@@ -11,12 +11,8 @@ import type { PrismaService } from "../../prisma/prisma.service";
 import { EMAIL_TAKEN_REASON } from "../auth/auth.service";
 import { Role } from "../auth/models/role.enum";
 import { hashPassword } from "../auth/password";
-import {
-  CONCURRENT_CHANGE_REASON,
-  OWN_ROLE_REASON,
-  SELF_DELETE_REASON,
-  UsersService,
-} from "./users.service";
+import { CONCURRENT_CHANGE_REASON } from "./user-lock";
+import { OWN_ROLE_REASON, SELF_DELETE_REASON, UsersService } from "./users.service";
 
 // argon2 is slow and its output random; the tests only need to know the service stores what it returns.
 jest.mock("../auth/password", () => ({ hashPassword: jest.fn() }));
