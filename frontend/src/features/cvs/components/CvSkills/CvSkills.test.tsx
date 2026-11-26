@@ -373,7 +373,7 @@ describe("CvSkills", () => {
       expect(within(dialog).getByRole("button", { name: "Update" })).toBeDisabled();
     });
 
-    it("saves the new mastery and shows it in the list after the backend answered (AC-25)", async () => {
+    it("updates the mastery and shows it in the list after the backend answered (AC-25)", async () => {
       const { user, dialog } = await openUpdateModal({
         mocks: [cvSkillsMock(), updateCvSkillMock(typescript, "EXPERT")],
       });
@@ -388,7 +388,7 @@ describe("CvSkills", () => {
       ).toBeInTheDocument();
     });
 
-    it("saves No mastery, shows it as chosen and shows it in the list", async () => {
+    it("updates to No mastery, shows it as chosen and shows it in the list", async () => {
       const { user, dialog } = await openUpdateModal({
         mocks: [cvSkillsMock(), updateCvSkillMock(typescript, "NONE")],
       });
