@@ -1,4 +1,4 @@
-import { avatarUrl } from "./avatar-url.utils";
+import { avatarUrl, avatarVersion } from "./avatar-url.utils";
 
 const USER_ID = "8d1b6f2e-3c4a-4b5d-9e6f-7a8b9c0d1e2f";
 
@@ -20,5 +20,14 @@ describe("avatarUrl", () => {
 
   it("is null for a user without an avatar", () => {
     expect(avatarUrl(USER_ID, null)).toBeNull();
+  });
+});
+
+describe("avatarVersion", () => {
+  it("is the upload time in milliseconds, the same as in avatarUrl", () => {
+    const updatedAt = new Date("2026-11-26T10:00:00.000Z");
+
+    expect(avatarVersion(updatedAt)).toBe(String(updatedAt.getTime()));
+    expect(avatarUrl(USER_ID, updatedAt)?.endsWith(`?v=${avatarVersion(updatedAt)}`)).toBe(true);
   });
 });

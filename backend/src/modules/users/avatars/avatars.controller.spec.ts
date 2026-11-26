@@ -7,10 +7,12 @@ import type { AvatarsService } from "./avatars.service";
 const USER_ID = "6f1d3c52-8a0e-4f6c-9a43-2b7d5e1c9a10";
 const ACTOR = { id: "0b8e9a3c-1f2d-4e5a-8b6c-7d9e0f1a2b3c", role: Role.USER, isVerified: false };
 const PNG = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+const UPDATED_AT = new Date("2026-11-26T10:00:00.000Z");
+const CURRENT_VERSION = String(UPDATED_AT.getTime());
 
 function setup() {
   const service = {
-    find: jest.fn().mockResolvedValue({ data: PNG, mimeType: "image/png" }),
+    find: jest.fn().mockResolvedValue({ data: PNG, mimeType: "image/png", updatedAt: UPDATED_AT }),
     upload: jest.fn().mockResolvedValue(undefined),
     remove: jest.fn().mockResolvedValue(undefined),
   } as unknown as jest.Mocked<AvatarsService>;
@@ -37,10 +39,10 @@ describe("AvatarsController", () => {
     },
   );
 
-  it("find sends the image with its stored type, nosniff and a long private cache", async () => {
+  it("find sends the image with its stored type, nosniff and a long private cache for the current version", async () => {
     const { controller, res } = setup();
 
-    const file = await controller.find(USER_ID, res);
+    const file = await controller.find(USER_ID, CURRENT_VERSION, res);
 
     expect(file).toBeInstanceOf(StreamableFile);
     expect(file.getHeaders()).toMatchObject({ type: "image/png", length: PNG.length });
@@ -55,8 +57,21 @@ describe("AvatarsController", () => {
     const { controller, service, res } = setup();
     service.find.mockRejectedValue(new NotFoundException("Avatar not found"));
 
-    await expect(controller.find(USER_ID, res)).rejects.toThrow(NotFoundException);
+    await expect(controller.find(USER_ID, CURRENT_VERSION, res)).rejects.toThrow(NotFoundException);
     expect(res.setHeader).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["no version", undefined],
+    ["an old version", String(UPDATED_AT.getTime() - 1000)],
+    ["a made-up version", "abc"],
+  ])("find sends no-cache for %s, so an old photo is never kept", async (_name, version) => {
+    const { controller, res } = setup();
+
+    await controller.find(USER_ID, version, res);
+
+    expect(res.setHeader).toHaveBeenCalledWith("Cache-Control", "private, no-cache");
+    expect(res.setHeader).toHaveBeenCalledWith("X-Content-Type-Options", "nosniff");
   });
 
   it("upload passes the user id, the file content and the signed-in user's id to the service", async () => {

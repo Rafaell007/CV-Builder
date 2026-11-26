@@ -8,6 +8,7 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
   Res,
   StreamableFile,
   UploadedFile,
@@ -15,6 +16,7 @@ import {
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { type AuthUser, CurrentUser, requireUser } from "../../../common/auth";
+import { avatarVersion } from "./avatar-url.utils";
 import { AVATAR_FILE_FIELD, AVATAR_MAX_BYTES } from "./avatars.constants";
 import { AvatarsService } from "./avatars.service";
 
@@ -33,18 +35,25 @@ export class AvatarsController {
   constructor(private readonly service: AvatarsService) {}
 
   /**
-   * Any signed-in user may see an avatar. The URL from `User.avatarUrl` changes with every upload, so the
-   * browser may keep the image for a year (`immutable`); `private`, because it is not public data.
-   * `nosniff`: the browser must use the stored type and not guess one from the content.
+   * Any signed-in user may see an avatar. `private`, because it is not public data. `nosniff`: the browser must
+   * use the stored type and not guess one from the content. The address from `User.avatarUrl` carries the
+   * current version (`?v=`) and changes with every upload, so the browser may keep that image for a year
+   * (`immutable`). Any other address (no `v`, an old one, a link made by hand) gets `no-cache`: the browser asks
+   * again each time, so it never keeps an old photo under an address that stays the same.
    */
   @Get()
   async find(
     @Param("id", ParseUUIDPipe) id: string,
+    @Query("v") version: string | undefined,
     @Res({ passthrough: true }) res: HeaderResponse,
   ): Promise<StreamableFile> {
-    const { data, mimeType } = await this.service.find(id);
+    const { data, mimeType, updatedAt } = await this.service.find(id);
     // Set only after the avatar was found, so an error answer is never cached.
-    res.setHeader("Cache-Control", "private, max-age=31536000, immutable");
+    const current = version === avatarVersion(updatedAt);
+    res.setHeader(
+      "Cache-Control",
+      current ? "private, max-age=31536000, immutable" : "private, no-cache",
+    );
     res.setHeader("X-Content-Type-Options", "nosniff");
     return new StreamableFile(data, { type: mimeType, length: data.length });
   }

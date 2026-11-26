@@ -13,6 +13,8 @@ import { detectImageType } from "./image-type.utils";
 export interface StoredAvatar {
   data: Uint8Array;
   mimeType: string;
+  /** Time of the last upload: the version in `User.avatarUrl` (`?v=`). */
+  updatedAt: Date;
 }
 
 /**
@@ -29,7 +31,7 @@ export class AvatarsService {
   async find(userId: string): Promise<StoredAvatar> {
     const avatar = await this.prisma.avatar.findUnique({
       where: { userId },
-      select: { data: true, mimeType: true },
+      select: { data: true, mimeType: true, updatedAt: true },
     });
     if (avatar === null) throw new NotFoundException("Avatar not found");
     return avatar;

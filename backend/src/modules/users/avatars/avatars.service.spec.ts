@@ -45,16 +45,18 @@ beforeEach(() => {
 });
 
 describe("AvatarsService.find", () => {
-  it("returns the stored image and its type", async () => {
-    prisma.avatar.findUnique.mockResolvedValue({ data: PNG, mimeType: "image/png" });
+  it("returns the stored image, its type and its upload time", async () => {
+    const updatedAt = new Date("2026-11-26T10:00:00.000Z");
+    prisma.avatar.findUnique.mockResolvedValue({ data: PNG, mimeType: "image/png", updatedAt });
 
     await expect(createService().find(OWNER_ID)).resolves.toEqual({
       data: PNG,
       mimeType: "image/png",
+      updatedAt,
     });
     expect(prisma.avatar.findUnique).toHaveBeenCalledWith({
       where: { userId: OWNER_ID },
-      select: { data: true, mimeType: true },
+      select: { data: true, mimeType: true, updatedAt: true },
     });
   });
 

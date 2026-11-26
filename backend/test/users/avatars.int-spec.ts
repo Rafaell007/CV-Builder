@@ -100,8 +100,12 @@ describe("avatars REST", () => {
       ["a GIF", GIF, "avatar.gif", "image/gif"],
     ])("stores %s and sends it back with safe headers", async (_name, content, filename, type) => {
       await upload(ann, ann.id, content, { filename, contentType: type }).expect(204);
+      const url = (await avatarUrlOf(ann.id)) as string;
 
-      const response = await download(ben, ann.id).expect(200);
+      const response = await request(app.getHttpServer())
+        .get(url)
+        .set("Cookie", cookiesOf(ben))
+        .expect(200);
 
       expect(response.headers["content-type"]).toBe(type);
       expect(response.headers["x-content-type-options"]).toBe("nosniff");
@@ -128,6 +132,22 @@ describe("avatars REST", () => {
       const response = await download(ann, ann.id).expect(200);
 
       expect(response.headers["content-type"]).toBe("image/jpeg");
+    });
+
+    it("sends no-cache for an address without the current version, so no old photo is kept", async () => {
+      await upload(ann, ann.id, PNG).expect(204);
+      const oldUrl = (await avatarUrlOf(ann.id)) as string;
+      await upload(ann, ann.id, GIF, { filename: "new.gif", contentType: "image/gif" }).expect(204);
+
+      const withoutVersion = await download(ann, ann.id).expect(200);
+      const withOldVersion = await request(app.getHttpServer())
+        .get(oldUrl)
+        .set("Cookie", cookiesOf(ann))
+        .expect(200);
+
+      expect(withoutVersion.headers["cache-control"]).toBe("private, no-cache");
+      expect(withOldVersion.headers["cache-control"]).toBe("private, no-cache");
+      expect(withOldVersion.headers["content-type"]).toBe("image/gif");
     });
 
     it("answers 404 without cache headers for a user without an avatar", async () => {

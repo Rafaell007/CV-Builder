@@ -3,7 +3,7 @@
 The profile photo of a user (D11, user profile page "Upload Avatar", AC-18 to AC-23). REST, not GraphQL, because the body is a file. Stored in PostgreSQL (`Avatar`: `userId`, `data`, `mimeType`, `updatedAt`), so it works locally and deployed without a storage service.
 
 - **REST** (the browser calls them through the Next.js rewrite `/api/*`, D8, so the auth cookie goes along):
-  - `GET /api/users/:id/avatar` → the image with its stored `Content-Type`, `X-Content-Type-Options: nosniff` and `Cache-Control: private, max-age=31536000, immutable`. The headers are set only on success, so a 404 is never cached. `404` when the user has no avatar.
+  - `GET /api/users/:id/avatar` → the image with its stored `Content-Type`, `X-Content-Type-Options: nosniff` and `Cache-Control: private, max-age=31536000, immutable` when `?v=` is the current version (the address from `User.avatarUrl`, `avatarVersion` in `avatar-url.utils.ts`). Without `v` or with an old one: `Cache-Control: private, no-cache`, so the browser never keeps an old photo under an address that stays the same. The headers are set only on success, so a 404 is never cached. `404` when the user has no avatar.
   - `POST /api/users/:id/avatar` → `204`. Multipart with one file in the field `file`.
   - `DELETE /api/users/:id/avatar` → `204`, also when there was no avatar.
   - `:id` must be a UUID (`400` otherwise).
