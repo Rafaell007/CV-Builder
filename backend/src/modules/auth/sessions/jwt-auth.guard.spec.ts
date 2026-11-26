@@ -46,10 +46,19 @@ function setup(options: {
   const run = (resolverClass: new () => object, handler: () => void) => {
     const context: AuthContext = { req: request, res: {} as AuthContext["res"] };
     const args = [{}, {}, context, {}]; // GraphQL resolver args: root, args, context, info
-    return guard.canActivate(new ExecutionContextHost(args, resolverClass, handler));
+    const host = new ExecutionContextHost(args, resolverClass, handler);
+    host.setType("graphql");
+    return guard.canActivate(host);
   };
 
-  return { run, request, tokens, authService };
+  const runRest = (controllerClass: new () => object, handler: () => void) => {
+    const args = [request, {}, () => undefined]; // Express handler args: request, response, next
+    const host = new ExecutionContextHost(args, controllerClass, handler);
+    host.setType("http");
+    return guard.canActivate(host);
+  };
+
+  return { run, runRest, request, tokens, authService };
 }
 
 describe("JwtAuthGuard", () => {
@@ -139,5 +148,29 @@ describe("JwtAuthGuard", () => {
     await run(MixedResolver, MixedResolver.prototype.open);
 
     expect(request.user).toEqual(USER);
+  });
+
+  describe("on a REST controller", () => {
+    it("puts the user on the Express request", async () => {
+      const { runRest, request } = setup({
+        cookie: "jwt",
+        claims: { userId: "user-1", tokenVersion: 0 },
+        user: USER,
+      });
+
+      await expect(runRest(ProtectedResolver, ProtectedResolver.prototype.list)).resolves.toBe(
+        true,
+      );
+
+      expect(request.user).toEqual(USER);
+    });
+
+    it("answers 401 without a session", async () => {
+      const { runRest } = setup({});
+
+      await expect(runRest(ProtectedResolver, ProtectedResolver.prototype.list)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
   });
 });
