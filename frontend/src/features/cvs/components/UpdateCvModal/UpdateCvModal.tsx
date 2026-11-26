@@ -8,7 +8,7 @@ export interface UpdateCvModalProps {
   update: UseUpdateCvFormResult;
 }
 
-/** The Update CV modal: the CV fields, filled with the current data, with SAVE and CANCEL. */
+/** The Update CV modal: the CV fields, filled with the current data, with UPDATE and CANCEL. */
 export function UpdateCvModal({ update }: UpdateCvModalProps) {
   const t = useTranslations("cvs.update");
   const { form, isOpen, setOpen, submit } = update;

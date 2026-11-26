@@ -31,7 +31,7 @@ Spec: [docs/pages/20-cvs-page.md](../../../../docs/pages/20-cvs-page.md), sectio
 | `useCreateCvForm()`           | Open state, form, submit and general error of Create CV. Returns `{ form, isOpen, open, setOpen, submit, failed }`. |
 | `useUpdateCvForm()`           | The same shape. `open(cv: CvListItem)` fills the form with the CV.                                                  |
 | `CreateCvModal({ creation })` | Title Create CV, buttons CANCEL and CREATE.                                                                         |
-| `UpdateCvModal({ update })`   | Title Update CV, buttons CANCEL and SAVE. The fields hold the data of the CV.                                       |
+| `UpdateCvModal({ update })`   | Title Update CV, buttons CANCEL and UPDATE. The fields hold the data of the CV.                                       |
 
 Internal parts:
 
@@ -45,7 +45,7 @@ Internal parts:
 Rules (the same in the backend):
 
 - Name: required, 255 characters at most. Education: required, 255 characters at most. Description: required, 2000 characters at most. Text is trimmed.
-- CREATE and SAVE are enabled only when the form is valid and the user changed it.
+- CREATE and UPDATE are enabled only when the form is valid and the user changed it.
 - A failed request keeps all values. A `BAD_USER_INPUT` error shows under its field. Other errors show one message in the modal.
 - Success: the modal closes and a toast shows.
 
@@ -100,7 +100,7 @@ Spec: [docs/pages/22-cv-skills-page.md](../../../../docs/pages/22-cv-skills-page
 - Hooks (each one holds a modal flow and its request):
   - `useCvSkills(cvId)`: the `CvSkills` query. `useAvailableCvSkills(cvId, enabled)`: the `AvailableCvSkills` query. It sends nothing while the Add modal is closed and always asks the backend again when it opens (`network-only`).
   - `useAddCvSkill(cvId)`: Add skill. The options come from the backend, so the page never filters them. `Skill is required` shows for an empty choice, `CONFLICT` and `BAD_USER_INPUT` show under the field, other errors show once in the modal. A failed request keeps the chosen skill. Only success closes the modal.
-  - `useUpdateCvSkill()`: Update skill. The Skill field is disabled (page doc). The mastery is the one value that changes, so SAVE is enabled only when it differs from the saved one and no request that changes nothing is sent.
+  - `useUpdateCvSkill()`: Update skill. The Skill field is disabled (page doc). The mastery is the one value that changes, so UPDATE is enabled only when it differs from the saved one and no request that changes nothing is sent.
   - `useRemoveCvSkills(cvId)`: the selection mode and the confirmation. A skill is chosen by the id of its CV-skill link. CANCEL and Escape leave the mode. A failed request keeps the choice. `NOT_FOUND` loads the list again and leaves the mode.
   - `useMasteryLabel()`: the translated level name.
 - `utils/groupSkillsByCategory` (keeps the order of the backend, so no empty category). The hooks read a failed request with `readFailure` (`shared/failures`: `notFound`, `forbidden`, `conflict`, `invalid`; anything else is a friendly general text).
@@ -120,7 +120,7 @@ Spec: [docs/pages/23-cv-projects-page.md](../../../../docs/pages/23-cv-projects-
   - `useAvailableCvProjects(cvId, enabled)` and `useProjectRoles(enabled)`: the options of the Add and Update modals. They send nothing while the modal is closed. The projects ask the backend again each time the modal opens (`network-only`), because the answer depends on the projects the CV holds now.
   - `useCvProjectForm(rangeOf)`: the form that Add and Update share (React Hook Form and Zod). It holds the rules, blocks a double submit and maps a failed request: `BAD_USER_INPUT` field errors show under their field, anything else becomes one general message. For Start Date and End Date it shows the text of each `reason` that the backend sent (`START_OUTSIDE_PROJECT`, `END_OUTSIDE_PROJECT`, `END_BEFORE_START`), one after the other, with the same texts as the form rules. A field error without a known reason shows the general text of the field (`server.startDate`, `server.endDate`).
   - `useAddCvProject(cvId)`: the open state, the chosen project and the `addCvProject` request. The options come from `availableCvProjects(cvId)`: the backend leaves out the projects that the CV holds (AC-31), so the page never filters. Choosing a project fills the two dates with its days. The server checks the duplicate again (`CONFLICT`), and the options load again after it.
-  - `useUpdateCvProject()`: `open(cvProject)` fills the form with the current data. The input has no project: the project of an entry cannot change. SAVE needs a change (`isDirty`).
+  - `useUpdateCvProject()`: `open(cvProject)` fills the form with the current data. The input has no project: the project of an entry cannot change. UPDATE needs a change (`isDirty`).
   - `useRemoveCvProject(cvId)`: the confirmation and the `removeCvProjects` request (a list with one id). The project leaves the list only after the backend answered (`cache.modify`, then the list loads again). The project of the catalog stays.
 - `utils/cvProjectForm.utils.ts`: `cvProjectFormSchema` (project and start date required, both dates inside the days of the project, the end date not before the start date, at least one role, responsibilities at most 2000 characters), `toProjectRange`, `toCvProjectFormValues`, `toAddCvProjectInput` and `toUpdateCvProjectInput`. Dates go to the backend as midnight UTC (`toUtcDateIso`, now in `@/shared/utils` with `fromUtcDateIso` and `formatCalendarDate`; the Projects page uses them too). `utils/cvProjectDates.utils.ts` holds the date rule once: `toCvProjectDateReasons` lists every broken rule (it compares calendar days, so the time of day never counts, like the backend that keeps the UTC day), `toCvProjectDateText` turns codes into text, and `CvProjectDateTexts` is a `Record` so a new code fails the build until it has a text. Without a readable project range the form checks only end before start, and the backend decides the rest. The hooks read a failed request with `readFailure` (`shared/failures`: `notFound`, `forbidden`, `conflict`, `invalid`, `unauthenticated`, `tooManyRequests` or `unknown`) and pick the translated text.
 - `components/CvProjectFormFields`: Project, Domain, Start Date, End Date, Description, Environment, Roles and Responsibilities. Domain, Description and Environment come from the catalog project: they are disabled and are not part of the form values. The date pickers block days outside the project, and each one also stops at the other date (`toDateLimits`): the End Date calendar offers no day before the Start Date, the Start Date calendar none after the End Date. A typed date outside these limits is ignored by the picker like any text that is not a date, so a typed End Date before the Start Date leaves the field empty (the form rule `End date cannot be earlier than start date` stays as a second guard). The three modals (`AddCvProjectModal`, `UpdateCvProjectModal`, `RemoveCvProjectModal`) only hold the buttons and the title.
