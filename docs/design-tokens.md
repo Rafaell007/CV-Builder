@@ -467,7 +467,24 @@ Users list (2026-11-24, KAN-104):
 User Details › Profile header (2026-11-25, KAN-105; read from 1440 › USER PROFILE, light and dark):
 
 - Avatar 120 circle, fill `--color-avatar-bg`; initials 400 40/40, letter spacing 0.15 (`--text-avatar-large`, the shared `Avatar` size `large`). Initials use the main text colour, as in the Users list (Figma: #F5F5F7 on #AEAEAE light, #2E2E2E on #626262 dark: too low contrast). Two letters (`getInitials`, as the Users list); Figma draws one.
-- Avatar centred on the form (x centre 819): the "USER PROFILE" frame without the upload group. The upload group is out of scope (D11).
+- Read-only profile: the avatar alone, centred on the form (x centre 819). Editable profile (owner or Admin, KAN-106): the avatar and the upload group in one row, the row centred (see "Avatar upload" below).
 - Tabs end at 112 → avatar 124 (12); avatar → name 32; name (Heading, text main) → email 8 (Body, `--color-text-secondary`); member since right under the email (Body, text main); its line ends at 364, the first field label starts at 412 (48).
 - Member since date: `Intl` format of the page language, in UTC (`Sun, Jan 14, 2024`); Figma shows `Sun Jan 14 2024` without commas.
 - Read-only fields (another employee's profile, Figma `desktop-1440/*/frame-20.png`, 2026-11-25): drawn as Figma draws them, with the disabled fill and value colour (#AEAEAE on #C4C4C6 / #626262, about 1.2:1). Figma wins here by the user's choice, though this is under WCAG 4.5:1. The label keeps its normal colour (as drawn). The fields stay focusable (`readonly` / `aria-readonly`, not `disabled`) and keep the focus border, which Figma does not draw. WCAG exempts only disabled fields from contrast, so the axe check of the read-only stories (TextField, Select, UserProfile) fails; they run with `a11y: { test: "todo" }` (warning only), confirmed by the user 2026-11-25.
+
+Avatar upload (2026-11-26, KAN-106; read from 1440 › USER PROFILE, 768 › USER PROFILE and Design system › Avatar Uploader, light and dark; no styles in Figma, raw values):
+
+- Size limit: 5 MB on every width. Figma conflicts with itself: the 1440 page shows "png, jpg or gif no more than 5MB" (its layer name says 0.5MB), while 768 and the Design system say 0.5MB. The 1440 text agrees with PLAN D11 and the ticket, so the hint says 5MB everywhere.
+- Row: 1440 avatar right edge 721 → upload icon 792 (71); group top = avatar top + 28. 768 avatar right edge 334 → hint 359 (25); group top = avatar top + 27. Exact values in the component CSS (off-grid).
+- Upload group: 35×35 icon frame (Material `file_upload`, 23×23 glyph) and label 16 apart; label 500 20/32, letter spacing 0.15, 6 under the icon's top; hint 400 16/28, letter spacing 0.15, right under the row. Hint left edge: 1440 +5 from the icon, 768 −7. Text and icon: main text colour.
+- Hint colour: Figma draws the main text colour at 60% layer opacity. Light uses `--color-text-secondary` (#626262) instead, because 60% gives 3.7:1, below 4.5:1 (accessibility wins). Dark keeps Figma (#F5F5F7 at 60%, 5.5:1). Token `--color-avatar-hint`.
+- "Adding" (Design system) = a 1px line in the main text colour under the icon and label row; used as the hover state.
+- Remove = Design system "Remove image": red circle 24×24 (#C63031, radius 12) with a white 12×12 cross, at the top-right corner of the photo; only with a photo and when the user may edit. Shown on hover and keyboard focus, always on touch screens.
+- Errors (wrong type, too big, server error) and success ("Avatar updated", "Avatar removed") use the Toast (Design system › Notifications), the only error UI drawn.
+
+Predictions for KAN-106 (2026-11-26): not drawn in Figma, chosen by us. Fix here and in the CSS when a better source appears.
+
+- Keyboard focus on the upload row and the Remove button: the Button ring (2px outline `--color-focus-ring`, offset 2px, `:focus-visible`).
+- While an upload or a removal runs: the upload row turns `--color-icon-disabled` with no hover line; the Remove button gets the disabled fill. No progress UI; the old photo stays until the new one loads.
+- Remove button position: its box sits on the photo's box corner (top 0, right 0); the exact offset was not read.
+- No crop or confirm dialog (none drawn).
