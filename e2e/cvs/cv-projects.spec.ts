@@ -148,14 +148,14 @@ test.describe("CV Projects page, as a user", () => {
     await expect(dialog.getByRole("textbox", { name: "Domain" })).toHaveValue("Finance");
     await expect(dialog.getByRole("textbox", { name: "Domain" })).toBeDisabled();
     await expect(dialog.getByRole("textbox", { name: "Description" })).toBeDisabled();
-    const save = dialog.getByRole("button", { name: "Save" });
-    await expect(save).toBeDisabled();
+    const update = dialog.getByRole("button", { name: "Update" });
+    await expect(update).toBeDisabled();
 
     await dialog
       .getByRole("textbox", { name: "Responsibilities" })
       .fill("Led the transfer screens.");
-    await expect(save).toBeEnabled();
-    await save.click();
+    await expect(update).toBeEnabled();
+    await update.click();
 
     await expect(page.getByText("Project updated", { exact: true })).toBeVisible();
     await expect(dialog).toBeHidden();
