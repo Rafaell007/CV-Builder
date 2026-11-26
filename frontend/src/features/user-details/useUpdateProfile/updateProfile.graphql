@@ -8,6 +8,7 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
     lastName
     role
     createdAt
+    avatarUrl
     department {
       id
       name

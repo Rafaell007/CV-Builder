@@ -61,6 +61,7 @@ export const userMock = (
         ...name,
         role: "USER",
         createdAt: "2024-01-14T10:00:00.000Z",
+        avatarUrl: null,
         department: assigned.department && { __typename: "Department", ...assigned.department },
         position: assigned.position && { __typename: "Position", ...assigned.position },
       },
@@ -122,6 +123,7 @@ export const updateProfileMock = (input: UpdateProfileInput): MockLink.MockedRes
         lastName: input.lastName,
         role: "USER",
         createdAt: "2024-01-14T10:00:00.000Z",
+        avatarUrl: null,
         department: {
           __typename: "Department",
           id: input.departmentId,
