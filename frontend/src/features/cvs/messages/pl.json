@@ -61,7 +61,7 @@
   "update": {
     "title": "Edytuj CV",
     "close": "Zamknij",
-    "submit": "Zapisz",
+    "submit": "Aktualizuj",
     "cancel": "Anuluj",
     "success": {
       "title": "CV zostało zaktualizowane",
@@ -158,7 +158,7 @@
       "close": "Zamknij",
       "skill": "Umiejętność",
       "mastery": "Poziom",
-      "submit": "Zapisz",
+      "submit": "Aktualizuj",
       "cancel": "Anuluj",
       "errors": {
         "notFound": "Tej umiejętności nie ma już w CV.",
@@ -283,7 +283,7 @@
     "update": {
       "title": "Zmień projekt",
       "close": "Zamknij",
-      "submit": "Zapisz",
+      "submit": "Aktualizuj",
       "cancel": "Anuluj",
       "success": {
         "title": "Zmieniono projekt",

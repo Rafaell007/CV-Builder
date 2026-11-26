@@ -74,7 +74,7 @@ describe("useUpdateCvProject", () => {
     await expect.poll(() => result().roles).toEqual(sampleRoles);
   });
 
-  it("is not dirty until a value changes, so SAVE stays disabled (AC-20)", () => {
+  it("is not dirty until a value changes, so UPDATE stays disabled (AC-20)", () => {
     const { result } = setup({ mocks: [projectRolesMock()] });
 
     act(() => result().open(blogEntry!));
