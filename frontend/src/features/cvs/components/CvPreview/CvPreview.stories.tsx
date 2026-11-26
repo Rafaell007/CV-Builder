@@ -5,6 +5,7 @@ import {
   cvPreviewFigmaSample,
   cvPreviewForbiddenMock,
   cvPreviewMock,
+  cvPreviewSample,
 } from "../../useCvPreview/cvPreview.mocks";
 import { CvPreview } from "./CvPreview";
 
@@ -89,5 +90,38 @@ export const Polish: Story = {
   parameters: { apollo: { mocks: [cvPreviewMock(undefined, "pl")] } },
   play: async ({ canvas }) => {
     await expect(await canvas.findByRole("table", { name: "Umiejętności zawodowe" })).toBeVisible();
+  },
+};
+
+/** The gap that the name keeps to the EXPORT PDF button (`--space-4`). */
+const EXPORT_GAP_PX = 16;
+
+/**
+ * A long name in Polish: the label `EKSPORTUJ PDF` is wider than `EXPORT PDF`, so the room that the header keeps free
+ * must still leave the full gap between the name and the button (KAN-178). Measured in the real browser, after the
+ * fonts load, because the button width comes from real text widths.
+ */
+export const PolishLongName: Story = {
+  globals: { locale: "pl" },
+  parameters: {
+    apollo: {
+      mocks: [
+        cvPreviewMock(
+          {
+            ...cvPreviewSample,
+            fullName: "Bartłomiej Konstantynopolitańczykiewicz-Wiśniewski Młodszy",
+          },
+          "pl",
+        ),
+      ],
+    },
+  },
+  play: async ({ canvas }) => {
+    const name = await canvas.findByRole("heading", { name: /Konstantynopolitańczykiewicz/ });
+    const button = canvas.getByRole("button", { name: "EKSPORTUJ PDF" });
+    await document.fonts.ready;
+
+    const gap = button.getBoundingClientRect().left - name.getBoundingClientRect().right;
+    await expect(gap).toBeGreaterThanOrEqual(EXPORT_GAP_PX);
   },
 };

@@ -1,8 +1,8 @@
 .header {
   display: flex;
   flex-direction: column;
-  /* Room for the EXPORT PDF button (160 wide) that hangs over the right end of this row, plus 16. */
-  padding-right: calc(160px + var(--space-4));
+  /* Room for the EXPORT PDF button that hangs over the right end of this row, plus a gap. Set by CvPreview. */
+  padding-right: calc(var(--cv-preview-export-width) + var(--space-4));
 }
 
 .name {
