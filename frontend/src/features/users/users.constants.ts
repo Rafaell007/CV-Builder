@@ -22,15 +22,6 @@ export const DEFAULT_USERS_SORT: SortState = {
 /** The variables of the first `Users` request of the page. The route prefetches them on the server (PLAN D6). */
 export const USERS_FIRST_PAGE = firstPageVariables(DEFAULT_USERS_SORT);
 
-/** Department and Position options load in pages of this size: the most the backend sends per request. */
-export const OPTIONS_PAGE_SIZE = 100;
-
-/** Department and Position options are listed by name, A to Z (the backend sorts). */
-export const OPTIONS_SORT = { field: "name", direction: "ASC" } as const;
-
-/** First and last name: at most 100 characters, like the backend `CreateUserInput`. */
-export const MAX_NAME_LENGTH = 100;
-
 /** The role a new user gets unless the admin picks another one (Figma: Role prefilled "Employee"). */
 export const DEFAULT_USER_ROLE = "USER" satisfies Role;
 
@@ -42,9 +33,3 @@ export const OWN_ROLE_REASON = "OWN_ROLE";
 
 /** `extensions.reason` of the backend CONFLICT when an admin deletes their own account (D24). */
 export const SELF_DELETE_REASON = "SELF_DELETE";
-
-/**
- * `extensions.reason` of the backend CONFLICT when another request changed the same user at the same time. Nothing was
- * saved, so the admin can try again.
- */
-export const CONCURRENT_CHANGE_REASON = "CONCURRENT_CHANGE";

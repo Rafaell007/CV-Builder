@@ -15,16 +15,17 @@
   --field-border: var(--color-input-border-focus);
 }
 
-/* Dark fill #454545 when open, filled or invalid (light: none). Not disabled: Field's disabled fill wins. */
+/* Dark fill #454545 when open, filled or invalid (light: none). Not disabled or read-only: Field's grey fill wins. */
 .control:where(:has([aria-expanded="true"]), [data-filled], :has([aria-invalid="true"])):where(
-    :not(:has(:disabled))
+    :not(:has(:disabled, [aria-readonly="true"]))
   ) {
   background: var(--color-select-active-bg);
 }
 
-/* Floated label: #626262 / #F5F5F7 (the text input's is #AEAEAE in dark). Field's invalid red outweighs this. */
+/* Floated label: #626262 / #F5F5F7 (the text input's is #AEAEAE in dark). Field's invalid red outweighs this.
+   Read-only keeps Field's label colour (Figma disabled select label: #626262 / #AEAEAE). */
 .control:where(:focus-within, [data-filled], :has([aria-expanded="true"])):where(
-    :not(:has(:disabled))
+    :not(:has(:disabled, [aria-readonly="true"]))
   )
   label {
   color: var(--color-select-label);
@@ -79,7 +80,13 @@
   color: var(--color-error);
 }
 
-.trigger:disabled .chevron {
+/* Read-only: drawn as disabled (Figma frame 20), but no list opens, so no pointer cursor */
+.trigger[aria-readonly="true"] {
+  color: var(--color-input-disabled-text);
+  cursor: default;
+}
+
+.trigger:is(:disabled, [aria-readonly="true"]) .chevron {
   color: var(--color-icon-disabled);
 }
 

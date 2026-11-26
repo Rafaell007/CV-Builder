@@ -1,29 +1,29 @@
-import { Suspense, type ReactNode } from "react";
+import { connection } from "next/server";
 import { UserLayout } from "@/features/user-details";
+import { PreloadQuery } from "@/shared/apollo/server";
+import { MeDocument, UserDocument } from "@/shared/graphql";
 
-type UserRouteParams = LayoutProps<"/[locale]/users/[userId]">["params"];
+// A navigation to a user waits for the data (the signed-in user and this user) and keeps the old page meanwhile,
+// instead of showing a loading state of its own (see the (app) layout). A layout's value does not cover its pages, so
+// the tab pages that wait for data declare it too. https://nextjs.org/docs/messages/blocking-prerender-dynamic
+export const instant = false;
 
-// Only reads userId from the params and passes it on. Reading the params is runtime data: Next.js needs it inside Suspense, or the build fails while prerendering.
-async function UserLayoutWithUserId({
-  params,
-  children,
-}: {
-  params: UserRouteParams;
-  children: ReactNode;
-}) {
-  const { userId } = await params;
-
-  return <UserLayout userId={userId}>{children}</UserLayout>;
-}
-
-// The shell of every tab of a user (PLAN S7.7, until S6.2 builds the full User Details page): header and tabs.
-export default function UserRouteLayout({
+// The shell of every tab of a user (PLAN S6.2): header, breadcrumbs and tabs. It starts the requests for the signed-in
+// user (the role decides the CVs tab) and for this user (the name in the breadcrumbs) on the server, per request
+// (PLAN D6). `UserLayout` reads both with `useSuspenseQuery`, so the first HTML already has them and the browser sends
+// no second request. It renders inside the one `<Suspense>` of the (app) layout, which per-request work needs.
+export default async function UserRouteLayout({
   children,
   params,
 }: LayoutProps<"/[locale]/users/[userId]">) {
+  await connection();
+  const { userId } = await params;
+
   return (
-    <Suspense>
-      <UserLayoutWithUserId params={params}>{children}</UserLayoutWithUserId>
-    </Suspense>
+    <PreloadQuery query={MeDocument}>
+      <PreloadQuery query={UserDocument} variables={{ id: userId }}>
+        <UserLayout userId={userId}>{children}</UserLayout>
+      </PreloadQuery>
+    </PreloadQuery>
   );
 }

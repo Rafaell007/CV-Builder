@@ -6,6 +6,9 @@ import { TextField } from "./TextField";
 const RED = "rgb(198, 48, 49)";
 const LIGHT_TEXT = "rgb(46, 46, 46)";
 const DARK_TEXT = "rgb(245, 245, 247)";
+const GREY_300 = "rgb(196, 196, 198)";
+const GREY_400 = "rgb(174, 174, 174)";
+const GREY_500 = "rgb(98, 98, 98)";
 
 const meta = {
   title: "Form controls/TextField",
@@ -74,4 +77,33 @@ export const InvalidEmpty: Story = {
 
 export const Disabled: Story = {
   args: { defaultValue: "John", disabled: true },
+};
+
+// Another employee's profile (Figma frame 20): drawn as disabled, but focusable with the focus border.
+export const ReadOnly: Story = {
+  args: { label: "First name", defaultValue: "John", readOnly: true },
+  // Figma's grey (about 1.2:1) is below WCAG 4.5:1; kept by the user's choice (docs/design-tokens.md). Warning only.
+  parameters: { a11y: { test: "todo" } },
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole("textbox", { name: "First name" });
+    await expect(input).toHaveStyle({ color: GREY_400 });
+    await expect(input.parentElement).toHaveStyle({ backgroundColor: GREY_300 });
+    await expect(canvas.getByText("First name")).toHaveStyle({ color: GREY_500 });
+
+    await userEvent.tab();
+
+    await expect(input).toHaveFocus();
+    await expect(input.parentElement).toHaveStyle({ borderTopColor: GREY_500 });
+  },
+};
+
+export const ReadOnlyDark: Story = {
+  args: { label: "First name", defaultValue: "John", readOnly: true },
+  parameters: { a11y: { test: "todo" } },
+  globals: { theme: "dark" },
+  play: async ({ canvas }) => {
+    const input = canvas.getByRole("textbox", { name: "First name" });
+    await expect(input).toHaveStyle({ color: GREY_400 });
+    await expect(input.parentElement).toHaveStyle({ backgroundColor: GREY_500 });
+  },
 };

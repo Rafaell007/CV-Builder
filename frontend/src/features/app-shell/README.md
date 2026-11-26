@@ -19,7 +19,6 @@ Found in the KAN-82 review (2026-11-12) and left open on purpose. Pick them up w
 - **Admin links.** An admin's Skills and Languages point to `/admin/skills` and `/admin/languages` (PLAN §6 routes table lists `/skills` and `/languages` as user pages). PLAN §6 does not say this in words; confirm with the team.
 - **Active item on profile pages.** "Employees" stays active on `/users/{id}/profile`, also for the user's own profile opened from the profile menu. Probably intended.
 - **Nav lists.** `USER_NAV_ITEMS` and `ADMIN_NAV_ITEMS` differ only in two hrefs. Merge them if a third role or a third difference appears.
-- **`getDisplayName`** works only on user fields; `shared/currentUser` may be a better home when a second place needs it.
 - **`ProfileMenu` props.** `settingsHref` is the same for every user; `profileHref` depends on the user. Kept as props so the menu has no routing knowledge.
 - **Raw px in CSS.** `Sidebar.module.css` and `ProfileMenu.module.css` keep Figma-exact values with no token: the 14px gaps, `top: 51px`, the 20px collapse-button radius, the avatar initial (`500 20px/20px`, 0.4px). Add tokens if a second component needs the same value.
 - **Focus ring.** The 2px inset outline is repeated in `Sidebar.module.css` and `ProfileMenu.module.css`. A shared token for it was not added because the colour comes from the theme.

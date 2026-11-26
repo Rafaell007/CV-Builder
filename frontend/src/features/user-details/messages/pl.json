@@ -5,5 +5,50 @@
     "skills": "Umiejętności",
     "languages": "Języki",
     "cvs": "CV"
+  },
+  "profile": {
+    "memberSince": "Członek od {date}",
+    "verifyEmail": {
+      "button": "Zweryfikuj e-mail",
+      "sent": "Wysłaliśmy e-mail weryfikacyjny",
+      "sentRecently": {
+        "title": "Sprawdź skrzynkę",
+        "text": "Kod weryfikacyjny został wysłany mniej niż minutę temu."
+      },
+      "alreadyVerified": "Twój e-mail jest już zweryfikowany",
+      "failed": "Nie udało się wysłać e-maila weryfikacyjnego"
+    },
+    "form": {
+      "update": "Zapisz",
+      "fields": {
+        "firstName": "Imię",
+        "lastName": "Nazwisko",
+        "department": "Dział",
+        "position": "Stanowisko"
+      },
+      "errors": {
+        "firstNameRequired": "Imię jest wymagane",
+        "firstNameTooLong": "Imię może mieć najwyżej {max, plural, one {# znak} few {# znaki} other {# znaków}}",
+        "lastNameRequired": "Nazwisko jest wymagane",
+        "lastNameTooLong": "Nazwisko może mieć najwyżej {max, plural, one {# znak} few {# znaki} other {# znaków}}",
+        "departmentRequired": "Dział jest wymagany",
+        "positionRequired": "Stanowisko jest wymagane",
+        "serverInvalid": "Sprawdź to pole",
+        "forbidden": "Nie masz uprawnień do tej operacji.",
+        "notFound": "Ten użytkownik już nie istnieje.",
+        "concurrentChange": "Ktoś w tym samym czasie zmienił tego użytkownika. Spróbuj ponownie.",
+        "failed": "Coś poszło nie tak. Spróbuj ponownie."
+      },
+      "success": {
+        "title": "Profil zaktualizowany",
+        "text": "Profil użytkownika {name} został zapisany."
+      },
+      "options": {
+        "loading": "Ładowanie…",
+        "departmentsFailed": "Nie udało się wczytać działów",
+        "positionsFailed": "Nie udało się wczytać stanowisk",
+        "retry": "Spróbuj ponownie"
+      }
+    }
   }
 }

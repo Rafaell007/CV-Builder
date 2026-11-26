@@ -13,15 +13,3 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
-
-/* The select and, when its options failed to load, the Retry button under it. */
-.catalog {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-3);
-}
-
-.catalog > :first-child {
-  align-self: stretch;
-}

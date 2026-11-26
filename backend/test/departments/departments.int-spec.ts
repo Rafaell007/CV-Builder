@@ -10,6 +10,7 @@ const SIGN_IN = `mutation ($input: SignInInput!) { signIn(input: $input) { id } 
 const LIST = `query ($search: String, $sort: SortInput, $page: PageInput) {
   departments(search: $search, sort: $sort, page: $page) { items { id name } total }
 }`;
+const OPTIONS = `query { departmentOptions { id name } }`;
 const CREATE = `mutation ($input: CreateDepartmentInput!) { createDepartment(input: $input) { id name } }`;
 const UPDATE = `mutation ($input: UpdateDepartmentInput!) { updateDepartment(input: $input) { id name } }`;
 const DELETE = `mutation ($id: ID!) { deleteDepartment(id: $id) }`;
@@ -221,6 +222,35 @@ describe("departments", () => {
       });
 
       expect(body.errors?.[0]?.extensions.code).toBe("BAD_USER_INPUT");
+    });
+  });
+
+  describe("departmentOptions", () => {
+    beforeEach(async () => {
+      for (const name of ["Sales", "engineering", "Design"]) {
+        await createDepartment(name);
+      }
+    });
+
+    it.each([
+      ["a user", () => user],
+      ["an admin", () => admin],
+    ])(
+      "lists every department by name, without regard to letter case, for %s",
+      async (_who, cookies) => {
+        const { body } = await graphqlRequest(app, OPTIONS, { cookies: cookies() });
+
+        expect(body.errors).toBeUndefined();
+        const options = (body.data as { departmentOptions: { id: string; name: string }[] })
+          .departmentOptions;
+        expect(options.map((d) => d.name)).toEqual(["Design", "engineering", "Sales"]);
+      },
+    );
+
+    it("refuses a visitor who is not signed in", async () => {
+      const { body } = await graphqlRequest(app, OPTIONS);
+
+      expect(body.errors?.[0]?.extensions.code).toBe("UNAUTHENTICATED");
     });
   });
 

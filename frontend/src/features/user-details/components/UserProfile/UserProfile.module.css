@@ -1,0 +1,38 @@
+/*
+ * Figma: 1440 › USER PROFILE (light and dark, read 2026-11-25). The block is centred on the form (x centre 819).
+ * Tabs end at y 112, the avatar starts at y 124: 12px. The shell's content padding is 24px (from the CVs tab), so
+ * this tab moves up by the difference.
+ */
+.profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: calc(var(--space-3) - var(--space-6));
+  text-align: center;
+}
+
+/* Avatar bottom 244 → name top 276: 32px. Heading 400 24/32. */
+.name {
+  margin: var(--space-8) 0 0;
+  color: var(--color-text);
+  font: var(--text-heading);
+  letter-spacing: var(--text-heading-ls);
+  overflow-wrap: anywhere;
+}
+
+/* Name bottom 308 → email top 316: 8px. Body 400 16/24, #626262 light / #AEAEAE dark. */
+.email {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-secondary);
+  font: var(--text-body);
+  letter-spacing: var(--text-body-ls);
+  overflow-wrap: anywhere;
+}
+
+/* Directly under the email (its 24px line starts at 340, where the email line ends). Body, text main. */
+.memberSince {
+  margin: 0;
+  color: var(--color-text);
+  font: var(--text-body);
+  letter-spacing: var(--text-body-ls);
+}

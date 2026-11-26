@@ -10,6 +10,7 @@ const SIGN_IN = `mutation ($input: SignInInput!) { signIn(input: $input) { id } 
 const LIST = `query ($search: String, $sort: SortInput, $page: PageInput) {
   positions(search: $search, sort: $sort, page: $page) { items { id name } total }
 }`;
+const OPTIONS = `query { positionOptions { id name } }`;
 const CREATE = `mutation ($input: CreatePositionInput!) { createPosition(input: $input) { id name } }`;
 const UPDATE = `mutation ($input: UpdatePositionInput!) { updatePosition(input: $input) { id name } }`;
 const DELETE = `mutation ($id: ID!) { deletePosition(id: $id) }`;
@@ -224,6 +225,35 @@ describe("positions", () => {
       });
 
       expect(body.errors?.[0]?.extensions.code).toBe("BAD_USER_INPUT");
+    });
+  });
+
+  describe("positionOptions", () => {
+    beforeEach(async () => {
+      for (const name of ["Tester", "developer", "Analyst"]) {
+        await createPosition(name);
+      }
+    });
+
+    it.each([
+      ["a user", () => user],
+      ["an admin", () => admin],
+    ])(
+      "lists every position by name, without regard to letter case, for %s",
+      async (_who, cookies) => {
+        const { body } = await graphqlRequest(app, OPTIONS, { cookies: cookies() });
+
+        expect(body.errors).toBeUndefined();
+        const options = (body.data as { positionOptions: { id: string; name: string }[] })
+          .positionOptions;
+        expect(options.map((p) => p.name)).toEqual(["Analyst", "developer", "Tester"]);
+      },
+    );
+
+    it("refuses a visitor who is not signed in", async () => {
+      const { body } = await graphqlRequest(app, OPTIONS);
+
+      expect(body.errors?.[0]?.extensions.code).toBe("UNAUTHENTICATED");
     });
   });
 

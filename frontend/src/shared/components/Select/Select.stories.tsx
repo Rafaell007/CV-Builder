@@ -7,6 +7,7 @@ import { Select, type SelectProps } from "./Select";
 const RED = "rgb(198, 48, 49)";
 const GREY_400 = "rgb(174, 174, 174)";
 const GREY_500 = "rgb(98, 98, 98)";
+const GREY_300 = "rgb(196, 196, 198)";
 const GREY_600 = "rgb(69, 69, 69)";
 const GREY_100 = "rgb(245, 245, 247)";
 
@@ -153,5 +154,38 @@ export const Disabled: Story = {
     const select = canvas.getByRole("combobox", { name: "Position" });
     await expect(select).toBeDisabled();
     await expect(select).toHaveStyle({ color: GREY_400, fontSize: "16px" });
+  },
+};
+
+// Another employee's profile (Figma frame 20): drawn as disabled, focusable, the list never opens.
+export const ReadOnly: Story = {
+  args: { value: "frontend", readOnly: true },
+  // Figma's grey (about 1.2:1) is below WCAG 4.5:1; kept by the user's choice (docs/design-tokens.md). Warning only.
+  parameters: { a11y: { test: "todo" } },
+  play: async ({ canvas, userEvent, args }) => {
+    const select = canvas.getByRole("combobox", { name: "Position" });
+    await expect(select).toHaveStyle({ color: GREY_400 });
+    await expect(select.parentElement).toHaveStyle({ backgroundColor: GREY_300 });
+    await expect(canvas.getByText("Position")).toHaveStyle({ color: GREY_500 });
+    await expect(select.querySelector("svg")).toHaveStyle({ color: GREY_400 });
+
+    await userEvent.tab();
+    await userEvent.keyboard("{Enter}");
+
+    await expect(select).toHaveFocus();
+    await expect(select.parentElement).toHaveStyle({ borderTopColor: GREY_500 });
+    await expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    await expect(args.onValueChange).not.toHaveBeenCalled();
+  },
+};
+
+export const ReadOnlyDark: Story = {
+  args: { value: "frontend", readOnly: true },
+  parameters: { a11y: { test: "todo" } },
+  globals: { theme: "dark" },
+  play: async ({ canvas }) => {
+    const select = canvas.getByRole("combobox", { name: "Position" });
+    await expect(select).toHaveStyle({ color: GREY_400 });
+    await expect(select.parentElement).toHaveStyle({ backgroundColor: GREY_500 });
   },
 };

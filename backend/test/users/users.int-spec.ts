@@ -16,6 +16,7 @@ const LIST = `query ($search: String, $sort: SortInput, $page: PageInput) {
 const USER = `query ($id: ID!) { user(id: $id) { ${FIELDS} } }`;
 const CREATE = `mutation ($input: CreateUserInput!) { createUser(input: $input) { ${FIELDS} } }`;
 const UPDATE = `mutation ($input: UpdateUserInput!) { updateUser(input: $input) { ${FIELDS} } }`;
+const UPDATE_PROFILE = `mutation ($input: UpdateProfileInput!) { updateProfile(input: $input) { ${FIELDS} } }`;
 const DELETE = `mutation ($id: ID!) { deleteUser(id: $id) }`;
 
 /** A password that passes D33 (8–128 characters, a letter and a digit). */
@@ -280,6 +281,27 @@ describe("users", () => {
           department: { name: "Sales" },
           position: { name: "Tester" },
         });
+      });
+
+      it("returns when the account was created, as an ISO date (Member since, profile AC-14)", async () => {
+        const { createdAt } = await prisma.user.findUniqueOrThrow({
+          where: { id: alphaId },
+          select: { createdAt: true },
+        });
+
+        const { body } = await graphqlRequest(
+          app,
+          `query ($id: ID!) { user(id: $id) { createdAt } }`,
+          {
+            cookies: admin,
+            variables: { id: alphaId },
+          },
+        );
+
+        expect(body.errors).toBeUndefined();
+        expect((body.data as { user: { createdAt: string } }).user.createdAt).toBe(
+          createdAt.toISOString(),
+        );
       });
 
       it("fails with NOT_FOUND for an unknown id", async () => {
@@ -931,6 +953,149 @@ describe("users", () => {
           Promise.all([deleteAs(a.cookies, b.id), setRoleAs(b.cookies, a.id, Role.USER)]),
         );
       });
+    });
+  });
+
+  describe("updateProfile (User Details, Profile tab)", () => {
+    let adminId: string;
+    let userId: string;
+    let departmentId: string;
+    let positionId: string;
+
+    /** A valid input for the user `id`: no role, no email, no password. */
+    const profileInput = (id: string, overrides: Record<string, unknown> = {}) => ({
+      id,
+      firstName: "Profile",
+      lastName: "Owner",
+      departmentId,
+      positionId,
+      ...overrides,
+    });
+
+    async function updateProfileAs(cookies: string[], input: Record<string, unknown>) {
+      return (await graphqlRequest(app, UPDATE_PROFILE, { cookies, variables: { input } })).body;
+    }
+
+    const savedUser = () => prisma.user.findUniqueOrThrow({ where: { id: userId } });
+
+    beforeAll(async () => {
+      adminId = (await prisma.user.findUniqueOrThrow({ where: { email: ADMIN_EMAIL } })).id;
+      userId = (await prisma.user.findUniqueOrThrow({ where: { email: USER_EMAIL } })).id;
+      departmentId = (await prisma.department.create({ data: { name: "Engineering" } })).id;
+      positionId = (await prisma.position.create({ data: { name: "Developer" } })).id;
+    });
+
+    afterEach(async () => {
+      await prisma.user.deleteMany({ where: { email: { notIn: [ADMIN_EMAIL, USER_EMAIL] } } });
+      // The next test starts from no profile again.
+      await prisma.user.updateMany({
+        where: { id: { in: [adminId, userId] } },
+        data: { firstName: null, lastName: null, departmentId: null, positionId: null },
+      });
+    });
+
+    afterAll(async () => {
+      await prisma.department.deleteMany();
+      await prisma.position.deleteMany();
+    });
+
+    it("lets the owner save their names, department and position, and keeps the role", async () => {
+      const body = await updateProfileAs(
+        user,
+        profileInput(userId, { firstName: " Profile ", lastName: " Owner " }),
+      );
+
+      expect(body.errors).toBeUndefined();
+      expect((body.data as { updateProfile: UserRow }).updateProfile).toEqual({
+        id: userId,
+        email: USER_EMAIL,
+        firstName: "Profile",
+        lastName: "Owner",
+        role: Role.USER,
+        department: { id: departmentId, name: "Engineering" },
+        position: { id: positionId, name: "Developer" },
+      });
+      await expect(savedUser()).resolves.toMatchObject({ firstName: "Profile", role: Role.USER });
+    });
+
+    it("lets an owner with an unverified email save (D16)", async () => {
+      const { id } = await createUser(app, { email: "unverified@example.com", isVerified: false });
+      const cookies = await signIn("unverified@example.com");
+
+      const body = await updateProfileAs(cookies, profileInput(id));
+
+      expect(body.errors).toBeUndefined();
+    });
+
+    it("lets an admin save another user's profile", async () => {
+      const body = await updateProfileAs(admin, profileInput(userId));
+
+      expect(body.errors).toBeUndefined();
+      await expect(savedUser()).resolves.toMatchObject({ firstName: "Profile" });
+    });
+
+    it("refuses a visitor who is not signed in", async () => {
+      const body = await updateProfileAs([], profileInput(userId));
+
+      expect(body.errors?.[0]?.extensions.code).toBe("UNAUTHENTICATED");
+    });
+
+    it.each([
+      ["another user's profile", () => adminId],
+      ["an unknown id, so ids cannot be probed", () => MISSING_ID],
+    ])("refuses with FORBIDDEN a user who edits %s and changes nothing", async (_case, id) => {
+      const body = await updateProfileAs(user, profileInput(id()));
+
+      expect(body.errors?.[0]?.extensions.code).toBe("FORBIDDEN");
+      await expect(
+        prisma.user.findUniqueOrThrow({ where: { id: adminId } }),
+      ).resolves.toMatchObject({ firstName: null });
+    });
+
+    it("fails with NOT_FOUND when an admin edits an unknown user", async () => {
+      const body = await updateProfileAs(admin, profileInput(MISSING_ID));
+
+      expect(body.errors?.[0]).toMatchObject({
+        message: "User not found",
+        extensions: { code: "NOT_FOUND" },
+      });
+    });
+
+    it.each([
+      ["firstName", "an empty first name", { firstName: " " }],
+      ["lastName", "a last name longer than 100 characters", { lastName: "a".repeat(101) }],
+      ["departmentId", "a missing department", { departmentId: MISSING_ID }],
+      ["positionId", "a missing position", { positionId: MISSING_ID }],
+    ])(
+      "rejects %s: %s, with a field error and changes nothing",
+      async (field, _case, overrides) => {
+        const body = await updateProfileAs(user, profileInput(userId, overrides));
+
+        expect(body.errors?.[0]?.extensions).toMatchObject({
+          code: "BAD_USER_INPUT",
+          fieldErrors: [expect.objectContaining({ field })],
+        });
+        await expect(savedUser()).resolves.toMatchObject({ firstName: null });
+      },
+    );
+
+    it.each([
+      ["role", { role: Role.ADMIN }],
+      ["email", { email: "other@example.com" }],
+    ])("has no %s in its input, so a user cannot change it", async (_field, extra) => {
+      // An unknown input field fails while GraphQL reads the variables, with HTTP 400,
+      // so this request goes without graphqlRequest (it expects 200).
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .set("Cookie", user.join("; "))
+        .send({
+          query: UPDATE_PROFILE,
+          variables: { input: { ...profileInput(userId), ...extra } },
+        })
+        .expect(400);
+
+      expect((response.body as GraphQLBody).errors?.[0]?.extensions.code).toBe("BAD_USER_INPUT");
+      await expect(savedUser()).resolves.toMatchObject({ role: Role.USER, email: USER_EMAIL });
     });
   });
 });

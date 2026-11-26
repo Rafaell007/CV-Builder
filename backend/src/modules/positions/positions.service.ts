@@ -33,6 +33,14 @@ export class PositionsService {
     return { items, total };
   }
 
+  /** Every position, sorted by name, for the Position select of the user forms (no pages). */
+  listOptions(): Promise<Position[]> {
+    return this.prisma.position.findMany({
+      select: { id: true, name: true },
+      orderBy: [{ name: "asc" }, { id: "asc" }],
+    });
+  }
+
   async create({ name }: CreatePositionInput): Promise<Position> {
     try {
       return await this.prisma.position.create({

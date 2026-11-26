@@ -7,6 +7,7 @@ const DEPARTMENT_ID = "6f1d3c52-8a0e-4f6c-9a43-2b7d5e1c9a10";
 function setup() {
   const service = {
     list: jest.fn().mockResolvedValue({ items: [], total: 0 }),
+    listOptions: jest.fn(),
     create: jest.fn().mockResolvedValue({ id: DEPARTMENT_ID }),
     update: jest.fn().mockResolvedValue({ id: DEPARTMENT_ID }),
     delete: jest.fn().mockResolvedValue(undefined),
@@ -15,9 +16,33 @@ function setup() {
 }
 
 describe("DepartmentsResolver", () => {
-  it("is for admins only", () => {
-    expect(Reflect.getMetadata("auth:roles", DepartmentsResolver)).toEqual([Role.ADMIN]);
+  it.each(["list", "createDepartment", "updateDepartment", "deleteDepartment"] as const)(
+    "%s is for admins only",
+    (method) => {
+      expect(Reflect.getMetadata("auth:roles", DepartmentsResolver.prototype[method])).toEqual([
+        Role.ADMIN,
+      ]);
+    },
+  );
+
+  it("listOptions is for every signed-in user", () => {
+    expect(
+      Reflect.getMetadata("auth:roles", DepartmentsResolver.prototype.listOptions),
+    ).toBeUndefined();
+    expect(Reflect.getMetadata("auth:roles", DepartmentsResolver)).toBeUndefined();
     expect(Reflect.getMetadata("auth:isPublic", DepartmentsResolver)).toBeUndefined();
+    expect(
+      Reflect.getMetadata("auth:isPublic", DepartmentsResolver.prototype.listOptions),
+    ).toBeUndefined();
+  });
+
+  it("listOptions returns the service's list", async () => {
+    const { resolver, service } = setup();
+    service.listOptions.mockResolvedValue([{ id: DEPARTMENT_ID, name: "Engineering" }]);
+
+    await expect(resolver.listOptions()).resolves.toEqual([
+      { id: DEPARTMENT_ID, name: "Engineering" },
+    ]);
   });
 
   it("list passes the arguments to the service", async () => {

@@ -4,6 +4,7 @@
  * States come from the control itself (CSS only): :focus-within, :placeholder-shown (filled), aria-invalid, :disabled.
  * Controls without an <input> add: data-filled (Field's `filled` prop), aria-expanded (open list, which lives in a
  * portal, so focus is outside the box) and a disabled [role="combobox"] (disabled or aria-disabled).
+ * Read-only: [readonly] on input / textarea, aria-readonly on a combobox.
  * State selectors use :where() so they all have the same specificity and the later rule wins.
  * --field-border: the default border colour; a control's controlClassName may change it (Select draws its own).
  */
@@ -70,6 +71,18 @@
 ) {
   border-color: var(--color-input-border);
   background: var(--color-input-disabled-bg);
+}
+
+/* Read-only (Figma frame 20, another employee's profile): drawn as disabled, but focusable, so the focus border stays */
+.control:where(:has(:is(input, textarea)[readonly], [role="combobox"][aria-readonly="true"])) {
+  border-color: var(--color-input-border);
+  background: var(--color-input-disabled-bg);
+}
+
+.control:where(
+  :has(:is(input, textarea)[readonly], [role="combobox"][aria-readonly="true"]):focus-within
+) {
+  border-color: var(--field-focus-border);
 }
 
 /*
@@ -163,6 +176,11 @@
 .input:disabled {
   color: var(--color-input-disabled-text);
   cursor: not-allowed;
+}
+
+/* Read-only: the disabled value colour (Figma frame 20); the label keeps its normal colour */
+.input[readonly] {
+  color: var(--color-input-disabled-text);
 }
 
 /* Browser autofill paints its own background; cover it with the page colour so both themes stay as drawn */

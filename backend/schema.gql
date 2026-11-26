@@ -242,6 +242,7 @@ type Mutation {
   updateDepartment(input: UpdateDepartmentInput!): Department!
   updateLanguage(input: UpdateLanguageInput!): Language!
   updatePosition(input: UpdatePositionInput!): Position!
+  updateProfile(input: UpdateProfileInput!): User!
   updateProject(input: UpdateProjectInput!): Project!
   updateSkill(input: UpdateSkillInput!): Skill!
   updateUser(input: UpdateUserInput!): User!
@@ -303,11 +304,13 @@ type Query {
   cvProjects(cvId: ID!, search: String, sort: SortInput): [CvProject!]!
   cvSkills(cvId: ID!): [CvSkill!]!
   cvs(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput, userId: ID): CvPage!
+  departmentOptions: [Department!]!
   departments(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): DepartmentPage!
   exportCvPdf(cvId: ID!, locale: String = "en"): CvPdf!
   health: Health!
   languages(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): LanguagePage!
   me: SessionUser
+  positionOptions: [Position!]!
   positions(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): PositionPage!
   projectRoles: [ProjectRole!]!
   projects(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): ProjectPage!
@@ -422,6 +425,14 @@ input UpdatePositionInput {
   name: String!
 }
 
+input UpdateProfileInput {
+  departmentId: ID!
+  firstName: String!
+  id: ID!
+  lastName: String!
+  positionId: ID!
+}
+
 input UpdateProjectInput {
   description: String!
   domain: String!
@@ -448,6 +459,7 @@ input UpdateUserInput {
 }
 
 type User {
+  createdAt: DateTime!
   department: Department
   email: String!
   firstName: String

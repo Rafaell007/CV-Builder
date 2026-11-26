@@ -2,4 +2,5 @@
 export * from "./calendarDate";
 export * from "./focus";
 export * from "./path";
+export * from "./userName";
 export * from "./validation";

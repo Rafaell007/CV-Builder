@@ -31,4 +31,8 @@ export class User {
 
   @Field(() => Position, { nullable: true })
   position!: Position | null;
+
+  /** When the account was created: "Member since" on the Profile tab (user profile AC-14, read-only). */
+  @Field()
+  createdAt!: Date;
 }

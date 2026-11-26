@@ -1,15 +1,13 @@
 import { useTranslations } from "next-intl";
-import type { Ref } from "react";
 import { Controller } from "react-hook-form";
 import {
-  Button,
   FormErrorMessage,
   PasswordField,
   Select,
   TextField,
   type SelectOption,
 } from "@/shared/components";
-import type { UseCatalogOptionsResult } from "../../useCatalogOptions";
+import { CatalogSelect, type UseCatalogOptionsResult } from "@/shared/catalogOptions";
 import type { UseUserFormResult } from "../../useUserForm";
 import type { UserFormSubmit, UserFormValues } from "../../users.types";
 import styles from "./UserFormFields.module.css";
@@ -112,7 +110,9 @@ export function UserFormFields({ userForm, mode, departments, positions }: UserF
               onValueChange={field.onChange}
               onBlur={field.onBlur}
               error={errors.departmentId?.message}
+              loadingText={t("options.loading")}
               failedText={t("options.departmentsFailed")}
+              retryLabel={t("options.retry")}
             />
           )}
         />
@@ -129,7 +129,9 @@ export function UserFormFields({ userForm, mode, departments, positions }: UserF
               onValueChange={field.onChange}
               onBlur={field.onBlur}
               error={errors.positionId?.message}
+              loadingText={t("options.loading")}
               failedText={t("options.positionsFailed")}
+              retryLabel={t("options.retry")}
             />
           )}
         />
@@ -156,42 +158,5 @@ export function UserFormFields({ userForm, mode, departments, positions }: UserF
       </div>
       {generalError && <FormErrorMessage>{t(`errors.${generalError}`)}</FormErrorMessage>}
     </>
-  );
-}
-
-interface CatalogSelectProps {
-  ref: Ref<HTMLButtonElement>;
-  name: string;
-  label: string;
-  catalog: UseCatalogOptionsResult;
-  value: string;
-  onValueChange: (value: string) => void;
-  onBlur: () => void;
-  error: string | undefined;
-  /** The error when the options failed to load. */
-  failedText: string;
-}
-
-/** A Department or Position select: disabled while its options load, an error and Retry when they failed. */
-function CatalogSelect({ catalog, error, failedText, ...selectProps }: CatalogSelectProps) {
-  const t = useTranslations("users.form.options");
-  const options = (catalog.options ?? []).map(({ id, name }) => ({ value: id, label: name }));
-
-  return (
-    <div className={styles.catalog}>
-      <Select
-        {...selectProps}
-        options={options}
-        required
-        disabled={catalog.loading || catalog.failed}
-        helperText={catalog.loading ? t("loading") : undefined}
-        error={catalog.failed ? failedText : error}
-      />
-      {catalog.failed && (
-        <Button variant="secondary" onClick={catalog.retry}>
-          {t("retry")}
-        </Button>
-      )}
-    </div>
   );
 }

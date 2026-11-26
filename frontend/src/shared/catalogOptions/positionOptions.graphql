@@ -1,0 +1,7 @@
+# Every position, by name, for the Position select of the user forms (any signed-in user, KAN-105).
+query PositionOptions {
+  positionOptions {
+    id
+    name
+  }
+}

@@ -6,19 +6,11 @@ import {
   type EmailProblem,
   type PasswordProblem,
 } from "@/shared/utils";
-import { MAX_NAME_LENGTH } from "../users.constants";
+import { userProfileRules, type UserProfileRuleMessages } from "@/shared/userProfile";
 import type { UserFormSubmit, UserFormValues, UserListItem } from "../users.types";
 
-/** The translated texts of the rules both forms share: names, department, position and role. */
-export type UpdateUserFormMessages = {
-  firstNameRequired: string;
-  firstNameTooLong: string;
-  lastNameRequired: string;
-  lastNameTooLong: string;
-  departmentRequired: string;
-  positionRequired: string;
-  roleRequired: string;
-};
+/** The translated texts of the rules both forms share: the profile rules (names, department, position) and role. */
+export type UpdateUserFormMessages = UserProfileRuleMessages & { roleRequired: string };
 
 /** The translated texts of the Create user rules. Email and password keys are the shared `emailProblem` / `passwordProblem` ones. */
 export type CreateUserFormMessages = Record<EmailProblem | PasswordProblem, string> &
@@ -26,20 +18,10 @@ export type CreateUserFormMessages = Record<EmailProblem | PasswordProblem, stri
 
 const ROLES = ["ADMIN", "USER"] as const satisfies readonly Role[];
 
-// A trimmed, required name of at most 100 characters: a name of spaces counts as empty.
-const nameRule = (required: string, tooLong: string) =>
-  z.string().trim().min(1, required).max(MAX_NAME_LENGTH, tooLong);
-
-// A select holds "" while nothing is chosen.
-const chosenRule = (required: string) => z.string().min(1, required);
-
-/** The rules of the fields that Create and Update both send. */
-function profileRules(messages: UpdateUserFormMessages) {
+/** The rules of the fields that Create and Update both send: the shared profile rules and the role. */
+function sharedRules(messages: UpdateUserFormMessages) {
   return {
-    firstName: nameRule(messages.firstNameRequired, messages.firstNameTooLong),
-    lastName: nameRule(messages.lastNameRequired, messages.lastNameTooLong),
-    departmentId: chosenRule(messages.departmentRequired),
-    positionId: chosenRule(messages.positionRequired),
+    ...userProfileRules(messages),
     role: z.enum(ROLES, { error: messages.roleRequired }),
   };
 }
@@ -65,7 +47,7 @@ export function createUserFormSchema(
       const problem = passwordProblem(password);
       if (problem) context.addIssue({ code: "custom", message: messages[problem] });
     }),
-    ...profileRules(messages),
+    ...sharedRules(messages),
   });
 }
 
@@ -79,7 +61,7 @@ export function updateUserFormSchema(
   return z.object({
     email: z.string(),
     password: z.string(),
-    ...profileRules(messages),
+    ...sharedRules(messages),
   });
 }
 

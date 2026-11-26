@@ -1,0 +1,38 @@
+/*
+ * Figma 1440 › USER PROFILE (frames 11 and desktop-1440 frame-20, measured on the images, estimates): 64px from the
+ * "member since" line (bottom 364) to the first field box (top 428); two columns of 410 with a 32 gap (852 in all),
+ * centred; rows 84 apart (48 field + 36). Tablet 768 (frame-22): one column from x 80 to 744, the edges of the tabs,
+ * so the form spans the shell's 16px side padding too (`.content` in UserLayout). The parent centres it, so a wider
+ * box overflows both sides equally.
+ * Button row (frame-21, estimate): 36px below the last field box (bottom 560, button top 596), right-aligned; VERIFY
+ * EMAIL (step 5) sits 24px left of UPDATE. The general error is not in Figma: our guess, 24px below the fields.
+ */
+.form {
+  width: calc(100% + 2 * var(--space-4));
+  max-width: calc(2 * 410px + var(--space-8));
+  margin-top: calc(var(--space-12) + var(--space-4));
+  text-align: start;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 36px var(--space-8);
+}
+
+.generalError {
+  margin-top: var(--space-6);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-6);
+  margin-top: 36px;
+}
+
+@media (min-width: 1024px) {
+  .fields {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

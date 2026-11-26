@@ -1,6 +1,7 @@
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 import { createCvs, deleteCvsByName } from "../support/cvs";
 import { graphql } from "../support/graphql";
+import { waitForHydration } from "../support/hydration";
 import { ADMIN_EMAIL, signIn, USER_EMAIL } from "../support/signIn";
 
 // Every CV that a test makes has this prefix, so `afterEach` can remove it, also after a test failed halfway.
@@ -35,6 +36,9 @@ test.describe("User CVs tab, as an admin", () => {
     await createCvs(context, `${PREFIX} admin`, 1);
 
     await page.goto(`/en/users/${userId}/cvs`);
+    // The tab comes with the server HTML (PLAN D6). Text typed before React takes the box over is lost: the list
+    // then shows every CV of user1, also those other specs make at the same time.
+    await waitForHydration(search(page));
     await search(page).fill(PREFIX);
     await expect(page.getByText(`${PREFIX} user1 1`)).toBeVisible();
   });
@@ -133,6 +137,7 @@ test.describe("User CVs tab, as an admin", () => {
     );
 
     await page.reload();
+    await waitForHydration(search(page));
     await search(page).fill(PREFIX);
     await expect(page.getByText(`${PREFIX} user1 1`)).toBeVisible();
     await expect(page.getByText("Must not be saved")).toHaveCount(0);

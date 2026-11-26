@@ -12,7 +12,8 @@ import { DESKTOP_MIN_WIDTH } from "@/shared/constants";
 import { Link } from "@/shared/i18n";
 import { USER_SORT_FIELDS } from "../../users.constants";
 import type { UserListItem } from "../../users.types";
-import { getUserDisplayName, toUserProfilePath } from "../../utils";
+import { getUserDisplayName } from "@/shared/utils";
+import { toUserProfilePath } from "../../utils";
 import styles from "./UsersTable.module.css";
 
 export interface UsersTableProps {

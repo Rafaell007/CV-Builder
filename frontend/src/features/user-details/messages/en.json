@@ -5,5 +5,50 @@
     "skills": "Skills",
     "languages": "Languages",
     "cvs": "CVs"
+  },
+  "profile": {
+    "memberSince": "A member since {date}",
+    "verifyEmail": {
+      "button": "Verify email",
+      "sent": "Verification email has been sent",
+      "sentRecently": {
+        "title": "Check your email",
+        "text": "A verification code was sent less than a minute ago."
+      },
+      "alreadyVerified": "Your email is already verified",
+      "failed": "Failed to send verification email"
+    },
+    "form": {
+      "update": "Update",
+      "fields": {
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "department": "Department",
+        "position": "Position"
+      },
+      "errors": {
+        "firstNameRequired": "First name is required",
+        "firstNameTooLong": "First name must be at most {max} characters long",
+        "lastNameRequired": "Last name is required",
+        "lastNameTooLong": "Last name must be at most {max} characters long",
+        "departmentRequired": "Department is required",
+        "positionRequired": "Position is required",
+        "serverInvalid": "Check this field",
+        "forbidden": "You do not have permission to do this.",
+        "notFound": "This user no longer exists.",
+        "concurrentChange": "Someone changed this user at the same time. Try again.",
+        "failed": "Something went wrong. Try again."
+      },
+      "success": {
+        "title": "Profile updated",
+        "text": "{name}'s profile was saved."
+      },
+      "options": {
+        "loading": "Loading…",
+        "departmentsFailed": "Failed to load departments",
+        "positionsFailed": "Failed to load positions",
+        "retry": "Retry"
+      }
+    }
   }
 }

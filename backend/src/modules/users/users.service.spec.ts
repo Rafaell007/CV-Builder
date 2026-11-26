@@ -43,6 +43,7 @@ const USER = {
   role: Role.USER,
   department: { id: DEPARTMENT_ID, name: "Engineering" },
   position: { id: POSITION_ID, name: "Developer" },
+  createdAt: new Date("2024-01-14T09:30:00.000Z"),
 };
 const SELECT = {
   id: true,
@@ -52,6 +53,7 @@ const SELECT = {
   role: true,
   department: { select: { id: true, name: true } },
   position: { select: { id: true, name: true } },
+  createdAt: true,
 };
 
 const prisma = {
@@ -430,6 +432,108 @@ describe("UsersService", () => {
       prisma.user.update.mockRejectedValue(databaseError(code));
 
       await expect(reasonOf(createService().update(input, ACTOR_ID))).resolves.toBe(
+        CONCURRENT_CHANGE_REASON,
+      );
+    });
+  });
+
+  describe("updateProfile", () => {
+    const profile = {
+      firstName: PROFILE.firstName,
+      lastName: PROFILE.lastName,
+      departmentId: DEPARTMENT_ID,
+      positionId: POSITION_ID,
+    };
+    const input = { id: ID, ...profile };
+
+    it("lets the owner save their profile, locked like update, without touching the role", async () => {
+      // The owner is both the actor and the target, so the lock returns one row.
+      prisma.$queryRaw.mockResolvedValue(lockedRows([ID, Role.USER]));
+      prisma.user.update.mockResolvedValue(USER);
+
+      await expect(createService().updateProfile(input, ID)).resolves.toEqual(USER);
+
+      expect(prisma.$queryRaw).toHaveBeenCalledWith(expect.anything(), ID, ID);
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: ID },
+        data: profile,
+        select: SELECT,
+      });
+    });
+
+    it("lets the owner save when their id comes in upper case", async () => {
+      prisma.$queryRaw.mockResolvedValue(lockedRows([ID, Role.USER]));
+      prisma.user.update.mockResolvedValue(USER);
+
+      await expect(
+        createService().updateProfile({ ...input, id: ID.toUpperCase() }, ID),
+      ).resolves.toEqual(USER);
+    });
+
+    it("lets an admin save another user's profile", async () => {
+      prisma.$queryRaw.mockResolvedValue(lockedRows([ACTOR_ID, Role.ADMIN], [ID, Role.USER]));
+      prisma.user.update.mockResolvedValue(USER);
+
+      await expect(createService().updateProfile(input, ACTOR_ID)).resolves.toEqual(USER);
+    });
+
+    it.each([
+      // Also an admin demoted by a parallel request after the guard passed: the lock reads the new role.
+      ["a user who edits someone else", lockedRows([ACTOR_ID, Role.USER], [ID, Role.USER])],
+      ["a user who probes an unknown id", lockedRows([ACTOR_ID, Role.USER])],
+      ["an actor deleted by a parallel request", lockedRows([ID, Role.USER])],
+    ])("refuses with FORBIDDEN %s and saves nothing", async (_case, rows) => {
+      prisma.$queryRaw.mockResolvedValue(rows);
+
+      await expect(createService().updateProfile(input, ACTOR_ID)).rejects.toThrow(
+        ForbiddenException,
+      );
+      expect(prisma.user.update).not.toHaveBeenCalled();
+    });
+
+    it("refuses with FORBIDDEN an owner deleted by a parallel request", async () => {
+      prisma.$queryRaw.mockResolvedValue(lockedRows());
+
+      await expect(createService().updateProfile(input, ID)).rejects.toThrow(ForbiddenException);
+    });
+
+    it("fails with NOT_FOUND, not a field error, when an admin edits an unknown user", async () => {
+      prisma.$queryRaw.mockResolvedValue(lockedRows([ACTOR_ID, Role.ADMIN]));
+      prisma.department.findUnique.mockResolvedValue(null);
+
+      await expect(createService().updateProfile(input, ACTOR_ID)).rejects.toThrow(
+        new NotFoundException("User not found"),
+      );
+      expect(prisma.user.update).not.toHaveBeenCalled();
+    });
+
+    it("names a missing department and position, checked inside the lock, and saves nothing", async () => {
+      prisma.$queryRaw.mockResolvedValue(lockedRows([ID, Role.USER]));
+      prisma.department.findUnique.mockResolvedValue(null);
+      prisma.position.findUnique.mockResolvedValue(null);
+
+      await expect(fieldErrorsOf(createService().updateProfile(input, ID))).resolves.toEqual([
+        { field: "departmentId", messages: ["Department not found"] },
+        { field: "positionId", messages: ["Position not found"] },
+      ]);
+      expect(prisma.user.update).not.toHaveBeenCalled();
+    });
+
+    it("names the field when the position is deleted during the save", async () => {
+      prisma.$queryRaw.mockResolvedValue(lockedRows([ID, Role.USER]));
+      prisma.user.update.mockRejectedValue(databaseError("P2003"));
+      prisma.position.findUnique.mockResolvedValueOnce({ id: POSITION_ID }).mockResolvedValue(null);
+
+      await expect(fieldErrorsOf(createService().updateProfile(input, ID))).resolves.toEqual([
+        { field: "positionId", messages: ["Position not found"] },
+      ]);
+    });
+
+    it("fails with a CONFLICT to retry on a write conflict (P2034)", async () => {
+      prisma.$queryRaw.mockResolvedValue(lockedRows([ID, Role.USER]));
+      prisma.user.update.mockRejectedValue(databaseError("P2034"));
+
+      await expect(reasonOf(createService().updateProfile(input, ID))).resolves.toBe(
         CONCURRENT_CHANGE_REASON,
       );
     });
