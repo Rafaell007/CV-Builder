@@ -190,7 +190,7 @@
       "startDate": "Start Date",
       "endDate": "End Date"
     },
-    "present": "Present",
+    "tillNow": "Till now",
     "dateMissing": "Date missing",
     "responsibilities": "Responsibilities",
     "actions": {

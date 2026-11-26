@@ -10,6 +10,6 @@ function formatMonth(date: Date): string {
  * when the project has no end date (Figma screen of the CV preview, Projects Period). The caller gives
  * the word for "Till now" (`OPEN_PERIOD_WORDS` in `cv-locale.ts`, the only place with these words).
  */
-export function formatPeriod(start: Date, end: Date | null, present: string): string {
-  return `${formatMonth(start)}${PERIOD_SEPARATOR}${end === null ? present : formatMonth(end)}`;
+export function formatPeriod(start: Date, end: Date | null, openPeriodWord: string): string {
+  return `${formatMonth(start)}${PERIOD_SEPARATOR}${end === null ? openPeriodWord : formatMonth(end)}`;
 }

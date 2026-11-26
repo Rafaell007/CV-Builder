@@ -493,7 +493,7 @@ If the skill is used in an active project:
 Project:
 
 - React
-- End Date: Present
+- End Date: Till now
 Result:
 
 `Last Used = Current Year`

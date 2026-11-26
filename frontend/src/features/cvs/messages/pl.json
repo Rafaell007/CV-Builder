@@ -61,7 +61,7 @@
   "update": {
     "title": "Edytuj CV",
     "close": "Zamknij",
-    "submit": "Aktualizuj",
+    "submit": "Zaktualizuj",
     "cancel": "Anuluj",
     "success": {
       "title": "CV zostało zaktualizowane",
@@ -158,7 +158,7 @@
       "close": "Zamknij",
       "skill": "Umiejętność",
       "mastery": "Poziom",
-      "submit": "Aktualizuj",
+      "submit": "Zaktualizuj",
       "cancel": "Anuluj",
       "errors": {
         "notFound": "Tej umiejętności nie ma już w CV.",
@@ -190,7 +190,7 @@
       "startDate": "Data rozpoczęcia",
       "endDate": "Data zakończenia"
     },
-    "present": "Obecnie",
+    "tillNow": "Obecnie",
     "dateMissing": "Brak daty",
     "responsibilities": "Obowiązki",
     "actions": {
@@ -283,7 +283,7 @@
     "update": {
       "title": "Zmień projekt",
       "close": "Zamknij",
-      "submit": "Aktualizuj",
+      "submit": "Zaktualizuj",
       "cancel": "Anuluj",
       "success": {
         "title": "Zmieniono projekt",

@@ -18,7 +18,7 @@ function setup(options: RenderWithProvidersOptions) {
 const typescript = sampleSkills[1]!;
 
 describe("useUpdateCvSkill", () => {
-  it("opens with the saved mastery and cannot save it (no meaningless request)", async () => {
+  it("opens with the saved mastery and cannot update it (no meaningless request)", async () => {
     // No mock for `updateCvSkill`: a request would fail the test.
     const { result } = setup({ mocks: [] });
 
@@ -29,7 +29,7 @@ describe("useUpdateCvSkill", () => {
     expect(result().error).toBeUndefined();
   });
 
-  it("can save once the mastery differs, and cannot again when it is set back", () => {
+  it("can update once the mastery differs, and cannot again when it is set back", () => {
     const { result } = setup({ mocks: [] });
     act(() => result().open(typescript));
 

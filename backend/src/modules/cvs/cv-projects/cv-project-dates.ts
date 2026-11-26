@@ -22,7 +22,7 @@ function toFieldError(field: string, reasons: CvProjectDateReason[]): FieldError
 
 /**
  * The dates of a CV project as stored: whole days (UTC), and an empty end date as `null`
- * ("Present"). They must stay within the dates of the project (CV projects page AC-15, AC-34, D25).
+ * ("Till now"). They must stay within the dates of the project (CV projects page AC-15, AC-34, D25).
  * The error lists every broken rule, each with a `reason` code, so the form can show all of them at once.
  */
 export function resolveCvProjectDates(

@@ -200,7 +200,7 @@ describe("cv projects", () => {
       expect(await sorted("endDate", "DESC")).toEqual(["Web Shop", "Bank App"]);
     });
 
-    it("puts Present (no end date) last when ascending and first when descending", async () => {
+    it("puts Till now (no end date) last when ascending and first when descending", async () => {
       await addedEntry(ann, { endDate: null });
       await addedEntry(ann, { projectId: shop, endDate: "2026-09-01" });
       const sorted = async (direction: string) =>
@@ -365,7 +365,7 @@ describe("cv projects", () => {
       expect(stored.roles.map(({ roleId }) => roleId).sort()).toEqual([developer, tester].sort());
     });
 
-    it("accepts Present as the end date and no responsibilities (AC-17)", async () => {
+    it("accepts Till now as the end date and no responsibilities (AC-17)", async () => {
       const entry = await addedEntry(ann, { endDate: null, responsibilities: "   " });
 
       expect(entry).toMatchObject({ endDate: null, responsibilities: null });

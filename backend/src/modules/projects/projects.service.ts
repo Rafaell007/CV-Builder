@@ -143,7 +143,7 @@ export class ProjectsService {
     }
   }
 
-  /** D25: CV project dates must stay within the project's dates. An empty CV end date means "Present". */
+  /** D25: CV project dates must stay within the project's dates. An empty CV end date means "Till now". */
   private async assertCvProjectsFitDates(
     tx: Prisma.TransactionClient,
     projectId: string,

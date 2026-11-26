@@ -31,7 +31,7 @@ const dayOf = (date: Date) => Date.UTC(date.getFullYear(), date.getMonth(), date
 /**
  * The rule of the CV project dates, as the backend checks it (`resolveCvProjectDates`): both dates stay inside
  * the days of the project, and the end is not earlier than the start (the same day is allowed). An empty end
- * date (Present) breaks nothing. Every broken rule is listed, in the order of the backend. Without a `range`
+ * date (Till now) breaks nothing. Every broken rule is listed, in the order of the backend. Without a `range`
  * (the project has no readable date) only the end-before-start rule can be checked and the backend decides the rest.
  */
 export function toCvProjectDateReasons(

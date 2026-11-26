@@ -33,7 +33,7 @@ export interface CvProjectsTableProps {
  * The projects of a CV as a table: Name and Domain (from the catalog project), Start Date and End Date (from the CV),
  * and a line under each row with the description of the catalog project and the responsibilities of the CV as tags.
  * Name, Start Date and End Date sort on the backend; the table never sorts the rows it holds.
- * An empty end date shows Present. Each row has a three-dot menu with Update and Delete.
+ * An empty end date shows Till now. Each row has a three-dot menu with Update and Delete.
  */
 export function CvProjectsTable({
   projects,
@@ -83,7 +83,7 @@ export function CvProjectsTable({
       id: "endDate",
       header: t("columns.endDate"),
       sortField: CV_PROJECT_SORT_FIELDS.endDate,
-      cell: (item) => (item.endDate === null ? t("present") : renderDate(item.endDate)),
+      cell: (item) => (item.endDate === null ? t("tillNow") : renderDate(item.endDate)),
     },
   ];
 
