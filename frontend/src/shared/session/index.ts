@@ -12,3 +12,4 @@ export type { RouteKind } from "./utils";
 export { redirectToSignIn } from "./redirectToSignIn";
 export { refreshSession } from "./refreshSession";
 export type { RefreshOutcome } from "./refreshSession";
+export { retryImageAfterRefresh } from "./retryImageAfterRefresh";

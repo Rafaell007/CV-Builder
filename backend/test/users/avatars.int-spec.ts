@@ -217,6 +217,15 @@ describe("avatars REST", () => {
       await remove(null, ann.id).expect(401);
     });
 
+    it("answers HEAD like GET, so the frontend can ask why an image failed to load", async () => {
+      await upload(ann, ann.id, PNG).expect(204);
+      const head = (who: Who | null) =>
+        request(app.getHttpServer()).head(avatarPath(ann.id)).set("Cookie", cookiesOf(who));
+
+      await head(null).expect(401);
+      await head(ben).expect(200);
+    });
+
     it("answers 400 for an id that is not a UUID", async () => {
       await download(ann, "not-a-uuid").expect(400);
       await upload(ann, "not-a-uuid", PNG).expect(400);

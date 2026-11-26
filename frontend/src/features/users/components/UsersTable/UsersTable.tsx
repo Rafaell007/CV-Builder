@@ -10,6 +10,7 @@ import {
 } from "@/shared/components";
 import { DESKTOP_MIN_WIDTH } from "@/shared/constants";
 import { Link } from "@/shared/i18n";
+import { retryImageAfterRefresh } from "@/shared/session";
 import { USER_SORT_FIELDS } from "../../users.constants";
 import type { UserListItem } from "../../users.types";
 import { getUserDisplayName } from "@/shared/utils";
@@ -75,7 +76,11 @@ export function UsersTable({
       hideHeader: true,
       cell: (user) => (
         <span className={styles.avatar} aria-hidden="true">
-          <Avatar name={getUserDisplayName(user)} src={user.avatarUrl ?? null} />
+          <Avatar
+            name={getUserDisplayName(user)}
+            src={user.avatarUrl ?? null}
+            retryImage={retryImageAfterRefresh}
+          />
         </span>
       ),
     },

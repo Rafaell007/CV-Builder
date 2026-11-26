@@ -1,5 +1,6 @@
 import { Avatar } from "@/shared/components/Avatar";
 import { CloseIcon } from "@/shared/components/icons";
+import { retryImageAfterRefresh } from "@/shared/session";
 import styles from "./ProfileAvatar.module.css";
 
 export interface ProfileAvatarProps {
@@ -28,7 +29,7 @@ export function ProfileAvatar({
 }: ProfileAvatarProps) {
   return (
     <div className={styles.frame}>
-      <Avatar name={name} src={src} size="large" />
+      <Avatar name={name} src={src} size="large" retryImage={retryImageAfterRefresh} />
       {onRemove && (
         <button
           type="button"
