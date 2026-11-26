@@ -61,7 +61,7 @@
   "update": {
     "title": "Edytuj CV",
     "close": "Zamknij",
-    "submit": "Zapisz",
+    "submit": "Zaktualizuj",
     "cancel": "Anuluj",
     "success": {
       "title": "CV zostało zaktualizowane",
@@ -283,7 +283,7 @@
     "update": {
       "title": "Zmień projekt",
       "close": "Zamknij",
-      "submit": "Zapisz",
+      "submit": "Zaktualizuj",
       "cancel": "Anuluj",
       "success": {
         "title": "Zmieniono projekt",

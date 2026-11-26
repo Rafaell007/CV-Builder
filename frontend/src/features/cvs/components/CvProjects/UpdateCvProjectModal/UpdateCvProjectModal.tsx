@@ -8,7 +8,7 @@ export interface UpdateCvProjectModalProps {
   updating: UseUpdateCvProjectResult;
 }
 
-/** The Update project modal: the project fields, filled with the current data, and SAVE and CANCEL. SAVE waits for a change (page 23, Update Project). */
+/** The Update project modal: the project fields, filled with the current data, and UPDATE and CANCEL. UPDATE waits for a change (page 23, Update Project). */
 export function UpdateCvProjectModal({ updating }: UpdateCvProjectModalProps) {
   const t = useTranslations("cvs.projects.update");
   const { form, isOpen, setOpen, submit } = updating;

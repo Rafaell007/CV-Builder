@@ -54,23 +54,23 @@ describe("UpdateCvModal", () => {
     );
   });
 
-  it("keeps SAVE disabled until something changes", async () => {
+  it("keeps UPDATE disabled until something changes", async () => {
     const { user } = await open();
-    expect(screen.getByRole("button", { name: "Save" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Update" })).toBeDisabled();
 
     await renameTo(user, "Backend CV 2");
 
-    expect(screen.getByRole("button", { name: "Save" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Update" })).toBeEnabled();
   });
 
-  it("shows the same messages as Create CV and disables SAVE", async () => {
+  it("shows the same messages as Create CV and disables UPDATE", async () => {
     const { user } = await open();
 
     await user.clear(screen.getByRole("textbox", { name: "Name" }));
     await user.click(screen.getByRole("dialog"));
 
     expect(await screen.findByText("Name is required")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Save" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Update" })).toBeDisabled();
   });
 
   it("saves the CV with its id, then closes and shows a success toast", async () => {
@@ -78,7 +78,7 @@ describe("UpdateCvModal", () => {
     const { user } = await open({ mocks: [updateCvMock(input)] });
 
     await renameTo(user, "Backend CV 2");
-    await user.click(screen.getByRole("button", { name: "Save" }));
+    await user.click(screen.getByRole("button", { name: "Update" }));
 
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
     expect(await screen.findByText("CV updated")).toBeInTheDocument();
@@ -88,7 +88,7 @@ describe("UpdateCvModal", () => {
     const { user } = await open({ mocks: [updateCvNetworkErrorMock(input)] });
 
     await renameTo(user, "Backend CV 2");
-    await user.click(screen.getByRole("button", { name: "Save" }));
+    await user.click(screen.getByRole("button", { name: "Update" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "Something went wrong. Please try again later",
@@ -104,7 +104,7 @@ describe("UpdateCvModal", () => {
     const { user } = await open({ mocks: [updateCvInvalidMock(input, "name")] });
 
     await renameTo(user, "Backend CV 2");
-    await user.click(screen.getByRole("button", { name: "Save" }));
+    await user.click(screen.getByRole("button", { name: "Update" }));
 
     expect(await screen.findByText("The server did not accept this value")).toBeInTheDocument();
     // The field error is the only message: the general one stays hidden.

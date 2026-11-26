@@ -217,7 +217,7 @@ describe("CvProjects", () => {
       return { ...view, dialog };
     }
 
-    it("shows the current data, with the fields of the project disabled and SAVE disabled (AC-11 to AC-13, AC-19, AC-20)", async () => {
+    it("shows the current data, with the fields of the project disabled and UPDATE disabled (AC-11 to AC-13, AC-19, AC-20)", async () => {
       const { dialog } = await openUpdate({ mocks: [cvProjectsMock(), projectRolesMock()] });
 
       expect(within(dialog).getByRole("combobox", { name: /Name/ })).toBeDisabled();
@@ -229,7 +229,7 @@ describe("CvProjects", () => {
       expect(within(dialog).getByRole("textbox", { name: "Responsibilities" })).toHaveValue(
         "Built the pages.",
       );
-      expect(within(dialog).getByRole("button", { name: "Save" })).toBeDisabled();
+      expect(within(dialog).getByRole("button", { name: "Update" })).toBeDisabled();
     });
 
     it("saves a changed responsibilities text, closes the modal and shows the list again (AC-18, AC-41)", async () => {
@@ -253,7 +253,7 @@ describe("CvProjects", () => {
       const field = within(dialog).getByRole("textbox", { name: "Responsibilities" });
       await user.clear(field);
       await user.type(field, "Built the pages and fixed bugs.");
-      await user.click(within(dialog).getByRole("button", { name: "Save" }));
+      await user.click(within(dialog).getByRole("button", { name: "Update" }));
 
       await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
       expect(await screen.findByText("Built the pages and fixed bugs.")).toBeInTheDocument();

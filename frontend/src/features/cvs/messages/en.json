@@ -61,7 +61,7 @@
   "update": {
     "title": "Update CV",
     "close": "Close",
-    "submit": "Save",
+    "submit": "Update",
     "cancel": "Cancel",
     "success": {
       "title": "CV updated",
@@ -283,7 +283,7 @@
     "update": {
       "title": "Update project",
       "close": "Close",
-      "submit": "Save",
+      "submit": "Update",
       "cancel": "Cancel",
       "success": {
         "title": "Project updated",
