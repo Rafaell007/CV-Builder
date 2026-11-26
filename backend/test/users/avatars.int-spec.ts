@@ -119,6 +119,17 @@ describe("avatars REST", () => {
       expect(response.headers["content-type"]).toBe("image/png");
     });
 
+    it("accepts an image the browser sent without a type (e.g. a .jfif file)", async () => {
+      await upload(ann, ann.id, JPG, {
+        filename: "photo.jfif",
+        contentType: "application/octet-stream",
+      }).expect(204);
+
+      const response = await download(ann, ann.id).expect(200);
+
+      expect(response.headers["content-type"]).toBe("image/jpeg");
+    });
+
     it("answers 404 without cache headers for a user without an avatar", async () => {
       await remove(ben, ben.id).expect(204);
 

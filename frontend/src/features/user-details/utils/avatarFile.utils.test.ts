@@ -7,12 +7,20 @@ describe("checkAvatarFile", () => {
     expect(checkAvatarFile({ type, size: 1024 })).toBe("ok");
   });
 
-  it.each(["image/webp", "image/svg+xml", "application/pdf", "text/plain", ""])(
+  it.each(["image/webp", "image/svg+xml", "application/pdf", "text/plain"])(
     "refuses the type %j",
     (type) => {
       expect(checkAvatarFile({ type, size: 1024 })).toBe("wrongType");
     },
   );
+
+  it("lets a file of unknown type through, so the backend checks its content", () => {
+    expect(checkAvatarFile({ type: "", size: 1024 })).toBe("ok");
+  });
+
+  it("still refuses a file of unknown type over 5 MB", () => {
+    expect(checkAvatarFile({ type: "", size: AVATAR_MAX_BYTES + 1 })).toBe("tooLarge");
+  });
 
   it("accepts a file of exactly 5 MB", () => {
     expect(checkAvatarFile({ type: "image/png", size: AVATAR_MAX_BYTES })).toBe("ok");
