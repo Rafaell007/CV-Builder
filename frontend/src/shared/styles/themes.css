@@ -105,6 +105,8 @@
   --color-avatar-bg: var(--palette-grey-400);
   /* Open-profile arrow at the end of a Users row (Figma: #626262 light, #AEAEAE dark) */
   --color-row-arrow: var(--palette-grey-500);
+  /* Avatar upload hint. Figma: main text at 60%; in light that is 3.7:1, so the secondary text (docs/design-tokens.md) */
+  --color-avatar-hint: var(--palette-grey-500);
 
   /* CV skill level bars: fill and track per level (docs/design-tokens.md › CV Skills) */
   /* Filled tag (CV projects list: the responsibilities under a row; Figma frame-46, light #E2E2E4, dark #626262) */
@@ -189,6 +191,8 @@
   --color-sort-icon: var(--palette-grey-400);
   --color-avatar-bg: var(--palette-grey-500);
   --color-row-arrow: var(--palette-grey-400);
+  /* Figma exact: main text at 60% (5.5:1 on the dark page) */
+  --color-avatar-hint: color-mix(in srgb, var(--palette-grey-100) 60%, transparent);
 
   --color-tag-bg: var(--palette-grey-500);
 
@@ -268,6 +272,7 @@
     --color-sort-icon: var(--palette-grey-400);
     --color-avatar-bg: var(--palette-grey-500);
     --color-row-arrow: var(--palette-grey-400);
+    --color-avatar-hint: color-mix(in srgb, var(--palette-grey-100) 60%, transparent);
 
     --color-tag-bg: var(--palette-grey-500);
 
