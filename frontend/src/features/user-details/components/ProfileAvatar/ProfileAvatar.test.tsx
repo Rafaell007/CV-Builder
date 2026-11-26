@@ -44,3 +44,55 @@ describe("ProfileAvatar", () => {
     expect(onRemove).not.toHaveBeenCalled();
   });
 });
+
+describe("ProfileAvatar focus", () => {
+  it("moves focus to the photo when the focused Remove button goes away", () => {
+    const { rerender } = renderWithProviders(
+      <ProfileAvatar name={NAME} src={PHOTO} removeLabel={REMOVE} onRemove={vi.fn()} />,
+    );
+    screen.getByRole("button", { name: REMOVE }).focus();
+
+    rerender(<ProfileAvatar name={NAME} src={null} removeLabel={REMOVE} />);
+
+    expect(screen.getByRole("img", { name: NAME }).parentElement).toHaveFocus();
+  });
+
+  it("keeps focus where it is when the button goes away without focus", () => {
+    const { rerender } = renderWithProviders(
+      <>
+        <button type="button">Elsewhere</button>
+        <ProfileAvatar name={NAME} src={PHOTO} removeLabel={REMOVE} onRemove={vi.fn()} />
+      </>,
+    );
+    screen.getByRole("button", { name: "Elsewhere" }).focus();
+
+    rerender(
+      <>
+        <button type="button">Elsewhere</button>
+        <ProfileAvatar name={NAME} src={null} removeLabel={REMOVE} />
+      </>,
+    );
+
+    expect(screen.getByRole("button", { name: "Elsewhere" })).toHaveFocus();
+  });
+
+  it("keeps focus on the button while it stays (e.g. disabled during the request)", () => {
+    const { rerender } = renderWithProviders(
+      <ProfileAvatar name={NAME} src={PHOTO} removeLabel={REMOVE} onRemove={vi.fn()} />,
+    );
+    const button = screen.getByRole("button", { name: REMOVE });
+    button.focus();
+
+    rerender(
+      <ProfileAvatar
+        name={NAME}
+        src={PHOTO}
+        removeLabel={REMOVE}
+        onRemove={vi.fn()}
+        disabled={false}
+      />,
+    );
+
+    expect(button).toHaveFocus();
+  });
+});

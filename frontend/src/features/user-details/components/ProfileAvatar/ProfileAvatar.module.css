@@ -7,6 +7,13 @@
   flex: none;
   width: 120px;
   height: 120px;
+  border-radius: var(--radius-round);
+}
+
+/* Prediction: not drawn in Figma. Focus lands here after the photo is removed by keyboard; the Button ring. */
+.frame:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
 }
 
 .remove {

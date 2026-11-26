@@ -484,6 +484,6 @@ Avatar upload (2026-11-26, KAN-106; read from 1440 › USER PROFILE, 768 › USE
 
 Predictions for KAN-106 (2026-11-26): not drawn in Figma, chosen by us. Fix here and in the CSS when a better source appears.
 
-- Keyboard focus on the upload row and the Remove button: the Button ring (2px outline `--color-focus-ring`, offset 2px, `:focus-visible`).
+- Keyboard focus on the upload row and the Remove button: the Button ring (2px outline `--color-focus-ring`, offset 2px, `:focus-visible`). After a removal by keyboard, focus moves to the photo (the button is gone); the photo gets the same ring, round.
 - While an upload or a removal runs: the upload row turns `--color-icon-disabled` with no hover line; the Remove button gets the disabled fill. No progress UI; the old photo stays until the new one loads.
 - No crop or confirm dialog (none drawn).
