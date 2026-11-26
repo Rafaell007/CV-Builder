@@ -1,4 +1,4 @@
-import { act, screen } from "@testing-library/react";
+﻿import { act, screen } from "@testing-library/react";
 import { Suspense } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "@/shared/testing";
@@ -19,15 +19,7 @@ vi.mock("@/shared/i18n", async (importOriginal) =>
 );
 
 const PHOTO = "/api/users/10/avatar?v=1";
-
-/** The same `user` answer, with a photo. */
-const withAvatar = (
-  mock: ReturnType<typeof userMock>,
-  avatarUrl: string,
-): ReturnType<typeof userMock> => {
-  const data = mock.result as { data: { user: Record<string, unknown> } };
-  return { ...mock, result: { data: { user: { ...data.data.user, avatarUrl } } } };
-};
+const withPhoto = () => userMock("10", undefined, undefined, PHOTO);
 
 // The tab reads `me`, `user(id)` and the form options with useSuspenseQuery; on the page the route preloads them on
 // the server. React 19 shows a suspended tree only inside an awaited act(); without it the fallback never leaves.
@@ -135,7 +127,7 @@ describe("UserProfile", () => {
   });
 
   it("shows the photo and lets an Admin upload or remove it", async () => {
-    await setup(withAvatar(userMock("10"), PHOTO), "en", "ADMIN");
+    await setup(withPhoto(), "en", "ADMIN");
 
     const avatar = await screen.findByRole("img", { name: "Emma Employee" });
     expect(avatar.querySelector("img")).toHaveAttribute("src", PHOTO);
@@ -153,7 +145,7 @@ describe("UserProfile", () => {
   });
 
   it("shows another employee's photo with no upload and no Remove", async () => {
-    await setup(withAvatar(userMock("10"), PHOTO));
+    await setup(withPhoto());
 
     const avatar = await screen.findByRole("img", { name: "Emma Employee" });
     expect(avatar.querySelector("img")).toHaveAttribute("src", PHOTO);
@@ -162,7 +154,7 @@ describe("UserProfile", () => {
   });
 
   it("writes the avatar texts in the language of the page", async () => {
-    await setup(withAvatar(userMock("10"), PHOTO), "pl", "ADMIN");
+    await setup(withPhoto(), "pl", "ADMIN");
 
     expect(await screen.findByLabelText("Prześlij zdjęcie awatara")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Usuń awatar" })).toBeInTheDocument();

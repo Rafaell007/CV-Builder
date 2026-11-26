@@ -36,9 +36,13 @@ export const meMock = (
 
 type CatalogItem = { id: string; name: string } | null;
 
+/** A photo for tests and stories: a grey 120×120 SVG, so it loads without the backend and the red × shows on it. */
+export const AVATAR_PHOTO_MOCK =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Crect width='120' height='120' fill='%23808080'/%3E%3C/svg%3E";
+
 /**
  * MockedProvider response of the `user` query: the employee of the page. Names are `null` for a user who signed up;
- * department and position are `null` until someone sets them.
+ * department and position are `null` until someone sets them; `avatarUrl` is `null` (no photo) unless told.
  */
 export const userMock = (
   id: string,
@@ -50,6 +54,7 @@ export const userMock = (
     department: null,
     position: null,
   },
+  avatarUrl: string | null = null,
 ): MockLink.MockedResponse => ({
   request: { query: UserDocument, variables: { id } },
   result: {
@@ -61,7 +66,7 @@ export const userMock = (
         ...name,
         role: "USER",
         createdAt: "2024-01-14T10:00:00.000Z",
-        avatarUrl: null,
+        avatarUrl,
         department: assigned.department && { __typename: "Department", ...assigned.department },
         position: assigned.position && { __typename: "Position", ...assigned.position },
       },
