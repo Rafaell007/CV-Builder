@@ -97,8 +97,9 @@ export const Polish: Story = {
 const EXPORT_GAP_PX = 16;
 
 /**
- * A long name in Polish: the label `EKSPORTUJ PDF` is wider than `EXPORT PDF`, so the name must still end before the
- * button with the full gap (KAN-178). Measured in the real browser, because the layout needs real text widths.
+ * A long name in Polish: the label `EKSPORTUJ PDF` is wider than `EXPORT PDF`, so the room that the header keeps free
+ * must still leave the full gap between the name and the button (KAN-178). Measured in the real browser, after the
+ * fonts load, because the button width comes from real text widths.
  */
 export const PolishLongName: Story = {
   globals: { locale: "pl" },
@@ -118,6 +119,7 @@ export const PolishLongName: Story = {
   play: async ({ canvas }) => {
     const name = await canvas.findByRole("heading", { name: /Konstantynopolitańczykiewicz/ });
     const button = canvas.getByRole("button", { name: "EKSPORTUJ PDF" });
+    await document.fonts.ready;
 
     const gap = button.getBoundingClientRect().left - name.getBoundingClientRect().right;
     await expect(gap).toBeGreaterThanOrEqual(EXPORT_GAP_PX);

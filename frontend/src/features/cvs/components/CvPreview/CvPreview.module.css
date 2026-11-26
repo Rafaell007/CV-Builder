@@ -4,7 +4,7 @@
   /* Room that the name keeps free for the EXPORT PDF button, which hangs over its row as in Figma. It must be at
      least as wide as the widest label: `EKSPORTUJ PDF` in Polish is 176px (`EXPORT PDF` is 160px). The story
      PolishLongName checks the gap in a real browser. */
-  --cv-preview-export-width: 12rem;
+  --cv-preview-export-width: 192px;
   /* The document and the button start 34px under the tabs in Figma (y 112 → 146); CvLayout gives 24. */
   padding-top: 10px;
 }
