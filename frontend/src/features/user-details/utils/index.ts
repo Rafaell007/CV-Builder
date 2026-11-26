@@ -6,6 +6,7 @@ export {
   isUserNotFound,
   toUserTabPath,
 } from "./userDetails.utils";
+export { type AvatarFileCheck, checkAvatarFile } from "./avatarFile.utils";
 export {
   hasProfileChanged,
   toProfileCatalog,
