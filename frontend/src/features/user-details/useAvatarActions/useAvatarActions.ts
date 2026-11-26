@@ -5,9 +5,7 @@ import { useRef } from "react";
 import { useToast } from "@/shared/components";
 import { useRemoveAvatar, type AvatarRemoveOutcome } from "../useRemoveAvatar";
 import { useUploadAvatar, type AvatarUploadOutcome } from "../useUploadAvatar";
-import { AVATAR_MAX_BYTES } from "../user-details.constants";
-
-const AVATAR_MAX_MB = AVATAR_MAX_BYTES / (1024 * 1024);
+import { AVATAR_MAX_MB } from "../user-details.constants";
 
 export type UseAvatarActionsResult = {
   /** True while an upload or a removal runs: the upload control and the Remove button are disabled. */

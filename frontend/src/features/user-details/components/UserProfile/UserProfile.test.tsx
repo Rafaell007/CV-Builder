@@ -18,6 +18,17 @@ vi.mock("@/shared/i18n", async (importOriginal) =>
   ),
 );
 
+const PHOTO = "/api/users/10/avatar?v=1";
+
+/** The same `user` answer, with a photo. */
+const withAvatar = (
+  mock: ReturnType<typeof userMock>,
+  avatarUrl: string,
+): ReturnType<typeof userMock> => {
+  const data = mock.result as { data: { user: Record<string, unknown> } };
+  return { ...mock, result: { data: { user: { ...data.data.user, avatarUrl } } } };
+};
+
 // The tab reads `me`, `user(id)` and the form options with useSuspenseQuery; on the page the route preloads them on
 // the server. React 19 shows a suspended tree only inside an awaited act(); without it the fallback never leaves.
 // The signed-in user of `meMock` has id "1"; the page shows user "10".
@@ -121,6 +132,40 @@ describe("UserProfile", () => {
 
     expect(await screen.findByRole("button", { name: "Update" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Verify email" })).toBeInTheDocument();
+  });
+
+  it("shows the photo and lets an Admin upload or remove it", async () => {
+    await setup(withAvatar(userMock("10"), PHOTO), "en", "ADMIN");
+
+    const avatar = await screen.findByRole("img", { name: "Emma Employee" });
+    expect(avatar.querySelector("img")).toHaveAttribute("src", PHOTO);
+    expect(screen.getByLabelText("Upload avatar image")).toHaveAccessibleDescription(
+      "png, jpg or gif no more than 5MB",
+    );
+    expect(screen.getByRole("button", { name: "Remove avatar" })).toBeInTheDocument();
+  });
+
+  it("offers upload but no Remove when there is no photo", async () => {
+    await setup(userMock("10"), "en", "ADMIN");
+
+    expect(await screen.findByLabelText("Upload avatar image")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Remove avatar" })).not.toBeInTheDocument();
+  });
+
+  it("shows another employee's photo with no upload and no Remove", async () => {
+    await setup(withAvatar(userMock("10"), PHOTO));
+
+    const avatar = await screen.findByRole("img", { name: "Emma Employee" });
+    expect(avatar.querySelector("img")).toHaveAttribute("src", PHOTO);
+    expect(screen.queryByLabelText("Upload avatar image")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Remove avatar" })).not.toBeInTheDocument();
+  });
+
+  it("writes the avatar texts in the language of the page", async () => {
+    await setup(withAvatar(userMock("10"), PHOTO), "pl", "ADMIN");
+
+    expect(await screen.findByLabelText("Prześlij zdjęcie awatara")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Usuń awatar" })).toBeInTheDocument();
   });
 
   it("offers no VERIFY EMAIL to an Admin on another employee's profile", async () => {

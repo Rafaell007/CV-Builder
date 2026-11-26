@@ -11,6 +11,34 @@
   text-align: center;
 }
 
+/*
+ * Figma 1440 › USER PROFILE (read 2026-11-26): the avatar (x 601) and the upload group sit in one row, the row centred
+ * (≈ x 817, the form's centre 819). Read-only profile: the avatar alone, centred. Avatar right edge 721 → upload icon
+ * 792: 71px. The upload group's top is the avatar's top + 28.
+ */
+.avatarRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 71px;
+  text-align: left;
+}
+
+.upload {
+  margin-top: 28px;
+}
+
+/* 768 › USER PROFILE: avatar right edge 334 → hint 359 (the group's left edge): 25px; group top = avatar top + 27. */
+@media (max-width: 1023.98px) {
+  .avatarRow {
+    gap: 25px;
+  }
+
+  .upload {
+    margin-top: 27px;
+  }
+}
+
 /* Avatar bottom 244 → name top 276: 32px. Heading 400 24/32. */
 .name {
   margin: var(--space-8) 0 0;

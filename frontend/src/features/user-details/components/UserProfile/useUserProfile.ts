@@ -37,6 +37,7 @@ export function useUserProfile(userId: string) {
     canEdit: canEditProfile(meData.me, user.id),
     canVerifyEmail: canVerifyEmail(meData.me, user.id),
     user,
+    avatarUrl: user.avatarUrl ?? null,
     memberSince: memberSince === null ? null : t("memberSince", { date: memberSince }),
   };
 }

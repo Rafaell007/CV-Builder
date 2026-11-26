@@ -9,6 +9,9 @@
   "profile": {
     "memberSince": "A member since {date}",
     "avatar": {
+      "upload": "Upload avatar image",
+      "hint": "png, jpg or gif no more than {max}MB",
+      "remove": "Remove avatar",
       "uploaded": "Avatar updated",
       "removed": "Avatar removed",
       "errors": {

@@ -9,6 +9,9 @@
   "profile": {
     "memberSince": "Członek od {date}",
     "avatar": {
+      "upload": "Prześlij zdjęcie awatara",
+      "hint": "png, jpg lub gif, maksymalnie {max} MB",
+      "remove": "Usuń awatar",
       "uploaded": "Awatar zaktualizowany",
       "removed": "Awatar usunięty",
       "errors": {
