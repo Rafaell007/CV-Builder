@@ -1,7 +1,6 @@
 /*
  * Figma Design system › Avatar Uploader › "Remove image" (read 2026-11-26): a 24×24 red circle (#c63031, radius 12)
- * with a white 12×12 cross, at the top-right corner of the 120×120 photo. Prediction: the exact offset from the
- * corner was not read; the button's box sits on the photo's box corner.
+ * with a #f5f5f7 12×12 cross, flush in the top-right corner of the 120×120 photo (offset 0 / 0, read 2026-11-26).
  */
 .frame {
   position: relative;

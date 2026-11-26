@@ -479,12 +479,11 @@ Avatar upload (2026-11-26, KAN-106; read from 1440 › USER PROFILE, 768 › USE
 - Upload group: 35×35 icon frame (Material `file_upload`, 23×23 glyph) and label 16 apart; label 500 20/32, letter spacing 0.15, 6 under the icon's top; hint 400 16/28, letter spacing 0.15, right under the row. Hint left edge: 1440 +5 from the icon, 768 −7. Text and icon: main text colour.
 - Hint colour: Figma draws the main text colour at 60% layer opacity. Light uses `--color-text-secondary` (#626262) instead, because 60% gives 3.7:1, below 4.5:1 (accessibility wins). Dark keeps Figma (#F5F5F7 at 60%, 5.5:1). Token `--color-avatar-hint`.
 - "Adding" (Design system) = a 1px line in the main text colour under the icon and label row; used as the hover state.
-- Remove = Design system "Remove image": red circle 24×24 (#C63031, radius 12) with a white 12×12 cross, at the top-right corner of the photo; only with a photo and when the user may edit. Shown on hover and keyboard focus, always on touch screens.
+- Remove = Design system "Remove image": red circle 24×24 (#C63031, radius 12) with a #F5F5F7 12×12 cross, flush in the photo's top-right corner (offset 0 / 0, read 2026-11-26; Figma's 1px inside stroke in the same red is not built, it looks the same); only with a photo and when the user may edit. Shown on hover and keyboard focus, always on touch screens.
 - Errors (wrong type, too big, server error) and success ("Avatar updated", "Avatar removed") use the Toast (Design system › Notifications), the only error UI drawn.
 
 Predictions for KAN-106 (2026-11-26): not drawn in Figma, chosen by us. Fix here and in the CSS when a better source appears.
 
 - Keyboard focus on the upload row and the Remove button: the Button ring (2px outline `--color-focus-ring`, offset 2px, `:focus-visible`).
 - While an upload or a removal runs: the upload row turns `--color-icon-disabled` with no hover line; the Remove button gets the disabled fill. No progress UI; the old photo stays until the new one loads.
-- Remove button position: its box sits on the photo's box corner (top 0, right 0); the exact offset was not read.
 - No crop or confirm dialog (none drawn).
