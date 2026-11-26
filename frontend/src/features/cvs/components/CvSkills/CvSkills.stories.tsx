@@ -141,7 +141,7 @@ export const UpdateSkillModal: Story = {
     );
     await expect(dialog.getByRole("combobox", { name: /Skill/ })).toBeDisabled();
     await expect(dialog.getByRole("combobox", { name: /Mastery/ })).toHaveTextContent("Advanced");
-    await expect(dialog.getByRole("button", { name: "Save" })).toBeDisabled();
+    await expect(dialog.getByRole("button", { name: "Update" })).toBeDisabled();
   },
 };
 

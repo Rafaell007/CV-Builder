@@ -158,7 +158,7 @@
       "close": "Close",
       "skill": "Skill",
       "mastery": "Mastery",
-      "submit": "Save",
+      "submit": "Update",
       "cancel": "Cancel",
       "errors": {
         "notFound": "This skill is not in the CV any more.",

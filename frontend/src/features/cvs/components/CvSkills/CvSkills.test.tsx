@@ -361,7 +361,7 @@ describe("CvSkills", () => {
       return { ...view, dialog };
     }
 
-    it("shows the current skill in a disabled field and keeps SAVE disabled until the mastery changes (AC-23, AC-24)", async () => {
+    it("shows the current skill in a disabled field and keeps UPDATE disabled until the mastery changes (AC-23, AC-24)", async () => {
       const { dialog } = await openUpdateModal({ mocks: [cvSkillsMock()] });
 
       const skill = within(dialog).getByRole("combobox", { name: "Skill" });
@@ -370,17 +370,17 @@ describe("CvSkills", () => {
       expect(within(dialog).getByRole("combobox", { name: /Mastery/ })).toHaveTextContent(
         "Advanced",
       );
-      expect(within(dialog).getByRole("button", { name: "Save" })).toBeDisabled();
+      expect(within(dialog).getByRole("button", { name: "Update" })).toBeDisabled();
     });
 
-    it("saves the new mastery and shows it in the list after the backend answered (AC-25)", async () => {
+    it("updates the mastery and shows it in the list after the backend answered (AC-25)", async () => {
       const { user, dialog } = await openUpdateModal({
         mocks: [cvSkillsMock(), updateCvSkillMock(typescript, "EXPERT")],
       });
       await user.click(within(dialog).getByRole("combobox", { name: /Mastery/ }));
       await user.click(screen.getByRole("option", { name: "Expert" }));
 
-      await user.click(within(dialog).getByRole("button", { name: "Save" }));
+      await user.click(within(dialog).getByRole("button", { name: "Update" }));
 
       await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
       expect(
@@ -388,7 +388,7 @@ describe("CvSkills", () => {
       ).toBeInTheDocument();
     });
 
-    it("saves No mastery, shows it as chosen and shows it in the list", async () => {
+    it("updates to No mastery, shows it as chosen and shows it in the list", async () => {
       const { user, dialog } = await openUpdateModal({
         mocks: [cvSkillsMock(), updateCvSkillMock(typescript, "NONE")],
       });
@@ -397,7 +397,7 @@ describe("CvSkills", () => {
       await user.click(screen.getByRole("option", { name: "No mastery" }));
       expect(mastery).toHaveTextContent("No mastery");
 
-      await user.click(within(dialog).getByRole("button", { name: "Save" }));
+      await user.click(within(dialog).getByRole("button", { name: "Update" }));
 
       await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
       expect(
@@ -405,17 +405,17 @@ describe("CvSkills", () => {
       ).toBeInTheDocument();
     });
 
-    it("keeps SAVE disabled when the mastery is changed back to the saved one", async () => {
+    it("keeps UPDATE disabled when the mastery is changed back to the saved one", async () => {
       const { user, dialog } = await openUpdateModal({ mocks: [cvSkillsMock()] });
       const mastery = within(dialog).getByRole("combobox", { name: /Mastery/ });
 
       await user.click(mastery);
       await user.click(screen.getByRole("option", { name: "Expert" }));
-      expect(within(dialog).getByRole("button", { name: "Save" })).toBeEnabled();
+      expect(within(dialog).getByRole("button", { name: "Update" })).toBeEnabled();
       await user.click(mastery);
       await user.click(screen.getByRole("option", { name: "Advanced" }));
 
-      expect(within(dialog).getByRole("button", { name: "Save" })).toBeDisabled();
+      expect(within(dialog).getByRole("button", { name: "Update" })).toBeDisabled();
     });
 
     it("keeps the chosen mastery and the old list when the request fails (AC-42, AC-43)", async () => {
@@ -426,7 +426,7 @@ describe("CvSkills", () => {
       await user.click(mastery);
       await user.click(screen.getByRole("option", { name: "Expert" }));
 
-      await user.click(within(dialog).getByRole("button", { name: "Save" }));
+      await user.click(within(dialog).getByRole("button", { name: "Update" }));
 
       expect(await within(dialog).findByRole("alert")).toHaveTextContent("Something went wrong");
       expect(mastery).toHaveTextContent("Expert");
