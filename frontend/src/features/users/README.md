@@ -6,7 +6,7 @@ The `/users` page, titled Employees (PLAN S6.1, KAN-104): the list of all users.
 - List state and variables: the shared `useListState(DEFAULT_USERS_SORT)` and `toListVariables` (`@/shared/lists`), as on the Projects page. A new search or sort goes back to page 1. Nothing is filtered or sorted in the frontend.
 - `useUsers`: the `Users` query (`useUsers/users.graphql`) through the shared `usePagedList`; returns `users`, `total`, `loading`, `failed`, `retry`.
 - **Server render (PLAN D6, KAN-172).** The route prefetches `me` and the first page (`USERS_FIRST_PAGE`, exported: `firstPageVariables(DEFAULT_USERS_SORT)` of `@/shared/lists`) with `PrefetchQuery` (`@/shared/apollo/server`), then renders `Users`. `useCurrentUser` and `useUsers` find both in the Apollo cache, so the server HTML already has the rows, CREATE USER and the row actions of the role, and the browser does not ask again. Search, sort and page changes go to the backend from the browser. The rows still wait for the current user (`loading || userLoading`), so an admin never sees the employee arrows first. E2E: `e2e/users/users.spec.ts`, "as the server renders it".
-- `components/UsersTable`: the shared `DataTable`. Columns: avatar (initials from the shared `Avatar`; the header text "Avatar" is for screen readers only, `hideHeader`), First Name, Last Name, Email, Department, Position. Email and Position are hidden below 1024px (Figma tablet). An empty value (a user who signed up and never filled the profile) shows a dash with the screen reader text `Not filled`. `getUserDisplayName` (`@/shared/utils`) falls back to the email when a user has no name.
+- `components/UsersTable`: the shared `DataTable`. Columns: avatar (the shared `Avatar`: the photo from `avatarUrl`, KAN-106, else the initials; the header text "Avatar" is for screen readers only, `hideHeader`), First Name, Last Name, Email, Department, Position. Email and Position are hidden below 1024px (Figma tablet). An empty value (a user who signed up and never filled the profile) shows a dash with the screen reader text `Not filled`. `getUserDisplayName` (`@/shared/utils`) falls back to the email when a user has no name.
 - Search: the shared `SearchField` (100 characters). The backend matches each word in the first name, last name or email, without regard to case.
 - Sort: First Name, Last Name, Department and Position sort on the backend. The page starts by First Name ascending (`DEFAULT_USERS_SORT`). Empty names come last in ascending and first in descending order (PostgreSQL default).
 - Pagination: the shared `Pagination`, 10 users on a page (PLAN D19).
@@ -33,7 +33,6 @@ The `/users` page, titled Employees (PLAN S6.1, KAN-104): the list of all users.
 
 ## Known issues
 
-- **Avatar shows initials only.** There is no picture field until S6.3.
 - **A spaces-only edit enables UPDATE.** `isDirty` compares the untrimmed text. The same on every list page; the shared next ticket fixes it.
 - **Three copies of the last-row rule** (Projects, catalogs, Users) and of the delete flow hook: the shared next ticket moves them into shared code.
 - **Search, sort and page are not in the URL**, as on the other list pages.

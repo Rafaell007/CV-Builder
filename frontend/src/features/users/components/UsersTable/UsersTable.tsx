@@ -75,7 +75,7 @@ export function UsersTable({
       hideHeader: true,
       cell: (user) => (
         <span className={styles.avatar} aria-hidden="true">
-          <Avatar name={getUserDisplayName(user)} />
+          <Avatar name={getUserDisplayName(user)} src={user.avatarUrl ?? null} />
         </span>
       ),
     },

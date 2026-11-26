@@ -55,6 +55,30 @@ export const Admin: Story = {
   },
 };
 
+// A grey 40×40 SVG: loads without the backend.
+const PHOTO =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='%23808080'/%3E%3C/svg%3E";
+
+/** Photos mixed with initials, as the Figma list draws them. */
+export const WithPhotos: Story = {
+  parameters: {
+    apollo: {
+      mocks: [
+        meMock("ADMIN"),
+        fakeBackendMock(
+          sampleUsers.map((user, i) => (i % 2 ? user : { ...user, avatarUrl: PHOTO })),
+        ),
+      ],
+    },
+  },
+  play: async ({ canvas }) => {
+    // The avatar is hidden from screen readers (the name is in the next columns), so it is found by its tag.
+    const alphaRow = await canvas.findByRole("row", { name: /Alpha/ });
+    await expect(alphaRow.querySelector("img")).toHaveAttribute("src", PHOTO);
+    await expect(canvas.getByText("BT")).toBeInTheDocument();
+  },
+};
+
 /** An employee: no CREATE USER and no row menu; an arrow on each row opens the profile. */
 export const Employee: Story = {
   parameters: { apollo: { mocks: [meMock("USER"), fakeBackendMock(sampleUsers)] } },
