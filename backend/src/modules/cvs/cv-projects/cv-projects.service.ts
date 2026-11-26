@@ -191,7 +191,7 @@ function orderBy(
     case "startDate":
       return { startDate: direction };
     case "endDate":
-      // "Present" (no end date) counts as the latest end: last when ascending, first when descending.
+      // "Till now" (no end date) counts as the latest end: last when ascending, first when descending.
       return { endDate: { sort: direction, nulls: direction === "asc" ? "last" : "first" } };
   }
 }

@@ -227,7 +227,7 @@ describe("CvProjectsService.list", () => {
     ]);
   });
 
-  it("sorts Present (no end date) after the dates when ascending and before them when descending", async () => {
+  it("sorts Till now (no end date) after the dates when ascending and before them when descending", async () => {
     await service.list(USER, {
       cvId: "cv-1",
       sort: { field: "endDate", direction: SortDirection.ASC },
@@ -388,7 +388,7 @@ describe("CvProjectsService.add", () => {
     });
   });
 
-  it("stores Present as no end date and empty responsibilities as no value", async () => {
+  it("stores Till now as no end date and empty responsibilities as no value", async () => {
     await service.add(USER, addInput({ endDate: null, responsibilities: "" }));
 
     expect(firstCall<{ data: unknown }>(prisma.cvProject.create).data).toMatchObject({

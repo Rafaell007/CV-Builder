@@ -5,7 +5,7 @@ import { ProjectRole } from "../../../projects/project-roles/models/project-role
 /**
  * A project in one CV (CV projects page). The catalog data (name, domain, description,
  * environment, project dates) is in `project`. The person's own dates, roles and responsibilities
- * belong to this entry. An empty `endDate` means "Present".
+ * belong to this entry. An empty `endDate` means "Till now".
  */
 @ObjectType()
 export class CvProject {
