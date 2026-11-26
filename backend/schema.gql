@@ -459,6 +459,7 @@ input UpdateUserInput {
 }
 
 type User {
+  avatarUrl: String
   createdAt: DateTime!
   department: Department
   email: String!

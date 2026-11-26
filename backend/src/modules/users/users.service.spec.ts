@@ -31,7 +31,7 @@ const PROFILE = {
   role: Role.USER,
 };
 const CREATE_INPUT = { ...PROFILE, email: "alpha@example.com", password: "secret12" };
-const USER = {
+const USER_FIELDS = {
   id: ID,
   email: "alpha@example.com",
   firstName: "Alpha",
@@ -40,6 +40,16 @@ const USER = {
   department: { id: DEPARTMENT_ID, name: "Engineering" },
   position: { id: POSITION_ID, name: "Developer" },
   createdAt: new Date("2024-01-14T09:30:00.000Z"),
+};
+/** The row Prisma returns for `SELECT`: a user without an avatar. */
+const USER_ROW = { ...USER_FIELDS, avatar: null };
+/** The `User` the service returns for `USER_ROW`. */
+const USER = { ...USER_FIELDS, avatarUrl: null };
+const AVATAR_UPDATED_AT = new Date("2026-11-26T10:00:00.000Z");
+const USER_ROW_WITH_AVATAR = { ...USER_FIELDS, avatar: { updatedAt: AVATAR_UPDATED_AT } };
+const USER_WITH_AVATAR = {
+  ...USER_FIELDS,
+  avatarUrl: `/api/users/${ID}/avatar?v=${AVATAR_UPDATED_AT.getTime()}`,
 };
 const SELECT = {
   id: true,
@@ -50,6 +60,7 @@ const SELECT = {
   department: { select: { id: true, name: true } },
   position: { select: { id: true, name: true } },
   createdAt: true,
+  avatar: { select: { updatedAt: true } },
 };
 
 const prisma = {
@@ -121,7 +132,7 @@ describe("UsersService", () => {
 
   describe("list", () => {
     beforeEach(() => {
-      prisma.user.findMany.mockResolvedValue([USER]);
+      prisma.user.findMany.mockResolvedValue([USER_ROW]);
       prisma.user.count.mockResolvedValue(1);
     });
 
@@ -134,6 +145,17 @@ describe("UsersService", () => {
       expect(prisma.user.findMany).toHaveBeenCalledWith(
         expect.objectContaining({ select: SELECT }),
       );
+    });
+
+    it("gives each user with an avatar its address, in the same query", async () => {
+      prisma.user.findMany.mockResolvedValue([USER_ROW_WITH_AVATAR, USER_ROW]);
+      prisma.user.count.mockResolvedValue(2);
+
+      await expect(createService().list({ page: page() })).resolves.toEqual({
+        items: [USER_WITH_AVATAR, USER],
+        total: 2,
+      });
+      expect(prisma.user.findMany).toHaveBeenCalledTimes(1);
     });
 
     it("sorts by first name ascending when no sort is given, then by id", async () => {
@@ -221,11 +243,17 @@ describe("UsersService", () => {
 
   describe("findOne", () => {
     it("returns the user without the password hash", async () => {
-      prisma.user.findUnique.mockResolvedValue(USER);
+      prisma.user.findUnique.mockResolvedValue(USER_ROW);
 
       await expect(createService().findOne(ID)).resolves.toEqual(USER);
 
       expect(prisma.user.findUnique).toHaveBeenCalledWith({ where: { id: ID }, select: SELECT });
+    });
+
+    it("returns the avatar's address with the upload time as the version", async () => {
+      prisma.user.findUnique.mockResolvedValue(USER_ROW_WITH_AVATAR);
+
+      await expect(createService().findOne(ID)).resolves.toEqual(USER_WITH_AVATAR);
     });
 
     it("fails with NOT_FOUND for an unknown user", async () => {
@@ -239,7 +267,7 @@ describe("UsersService", () => {
 
   describe("create", () => {
     it("saves a verified user with the hash, never the password, and returns it", async () => {
-      prisma.user.create.mockResolvedValue(USER);
+      prisma.user.create.mockResolvedValue(USER_ROW);
 
       await expect(createService().create(CREATE_INPUT)).resolves.toEqual(USER);
 
@@ -305,7 +333,7 @@ describe("UsersService", () => {
 
     it("locks the actor and the target, then saves the changes and returns the user", async () => {
       prisma.$queryRaw.mockResolvedValue(lockedRows([ACTOR_ID, Role.ADMIN], [ID, Role.USER]));
-      prisma.user.update.mockResolvedValue(USER);
+      prisma.user.update.mockResolvedValue(USER_ROW);
 
       await expect(createService().update(input, ACTOR_ID)).resolves.toEqual(USER);
 
@@ -319,7 +347,7 @@ describe("UsersService", () => {
 
     it("finds the user when the id comes in upper case", async () => {
       prisma.$queryRaw.mockResolvedValue(lockedRows([ACTOR_ID, Role.ADMIN], [ID, Role.USER]));
-      prisma.user.update.mockResolvedValue(USER);
+      prisma.user.update.mockResolvedValue(USER_ROW);
 
       await expect(
         createService().update({ ...input, id: ID.toUpperCase() }, ACTOR_ID),
@@ -379,7 +407,7 @@ describe("UsersService", () => {
 
     it("lets an admin change their own names while keeping the Admin role", async () => {
       prisma.$queryRaw.mockResolvedValue(lockedRows([ACTOR_ID, Role.ADMIN]));
-      prisma.user.update.mockResolvedValue(USER);
+      prisma.user.update.mockResolvedValue(USER_ROW);
 
       await createService().update({ ...input, id: ACTOR_ID, role: Role.ADMIN }, ACTOR_ID);
 
@@ -401,7 +429,7 @@ describe("UsersService", () => {
 
     it("demotes another admin", async () => {
       prisma.$queryRaw.mockResolvedValue(lockedRows([ACTOR_ID, Role.ADMIN], [ID, Role.ADMIN]));
-      prisma.user.update.mockResolvedValue(USER);
+      prisma.user.update.mockResolvedValue(USER_ROW);
 
       await createService().update(input, ACTOR_ID);
 
@@ -445,7 +473,7 @@ describe("UsersService", () => {
     it("lets the owner save their profile, locked like update, without touching the role", async () => {
       // The owner is both the actor and the target, so the lock returns one row.
       prisma.$queryRaw.mockResolvedValue(lockedRows([ID, Role.USER]));
-      prisma.user.update.mockResolvedValue(USER);
+      prisma.user.update.mockResolvedValue(USER_ROW);
 
       await expect(createService().updateProfile(input, ID)).resolves.toEqual(USER);
 
@@ -459,7 +487,7 @@ describe("UsersService", () => {
 
     it("lets the owner save when their id comes in upper case", async () => {
       prisma.$queryRaw.mockResolvedValue(lockedRows([ID, Role.USER]));
-      prisma.user.update.mockResolvedValue(USER);
+      prisma.user.update.mockResolvedValue(USER_ROW);
 
       await expect(
         createService().updateProfile({ ...input, id: ID.toUpperCase() }, ID),
@@ -468,7 +496,7 @@ describe("UsersService", () => {
 
     it("lets an admin save another user's profile", async () => {
       prisma.$queryRaw.mockResolvedValue(lockedRows([ACTOR_ID, Role.ADMIN], [ID, Role.USER]));
-      prisma.user.update.mockResolvedValue(USER);
+      prisma.user.update.mockResolvedValue(USER_ROW);
 
       await expect(createService().updateProfile(input, ACTOR_ID)).resolves.toEqual(USER);
     });

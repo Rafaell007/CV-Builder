@@ -6,6 +6,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import { EMAIL_TAKEN_REASON } from "../auth/auth.service";
 import { Role } from "../auth/models/role.enum";
 import { hashPassword } from "../auth/password";
+import { avatarUrl } from "./avatars/avatar-url.utils";
 import type { CreateUserInput } from "./dto/create-user.input";
 import type { UpdateProfileInput } from "./dto/update-profile.input";
 import type { UpdateUserInput } from "./dto/update-user.input";
@@ -38,7 +39,16 @@ const USER_SELECT = {
   department: { select: { id: true, name: true } },
   position: { select: { id: true, name: true } },
   createdAt: true,
+  // Only the upload time, never the image bytes: it becomes `avatarUrl` (see `toUser`).
+  avatar: { select: { updatedAt: true } },
 } as const satisfies Prisma.UserSelect;
+
+type UserRow = Prisma.UserGetPayload<{ select: typeof USER_SELECT }>;
+
+/** A selected row as a `User`: the avatar's upload time becomes its address, `null` without an avatar. */
+function toUser({ avatar, ...user }: UserRow): User {
+  return { ...user, avatarUrl: avatarUrl(user.id, avatar?.updatedAt ?? null) };
+}
 
 @Injectable()
 export class UsersService {
@@ -63,14 +73,14 @@ export class UsersService {
       }),
       this.prisma.user.count({ where }),
     ]);
-    return { items, total };
+    return { items: items.map(toUser), total };
   }
 
   /** One user for User Details (`user(id)`); `NOT_FOUND` when there is no such user. */
   async findOne(id: string): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { id }, select: USER_SELECT });
     if (user === null) throw new NotFoundException("User not found");
-    return user;
+    return toUser(user);
   }
 
   /**
@@ -83,10 +93,11 @@ export class UsersService {
     await this.assertDepartmentAndPositionExist(data);
     const passwordHash = await hashPassword(password);
     try {
-      return await this.prisma.user.create({
+      const user = await this.prisma.user.create({
         data: { ...data, passwordHash, isVerified: true },
         select: USER_SELECT,
       });
+      return toUser(user);
     } catch (error) {
       throw await this.toWriteError(error, data);
     }
@@ -114,7 +125,7 @@ export class UsersService {
           });
         }
         await this.assertDepartmentAndPositionExist(data, tx);
-        return tx.user.update({ where: { id }, data, select: USER_SELECT });
+        return toUser(await tx.user.update({ where: { id }, data, select: USER_SELECT }));
       });
     } catch (error) {
       throw await this.toWriteError(error, data);
@@ -133,7 +144,7 @@ export class UsersService {
       return await this.prisma.$transaction(async (tx) => {
         await lockActorAndTarget(tx, id, actorId, { ownerMayAct: true });
         await this.assertDepartmentAndPositionExist(data, tx);
-        return tx.user.update({ where: { id }, data, select: USER_SELECT });
+        return toUser(await tx.user.update({ where: { id }, data, select: USER_SELECT }));
       });
     } catch (error) {
       throw await this.toWriteError(error, data);

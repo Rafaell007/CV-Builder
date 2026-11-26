@@ -35,4 +35,11 @@ export class User {
   /** When the account was created: "Member since" on the Profile tab (user profile AC-14, read-only). */
   @Field()
   createdAt!: Date;
+
+  /**
+   * The avatar's address for `<img src>` (`GET /api/users/:id/avatar?v=<upload time>`, D11); `null` when the user
+   * has no avatar, so the page shows the initials. A new upload gives a new address (no stale cached image).
+   */
+  @Field(() => String, { nullable: true })
+  avatarUrl!: string | null;
 }
