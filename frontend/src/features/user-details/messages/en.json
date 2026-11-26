@@ -8,6 +8,18 @@
   },
   "profile": {
     "memberSince": "A member since {date}",
+    "avatar": {
+      "uploaded": "Avatar updated",
+      "removed": "Avatar removed",
+      "errors": {
+        "uploadFailed": "Failed to upload avatar",
+        "removeFailed": "Failed to remove avatar",
+        "wrongType": "Only png, jpg or gif images are allowed.",
+        "tooLarge": "File size must not exceed {max} MB.",
+        "forbidden": "You do not have permission to do this.",
+        "tryAgain": "Something went wrong. Try again."
+      }
+    },
     "verifyEmail": {
       "button": "Verify email",
       "sent": "Verification email has been sent",
