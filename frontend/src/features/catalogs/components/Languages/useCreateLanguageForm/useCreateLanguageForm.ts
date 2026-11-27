@@ -15,7 +15,7 @@ import { useLanguageForm } from "../useLanguageForm";
 export function useCreateLanguageForm(create: (input: LanguageInput) => Promise<LanguageListItem>) {
   const t = useTranslations("catalogs.languages");
   const toast = useToast();
-  const { form, failed, hasChanged, reset, showError, submit: submitForm } = useLanguageForm();
+  const { form, failed, hasChanged, reset, submit: submitForm } = useLanguageForm();
   const [isOpen, setIsOpen] = useState(false);
 
   function open() {
@@ -24,17 +24,12 @@ export function useCreateLanguageForm(create: (input: LanguageInput) => Promise<
   }
 
   async function send(input: LanguageInput) {
-    try {
-      const created = await create(input);
-      setIsOpen(false);
-      toast.success({
-        title: t("create.success.title"),
-        description: t("create.success.text", { name: created.name }),
-      });
-    } catch (error) {
-      // Nothing resets the form here, so the values stay.
-      showError(error);
-    }
+    const created = await create(input);
+    setIsOpen(false);
+    toast.success({
+      title: t("create.success.title"),
+      description: t("create.success.text", { name: created.name }),
+    });
   }
 
   function submit(event: BaseSyntheticEvent) {
