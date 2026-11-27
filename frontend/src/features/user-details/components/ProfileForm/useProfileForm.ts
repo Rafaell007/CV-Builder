@@ -8,7 +8,7 @@ import { useToast } from "@/shared/components";
 import { useServerForm } from "@/shared/forms";
 import { USER_NAME_MAX_LENGTH, userProfileRules } from "@/shared/userProfile";
 import { getUserDisplayName } from "@/shared/utils";
-import type { ProfileFormValues, ProfileUser } from "../../user-details.types";
+import type { ProfileFormValues, ProfileGeneralError, ProfileUser } from "../../user-details.types";
 import { useUpdateProfile } from "../../useUpdateProfile";
 import {
   hasProfileChanged,
@@ -59,19 +59,18 @@ export function useProfileForm(user: ProfileUser) {
     reset,
     showError,
     submit: submitForm,
-  } = useServerForm<
-    ProfileFormValues,
-    ProfileFormValues,
-    "forbidden" | "notFound" | "concurrentChange"
-  >(schema, {
-    defaultValues: initialValues,
-    serverFields: { fields: SERVER_FIELDS, getMessage: () => t("errors.serverInvalid") },
-    // Field errors show under their fields; anything they cannot show (and every other failure) is the general error.
-    placeFailure: (failure) =>
-      failure.kind === "invalid"
-        ? { show: "fieldErrors", otherwise: toProfileGeneralError(failure) }
-        : { show: "general", error: toProfileGeneralError(failure) },
-  });
+  } = useServerForm<ProfileFormValues, ProfileFormValues, Exclude<ProfileGeneralError, "failed">>(
+    schema,
+    {
+      defaultValues: initialValues,
+      serverFields: { fields: SERVER_FIELDS, getMessage: () => t("errors.serverInvalid") },
+      // Field errors show under their fields; anything they cannot show (and every other failure) is the general error.
+      placeFailure: (failure) =>
+        failure.kind === "invalid"
+          ? { show: "fieldErrors", otherwise: toProfileGeneralError(failure) }
+          : { show: "general", error: toProfileGeneralError(failure) },
+    },
+  );
 
   const [firstName, lastName, departmentId, positionId] = useWatch({
     control: form.control,
