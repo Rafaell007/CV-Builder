@@ -20,7 +20,7 @@ type GraphqlError = { extensions?: { code?: string; reason?: string } };
 
 /** Sends one operation and returns the code and the reason of its first error. Fails when there is no error. */
 async function refusalOf(
-  request: APIRequestContext | BrowserContext["request"],
+  request: APIRequestContext,
   query: string,
   variables: Record<string, unknown> = {},
 ): Promise<Refusal> {
