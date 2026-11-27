@@ -1,0 +1,127 @@
+import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
+import type { Environment } from "../../../config";
+import { ACCESS_TOKEN_TTL_SECONDS, TokenService } from "./token.service";
+
+const SECRETS = {
+  JWT_ACCESS_SECRET: "unit-test-access-secret-0123456789abc",
+  JWT_REFRESH_SECRET: "unit-test-refresh-secret-0123456789ab",
+};
+
+function createService(secrets: Partial<typeof SECRETS> = {}): TokenService {
+  const config = new ConfigService<Environment, true>({ ...SECRETS, ...secrets });
+  return new TokenService(new JwtService(), config);
+}
+
+describe("TokenService", () => {
+  describe("access token", () => {
+    it("carries the user id and token version and lasts 15 minutes", async () => {
+      const service = createService();
+      const token = await service.signAccessToken("user-1", 3);
+
+      const payload = new JwtService().decode<{ sub: string; iat: number; exp: number }>(token);
+      expect(payload.sub).toBe("user-1");
+      expect(payload.exp - payload.iat).toBe(ACCESS_TOKEN_TTL_SECONDS);
+      await expect(service.verifyAccessToken(token)).resolves.toEqual({
+        userId: "user-1",
+        tokenVersion: 3,
+      });
+    });
+
+    it("rejects a token signed with another secret", async () => {
+      const token = await createService({ JWT_ACCESS_SECRET: "x".repeat(32) }).signAccessToken(
+        "u",
+        0,
+      );
+
+      await expect(createService().verifyAccessToken(token)).resolves.toBeUndefined();
+    });
+
+    it("rejects an expired token", async () => {
+      const token = await new JwtService().signAsync(
+        {},
+        { subject: "user-1", secret: SECRETS.JWT_ACCESS_SECRET, expiresIn: -10 },
+      );
+
+      await expect(createService().verifyAccessToken(token)).resolves.toBeUndefined();
+    });
+
+    it("rejects a token that has no signature", async () => {
+      const header = Buffer.from(JSON.stringify({ alg: "none", typ: "JWT" })).toString("base64url");
+      const body = Buffer.from(JSON.stringify({ sub: "user-1" })).toString("base64url");
+
+      await expect(
+        createService().verifyAccessToken(`${header}.${body}.`),
+      ).resolves.toBeUndefined();
+    });
+
+    it("rejects a token signed with another algorithm, even with the right secret", async () => {
+      const token = await new JwtService().signAsync(
+        { tokenVersion: 0 },
+        { subject: "user-1", secret: SECRETS.JWT_ACCESS_SECRET, algorithm: "HS512", expiresIn: 60 },
+      );
+
+      await expect(createService().verifyAccessToken(token)).resolves.toBeUndefined();
+    });
+
+    it("rejects a token without a user id", async () => {
+      const token = await new JwtService().signAsync(
+        { tokenVersion: 0 },
+        { secret: SECRETS.JWT_ACCESS_SECRET, expiresIn: 60 },
+      );
+
+      await expect(createService().verifyAccessToken(token)).resolves.toBeUndefined();
+    });
+
+    it("rejects a token without a token version, made before versions existed", async () => {
+      const token = await new JwtService().signAsync(
+        {},
+        { subject: "user-1", secret: SECRETS.JWT_ACCESS_SECRET, expiresIn: 60 },
+      );
+
+      await expect(createService().verifyAccessToken(token)).resolves.toBeUndefined();
+    });
+
+    it("rejects text that is not a token", async () => {
+      await expect(createService().verifyAccessToken("garbage")).resolves.toBeUndefined();
+    });
+  });
+
+  describe("refresh token", () => {
+    it("creates a different long random token every time", () => {
+      const service = createService();
+      const first = service.createRefreshToken();
+
+      expect(first).toMatch(/^[A-Za-z0-9_-]{43}$/); // 32 bytes in base64url
+      expect(first).not.toBe(service.createRefreshToken());
+    });
+
+    it("hashes the same token to the same value, which is not the token", () => {
+      const service = createService();
+      const token = service.createRefreshToken();
+
+      expect(service.hashRefreshToken(token)).toBe(service.hashRefreshToken(token));
+      expect(service.hashRefreshToken(token)).not.toContain(token);
+    });
+
+    it("hashes different tokens to different values", () => {
+      const service = createService();
+
+      expect(service.hashRefreshToken("token-a")).not.toBe(service.hashRefreshToken("token-b"));
+    });
+
+    it("keeps the stored value stable: HMAC-SHA256 in hex", () => {
+      // Made outside this code with node:crypto, key = the refresh secret above, text = "t".
+      // A changed algorithm or encoding changes the value, and every stored refresh token stops matching.
+      expect(createService().hashRefreshToken("t")).toBe(
+        "c5fe36c418e18586b8caf53bd014a33f39748857845b85cd987ce1ee0fcbbc8e",
+      );
+    });
+
+    it("hashes differently with another refresh secret", () => {
+      const other = createService({ JWT_REFRESH_SECRET: "y".repeat(32) });
+
+      expect(other.hashRefreshToken("t")).not.toBe(createService().hashRefreshToken("t"));
+    });
+  });
+});

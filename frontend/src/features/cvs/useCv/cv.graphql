@@ -1,0 +1,13 @@
+# One CV for the CV Details page. The backend checks access: a user gets only their own CV, an admin any CV.
+# Someone else's CV answers NOT_FOUND, the same as a missing one (docs/pages/21-cv-details-page.md).
+# `userId` is the employee of the User CVs tab (AC-12): a CV of another employee answers NOT_FOUND, also for an admin.
+query Cv($id: ID!, $userId: ID) {
+  cv(id: $id, userId: $userId) {
+    id
+    name
+    education
+    description
+    ownerEmail
+    userId
+  }
+}

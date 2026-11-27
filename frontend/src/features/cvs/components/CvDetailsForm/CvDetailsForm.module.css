@@ -1,0 +1,16 @@
+/* Values: Figma CV Details (1440 frame): the form is about 850px wide, centred under the tabs; the UPDATE button is at its right end. */
+/* Fields are 36 apart, as in the modals; the floated label sits in that space (docs/design-tokens.md › Components › Modal). */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 852px;
+  margin: 0 auto;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}

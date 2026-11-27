@@ -1,0 +1,66 @@
+/*
+ * Figma: 1440 › USER PROFILE (light and dark, read 2026-11-25). The block is centred on the form (x centre 819).
+ * Tabs end at y 112, the avatar starts at y 124: 12px. The shell's content padding is 24px (from the CVs tab), so
+ * this tab moves up by the difference.
+ */
+.profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: calc(var(--space-3) - var(--space-6));
+  text-align: center;
+}
+
+/*
+ * Figma 1440 › USER PROFILE (read 2026-11-26): the avatar (x 601) and the upload group sit in one row, the row centred
+ * (≈ x 817, the form's centre 819). Read-only profile: the avatar alone, centred. Avatar right edge 721 → upload icon
+ * 792: 71px. The upload group's top is the avatar's top + 28.
+ */
+.avatarRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 71px;
+  text-align: left;
+}
+
+.upload {
+  margin-top: 28px;
+}
+
+/* 768 › USER PROFILE: avatar right edge 334 → hint 359 (the group's left edge): 25px; group top = avatar top + 27. */
+@media (max-width: 1023.98px) {
+  .avatarRow {
+    gap: 25px;
+  }
+
+  .upload {
+    margin-top: 27px;
+  }
+}
+
+/* Avatar bottom 244 → name top 276: 32px. Heading 400 24/32. */
+.name {
+  margin: var(--space-8) 0 0;
+  color: var(--color-text);
+  font: var(--text-heading);
+  letter-spacing: var(--text-heading-ls);
+  overflow-wrap: anywhere;
+}
+
+/* Name bottom 308 → email top 316: 8px. Body 400 16/24, #626262 light / #AEAEAE dark. */
+.email {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-secondary);
+  font: var(--text-body);
+  letter-spacing: var(--text-body-ls);
+  overflow-wrap: anywhere;
+}
+
+/* Directly under the email (its 24px line starts at 340, where the email line ends). Body, text main. */
+.memberSince {
+  margin: 0;
+  color: var(--color-text);
+  font: var(--text-body);
+  letter-spacing: var(--text-body-ls);
+}

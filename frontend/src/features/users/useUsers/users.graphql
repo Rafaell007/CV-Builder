@@ -1,0 +1,23 @@
+# One page of users (Employees). Any signed-in user (backend). The backend searches first name, last name and email,
+# sorts and cuts the page, so the frontend never filters or sorts the loaded rows (docs/pages/10-users-page.md).
+query Users($page: PageInput!, $search: String, $sort: SortInput) {
+  users(page: $page, search: $search, sort: $sort) {
+    items {
+      id
+      email
+      firstName
+      lastName
+      role
+      avatarUrl
+      department {
+        id
+        name
+      }
+      position {
+        id
+        name
+      }
+    }
+    total
+  }
+}

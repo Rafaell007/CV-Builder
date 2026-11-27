@@ -1,0 +1,8 @@
+# Deletes one CV. An employee can delete only their own CVs, an admin any CV (backend).
+# The backend answers NOT_FOUND for a missing CV and for the CV of another user, and FORBIDDEN when the role does not allow it.
+# `userId` is sent only by the User CVs tab (the employee of the page): a CV of another employee then answers NOT_FOUND.
+mutation DeleteCv($id: ID!, $userId: ID) {
+  deleteCv(id: $id, userId: $userId) {
+    id
+  }
+}

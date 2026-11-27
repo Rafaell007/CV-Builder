@@ -1,0 +1,28 @@
+# The projects of one CV for the Projects tab. The backend checks access (owner or admin; someone else's CV answers
+# NOT_FOUND, the same as a missing one), searches name and domain without case, and sorts by name, startDate or
+# endDate. A missing endDate means the person still works on the project (docs/pages/23-cv-projects-page.md).
+query CvProjects($cvId: ID!, $search: String, $sort: SortInput) {
+  cvProjects(cvId: $cvId, search: $search, sort: $sort) {
+    id
+    cvId
+    startDate
+    endDate
+    responsibilities
+    roles {
+      id
+      name
+    }
+    project {
+      id
+      name
+      domain
+      startDate
+      endDate
+      description
+      environment {
+        id
+        name
+      }
+    }
+  }
+}

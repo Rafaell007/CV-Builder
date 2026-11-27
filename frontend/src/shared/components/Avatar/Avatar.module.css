@@ -1,0 +1,40 @@
+/* Values: docs/design-tokens.md › Decisions › Users list (40px circle, initials 400 20/20 in the main text colour). */
+
+.avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: var(--radius-round);
+  background: var(--color-avatar-bg);
+  color: var(--color-text);
+  font: var(--text-avatar);
+  letter-spacing: var(--text-avatar-ls);
+  user-select: none;
+}
+
+.small {
+  width: var(--space-8);
+  height: var(--space-8);
+  font: var(--text-caption);
+}
+
+.medium {
+  width: var(--space-10);
+  height: var(--space-10);
+}
+
+/* User Details › Profile (Figma): 120px circle, initials 400 40/40, letter spacing 0.15 */
+.large {
+  width: 120px;
+  height: 120px;
+  font: var(--text-avatar-large);
+  letter-spacing: var(--text-avatar-large-ls);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

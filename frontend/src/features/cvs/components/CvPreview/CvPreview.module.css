@@ -1,0 +1,78 @@
+/* Holds the one width of the Preview tab. The EXPORT PDF bar and the document read it. */
+.page {
+  --cv-preview-width: 852px;
+  /* Room that the name keeps free for the EXPORT PDF button, which hangs over its row as in Figma. It must be at
+     least as wide as the widest label: `EKSPORTUJ PDF` in Polish is 176px (`EXPORT PDF` is 160px). The story
+     PolishLongName checks the gap in a real browser. */
+  --cv-preview-export-width: 192px;
+  /* The document and the button start 34px under the tabs in Figma (y 112 → 146); CvLayout gives 24. */
+  padding-top: 10px;
+}
+
+/* The CV sits on the page background, as in Figma. The width keeps lines readable next to the app navigation. */
+.document {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  box-sizing: border-box;
+  max-width: var(--cv-preview-width);
+  margin: 0 auto;
+  padding: 0 0 var(--space-6);
+  color: var(--color-text);
+}
+
+/* General on the left, summary and skills on the right, with a vertical line between them. The right column has the 24px space as padding after the line. */
+.overview {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+}
+
+.aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  /* Space between the text and the vertical line of the right column. */
+  padding: var(--space-4) var(--space-4) 0 0;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4) 0 var(--space-4) var(--space-6);
+  border-left: 1px solid var(--color-primary);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.title {
+  margin: 0;
+  color: var(--color-text);
+  font: var(--text-title);
+}
+
+/* Tablet: Figma makes the left column 7px narrower. */
+@media (max-width: 1023px) {
+  .overview {
+    grid-template-columns: 253px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .overview {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .aside {
+    padding-right: 0;
+  }
+
+  .main {
+    padding-left: 0;
+    border-left: 0;
+  }
+}

@@ -1,0 +1,59 @@
+/* Values: docs/design-tokens.md › App shell › Header and content. */
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: var(--text-body);
+  letter-spacing: var(--text-body-ls);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+}
+
+/* Chevron in a 20×20 box, 8px on each side, the same grey in both themes. */
+.separator {
+  flex-shrink: 0;
+  margin: 0 var(--space-2);
+  color: var(--color-breadcrumb-separator);
+}
+
+/* Links and the current page are both grey. */
+.entry {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  color: var(--color-text-secondary);
+}
+
+/* The red of the design tokens in both themes (the dark theme no longer uses the light pink of the error text). */
+.highlighted {
+  color: var(--color-primary);
+}
+
+.icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.link {
+  text-decoration: none;
+}
+
+.link:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+
+.highlighted.link:hover {
+  color: var(--color-primary);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}

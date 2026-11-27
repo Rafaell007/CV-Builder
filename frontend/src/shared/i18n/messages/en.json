@@ -1,0 +1,13 @@
+{
+  "appName": "CV Builder",
+  "appDescription": "Create, edit and preview CVs.",
+  "employees": "Employees",
+  "breadcrumbs": "Breadcrumbs",
+  "details": "Details",
+  "preview": "Preview",
+  "toast": {
+    "label": "Notification",
+    "close": "Close notification",
+    "viewport": "Notifications (F8)"
+  }
+}

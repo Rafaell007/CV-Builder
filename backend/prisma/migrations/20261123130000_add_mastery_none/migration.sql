@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "Mastery" ADD VALUE 'NONE' BEFORE 'BEGINNER';

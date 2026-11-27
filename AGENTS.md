@@ -1,38 +1,29 @@
 # CV Builder
 
-Full plan, stack, decisions and progress: [PLAN.md](PLAN.md). Read §0–§5 first, then only the step you work on.
+Plan, stack, decisions, rules and progress: [PLAN.md](PLAN.md). Read a section when you need it (rules: §5), and the step you work on. App-specific rules: `frontend/AGENTS.md`, `backend/AGENTS.md`.
 
-Next.js (App Router) + MUI + TanStack Store; Apollo Client for GraphQL (not installed yet). TypeScript only.
+## Versions (fixed, do not upgrade)
 
-## Commands
+Node 24, pnpm 12, Next.js 16. NestJS 11, Prisma 7, Apollo Client 4 and Storybook 10 also differ from older versions; check the official docs rather than relying on memory.
 
-- `npm run dev` — dev server, http://localhost:3000
-- `npm run lint` — ESLint
-- `npm run typecheck` — `tsc --noEmit`
-- `npm run build` — production build
+## Plan is read-only
 
-Run `lint` and `typecheck` after changes; run `build` only when touching config or routing.
+- Do not edit `PLAN.md` or `docs/pages/` unless the user asks for that edit in the current message. A hook asks the user before each write. A CI check fails a PR that changes them without the label `plan-change`.
+- If code does not comply with the plan, fix the code. If many components do not comply, this is a finding, not a reason to change the plan. Report the list to the user as a checkbox todo.
+- If you think the plan is wrong, say so and stop. The user decides.
+- Only the §12 Progress log of `PLAN.md` gets a new line when a step is merged.
 
-## Where things are
+## Gotchas
 
-- `src/app/` — routes only, thin wiring of containers
-- `src/features/<name>/` — one folder per feature (component, hook, utils, types, tests, `components/`)
-- `src/shared/` — code used across unrelated features (`theme/` exists)
-- `src/env.ts` — the only place that reads `process.env`
-- `docs/` — per-page requirements; start at [docs/README.md](docs/README.md)
-
-## Rules (full text: [PLAN.md §5](PLAN.md#5-development-rules))
-
-- Components are representational: props in, JSX out. Logic goes into composed hooks, pure typed utils.
-- One responsibility per file; one exported component per file, named like the file.
-- Fractal layout: children live inside the parent; shared code moves to the nearest common ancestor; import only via a folder's `index.ts`.
-- No `.js` files, no `any`, no `process.env` outside `src/env.ts`.
-- New env var: add to `.env.example`, `src/env.ts`, and Vercel settings.
+- `docker compose up -d` starts PostgreSQL + Mailpit. `pnpm --filter @cv-builder/backend test:int` and `pnpm test:e2e` need Docker.
+- `pnpm test-all` starts Docker (`docker compose up -d --wait`), then runs all tests in turn: unit tests (with stories), backend integration tests, then E2E; it stops at the first failure and ends with a table of tests and time per step (needs Docker).
+- After `backend/schema.gql` or a frontend `.graphql` file changes, run `pnpm --filter @cv-builder/frontend codegen`. After a backend contract change, run `pnpm --filter @cv-builder/backend schema:generate` (needs the database and `DATABASE_URL`); CI fails when the committed `schema.gql` differs.
+- The Prisma client in `backend/src/generated/` is git ignored. It is built from `schema.prisma` of the branch that last ran `db:generate`. Enums such as `Mastery` come from it, and every backend start (dev server, tests, `schema:generate`) rewrites `backend/schema.gql` from it. After you switch branch, run `pnpm --filter @cv-builder/backend db:generate` first. Otherwise `schema.gql` can change by itself (KAN-166). Do not commit that change. Run `git restore backend/schema.gql`.
+- `pnpm --filter @cv-builder/frontend test` runs codegen first. If you run `vitest` directly, a global setup stops the run with a message when the generated GraphQL file is older than a `.graphql` file or `schema.gql`. Then run codegen.
+- Contract changes (`schema.gql`) are called out in the PR and agreed with the frontend side.
+- The frontend `test` also runs every story in Chromium: `playwright install chromium` once.
 
 ## Working here
 
-- Read only the `docs/` page for the screen you are building; open its `preview.png` only when layout details matter.
-- Do not read or edit `package-lock.json`, `.next/`, `node_modules/`, `*.tsbuildinfo`.
-- Next.js 16, MUI 9 and TanStack Store differ from older versions; check the official docs rather than relying on memory.
-- Prefer targeted edits over rewriting whole files. Keep new code consistent with the neighbouring files.
-- Not yet set up: Apollo Client, Vitest + RTL, Playwright, Vercel, Render. Ask before adding them.
+- Read only the `docs/pages/` file for the screen you are building; open its image in `docs/images/` only when layout details matter.
+- Do not read or edit lockfiles, `.next/`, `dist/`, `node_modules/`, `*.tsbuildinfo`, generated files.

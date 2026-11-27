@@ -1,0 +1,16 @@
+# The projects of the catalog that are not yet in the CV: the options of the Add project modal.
+# The backend checks the access to the CV (owner or admin) and decides what is available; the page never filters the list itself.
+query AvailableCvProjects($cvId: ID!) {
+  availableCvProjects(cvId: $cvId) {
+    id
+    name
+    domain
+    startDate
+    endDate
+    description
+    environment {
+      id
+      name
+    }
+  }
+}

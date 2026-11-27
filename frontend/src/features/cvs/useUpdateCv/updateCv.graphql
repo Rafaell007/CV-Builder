@@ -1,0 +1,11 @@
+# Updates the name, education and description of one CV. The backend checks that the user owns the CV (an admin may edit any CV).
+mutation UpdateCv($input: UpdateCvInput!) {
+  updateCv(input: $input) {
+    id
+    name
+    education
+    description
+    ownerEmail
+    userId
+  }
+}

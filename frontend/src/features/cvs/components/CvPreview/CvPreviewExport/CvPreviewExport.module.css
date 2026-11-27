@@ -1,0 +1,33 @@
+/* Figma: the button is at the top right of the document column, on the row of the name (both start at y 146).
+   The bar has no height, so the document starts at the same top, and the button hangs over its first row.
+   --cv-preview-width is set by CvPreview (.page), so the bar and the document have the same width. */
+.toolbar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  box-sizing: border-box;
+  max-width: var(--cv-preview-width);
+  height: 0;
+  margin: 0 auto;
+}
+
+/* 160 × 40 in Figma. Two classes, so the height wins over the shared Button whatever order the stylesheets load in. */
+.toolbar .export {
+  height: var(--space-10);
+}
+
+/* No fill, red text and a red border. The extra class in the selector wins over the border of the shared Button.
+   A disabled or busy button keeps the grey look of the shared Button. */
+.toolbar .export:not(:disabled, [aria-disabled="true"]) {
+  border-color: var(--color-primary);
+  background: transparent;
+  color: var(--color-primary);
+  box-shadow: none;
+}
+
+/* Read by screen readers, not shown. */
+.status {
+  composes: visuallyHidden from "../../../../../shared/styles/visuallyHidden.module.css";
+}

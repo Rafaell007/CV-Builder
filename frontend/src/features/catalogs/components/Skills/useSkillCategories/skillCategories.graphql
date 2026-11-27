@@ -1,0 +1,9 @@
+# All skill categories, sorted by name, for the Category select. Admin only (backend). The type of a skill comes from
+# its category, so each option also carries the type.
+query SkillCategories {
+  skillCategories {
+    id
+    name
+    type
+  }
+}

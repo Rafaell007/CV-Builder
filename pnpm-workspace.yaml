@@ -1,0 +1,13 @@
+packages:
+  - frontend
+  - backend
+  - e2e
+
+allowBuilds:
+  unrs-resolver: false
+  "@parcel/watcher": false
+  "@prisma/engines": false
+  prisma: false
+  esbuild: false
+  "@apollo/protobufjs": false
+  "@swc/core": false

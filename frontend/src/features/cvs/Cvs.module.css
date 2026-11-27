@@ -1,0 +1,13 @@
+/*
+ * Figma CVs page and User CVs tab (1440): the create button centres its plus icon and text, 8 apart
+ * (icon at 56, text at 88), not at the left as on the other list pages. Values: docs/design-tokens.md › List page.
+ */
+.page {
+  --list-page-create-justify: center;
+  --list-page-create-gap: var(--space-2);
+}
+
+/* `/cvs` (all CVs) only: the button is 120 from the right edge; the User CVs tab keeps the default 20. */
+.allCvs {
+  --list-page-toolbar-padding-right: 120px;
+}

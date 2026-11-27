@@ -1,0 +1,4 @@
+# Deletes one project. Admin only (backend). The backend refuses with a CONFLICT error when a CV uses the project (PLAN D18).
+mutation DeleteProject($id: ID!) {
+  deleteProject(id: $id)
+}

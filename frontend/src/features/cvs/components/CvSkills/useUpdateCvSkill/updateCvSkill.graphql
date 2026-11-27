@@ -1,0 +1,14 @@
+# Changes the mastery of a skill in one CV. The skill itself cannot change.
+mutation UpdateCvSkill($input: UpdateCvSkillInput!) {
+  updateCvSkill(input: $input) {
+    id
+    cvId
+    skillId
+    name
+    mastery
+    category {
+      id
+      name
+    }
+  }
+}

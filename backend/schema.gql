@@ -1,0 +1,480 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input AddCvProjectInput {
+  cvId: ID!
+  endDate: DateTime
+  projectId: ID!
+  responsibilities: String
+  roleIds: [ID!]!
+  startDate: DateTime!
+}
+
+input AddCvSkillInput {
+  cvId: ID!
+  mastery: Mastery
+  skillId: ID!
+}
+
+type AvailableCvSkill {
+  category: SkillCategory!
+  id: ID!
+  mastery: Mastery!
+  name: String!
+}
+
+input ChangePasswordInput {
+  currentPassword: String!
+  newPassword: String!
+}
+
+input CreateCvInput {
+  description: String!
+  education: String!
+  name: String!
+  userId: ID
+}
+
+input CreateDepartmentInput {
+  name: String!
+}
+
+input CreateLanguageInput {
+  iso: String!
+  name: String!
+  nativeName: String!
+}
+
+input CreatePositionInput {
+  name: String!
+}
+
+input CreateProjectInput {
+  description: String!
+  domain: String!
+  endDate: DateTime!
+  environmentIds: [ID!]! = []
+  name: String!
+  startDate: DateTime!
+}
+
+input CreateSkillInput {
+  categoryId: ID!
+  name: String!
+}
+
+input CreateUserInput {
+  departmentId: ID!
+  email: String!
+  firstName: String!
+  lastName: String!
+  password: String!
+  positionId: ID!
+  role: Role!
+}
+
+type Cv {
+  createdAt: DateTime!
+  description: String!
+  education: String!
+  id: ID!
+  name: String!
+  ownerEmail: String!
+  updatedAt: DateTime!
+  userId: ID!
+}
+
+type CvPage {
+  items: [Cv!]!
+  total: Int!
+}
+
+type CvPdf {
+  base64: String!
+  fileName: String!
+}
+
+type CvPreview {
+  cvId: ID!
+  description: String!
+  domains: [String!]!
+  education: String!
+  fullName: String
+  languages: [CvPreviewLanguage!]!
+  name: String!
+  position: String
+  projects: [CvPreviewProject!]!
+  skillGroups: [CvPreviewSkillGroup!]!
+}
+
+type CvPreviewLanguage {
+  name: String!
+  proficiency: Proficiency!
+}
+
+type CvPreviewProject {
+  description: String!
+  domain: String!
+  endDate: DateTime
+  environment: [String!]!
+  name: String!
+  period: String!
+  responsibilities: String
+  roles: [String!]!
+  startDate: DateTime!
+}
+
+type CvPreviewSkill {
+  experienceYears: Int
+  lastUsedYear: Int
+  mastery: Mastery!
+  name: String!
+}
+
+type CvPreviewSkillGroup {
+  category: String!
+  skills: [CvPreviewSkill!]!
+}
+
+type CvProject {
+  createdAt: DateTime!
+  cvId: ID!
+  endDate: DateTime
+  id: ID!
+  project: Project!
+  responsibilities: String
+  roles: [ProjectRole!]!
+  startDate: DateTime!
+  updatedAt: DateTime!
+}
+
+type CvSkill {
+  category: SkillCategory!
+  createdAt: DateTime!
+  cvId: ID!
+  id: ID!
+  mastery: Mastery!
+  name: String!
+  skillId: ID!
+  updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Department {
+  id: ID!
+  name: String!
+}
+
+type DepartmentPage {
+  items: [Department!]!
+  total: Int!
+}
+
+type EnvironmentSkill {
+  id: ID!
+  name: String!
+}
+
+input ForgotPasswordInput {
+  email: String!
+}
+
+type Health {
+  status: String!
+}
+
+type Language {
+  id: ID!
+  iso: String!
+  name: String!
+  nativeName: String!
+}
+
+type LanguagePage {
+  items: [Language!]!
+  total: Int!
+}
+
+enum Mastery {
+  ADVANCED
+  BEGINNER
+  ELEMENTARY
+  EXPERT
+  INTERMEDIATE
+  NONE
+}
+
+type Mutation {
+  addCvProject(input: AddCvProjectInput!): CvProject!
+  addCvSkill(input: AddCvSkillInput!): CvSkill!
+  changePassword(input: ChangePasswordInput!): Boolean!
+  createCv(input: CreateCvInput!): Cv!
+  createDepartment(input: CreateDepartmentInput!): Department!
+  createLanguage(input: CreateLanguageInput!): Language!
+  createPosition(input: CreatePositionInput!): Position!
+  createProject(input: CreateProjectInput!): Project!
+  createSkill(input: CreateSkillInput!): Skill!
+  createUser(input: CreateUserInput!): User!
+  deleteCv(id: ID!, userId: ID): Cv!
+  deleteDepartment(id: ID!): Boolean!
+  deleteLanguage(id: ID!): Boolean!
+  deletePosition(id: ID!): Boolean!
+  deleteProject(id: ID!): Boolean!
+  deleteSkill(id: ID!): Boolean!
+  deleteUser(id: ID!): Boolean!
+  forgotPassword(input: ForgotPasswordInput!): Boolean!
+  refresh: Boolean!
+  removeCvProjects(input: RemoveCvProjectsInput!): Boolean!
+  removeCvSkills(input: RemoveCvSkillsInput!): Boolean!
+  resendVerificationCode: Boolean!
+  resetPassword(input: ResetPasswordInput!): Boolean!
+  signIn(input: SignInInput!): SessionUser!
+  signOut: Boolean!
+  signUp(input: SignUpInput!): SessionUser!
+  updateCv(input: UpdateCvInput!): Cv!
+  updateCvProject(input: UpdateCvProjectInput!): CvProject!
+  updateCvSkill(input: UpdateCvSkillInput!): CvSkill!
+  updateDepartment(input: UpdateDepartmentInput!): Department!
+  updateLanguage(input: UpdateLanguageInput!): Language!
+  updatePosition(input: UpdatePositionInput!): Position!
+  updateProfile(input: UpdateProfileInput!): User!
+  updateProject(input: UpdateProjectInput!): Project!
+  updateSkill(input: UpdateSkillInput!): Skill!
+  updateUser(input: UpdateUserInput!): User!
+  verifyEmail(input: VerifyEmailInput!): SessionUser!
+}
+
+input PageInput {
+  number: Int! = 1
+  size: Int! = 10
+}
+
+type Position {
+  id: ID!
+  name: String!
+}
+
+type PositionPage {
+  items: [Position!]!
+  total: Int!
+}
+
+enum Proficiency {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+  NATIVE
+}
+
+type Project {
+  createdAt: DateTime!
+  description: String!
+  domain: String!
+  endDate: DateTime!
+  environment: [EnvironmentSkill!]!
+  id: ID!
+  name: String!
+  startDate: DateTime!
+  updatedAt: DateTime!
+}
+
+type ProjectPage {
+  items: [Project!]!
+  total: Int!
+}
+
+type ProjectRole {
+  id: ID!
+  name: String!
+}
+
+type Query {
+  availableCvProjects(cvId: ID!): [Project!]!
+  availableCvSkills(cvId: ID!): [AvailableCvSkill!]!
+  cv(id: ID!, userId: ID): Cv!
+  cvPreview(cvId: ID!, locale: String = "en"): CvPreview!
+  cvProjects(cvId: ID!, search: String, sort: SortInput): [CvProject!]!
+  cvSkills(cvId: ID!): [CvSkill!]!
+  cvs(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput, userId: ID): CvPage!
+  departmentOptions: [Department!]!
+  departments(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): DepartmentPage!
+  exportCvPdf(cvId: ID!, locale: String = "en"): CvPdf!
+  health: Health!
+  languages(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): LanguagePage!
+  me: SessionUser
+  positionOptions: [Position!]!
+  positions(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): PositionPage!
+  projectRoles: [ProjectRole!]!
+  projects(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): ProjectPage!
+  skillCatalog(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): SkillPage!
+  skillCategories: [SkillCategory!]!
+  skills: [EnvironmentSkill!]!
+  user(id: ID!): User!
+  users(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): UserPage!
+}
+
+input RemoveCvProjectsInput {
+  cvId: ID!
+  ids: [ID!]!
+}
+
+input RemoveCvSkillsInput {
+  cvId: ID!
+  ids: [ID!]!
+}
+
+input ResetPasswordInput {
+  newPassword: String!
+  token: String!
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+type SessionUser {
+  email: String!
+  firstName: String
+  id: ID!
+  isVerified: Boolean!
+  lastName: String
+  role: Role!
+}
+
+input SignInInput {
+  email: String!
+  password: String!
+}
+
+input SignUpInput {
+  email: String!
+  password: String!
+}
+
+type Skill {
+  category: SkillCategory!
+  id: ID!
+  name: String!
+}
+
+type SkillCategory {
+  id: ID!
+  name: String!
+  type: String!
+}
+
+type SkillPage {
+  items: [Skill!]!
+  total: Int!
+}
+
+enum SortDirection {
+  ASC
+  DESC
+}
+
+input SortInput {
+  direction: SortDirection! = ASC
+  field: String!
+}
+
+input UpdateCvInput {
+  description: String!
+  education: String!
+  id: ID!
+  name: String!
+  userId: ID
+}
+
+input UpdateCvProjectInput {
+  endDate: DateTime
+  id: ID!
+  responsibilities: String
+  roleIds: [ID!]!
+  startDate: DateTime!
+}
+
+input UpdateCvSkillInput {
+  id: ID!
+  mastery: Mastery!
+}
+
+input UpdateDepartmentInput {
+  id: ID!
+  name: String!
+}
+
+input UpdateLanguageInput {
+  id: ID!
+  iso: String!
+  name: String!
+  nativeName: String!
+}
+
+input UpdatePositionInput {
+  id: ID!
+  name: String!
+}
+
+input UpdateProfileInput {
+  departmentId: ID!
+  firstName: String!
+  id: ID!
+  lastName: String!
+  positionId: ID!
+}
+
+input UpdateProjectInput {
+  description: String!
+  domain: String!
+  endDate: DateTime!
+  environmentIds: [ID!]! = []
+  id: ID!
+  name: String!
+  startDate: DateTime!
+}
+
+input UpdateSkillInput {
+  categoryId: ID!
+  id: ID!
+  name: String!
+}
+
+input UpdateUserInput {
+  departmentId: ID!
+  firstName: String!
+  id: ID!
+  lastName: String!
+  positionId: ID!
+  role: Role!
+}
+
+type User {
+  avatarUrl: String
+  createdAt: DateTime!
+  department: Department
+  email: String!
+  firstName: String
+  id: ID!
+  lastName: String
+  position: Position
+  role: Role!
+}
+
+type UserPage {
+  items: [User!]!
+  total: Int!
+}
+
+input VerifyEmailInput {
+  code: String!
+}

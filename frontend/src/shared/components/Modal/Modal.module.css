@@ -1,0 +1,72 @@
+/* Values: docs/design-tokens.md › Components › Modal (Figma ADD SKILL, UPDATE SKILL) */
+
+/* Above row menus (z-index 10) */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: var(--color-overlay);
+}
+
+/* Prediction: centred on screen (inset + auto margins, no transform: a transform would make a fixed popup inside follow the modal and be clipped); narrower screens keep 16px each side, short screens scroll inside */
+.content {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  width: min(620px, calc(100% - 2 * var(--space-4)));
+  height: fit-content;
+  max-height: calc(100% - 2 * var(--space-4));
+  margin: auto;
+  overflow-y: auto;
+  padding: var(--space-4) var(--space-6);
+  background: var(--color-modal-bg);
+  color: var(--color-text);
+}
+
+/* Figma Create user (desktop): 860 wide; the tablet frame keeps 620 */
+@media (min-width: 1024px) {
+  .wide {
+    width: min(860px, calc(100% - 2 * var(--space-4)));
+  }
+}
+
+/*
+ * Title at 16 / 24; first content 26 below the title.
+ * ConfirmModal composes these classes and sets --modal-header-gap and --modal-footer-gap. A variable, not an
+ * overriding margin, because two single-class rules of equal weight are won by whichever stylesheet loads last.
+ */
+.header {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--modal-header-gap, 26px);
+}
+
+.title {
+  margin: 0;
+  font: var(--text-modal-title);
+  letter-spacing: var(--text-modal-title-ls);
+}
+
+/* Figma: close button at top 14, 2px above the title */
+.close {
+  margin-top: -2px;
+}
+
+.description {
+  margin: 0;
+  font: var(--text-body);
+  letter-spacing: var(--text-body-ls);
+}
+
+/* Right-aligned, 24 apart, 26 under the content */
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  justify-content: flex-end;
+  margin-top: var(--modal-footer-gap, 26px);
+}

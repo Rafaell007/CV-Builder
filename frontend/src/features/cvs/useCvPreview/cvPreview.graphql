@@ -1,0 +1,35 @@
+# The whole CV for the CV Preview page, put together by the backend from the CV details, skills, projects, user languages
+# and profile. The backend checks access: a user gets only their own CV, an admin any CV. Someone else's CV answers
+# NOT_FOUND, the same as a missing one (docs/pages/24-cv-preview-page.md). `locale` is the language of the page (`en` or
+# `pl`): the backend writes the open period of a project (`period`) in it, the same text as in the PDF.
+query CvPreview($cvId: ID!, $locale: String) {
+  cvPreview(cvId: $cvId, locale: $locale) {
+    cvId
+    name
+    description
+    education
+    fullName
+    position
+    domains
+    languages {
+      name
+      proficiency
+    }
+    skillGroups {
+      category
+      skills {
+        name
+        experienceYears
+        lastUsedYear
+      }
+    }
+    projects {
+      name
+      description
+      period
+      roles
+      responsibilities
+      environment
+    }
+  }
+}

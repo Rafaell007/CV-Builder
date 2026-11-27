@@ -1,0 +1,13 @@
+{
+  "appName": "CV Builder",
+  "appDescription": "Twórz, edytuj i przeglądaj CV.",
+  "employees": "Pracownicy",
+  "breadcrumbs": "Ścieżka nawigacji",
+  "details": "Szczegóły",
+  "preview": "Podgląd",
+  "toast": {
+    "label": "Powiadomienie",
+    "close": "Zamknij powiadomienie",
+    "viewport": "Powiadomienia (F8)"
+  }
+}

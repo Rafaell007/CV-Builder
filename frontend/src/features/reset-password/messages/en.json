@@ -1,0 +1,28 @@
+{
+  "pageTitle": "Reset password | CV Builder",
+  "title": "Reset password",
+  "subtitle": "Here you should write a new password and confirm it",
+  "newPassword": "New Password",
+  "confirmPassword": "Confirm Password",
+  "showPassword": "Show password",
+  "hidePassword": "Hide password",
+  "showConfirmPassword": "Show confirm password",
+  "hideConfirmPassword": "Hide confirm password",
+  "submit": "Submit",
+  "goToSignIn": "Go to sign in",
+  "requestNewLink": "Request a new link",
+  "errors": {
+    "passwordRequired": "Password is required",
+    "passwordTooShort": "Password must be at least {min} characters long",
+    "passwordTooLong": "Password must be at most {max} characters long",
+    "passwordWeak": "Password must contain at least one letter and one digit",
+    "confirmRequired": "Confirm Password is required",
+    "confirmMismatch": "Passwords do not match",
+    "tokenInvalid": "This password reset link is invalid",
+    "tokenExpired": "This password reset link has expired",
+    "tokenUsed": "This password reset link has already been used",
+    "tooManyRequests": "Too many attempts, try again later",
+    "invalidInput": "Please check the entered values and try again",
+    "unexpected": "Something went wrong. Please try again later"
+  }
+}

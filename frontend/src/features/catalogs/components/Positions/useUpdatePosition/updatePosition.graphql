@@ -1,0 +1,7 @@
+# Renames one position. Admin only (backend). CONFLICT when another position has the name; its own name is allowed.
+mutation UpdatePosition($input: UpdatePositionInput!) {
+  updatePosition(input: $input) {
+    id
+    name
+  }
+}

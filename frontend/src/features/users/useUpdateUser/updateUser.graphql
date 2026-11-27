@@ -1,0 +1,20 @@
+# Updates one user. Admin only (backend). Email and password cannot change here. The backend refuses with CONFLICT
+# reason OWN_ROLE when an admin changes their own role (D24).
+mutation UpdateUser($input: UpdateUserInput!) {
+  updateUser(input: $input) {
+    id
+    email
+    firstName
+    lastName
+    role
+    avatarUrl
+    department {
+      id
+      name
+    }
+    position {
+      id
+      name
+    }
+  }
+}

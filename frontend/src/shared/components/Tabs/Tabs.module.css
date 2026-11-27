@@ -1,0 +1,44 @@
+.list {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+ * Figma (User profile, CV tabs, measured on the images): every tab is 150 wide, the tabs touch each other, the
+ * label is centred and the active underline (2px) covers the whole tab. The tab is 52 high: 4px page padding above
+ * it and 56px header make the underline end at y 112. A long label widens its tab (the side padding).
+ */
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 150px;
+  height: calc(var(--space-14) - var(--space-1));
+  padding: 0 var(--space-6);
+  border-bottom: 2px solid transparent;
+  color: var(--color-text);
+  font: var(--text-tab);
+  letter-spacing: var(--text-tab-ls);
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.tab:hover {
+  color: var(--color-primary);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--color-input-border-focus);
+  outline-offset: 2px;
+}
+
+/* Active tab: red text and a 2px red underline (Figma, SIGN IN tabs). */
+.tab[aria-current="page"] {
+  border-bottom-color: var(--color-primary);
+  color: var(--color-primary);
+  font: var(--text-tab-active);
+  letter-spacing: var(--text-tab-ls);
+}

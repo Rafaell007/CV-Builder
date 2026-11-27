@@ -1,0 +1,61 @@
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-10);
+  height: var(--space-10);
+  border: 0;
+  border-radius: var(--radius-round);
+  background: transparent;
+  color: var(--color-text);
+  font: var(--text-heading);
+  cursor: pointer;
+}
+
+.trigger:hover,
+.trigger[data-state="open"] {
+  background: var(--color-surface);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--color-input-border-focus);
+  outline-offset: 2px;
+}
+
+/* Row menu: surface fill, border and 8px radius (Figma, DS Table Nav). At least 90 wide, no inset above or below
+   the items (the open Users row menu, docs/design-tokens.md › Decisions › Users list). */
+.content {
+  z-index: 10;
+  min-width: 90px;
+  padding: 0;
+  /* Without an inset, the highlighted first and last items would cover the round corners. */
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-menu);
+  background: var(--color-surface);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  height: var(--space-8);
+  padding: 0 15px;
+  color: var(--color-text);
+  font: var(--text-menu);
+  letter-spacing: var(--text-menu-ls);
+  cursor: pointer;
+  outline: none;
+}
+
+.item[data-highlighted] {
+  background: var(--color-bg);
+}
+
+.item[data-disabled] {
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+.destructive {
+  color: var(--color-error);
+}

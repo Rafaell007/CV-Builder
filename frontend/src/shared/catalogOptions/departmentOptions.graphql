@@ -1,0 +1,7 @@
+# Every department, by name, for the Department select of the user forms (any signed-in user, KAN-105).
+query DepartmentOptions {
+  departmentOptions {
+    id
+    name
+  }
+}

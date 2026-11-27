@@ -1,0 +1,64 @@
+/*
+ * Disabled fields keep the transparent fill of the Figma modal (Domain, Description, Environment, the dates): only
+ * their text and border are grey. The wrapper adds no box, so the spacing between the fields stays the parent's.
+ */
+.fields {
+  /* Every field of the form has a 2px focus border (see Field.module.css, --field-focus-extra) */
+  --field-focus-extra: 1px;
+
+  --color-input-disabled-bg: transparent;
+
+  display: contents;
+}
+
+/* A disabled field shows the regular cursor, not the "not allowed" one, and no blinking caret. */
+.fields :is(input, textarea, button):disabled,
+.fields div[aria-disabled="true"] {
+  cursor: default;
+}
+
+.fields :is(input, textarea):is(:disabled, [readonly]) {
+  caret-color: transparent;
+}
+
+/* Start Date and End Date side by side; they stack when the modal is narrow. */
+.dates {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-6);
+}
+
+.error {
+  margin: 0;
+  color: var(--color-error-text);
+  font: var(--text-body);
+}
+
+.status {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font: var(--text-body);
+}
+
+.retry {
+  margin-left: var(--space-2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary-text);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* The multi-select and, when the roles failed to load, the retry button under it. */
+.roles {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.roles > :first-child {
+  align-self: stretch;
+}

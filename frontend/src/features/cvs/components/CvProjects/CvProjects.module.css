@@ -1,0 +1,30 @@
+/* The search field is 320px wide in Figma (as on the CVs page); ADD PROJECT sits at the right end. */
+.toolbar {
+  /* The search field gets the same 2px focus border as the fields of the modals (Field README, GitHub issue 89) */
+  --field-focus-extra: 1px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+  /* Figma ends the button 20px before the table edge, the page padding is 16px: the 4px is the difference. */
+  padding-right: var(--space-1);
+}
+
+/*
+ * The text Button as on the CVs page (Figma 1440 › CV Projects, measured on the image): 220 × 40, plus icon and
+ * text centred with 8px between them (glyph 14×14 at x 1225, text 95px wide, both #C63031).
+ * Two classes, so these win over the Button's own size whatever order the stylesheets load in.
+ */
+.toolbar .addButton {
+  gap: var(--space-2);
+  min-width: 220px;
+  height: var(--space-10);
+  padding: 0 var(--space-3);
+}
+
+.toolbar > :first-child {
+  flex: 1;
+  max-width: 320px;
+}

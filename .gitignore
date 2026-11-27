@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -11,14 +11,29 @@
 !.yarn/versions
 
 # testing
-/coverage
+coverage
+# Vitest blob reports of one test shard (pnpm test:shard); the CI merge job reads them
+.vitest/
+test-results/
+playwright-report/
+blob-report/
+
+# storybook build output (pnpm --filter @cv-builder/frontend build-storybook)
+storybook-static
 
 # next.js
-/.next/
-/out/
+.next/
+out/
 
 # production
-/build
+build
+dist
+
+# prisma generated client
+backend/src/generated
+
+# graphql codegen output (pnpm --filter @cv-builder/frontend codegen)
+frontend/src/shared/graphql/generated
 
 # misc
 .DS_Store
@@ -26,6 +41,7 @@
 
 # debug
 npm-debug.log*
+debug-storybook.log
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
@@ -43,3 +59,9 @@ next-env.d.ts
 
 # local agent settings
 .claude/settings.local.json
+
+# side notes - personal
+maciek/
+
+# plan pages of the ticket-to-plan skill (default folder, personal working files)
+.ticket-plans/

@@ -1,0 +1,21 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  /* Room for the EXPORT PDF button that hangs over the right end of this row, plus a gap. Set by CvPreview. */
+  padding-right: calc(var(--cv-preview-export-width) + var(--space-4));
+}
+
+.name {
+  margin: 0;
+  color: var(--color-text);
+  font: var(--text-title);
+  overflow-wrap: anywhere;
+}
+
+.position {
+  margin: 0;
+  color: var(--color-text);
+  font: var(--text-body);
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}

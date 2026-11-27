@@ -1,0 +1,12 @@
+.name {
+  overflow-wrap: anywhere;
+}
+
+/* The detail line under a row: the description, then the environment tags. */
+.detail {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  min-width: 0;
+}

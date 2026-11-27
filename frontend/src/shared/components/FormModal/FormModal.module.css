@@ -1,0 +1,12 @@
+/* Values: docs/design-tokens.md › Components › Modal (fields 36 apart; the floated label sits in that space) */
+
+/* Focused by the code on open when the first field is a date field: no ring, the next Tab shows the field */
+.form:focus {
+  outline: none;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}

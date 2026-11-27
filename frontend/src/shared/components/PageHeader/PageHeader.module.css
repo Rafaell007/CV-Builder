@@ -1,0 +1,16 @@
+/* Values: docs/design-tokens.md › App shell › Header and content. */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  height: var(--space-14);
+  /* Breadcrumbs at top 16, left 20 (off the 4px grid, kept exact). */
+  padding: var(--space-4) 0 0 20px;
+  background: var(--color-bg);
+}
+
+/* Read by screen readers, not shown. */
+.visuallyHidden {
+  composes: visuallyHidden from "../../styles/visuallyHidden.module.css";
+}

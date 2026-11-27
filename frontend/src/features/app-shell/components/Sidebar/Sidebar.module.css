@@ -1,0 +1,141 @@
+/* Values: docs/design-tokens.md › App shell. Width and chevron direction come from AppShell. */
+.sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  width: var(--sidebar-width);
+  height: 100dvh;
+  padding-bottom: var(--space-14);
+}
+
+.logoRow {
+  height: var(--space-14);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* The logo and the app name are one link to the home page; it fills the row so the whole row is clickable. */
+.logoLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  height: 100%;
+  padding-left: var(--space-4);
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 24×24 at left 16; it is the only thing in the row when the sidebar is collapsed. */
+.logo {
+  flex: none;
+}
+
+.appName {
+  color: var(--color-text);
+  font: 500 16px/24px var(--font-family);
+  letter-spacing: 0.15px;
+}
+
+/* Its centre sits on the sidebar's right edge. */
+.toggle {
+  position: absolute;
+  top: 51px;
+  left: calc(var(--sidebar-width) - var(--space-3));
+  z-index: 1;
+  display: flex;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.toggle:hover {
+  color: var(--color-text);
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+}
+
+/* Points right when collapsed: it shows what a click does. */
+.chevron {
+  width: 24px;
+  height: 24px;
+  transform: scaleX(var(--chevron-flip, 1));
+}
+
+.navigation {
+  flex: 1;
+  margin-top: 14px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: var(--sidebar-width);
+  height: var(--space-14);
+  padding-left: var(--space-4);
+  overflow: hidden;
+  border-radius: var(--radius-nav);
+  color: var(--color-text-secondary);
+  font: var(--text-body);
+  letter-spacing: var(--text-body-ls);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.link:hover {
+  color: var(--color-text);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+.active {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+}
+
+/* Same size and shape as a link, so nothing moves when the links arrive. */
+.skeletonBar {
+  width: var(--sidebar-width);
+  height: var(--space-14);
+  border-radius: var(--radius-nav);
+  background: var(--color-surface);
+}
+
+.divider {
+  width: var(--sidebar-width);
+  margin: 14px 0;
+  border: 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.footer {
+  flex-shrink: 0;
+}

@@ -1,0 +1,121 @@
+/* Values: docs/design-tokens.md › Toast (Figma DS › Notifications) and "Decisions where Figma is unclear" */
+
+/* 280 wide, height grows with the text. Title at 8 / 16, close at top 8, 12 from the right.
+   Bottom 20: the 80px sample minus the text at top 40 and its 20px line (derived). */
+.toast {
+  box-sizing: border-box;
+  width: 280px;
+  padding: var(--space-2) var(--space-3) 20px var(--space-4);
+  border: 1px solid;
+  border-radius: var(--radius-notification);
+  animation: toast-enter 200ms ease-out;
+}
+
+.success {
+  border-color: var(--color-success-border);
+  background: var(--color-success);
+  color: var(--color-notification-text);
+}
+
+.error {
+  border-color: var(--color-error-border);
+  background: var(--color-error);
+  color: var(--color-notification-error-text);
+}
+
+.warning {
+  border-color: var(--color-warning-border);
+  background: var(--color-warning);
+  color: var(--color-notification-text);
+}
+
+.info {
+  border-color: var(--color-info-border);
+  background: var(--color-info);
+  color: var(--color-notification-text);
+}
+
+/* Prediction: not drawn in Figma; same ring as Button (Radix focuses the toast on F8 + Tab) */
+.toast:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Prediction: the 8px gap between title and close is not drawn */
+.header {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.title {
+  font: var(--text-notification-title);
+  letter-spacing: var(--text-notification-title-ls);
+}
+
+/* Text at top 40: 8 under the 24px title line */
+.description {
+  margin-top: var(--space-2);
+  font: var(--text-notification-text);
+  letter-spacing: var(--text-notification-text-ls);
+}
+
+/* Prediction: no motion drawn in Figma. Slides in from the right, fades out. */
+.toast[data-state="closed"] {
+  animation: toast-exit 150ms ease-in forwards;
+}
+
+/* Swipe right to dismiss (Radix docs pattern) */
+.toast[data-swipe="move"] {
+  transform: translateX(var(--radix-toast-swipe-move-x));
+}
+
+.toast[data-swipe="cancel"] {
+  transform: translateX(0);
+  transition: transform 200ms ease-out;
+}
+
+.toast[data-swipe="end"] {
+  animation: toast-swipe-out 150ms ease-out forwards;
+}
+
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateX(calc(100% + var(--space-6)));
+  }
+}
+
+@keyframes toast-exit {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes toast-swipe-out {
+  from {
+    transform: translateX(var(--radix-toast-swipe-end-x));
+  }
+
+  to {
+    transform: translateX(calc(100% + var(--space-6)));
+  }
+}
+
+/* No movement, only a short fade: the exit still fires animationend, so the toast leaves the list */
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation-name: toast-fade-in;
+  }
+
+  .toast[data-swipe="end"] {
+    animation-name: toast-exit;
+  }
+}
+
+@keyframes toast-fade-in {
+  from {
+    opacity: 0;
+  }
+}

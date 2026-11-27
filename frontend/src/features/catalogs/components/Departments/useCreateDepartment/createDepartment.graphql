@@ -1,0 +1,7 @@
+# Creates one department. Admin only (backend). CONFLICT when the name is taken (case-insensitive, backend README).
+mutation CreateDepartment($input: CreateDepartmentInput!) {
+  createDepartment(input: $input) {
+    id
+    name
+  }
+}

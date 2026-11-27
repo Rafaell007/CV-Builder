@@ -1,0 +1,64 @@
+/* Figma "Email verification": six 48px boxes, 16px apart, centred. Colours reuse the text input tokens. */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.boxes {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+/* The boxes shrink on a narrow screen instead of overflowing; they stay square. */
+.box {
+  flex: 0 1 var(--space-12);
+  min-width: 0;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 1px solid var(--color-input-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: var(--text-input);
+  letter-spacing: var(--text-input-ls);
+  text-align: center;
+}
+
+.box:hover {
+  border-color: var(--color-input-border-hover);
+}
+
+.box:focus {
+  border-color: var(--color-input-border-focus);
+  outline: none;
+}
+
+/* Keyboard users get a visible ring on top of the border colour (page AC-24). */
+.box:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.box[aria-invalid="true"] {
+  border-color: var(--color-error);
+}
+
+.box:disabled {
+  border-color: var(--color-input-border);
+  background: var(--color-input-disabled-bg);
+  color: var(--color-input-disabled-text);
+}
+
+.error {
+  margin: 0;
+  color: var(--color-error-text);
+  font: var(--text-error);
+  letter-spacing: var(--text-error-ls);
+  text-align: center;
+}

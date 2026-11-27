@@ -1,0 +1,43 @@
+/* Values: Figma CV Skills (1440 frame): bar, 16 gap, name in the secondary text colour; the item is 48 high. */
+.item {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--space-12);
+  /* 15 + the 1px border = 16: the bar starts 16 from the column edge, as in Figma. */
+  padding: 0 calc(var(--space-4) - 1px);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: var(--text-body);
+  letter-spacing: var(--text-body-ls);
+  text-align: left;
+  cursor: pointer;
+}
+
+.item:hover {
+  background: var(--color-surface);
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Selection mode: the chosen skill is highlighted by the border and the fill, not by colour alone. */
+.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-active-bg);
+  color: var(--color-text);
+}
+
+.name {
+  overflow-wrap: anywhere;
+}
+
+.hidden {
+  composes: visuallyHidden from "../../../../../../shared/styles/visuallyHidden.module.css";
+}

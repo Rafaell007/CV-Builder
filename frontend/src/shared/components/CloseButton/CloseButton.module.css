@@ -1,0 +1,32 @@
+/* Values: docs/design-tokens.md › Components › Modal (close 24×24, cross 12×12) */
+
+.closeButton {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-6);
+  height: var(--space-6);
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-round);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* The 24px icon frame is wider than the 22px inside the border; the 12px cross stays centred */
+.closeButton svg {
+  flex: none;
+}
+
+/* Prediction: hover not drawn in Figma; a border in the cross colour, like IconButton */
+.closeButton:hover {
+  border-color: currentcolor;
+}
+
+/* Prediction: not drawn in Figma; same ring as Button */
+.closeButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}

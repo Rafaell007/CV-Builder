@@ -1,0 +1,13 @@
+.text {
+  overflow-wrap: anywhere;
+}
+
+/* The detail line under a row: the description, then the responsibilities as tags (Figma CV projects list). */
+.detail {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  /* Figma frame-46: the tags start 18 under the last line of the description (off the 4px grid, kept exact). */
+  gap: 18px;
+  min-width: 0;
+}

@@ -1,0 +1,20 @@
+# Creates one user. Admin only (backend). The backend lowercases the email, verifies the user (D16) and answers
+# CONFLICT with reason EMAIL_TAKEN for a taken email.
+mutation CreateUser($input: CreateUserInput!) {
+  createUser(input: $input) {
+    id
+    email
+    firstName
+    lastName
+    role
+    avatarUrl
+    department {
+      id
+      name
+    }
+    position {
+      id
+      name
+    }
+  }
+}

@@ -1,0 +1,16 @@
+# Creates one project. Admin only (backend). `environmentIds` is left out: the form has no Environment field yet
+# (it needs the skills catalog query, which the backend does not have, PLAN S5.3). The backend then uses an empty list.
+mutation CreateProject($input: CreateProjectInput!) {
+  createProject(input: $input) {
+    id
+    name
+    domain
+    startDate
+    endDate
+    description
+    environment {
+      id
+      name
+    }
+  }
+}

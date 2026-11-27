@@ -1,0 +1,24 @@
+{
+  "navigation": "Main navigation",
+  "nav": {
+    "employees": "Employees",
+    "skills": "Skills",
+    "languages": "Languages",
+    "cvs": "CVs",
+    "departments": "Departments",
+    "positions": "Positions",
+    "projects": "Projects"
+  },
+  "sidebar": "Sidebar",
+  "profile": "Profile",
+  "settings": "Settings",
+  "logout": "Logout",
+  "logoutFailed": "Could not log out. Please try again.",
+  "forbidden": {
+    "title": "No access",
+    "message": "Only Admin users can open this page.",
+    "back": "Back to Employees",
+    "error": "Could not check your access. Please try again.",
+    "retry": "Retry"
+  }
+}

@@ -1,0 +1,5 @@
+# Deletes one user and everything they own (D13). Admin only (backend). The backend refuses with CONFLICT reason
+# SELF_DELETE when an admin deletes themselves (D24).
+mutation DeleteUser($id: ID!) {
+  deleteUser(id: $id)
+}

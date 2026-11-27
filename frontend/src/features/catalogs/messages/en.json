@@ -1,0 +1,307 @@
+{
+  "departments": {
+    "button": "CREATE DEPARTMENT",
+    "table": "Departments list",
+    "columns": {
+      "name": "Name"
+    },
+    "actions": {
+      "column": "Actions",
+      "menu": "Actions for {name}",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "search": {
+      "label": "Search departments",
+      "placeholder": "Search"
+    },
+    "pagination": {
+      "navigation": "Departments pagination",
+      "previous": "Previous page",
+      "next": "Next page",
+      "page": "Page {number}"
+    },
+    "states": {
+      "loading": "Loading departments",
+      "empty": "No departments found",
+      "noResults": "No departments found",
+      "error": "Something went wrong. Please try again later",
+      "retry": "Retry"
+    },
+    "create": {
+      "title": "Create department",
+      "close": "Close",
+      "submit": "Create",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Department created",
+        "text": "{name} was added to the departments."
+      }
+    },
+    "update": {
+      "title": "Edit department",
+      "close": "Close",
+      "submit": "Save",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Department updated",
+        "text": "{name} was saved."
+      }
+    },
+    "delete": {
+      "title": "Delete department",
+      "message": "Are you sure you want to delete department <strong>{name}</strong>?",
+      "close": "Close",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "failedTitle": "Could not delete the department",
+      "failedText": "Something went wrong. Please try again.",
+      "inUseText": "Department cannot be deleted because it is currently in use"
+    },
+    "form": {
+      "fields": {
+        "name": "Department"
+      },
+      "errors": {
+        "nameRequired": "Department name is required",
+        "nameTooLong": "Department name must not exceed 100 characters",
+        "nameTaken": "Department already exists",
+        "serverInvalid": "The server did not accept this value",
+        "failed": "Something went wrong. Please try again later"
+      }
+    }
+  },
+  "positions": {
+    "button": "CREATE POSITION",
+    "table": "Positions list",
+    "columns": {
+      "name": "Name"
+    },
+    "actions": {
+      "column": "Actions",
+      "menu": "Actions for {name}",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "search": {
+      "label": "Search positions",
+      "placeholder": "Search"
+    },
+    "pagination": {
+      "navigation": "Positions pagination",
+      "previous": "Previous page",
+      "next": "Next page",
+      "page": "Page {number}"
+    },
+    "states": {
+      "loading": "Loading positions",
+      "empty": "No positions found",
+      "noResults": "No positions found",
+      "error": "Something went wrong. Please try again later",
+      "retry": "Retry"
+    },
+    "create": {
+      "title": "Create position",
+      "close": "Close",
+      "submit": "Create",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Position created",
+        "text": "{name} was added to the positions."
+      }
+    },
+    "update": {
+      "title": "Edit position",
+      "close": "Close",
+      "submit": "Save",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Position updated",
+        "text": "{name} was saved."
+      }
+    },
+    "delete": {
+      "title": "Delete position",
+      "message": "Are you sure you want to delete position <strong>{name}</strong>?",
+      "close": "Close",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "failedTitle": "Could not delete the position",
+      "failedText": "Something went wrong. Please try again.",
+      "inUseText": "Position cannot be deleted because it is currently in use"
+    },
+    "form": {
+      "fields": {
+        "name": "Position"
+      },
+      "errors": {
+        "nameRequired": "Position name is required",
+        "nameTooLong": "Position name must not exceed 100 characters",
+        "nameTaken": "Position already exists",
+        "serverInvalid": "The server did not accept this value",
+        "failed": "Something went wrong. Please try again later"
+      }
+    }
+  },
+  "skills": {
+    "button": "CREATE SKILL",
+    "table": "Skills list",
+    "columns": {
+      "name": "Name",
+      "type": "Type",
+      "category": "Category"
+    },
+    "actions": {
+      "column": "Actions",
+      "menu": "Actions for {name}",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "search": {
+      "label": "Search skills",
+      "placeholder": "Search"
+    },
+    "pagination": {
+      "navigation": "Skills pagination",
+      "previous": "Previous page",
+      "next": "Next page",
+      "page": "Page {number}"
+    },
+    "states": {
+      "loading": "Loading skills",
+      "empty": "No skills found",
+      "noResults": "No skills found",
+      "error": "Something went wrong. Please try again later",
+      "retry": "Retry"
+    },
+    "create": {
+      "title": "Create skill",
+      "close": "Close",
+      "submit": "Create",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Skill created",
+        "text": "{name} was added to the skills."
+      }
+    },
+    "update": {
+      "title": "Update skill",
+      "close": "Close",
+      "submit": "Update",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Skill updated",
+        "text": "{name} was saved."
+      }
+    },
+    "delete": {
+      "title": "Delete skill",
+      "message": "Are you sure you want to delete skill <strong>{name}</strong>?",
+      "close": "Close",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "failedTitle": "Could not delete the skill",
+      "failedText": "Something went wrong. Please try again.",
+      "inUseText": "Skill cannot be deleted because it is currently in use"
+    },
+    "form": {
+      "fields": {
+        "name": "Name",
+        "category": "Category"
+      },
+      "errors": {
+        "nameRequired": "Skill is required",
+        "nameTooLong": "Skill name must not exceed 100 characters",
+        "nameTaken": "Skill already exists",
+        "categoryRequired": "Category is required",
+        "categoryNotFound": "Category not found",
+        "categoriesFailed": "Could not load the categories",
+        "categoriesRetry": "Retry",
+        "serverInvalid": "The server did not accept this value",
+        "failed": "Something went wrong. Please try again later"
+      }
+    }
+  },
+  "languages": {
+    "button": "CREATE LANGUAGE",
+    "table": "Languages list",
+    "columns": {
+      "name": "Name",
+      "iso": "ISO",
+      "nativeName": "Native name"
+    },
+    "actions": {
+      "column": "Actions",
+      "menu": "Actions for {name}",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "search": {
+      "label": "Search languages",
+      "placeholder": "Search"
+    },
+    "pagination": {
+      "navigation": "Languages pagination",
+      "previous": "Previous page",
+      "next": "Next page",
+      "page": "Page {number}"
+    },
+    "states": {
+      "loading": "Loading languages",
+      "empty": "No languages found",
+      "noResults": "No languages found",
+      "error": "Something went wrong. Please try again later",
+      "retry": "Retry"
+    },
+    "create": {
+      "title": "Create language",
+      "close": "Close",
+      "submit": "Create",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Language created",
+        "text": "{name} was added to the languages."
+      }
+    },
+    "update": {
+      "title": "Update language",
+      "close": "Close",
+      "submit": "Update",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Language updated",
+        "text": "{name} was saved."
+      }
+    },
+    "delete": {
+      "title": "Delete language",
+      "message": "Are you sure you want to delete language <strong>{name}</strong>?",
+      "close": "Close",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "failedTitle": "Could not delete the language",
+      "failedText": "Something went wrong. Please try again.",
+      "inUseText": "Language cannot be deleted because it is currently in use"
+    },
+    "form": {
+      "fields": {
+        "name": "Name",
+        "iso": "ISO",
+        "nativeName": "Native name"
+      },
+      "errors": {
+        "nameRequired": "Name is required",
+        "nameTooLong": "Name must not exceed 100 characters",
+        "nameTaken": "Language already exists",
+        "isoRequired": "ISO is required",
+        "isoTooLong": "ISO must not exceed 5 characters",
+        "isoInvalid": "ISO may contain only the letters A-Z and one hyphen",
+        "isoTaken": "ISO code already exists",
+        "nativeNameRequired": "Native name is required",
+        "nativeNameTooLong": "Native name must not exceed 100 characters",
+        "serverInvalid": "The server did not accept this value",
+        "failed": "Something went wrong. Please try again later"
+      }
+    }
+  }
+}

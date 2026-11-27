@@ -1,0 +1,74 @@
+/*
+ * Figma (read 2026-11-26, notes in docs/design-tokens.md): 1440 › USER PROFILE and 768 › USER PROFILE, Design
+ * system › Avatar Uploader. The 35×35 icon frame and the label sit in one row, 16px apart; the label's 32px line
+ * starts 6px under the icon's top; the hint starts where the icon ends (0 gap). Colours: main text, also the icon.
+ */
+.upload {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.control {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+/* Kept in the tab order and in the accessibility tree; the label is what people see and click. */
+.input {
+  composes: visuallyHidden from "../../../../shared/styles/visuallyHidden.module.css";
+}
+
+.icon {
+  flex: none;
+}
+
+/* 500 20/32, letter spacing 0.15 (no style in Figma; Roboto Medium as drawn). */
+.label {
+  margin-top: 6px;
+  font: 500 20px/32px var(--font-family);
+  letter-spacing: 0.15px;
+}
+
+/* Figma "Adding": a 1px line under the icon and label row. A shadow, so the row does not move. */
+.control:hover {
+  box-shadow: 0 1px 0 currentColor;
+}
+
+/* Prediction: not drawn in Figma; the same ring as Button around the whole row. */
+.control:has(.input:focus-visible) {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Prediction: not drawn in Figma; while an upload or a removal runs. Last, so it wins over hover. */
+.control:has(.input:disabled) {
+  box-shadow: none;
+  color: var(--color-icon-disabled);
+  cursor: not-allowed;
+}
+
+/*
+ * 400 16/28, letter spacing 0.15. Figma: main text at 60% layer opacity; light uses the secondary text colour
+ * instead (60% is 3.7:1, below 4.5:1), dark keeps Figma (5.5:1). Desktop: 5px right of the icon's left edge.
+ */
+.hint {
+  margin: 0 0 0 5px;
+  color: var(--color-avatar-hint);
+  font: 400 16px/28px var(--font-family);
+  letter-spacing: 0.15px;
+}
+
+/* 768: the hint starts 7px left of the icon instead. */
+@media (max-width: 1023.98px) {
+  .control {
+    margin-left: 7px;
+  }
+
+  .hint {
+    margin-left: 0;
+  }
+}

@@ -1,0 +1,361 @@
+{
+  "button": "CREATE CV",
+  "table": "CVs list",
+  "columns": {
+    "name": "Name",
+    "education": "Education",
+    "employee": "Employee"
+  },
+  "actions": {
+    "column": "Actions",
+    "menu": "Actions for {name}",
+    "view": "View",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "search": {
+    "label": "Search CVs",
+    "placeholder": "Search"
+  },
+  "pagination": {
+    "navigation": "CVs pagination",
+    "previous": "Previous page",
+    "next": "Next page",
+    "page": "Page {number}"
+  },
+  "states": {
+    "loading": "Loading CVs",
+    "empty": "You have no CVs yet",
+    "noResults": "No CVs found",
+    "error": "Failed to load CVs",
+    "forbidden": "You are not authorized to access this page",
+    "retry": "Retry"
+  },
+  "form": {
+    "fields": {
+      "name": "Name",
+      "education": "Education",
+      "description": "Description"
+    },
+    "errors": {
+      "nameRequired": "Name is required",
+      "nameTooLong": "Name must not exceed 255 characters",
+      "educationRequired": "Education is required",
+      "educationTooLong": "Education must not exceed 255 characters",
+      "descriptionRequired": "Description is required",
+      "descriptionTooLong": "Description must not exceed 2000 characters",
+      "serverInvalid": "The server did not accept this value",
+      "failed": "Something went wrong. Please try again later"
+    }
+  },
+  "create": {
+    "title": "Create CV",
+    "close": "Close",
+    "submit": "Create",
+    "cancel": "Cancel",
+    "success": {
+      "title": "CV created",
+      "text": "{name} was added to the CVs."
+    }
+  },
+  "update": {
+    "title": "Update CV",
+    "close": "Close",
+    "submit": "Update",
+    "cancel": "Cancel",
+    "success": {
+      "title": "CV updated",
+      "text": "{name} was saved."
+    }
+  },
+  "tabs": {
+    "label": "CV sections",
+    "details": "Details",
+    "skills": "Skills",
+    "projects": "Projects",
+    "preview": "Preview"
+  },
+  "details": {
+    "update": "UPDATE",
+    "states": {
+      "loading": "Loading CV",
+      "error": "Failed to load CV details",
+      "retry": "Retry"
+    },
+    "notFound": {
+      "title": "CV not found",
+      "message": "This CV does not exist, or you cannot open it.",
+      "back": "Back to CVs"
+    },
+    "forbidden": {
+      "title": "No access",
+      "message": "You are not allowed to open this CV.",
+      "back": "Back to CVs"
+    }
+  },
+  "delete": {
+    "title": "Delete CV",
+    "message": "Are you sure you want to delete CV <strong>{name}</strong>?",
+    "close": "Close",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "failedTitle": "Could not delete the CV",
+    "failedText": "Something went wrong. Please try again.",
+    "notFound": "This CV does not exist any more. The list was updated.",
+    "forbidden": "You are not allowed to delete this CV."
+  },
+  "skills": {
+    "actions": {
+      "add": "ADD SKILL",
+      "remove": "REMOVE SKILLS"
+    },
+    "masteryLevel": "Mastery: {level}",
+    "mastery": {
+      "NONE": "No mastery",
+      "BEGINNER": "Beginner",
+      "ELEMENTARY": "Elementary",
+      "INTERMEDIATE": "Intermediate",
+      "ADVANCED": "Advanced",
+      "EXPERT": "Expert"
+    },
+    "states": {
+      "loading": "Loading skills",
+      "empty": "No skills added yet",
+      "error": "Failed to load skills",
+      "retry": "Retry"
+    },
+    "selection": {
+      "remove": "Remove",
+      "cancel": "Cancel"
+    },
+    "add": {
+      "title": "Add skill",
+      "close": "Close",
+      "skill": "Skill",
+      "mastery": "Mastery",
+      "noMastery": "No mastery",
+      "submit": "Add",
+      "cancel": "Cancel",
+      "loading": "Loading skills",
+      "loadFailed": "Failed to load the skills you can add.",
+      "retry": "Retry",
+      "none": "The owner of this CV has no more skills to add.",
+      "errors": {
+        "required": "Skill is required",
+        "conflict": "This skill is already in the CV",
+        "invalid": "This skill is not available for the owner of the CV",
+        "notFound": "This CV does not exist any more.",
+        "forbidden": "You are not allowed to add skills to this CV.",
+        "failed": "Something went wrong. Please try again later"
+      },
+      "success": {
+        "title": "Skill added",
+        "text": "{name} was added to the CV."
+      }
+    },
+    "update": {
+      "title": "Update skill",
+      "close": "Close",
+      "skill": "Skill",
+      "mastery": "Mastery",
+      "submit": "Update",
+      "cancel": "Cancel",
+      "errors": {
+        "notFound": "This skill is not in the CV any more.",
+        "forbidden": "You are not allowed to change this CV.",
+        "failed": "Something went wrong. Please try again later"
+      },
+      "success": {
+        "title": "Skill updated",
+        "text": "{name} was saved."
+      }
+    },
+    "remove": {
+      "title": "Remove skills",
+      "message": "{count, plural, one {Are you sure you want to remove # skill?} other {Are you sure you want to remove # skills?}}",
+      "close": "Close",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "failedTitle": "Could not remove the skills",
+      "failedText": "Something went wrong. Please try again.",
+      "notFound": "Some of these skills are not in the CV any more. The list was updated.",
+      "forbidden": "You are not allowed to change this CV."
+    }
+  },
+  "projects": {
+    "table": "CV projects",
+    "columns": {
+      "name": "Name",
+      "domain": "Domain",
+      "startDate": "Start Date",
+      "endDate": "End Date"
+    },
+    "tillNow": "Till now",
+    "dateMissing": "Date missing",
+    "responsibilities": "Responsibilities",
+    "actions": {
+      "add": "ADD PROJECT",
+      "column": "Actions",
+      "menu": "Actions for {name}",
+      "update": "Update",
+      "delete": "Delete"
+    },
+    "search": {
+      "label": "Search projects",
+      "placeholder": "Search"
+    },
+    "states": {
+      "loading": "Loading projects",
+      "empty": "No projects added yet",
+      "noResults": "No projects found",
+      "error": "Failed to load projects",
+      "retry": "Retry"
+    },
+    "form": {
+      "fields": {
+        "project": "Name",
+        "domain": "Domain",
+        "description": "Description",
+        "environment": "Environment",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "roles": "Roles",
+        "responsibilities": "Responsibilities"
+      },
+      "datePicker": {
+        "calendar": "Choose a date",
+        "previousMonth": "Previous month",
+        "nextMonth": "Next month",
+        "previousYear": "Previous year",
+        "nextYear": "Next year",
+        "chooseDayPrefix": "Choose",
+        "unavailableDayPrefix": "Not available",
+        "monthPrefix": "Month"
+      },
+      "environment": {
+        "remove": "Remove {option}"
+      },
+      "roles": {
+        "remove": "Remove {option}",
+        "loading": "Loading roles",
+        "failed": "The roles could not be loaded.",
+        "retry": "Retry"
+      },
+      "projectOptions": {
+        "loading": "Loading projects",
+        "failed": "The projects you can add could not be loaded.",
+        "retry": "Retry",
+        "none": "All projects of the catalog are already in this CV."
+      },
+      "errors": {
+        "projectRequired": "Project is required",
+        "startDateRequired": "Start date is required",
+        "startDateOutOfRange": "Start date must be within project duration",
+        "endDateOutOfRange": "End date must be within project duration",
+        "endDateBeforeStart": "End date cannot be earlier than start date",
+        "rolesRequired": "At least one role must be selected",
+        "rolesTooMany": "Select at most 50 roles",
+        "responsibilitiesTooLong": "Responsibilities must not exceed 2000 characters",
+        "server": {
+          "projectId": "This project cannot be added to the CV",
+          "startDate": "Start date must be within project duration",
+          "endDate": "End date must be within project duration",
+          "roleIds": "At least one valid role must be selected",
+          "responsibilities": "The server did not accept this value"
+        },
+        "invalid": "The server did not accept these values.",
+        "conflict": "This project is already in the CV, or its dates changed. Please try again.",
+        "notFound": "This CV does not exist any more.",
+        "forbidden": "You are not allowed to change this CV.",
+        "failed": "Something went wrong. Please try again later"
+      }
+    },
+    "add": {
+      "title": "Add project",
+      "close": "Close",
+      "submit": "Add",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Project added",
+        "text": "{name} was added to the CV."
+      }
+    },
+    "update": {
+      "title": "Update project",
+      "close": "Close",
+      "submit": "Update",
+      "cancel": "Cancel",
+      "success": {
+        "title": "Project updated",
+        "text": "{name} was saved."
+      }
+    },
+    "remove": {
+      "title": "Remove project",
+      "message": "Are you sure you want to remove project <strong>{name}</strong>?",
+      "close": "Close",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "failedTitle": "Could not remove the project",
+      "failedText": "Something went wrong. Please try again.",
+      "notFound": "This project is not in the CV any more. The list was updated.",
+      "forbidden": "You are not allowed to change this CV.",
+      "success": {
+        "title": "Project removed",
+        "text": "{name} was removed from the CV."
+      }
+    }
+  },
+  "preview": {
+    "document": "CV preview",
+    "export": {
+      "label": "EXPORT PDF",
+      "generating": "Generating the PDF",
+      "failedTitle": "Could not export the PDF",
+      "failedText": "Something went wrong. Please try again.",
+      "notFound": "This CV does not exist, or you cannot open it.",
+      "forbidden": "You are not allowed to export this CV."
+    },
+    "states": {
+      "loading": "Loading CV preview",
+      "unauthorized": "You are not authorized to access this CV",
+      "error": "Failed to load CV preview",
+      "retry": "Retry"
+    },
+    "skillsTable": {
+      "caption": "Professional skills",
+      "columns": {
+        "skills": "Skills",
+        "experience": "Experience in Years",
+        "lastUsed": "Last Used"
+      },
+      "notAvailable": "{column}: not available",
+      "empty": "No skills added"
+    },
+    "sections": {
+      "general": {
+        "title": "General information",
+        "education": "Education",
+        "languages": "Language proficiency",
+        "levelNative": "Native",
+        "domains": "Domains"
+      },
+      "summary": {
+        "title": "Summary"
+      },
+      "professionalSkills": {
+        "title": "Professional skills"
+      },
+      "skills": {
+        "title": "Skills"
+      },
+      "projects": {
+        "title": "Projects",
+        "roles": "Project roles",
+        "period": "Period",
+        "responsibilities": "Responsibilities",
+        "environment": "Environment"
+      }
+    }
+  }
+}
