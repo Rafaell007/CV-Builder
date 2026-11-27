@@ -57,7 +57,7 @@ afterEach(() => {
 });
 
 // The Profile tab has the `User` query open (preloaded on the server), so a reload after an action updates it.
-async function setup(before: string | null, after: string | null) {
+async function setup(before: string | null, after: string | null, locale: "en" | "pl" = "en") {
   let current!: { client: ApolloClient; hook: ReturnType<typeof useAvatarActions> };
   function Probe(): ReactNode {
     useQuery(UserDocument, { variables: { id: "7" } });
@@ -66,6 +66,7 @@ async function setup(before: string | null, after: string | null) {
   }
   renderWithProviders(<Probe />, {
     mocks: [withAvatarUrl(userMock("7"), before), withAvatarUrl(userMock("7"), after)],
+    locale,
   });
   const cachedAvatarUrl = () =>
     current.client.cache.readQuery({ query: UserDocument, variables: { id: "7" } })?.user.avatarUrl;
@@ -314,6 +315,18 @@ describe("useAvatarActions: remove", () => {
     expect(settled).toBe(false);
     expect(hook().busy).toBe(true);
     expect(screen.queryByText("Failed to remove avatar")).not.toBeInTheDocument();
+  });
+});
+
+describe("useAvatarActions: language", () => {
+  it("speaks the language of the page", async () => {
+    const { upload } = await setup(null, NEW_AVATAR_URL, "pl");
+
+    await upload(
+      new File([new Uint8Array(AVATAR_MAX_BYTES + 1)], "big.png", { type: "image/png" }),
+    );
+
+    expect(await screen.findByText("Plik nie może być większy niż 5 MB.")).toBeInTheDocument();
   });
 });
 
