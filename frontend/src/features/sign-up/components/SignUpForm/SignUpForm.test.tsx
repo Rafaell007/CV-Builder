@@ -2,6 +2,7 @@ import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SignUpDocument } from "@/shared/graphql";
 import { renderWithProviders, screen, waitFor } from "@/shared/testing";
+import { EMAIL_TAKEN_REASON } from "./utils";
 import { SignUpForm } from "./index";
 
 const push = vi.fn();
@@ -159,7 +160,7 @@ describe("SignUpForm", () => {
 
   it("shows a taken email under the email field and keeps the values", async () => {
     const { user } = renderWithProviders(<SignUpForm />, {
-      mocks: [signUpMock(failure("CONFLICT", "EMAIL_TAKEN"))],
+      mocks: [signUpMock(failure("CONFLICT", EMAIL_TAKEN_REASON))],
     });
 
     await fillForm(user);
@@ -180,7 +181,7 @@ describe("SignUpForm", () => {
 
   it("removes the taken-email message when the email is changed", async () => {
     const { user } = renderWithProviders(<SignUpForm />, {
-      mocks: [signUpMock(failure("CONFLICT", "EMAIL_TAKEN"))],
+      mocks: [signUpMock(failure("CONFLICT", EMAIL_TAKEN_REASON))],
     });
     await fillForm(user);
     await user.click(submit());

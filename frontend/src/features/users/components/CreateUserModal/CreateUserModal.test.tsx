@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { Button } from "@/shared/components";
 import type { CreateUserInput } from "@/shared/graphql";
 import { renderWithProviders, type RenderWithProvidersOptions } from "@/shared/testing";
+import { EMAIL_TAKEN_REASON } from "../../users.constants";
 import { useCreateUserForm } from "../../useCreateUserForm";
 import {
   createUserMock,
@@ -181,7 +182,7 @@ describe("CreateUserModal", () => {
 
   it("shows a taken email under Email and keeps the values", async () => {
     const view = await open({
-      mocks: [createUserRefusedMock(input, { code: "CONFLICT", reason: "EMAIL_TAKEN" })],
+      mocks: [createUserRefusedMock(input, { code: "CONFLICT", reason: EMAIL_TAKEN_REASON })],
     });
     await fill(view);
 

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type { UseCatalogOptionsResult } from "@/shared/catalogOptions";
+import { CONCURRENT_CHANGE_REASON } from "@/shared/userProfile";
 import {
   hasProfileChanged,
   toProfileCatalog,
@@ -105,7 +106,7 @@ describe("toProfileGeneralError", () => {
   it.each([
     [{ kind: "forbidden" as const }, "forbidden"],
     [{ kind: "notFound" as const }, "notFound"],
-    [{ kind: "conflict" as const, reason: "CONCURRENT_CHANGE" }, "concurrentChange"],
+    [{ kind: "conflict" as const, reason: CONCURRENT_CHANGE_REASON }, "concurrentChange"],
     [{ kind: "conflict" as const, reason: "OTHER" }, "failed"],
     [{ kind: "invalid" as const }, "failed"],
     [{ kind: "unknown" as const }, "failed"],

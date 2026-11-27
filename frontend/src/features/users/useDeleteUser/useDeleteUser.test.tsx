@@ -2,6 +2,8 @@ import { act, screen, waitFor } from "@testing-library/react";
 import { useState, type ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import { renderWithProviders, type RenderWithProvidersOptions } from "@/shared/testing";
+import { CONCURRENT_CHANGE_REASON } from "@/shared/userProfile";
+import { SELF_DELETE_REASON } from "../users.constants";
 import {
   bravo,
   charlie,
@@ -137,10 +139,10 @@ describe("useDeleteUser", () => {
   });
 
   it.each([
-    [{ code: "CONFLICT", reason: "SELF_DELETE" }, "You cannot delete your own account."],
+    [{ code: "CONFLICT", reason: SELF_DELETE_REASON }, "You cannot delete your own account."],
     [{ code: "FORBIDDEN" }, "You do not have permission to do this."],
     [
-      { code: "CONFLICT", reason: "CONCURRENT_CHANGE" },
+      { code: "CONFLICT", reason: CONCURRENT_CHANGE_REASON },
       "Someone changed this user at the same time. Try again.",
     ],
     [{ code: "CONFLICT" }, "Something went wrong. Please try again."],
@@ -190,7 +192,7 @@ describe("useDeleteUser", () => {
     const { result } = setup({
       mocks: [
         withErrors(deleteUserMock(bravo.id), [
-          { code: "CONFLICT", reason: "SELF_DELETE" },
+          { code: "CONFLICT", reason: SELF_DELETE_REASON },
           { code: "NOT_FOUND" },
         ]),
       ],

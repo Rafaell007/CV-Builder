@@ -98,6 +98,23 @@ Each bullet is one `test()`. The name of the spec file is in bold.
 - An admin adds skills that the owner has, not skills of the admin.
 - A user cannot open the skills of the CV of another user.
 
+### error-reasons
+
+**error-reasons.spec.ts** (KAN-184; sends the real request for each `extensions.reason` the frontend reads and checks the code and the reason on the wire. The strings are written out in the spec, because the frontend and the backend share no code. The spec lists the reasons that need a race or a clock and are not covered.)
+- A taken email gives `CONFLICT` with `EMAIL_TAKEN`.
+- A wrong code gives `BAD_USER_INPUT` with `CODE_INVALID`.
+- The sixth wrong code gives `TOO_MANY_REQUESTS` with `TOO_MANY_ATTEMPTS`.
+- RESEND right after sign-up gives `TOO_MANY_REQUESTS` with `RESEND_COOLDOWN`.
+- RESEND by a verified user gives `CONFLICT` with `ALREADY_VERIFIED`.
+- A verified-only action of an unverified user gives `FORBIDDEN` with `EMAIL_NOT_VERIFIED`.
+- An unknown reset token gives `BAD_USER_INPUT` with `RESET_TOKEN_INVALID`.
+- A reset token used twice gives `BAD_USER_INPUT` with `RESET_TOKEN_USED`.
+- A wrong current password gives `BAD_USER_INPUT` with `CURRENT_PASSWORD_INCORRECT`.
+- A new password equal to the current one gives `BAD_USER_INPUT` with `NEW_PASSWORD_SAME`.
+- An admin who removes their own Admin role gets `CONFLICT` with `OWN_ROLE`.
+- An admin who deletes themselves gets `CONFLICT` with `SELF_DELETE`.
+- A language with a taken ISO code gives `CONFLICT` with `ISO_TAKEN`.
+
 ### error-pages
 
 **no-internet.spec.ts**

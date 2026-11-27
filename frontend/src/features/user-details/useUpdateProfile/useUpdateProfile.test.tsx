@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import { MeDocument, UserDocument, type UpdateProfileInput } from "@/shared/graphql";
 import { renderWithProviders } from "@/shared/testing";
+import { CONCURRENT_CHANGE_REASON } from "@/shared/userProfile";
 import {
   meMock,
   updateProfileMock,
@@ -126,14 +127,14 @@ describe("useUpdateProfile", () => {
   it("rejects with the backend error and changes nothing in the cache", async () => {
     const input = inputFor("7");
     const { update, cachedUser, hasStoredUsers } = setup([
-      updateProfileRefusedMock(input, { code: "CONFLICT", reason: "CONCURRENT_CHANGE" }),
+      updateProfileRefusedMock(input, { code: "CONFLICT", reason: CONCURRENT_CHANGE_REASON }),
     ]);
 
     await act(async () => {
       await expect(update(input)).rejects.toMatchObject({
         errors: [
           expect.objectContaining({
-            extensions: { code: "CONFLICT", reason: "CONCURRENT_CHANGE" },
+            extensions: { code: "CONFLICT", reason: CONCURRENT_CHANGE_REASON },
           }),
         ],
       });

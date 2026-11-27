@@ -3,6 +3,7 @@ import { useState, type ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import type { UpdateUserInput } from "@/shared/graphql";
 import { renderWithProviders, type RenderWithProvidersOptions } from "@/shared/testing";
+import { OWN_ROLE_REASON } from "../users.constants";
 import {
   bravo,
   updateUserMock,
@@ -76,12 +77,14 @@ describe("useUpdateUser", () => {
 
   it("rejects with the backend error, so the form can show the reason and keep its values", async () => {
     const { result } = setup({
-      mocks: [updateUserRefusedMock(input, { code: "CONFLICT", reason: "OWN_ROLE" })],
+      mocks: [updateUserRefusedMock(input, { code: "CONFLICT", reason: OWN_ROLE_REASON })],
     });
 
     await act(async () => {
       await expect(result().update(input)).rejects.toMatchObject({
-        errors: [expect.objectContaining({ extensions: { code: "CONFLICT", reason: "OWN_ROLE" } })],
+        errors: [
+          expect.objectContaining({ extensions: { code: "CONFLICT", reason: OWN_ROLE_REASON } }),
+        ],
       });
     });
   });
@@ -121,7 +124,7 @@ describe("useUpdateUser", () => {
       mocks: [
         usersMock([bravo], { variables: tangoSearch }),
         withErrors(updateUserMock(input, bravo.email), [
-          { code: "CONFLICT", reason: "OWN_ROLE" },
+          { code: "CONFLICT", reason: OWN_ROLE_REASON },
           { code: "NOT_FOUND" },
         ]),
         usersMock([], { variables: tangoSearch }),
