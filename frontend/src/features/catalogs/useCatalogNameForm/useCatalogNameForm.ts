@@ -10,8 +10,9 @@ import { catalogNameSchema } from "../utils";
 const EMPTY_VALUES: CatalogNameFormValues = { name: "" };
 
 /**
- * The one-field name form that Create and Update share: the rule and the mapping of a failed request. A failed request keeps the typed name: `CONFLICT` shows "… already exists" under the field,
- * a `BAD_USER_INPUT` field error shows under the field too, anything else becomes one general message (`failed`).
+ * The one-field name form that Create and Update share: the rule and the mapping of a failed request. A failed
+ * request keeps the typed name: `CONFLICT` shows "… already exists" under the field, a `BAD_USER_INPUT` field error
+ * shows under the field too, anything else becomes one general message (`failed`).
  * The guard against a double submit is in `useServerForm`.
  */
 export function useCatalogNameForm(namespace: CatalogNamespace) {
