@@ -555,6 +555,7 @@ Each: BE module (CRUD, unique names, delete blocked when used, admin only) + FE 
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | backend | Mail; the defaults (`localhost`, `1025`, no login) reach Mailpit; required in production; `SMTP_USER` and `SMTP_PASS` are optional, but set together |
 | `PORT` | backend | HTTP port (default 4000) |
 | `TEST_DATABASE_URL` | backend | Integration test database, name must end in `_test` (optional, defaults to `cv_builder_test` on localhost) |
+| `SEED_ALLOW_REMOTE` | backend | Optional, read by `prisma/seed.ts` only. `1` lets `db:seed` run on a database that is not on `localhost` or `127.0.0.1` and whose name does not end in `_test`. `NODE_ENV=production` is refused even with it. The seed sets known passwords |
 
 ---
 

@@ -3,6 +3,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { seedCatalogs } from "./seed/catalogs";
 import { seedCvs } from "./seed/cvs";
+import { assertSeedAllowed } from "./seed/guard";
 import { seedProjects } from "./seed/projects";
 import { seedUsers } from "./seed/users";
 
@@ -12,6 +13,7 @@ async function main(): Promise<void> {
   if (!connectionString) {
     throw new Error("DATABASE_URL is not set. Copy backend/.env.example to backend/.env.");
   }
+  assertSeedAllowed(connectionString, process.env);
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
 
   try {
