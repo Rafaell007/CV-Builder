@@ -57,7 +57,6 @@ export function useProfileForm(user: ProfileUser) {
     form,
     generalError,
     reset,
-    showError,
     submit: submitForm,
   } = useServerForm<ProfileFormValues, ProfileFormValues, Exclude<ProfileGeneralError, "failed">>(
     schema,
@@ -82,20 +81,15 @@ export function useProfileForm(user: ProfileUser) {
   );
 
   async function save(values: ProfileFormValues) {
-    try {
-      const saved = await update(toUpdateProfileInput(user.id, values));
-      // The saved (trimmed) values become the "unchanged" state, so UPDATE is disabled again.
-      const savedFormValues = toProfileFormValues(saved);
-      reset(savedFormValues);
-      setSavedValues(savedFormValues);
-      toast.success({
-        title: t("success.title"),
-        description: t("success.text", { name: getUserDisplayName(saved) }),
-      });
-    } catch (error) {
-      // Nothing resets the form here, so the typed values stay.
-      showError(error);
-    }
+    const saved = await update(toUpdateProfileInput(user.id, values));
+    // The saved (trimmed) values become the "unchanged" state, so UPDATE is disabled again.
+    const savedFormValues = toProfileFormValues(saved);
+    reset(savedFormValues);
+    setSavedValues(savedFormValues);
+    toast.success({
+      title: t("success.title"),
+      description: t("success.text", { name: getUserDisplayName(saved) }),
+    });
   }
 
   /** Validates, then saves the checked values. A second submit during the request is ignored. */
