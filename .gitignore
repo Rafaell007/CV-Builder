@@ -63,5 +63,5 @@ next-env.d.ts
 # side notes - personal
 maciek/
 
-# plan pages of the ticket-to-plan skill (default folder, personal working files)
+# plan pages of the ticket-to-plan and story-to-flow skills (default folder, personal working files)
 .ticket-plans/
