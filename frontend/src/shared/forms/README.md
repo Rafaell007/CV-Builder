@@ -11,6 +11,8 @@ Fields that get `shouldFocus` need a ref on a focusable element: `register()` do
 
 Used by: every form with server validation. Reference: `SampleForm.stories.tsx` (Storybook "Forms/Sample form"): every field wired with `register` or `Controller`, client errors, and a mocked `BAD_USER_INPUT` shown under the fields. Backend side: `backend/src/common/validation/README.md`. Docs: [React Hook Form](https://react-hook-form.com/docs/useform), [resolvers](https://github.com/react-hook-form/resolvers#zod), [Zod](https://zod.dev/).
 
+A server form uses `useServerForm`. The root `eslint.config.ts` forbids importing `useZodForm` from `@/shared/forms` outside `shared/forms`, stories and tests (KAN-187).
+
 ## Known issues (found in the KAN-78 review)
 
 - No `Controller` wrapper. Every form wires `Controller` by hand (see `SampleForm.stories.tsx`). Add one when a third form repeats the same code.
