@@ -1,28 +1,23 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useMemo, useRef, useState, type BaseSyntheticEvent } from "react";
+import { useMemo, useState, type BaseSyntheticEvent } from "react";
 import { useWatch } from "react-hook-form";
-import { readFailure } from "@/shared/failures";
-import { applyServerFieldErrors, useZodForm } from "@/shared/forms";
+import { useServerForm } from "@/shared/forms";
 import type { CatalogNameFormValues, CatalogNamespace } from "../catalogs.types";
 import { catalogNameSchema } from "../utils";
 
 const EMPTY_VALUES: CatalogNameFormValues = { name: "" };
 
 /**
- * The one-field name form that Create and Update share: the rule, the guard against a double submit and the mapping
- * of a failed request. A failed request keeps the typed name: `CONFLICT` shows "… already exists" under the field,
+ * The one-field name form that Create and Update share: the rule and the mapping of a failed request. A failed request keeps the typed name: `CONFLICT` shows "… already exists" under the field,
  * a `BAD_USER_INPUT` field error shows under the field too, anything else becomes one general message (`failed`).
+ * The guard against a double submit is in `useServerForm`.
  */
 export function useCatalogNameForm(namespace: CatalogNamespace) {
   const t = useTranslations(namespace);
-  const [failed, setFailed] = useState(false);
   // The trimmed name the form started with: a save is only worth sending when the trimmed name differs from it.
   const [original, setOriginal] = useState("");
-
-  // A ref changes at once: two submits in the same tick cannot both pass.
-  const sending = useRef(false);
 
   const schema = useMemo(
     () =>
@@ -32,8 +27,19 @@ export function useCatalogNameForm(namespace: CatalogNamespace) {
       }),
     [t],
   );
-  const form = useZodForm<CatalogNameFormValues, CatalogNameFormValues>(schema, {
+  const {
+    form,
+    generalError,
+    reset: resetForm,
+    showError,
+    submit: submitForm,
+  } = useServerForm(schema, {
     defaultValues: EMPTY_VALUES,
+    serverFields: { fields: ["name"], getMessage: () => t("form.errors.serverInvalid") },
+    placeFailure: ({ kind }) =>
+      kind === "conflict"
+        ? { show: "field", field: "name", message: t("form.errors.nameTaken") }
+        : { show: "fieldErrors", otherwise: "failed" },
   });
 
   const typedName = useWatch({ control: form.control, name: "name" });
@@ -42,47 +48,16 @@ export function useCatalogNameForm(namespace: CatalogNamespace) {
 
   /** Fills the form with `name` (it becomes the new "unchanged" state) and clears the general error. */
   function reset(name: string) {
-    form.reset({ name });
+    resetForm({ name });
     setOriginal(name.trim());
-    setFailed(false);
   }
 
-  /** Shows a failed request: a taken name or a field error under the field, anything else as the general message. */
-  function showError(error: unknown) {
-    if (readFailure(error).kind === "conflict") {
-      form.setError(
-        "name",
-        { type: "server", message: t("form.errors.nameTaken") },
-        { shouldFocus: true },
-      );
-      setFailed(false);
-      return;
-    }
-    const allShown = applyServerFieldErrors(error, form.setError, {
-      fields: ["name"],
-      getMessage: () => t("form.errors.serverInvalid"),
-    });
-    setFailed(!allShown);
-  }
-
-  /**
-   * Validates, then calls `send` with the trimmed name. A second submit during the request is ignored.
-   * `send` must not throw; it calls `showError`.
-   */
+  /** Validates, then calls `send` with the trimmed name. `send` must not throw; it calls `showError`. */
   async function submit(event: BaseSyntheticEvent, send: (name: string) => Promise<void>) {
-    if (sending.current) return;
-    sending.current = true;
-    try {
-      await form.handleSubmit(async ({ name }) => {
-        setFailed(false);
-        await send(name);
-      })(event);
-    } finally {
-      sending.current = false;
-    }
+    await submitForm(event, ({ name }) => send(name));
   }
 
-  return { form, failed, hasChanged, reset, showError, submit };
+  return { form, failed: generalError !== null, hasChanged, reset, showError, submit };
 }
 
 export type UseCatalogNameFormResult = ReturnType<typeof useCatalogNameForm>;
