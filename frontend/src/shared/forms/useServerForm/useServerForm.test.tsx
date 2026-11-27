@@ -145,18 +145,42 @@ describe("useServerForm", () => {
     expect(send).toHaveBeenCalledTimes(2);
   });
 
-  it("accepts a submit after send threw", async () => {
+  it("shows an error that send throws as the general error and accepts the next submit", async () => {
     const { result } = setup();
     const send = vi.fn().mockRejectedValueOnce(new Error("boom")).mockResolvedValue(undefined);
 
-    await act(async () => {
-      await result()
-        .submit(fakeEvent, send)
-        .catch(() => undefined);
-    });
+    await act(() => result().submit(fakeEvent, send));
+    expect(result().generalError).toBe("failed");
+
+    await act(() => result().submit(fakeEvent, send));
+    expect(send).toHaveBeenCalledTimes(2);
+    expect(result().generalError).toBeNull();
+  });
+
+  it("places a GraphQL error that send throws where placeFailure says", async () => {
+    const { result } = setup();
+    const send = vi.fn().mockRejectedValue(graphQlError({ code: "FORBIDDEN" }));
+
     await act(() => result().submit(fakeEvent, send));
 
-    expect(send).toHaveBeenCalledTimes(2);
+    expect(result().generalError).toBe("forbidden");
+  });
+
+  it("does not call send again while a send that will throw is still running", async () => {
+    const { result } = setup();
+    const rejecters: ((error: Error) => void)[] = [];
+    const send = vi.fn(() => new Promise<void>((_, reject) => rejecters.push(reject)));
+
+    await act(async () => {
+      const first = result().submit(fakeEvent, send);
+      const second = result().submit(fakeEvent, send);
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      rejecters.forEach((reject) => reject(new Error("boom")));
+      await Promise.all([first, second]);
+    });
+
+    expect(send).toHaveBeenCalledTimes(1);
+    expect(result().generalError).toBe("failed");
   });
 
   it("keeps the general error when validation fails and clears it before send", async () => {
