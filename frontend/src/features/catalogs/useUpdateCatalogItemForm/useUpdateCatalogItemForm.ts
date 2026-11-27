@@ -18,14 +18,7 @@ export function useUpdateCatalogItemForm(
 ) {
   const t = useTranslations(namespace);
   const toast = useToast();
-  const {
-    form,
-    failed,
-    hasChanged,
-    reset,
-    showError,
-    submit: submitForm,
-  } = useCatalogNameForm(namespace);
+  const { form, failed, hasChanged, reset, submit: submitForm } = useCatalogNameForm(namespace);
   // The item stays set while the modal fades out, so the request still has its id.
   const [item, setItem] = useState<CatalogItem | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -38,17 +31,12 @@ export function useUpdateCatalogItemForm(
 
   async function send(name: string) {
     if (!item) return;
-    try {
-      const saved = await update(item.id, name);
-      setIsOpen(false);
-      toast.success({
-        title: t("update.success.title"),
-        description: t("update.success.text", { name: saved.name }),
-      });
-    } catch (error) {
-      // Nothing resets the form here, so the name stays.
-      showError(error);
-    }
+    const saved = await update(item.id, name);
+    setIsOpen(false);
+    toast.success({
+      title: t("update.success.title"),
+      description: t("update.success.text", { name: saved.name }),
+    });
   }
 
   function submit(event: BaseSyntheticEvent) {
