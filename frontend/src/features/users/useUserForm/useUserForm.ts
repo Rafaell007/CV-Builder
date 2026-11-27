@@ -1,10 +1,10 @@
 "use client";
 
-import { CombinedGraphQLErrors } from "@apollo/client";
 import { useTranslations } from "next-intl";
 import { useRef, useState, type BaseSyntheticEvent } from "react";
 import type { DefaultValues, FieldValues, Path } from "react-hook-form";
 import type { z } from "zod";
+import { readFailure } from "@/shared/failures";
 import { applyServerFieldErrors, useZodForm } from "@/shared/forms";
 import { CONCURRENT_CHANGE_REASON } from "@/shared/userProfile";
 import { EMAIL_TAKEN_REASON, OWN_ROLE_REASON } from "../users.constants";
@@ -51,8 +51,8 @@ export function useUserForm<TValues extends FieldValues, TSubmit extends FieldVa
 
   /** Shows a failed request: under a field when one field is to blame, otherwise as the general message. */
   function showError(error: unknown) {
-    const code = errorExtension(error, "code");
-    if (code === "CONFLICT" && errorExtension(error, "reason") === EMAIL_TAKEN_REASON) {
+    const { kind, reason } = readFailure(error);
+    if (kind === "conflict" && reason === EMAIL_TAKEN_REASON) {
       // Only createUser answers EMAIL_TAKEN (Update cannot change the email), so the form has an Email field here.
       form.setError(
         "email" as Path<TValues>,
@@ -62,23 +62,23 @@ export function useUserForm<TValues extends FieldValues, TSubmit extends FieldVa
       setGeneralError(null);
       return;
     }
-    if (code === "FORBIDDEN") {
+    if (kind === "forbidden") {
       setGeneralError("forbidden");
       return;
     }
     // Only updateUser answers these two: the admin's own role (the Role field is disabled there, so only a stale
     // page gets here) and a user deleted while the modal was open.
-    if (code === "CONFLICT" && errorExtension(error, "reason") === OWN_ROLE_REASON) {
+    if (kind === "conflict" && reason === OWN_ROLE_REASON) {
       setGeneralError("ownRole");
       return;
     }
-    if (code === "NOT_FOUND") {
+    if (kind === "notFound") {
       setGeneralError("notFound");
       return;
     }
     // Both mutations can answer this one: another request locked the same user. Nothing was saved, so the values stay
     // and the admin submits again.
-    if (code === "CONFLICT" && errorExtension(error, "reason") === CONCURRENT_CHANGE_REASON) {
+    if (kind === "conflict" && reason === CONCURRENT_CHANGE_REASON) {
       setGeneralError("concurrentChange");
       return;
     }
@@ -113,9 +113,3 @@ export type UseUserFormResult<
   TValues extends FieldValues,
   TSubmit extends FieldValues,
 > = ReturnType<typeof useUserForm<TValues, TSubmit>>;
-
-/** One `extensions` value of the first GraphQL error, or undefined for any other error (no network). */
-function errorExtension(error: unknown, key: string): unknown {
-  if (!CombinedGraphQLErrors.is(error)) return undefined;
-  return error.errors[0]?.extensions?.[key];
-}

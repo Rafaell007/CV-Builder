@@ -1,7 +1,7 @@
 "use client";
 
-import { CombinedGraphQLErrors } from "@apollo/client";
 import { useApolloClient, useMutation } from "@apollo/client/react";
+import { readFailure } from "@/shared/failures";
 import { UpdateUserDocument, UsersDocument, type UpdateUserInput } from "@/shared/graphql";
 import type { UserListItem } from "../users.types";
 
@@ -34,7 +34,7 @@ export function useUpdateUser(): UseUpdateUserResult {
       if (!data) throw new Error("updateUser returned no user");
       return data.updateUser;
     } catch (error) {
-      if (isNotFound(error)) {
+      if (readFailure(error).kind === "notFound") {
         client.cache.evict({ id: "ROOT_QUERY", fieldName: "users" });
         // Not awaited: the caller shows the error at once; the list loads in the background. A failed reload shows
         // the list's own error state, so it is not reported here again.
@@ -45,8 +45,4 @@ export function useUpdateUser(): UseUpdateUserResult {
   }
 
   return { pending: loading, update };
-}
-
-function isNotFound(error: unknown): boolean {
-  return CombinedGraphQLErrors.is(error) && error.errors[0]?.extensions?.code === "NOT_FOUND";
 }

@@ -11,6 +11,7 @@ import {
   updateUserMock,
   updateUserNetworkErrorMock,
   updateUserRefusedMock,
+  withErrors,
 } from "../users.mocks";
 import { useUpdateUserForm } from "./useUpdateUserForm";
 
@@ -124,6 +125,21 @@ describe("useUpdateUserForm", () => {
 
   it("shows NOT_FOUND as 'no longer exists'", async () => {
     const { result } = setup({ mocks: [updateUserRefusedMock(input, { code: "NOT_FOUND" })] });
+    openAndChange(result);
+    await submit(result);
+
+    expect(result().generalError).toBe("notFound");
+  });
+
+  it("shows NOT_FOUND when it is not the first error of the response", async () => {
+    const { result } = setup({
+      mocks: [
+        withErrors(updateUserMock(input), [
+          { code: "CONFLICT", reason: "OWN_ROLE" },
+          { code: "NOT_FOUND" },
+        ]),
+      ],
+    });
     openAndChange(result);
     await submit(result);
 
