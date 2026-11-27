@@ -1,8 +1,14 @@
-import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import type { AuthUser } from "../../../common/auth";
 import { ValidationFailedException } from "../../../common/errors";
 import { Prisma } from "../../../generated/prisma/client";
 import { PrismaService } from "../../../prisma/prisma.service";
+import { Role } from "../../auth/models/role.enum";
 import { canonicalId, lockActorAndTarget, toTransactionConflict } from "../user-lock";
 import type { AddUserSkillInput } from "./dto/add-user-skill.input";
 import type { RemoveUserSkillsInput } from "./dto/remove-user-skills.input";
@@ -72,7 +78,12 @@ export class UserSkillsService {
       where: { id },
       select: { userId: true },
     });
-    if (existing === null) throw userSkillNotFound();
+    // Same order of checks as add and remove: only an admin learns that a link does not exist.
+    if (existing === null) {
+      throw actor.role === Role.ADMIN
+        ? userSkillNotFound()
+        : new ForbiddenException("You are not allowed to do this");
+    }
     try {
       return await this.prisma.$transaction(async (tx) => {
         await lockActorAndTarget(tx, existing.userId, actor.id, { ownerMayAct: true });
@@ -93,8 +104,13 @@ export class UserSkillsService {
    * Removes the links from the user and the same skills from the user's CVs (D13). The catalog skills stay.
    * One id that does not belong to this user: nothing is removed.
    */
-  async remove(actor: AuthUser, { userId: sentUserId, ids }: RemoveUserSkillsInput): Promise<void> {
+  async remove(
+    actor: AuthUser,
+    { userId: sentUserId, ids: sentIds }: RemoveUserSkillsInput,
+  ): Promise<void> {
     const userId = canonicalId(sentUserId);
+    // The input check compares the ids as text; "ABC…" and "abc…" are one link for PostgreSQL.
+    const ids = [...new Set(sentIds.map(canonicalId))];
     try {
       await this.prisma.$transaction(async (tx) => {
         await lockActorAndTarget(tx, userId, actor.id, { ownerMayAct: true });
@@ -104,8 +120,8 @@ export class UserSkillsService {
         });
         if (links.length !== ids.length) throw userSkillNotFound();
         const skillIds = links.map((link) => link.skillId);
-        await tx.cvSkill.deleteMany({ where: { skillId: { in: skillIds }, cv: { userId } } });
         await tx.userSkill.deleteMany({ where: { id: { in: ids }, userId } });
+        await tx.cvSkill.deleteMany({ where: { skillId: { in: skillIds }, cv: { userId } } });
       });
     } catch (error) {
       throw translateDatabaseError(error);

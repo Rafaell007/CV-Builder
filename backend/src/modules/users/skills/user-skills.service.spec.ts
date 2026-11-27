@@ -231,10 +231,11 @@ describe("UserSkillsService.update", () => {
     expect(prisma.userSkill.update).not.toHaveBeenCalled();
   });
 
-  it("answers NOT_FOUND for an unknown link", async () => {
+  it("answers FORBIDDEN to a user and NOT_FOUND to an admin for an unknown link", async () => {
     prisma.userSkill.findUnique.mockResolvedValue(null);
 
-    await expect(createService().update(OWNER, input)).rejects.toThrow(NotFoundException);
+    await expect(createService().update(OWNER, input)).rejects.toThrow(ForbiddenException);
+    await expect(createService().update(ADMIN, input)).rejects.toThrow(NotFoundException);
     expect(prisma.$transaction).not.toHaveBeenCalled();
   });
 
@@ -261,6 +262,18 @@ describe("UserSkillsService.remove", () => {
     });
     expect(prisma.userSkill.deleteMany).toHaveBeenCalledWith({
       where: { id: { in: ["link-1", "link-2"] }, userId: OWNER_ID },
+    });
+  });
+
+  it("treats one id sent twice in different letter case as one link", async () => {
+    lockedRows(owner);
+    prisma.userSkill.findMany.mockResolvedValue([{ skillId: "skill-1" }]);
+    const id = "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d";
+
+    await createService().remove(OWNER, { userId: OWNER_ID, ids: [id.toUpperCase(), id] });
+
+    expect(prisma.userSkill.deleteMany).toHaveBeenCalledWith({
+      where: { id: { in: [id] }, userId: OWNER_ID },
     });
   });
 

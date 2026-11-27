@@ -3,15 +3,15 @@ import { Prisma } from "../../generated/prisma/client";
 import { Role } from "../auth/models/role.enum";
 
 /**
- * Shared by the writes on a user (`UsersService`, `AvatarsService`): who may act, the row lock, and the
+ * Shared by the writes on a user (`UsersService`, `AvatarsService`, `UserSkillsService`): who may act, the row lock, and the
  * transaction errors after which the client can simply try again.
  */
 
-/** `extensions.reason` of the `CONFLICT` after which nothing was saved and the admin can try again. */
+/** `extensions.reason` of the `CONFLICT` after which nothing was saved and the client can try again. */
 export const CONCURRENT_CHANGE_REASON = "CONCURRENT_CHANGE";
 
 /**
- * Transaction errors after which nothing was saved, so the admin can simply try again:
+ * Transaction errors after which nothing was saved, so the client can simply try again:
  * - P2034: a deadlock or a write conflict; PostgreSQL stopped this transaction because a parallel one needs the
  *   same rows. Example: a user is deleted while their browser refreshes its session token.
  * - P2028: Prisma rolled the transaction back because it did not finish in time (default 5 s), or got no free

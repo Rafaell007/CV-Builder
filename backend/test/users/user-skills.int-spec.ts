@@ -265,10 +265,16 @@ describe("user skills", () => {
       );
     });
 
-    it("answers NOT_FOUND for an unknown link and BAD_USER_INPUT for NONE", async () => {
+    it("answers FORBIDDEN, not NOT_FOUND, to a user who sends an unknown link", async () => {
+      const { body } = await call(ben, UPDATE, { input: { id: MISSING_ID, mastery: "EXPERT" } });
+
+      expect(errorOf(body)?.extensions.code).toBe("FORBIDDEN");
+    });
+
+    it("answers NOT_FOUND to an admin for an unknown link and BAD_USER_INPUT for NONE", async () => {
       const link = await addedLink(ann);
 
-      const missing = await call(ann, UPDATE, { input: { id: MISSING_ID, mastery: "EXPERT" } });
+      const missing = await call(admin, UPDATE, { input: { id: MISSING_ID, mastery: "EXPERT" } });
       const none = await call(ann, UPDATE, { input: { id: link.id, mastery: "NONE" } });
 
       expect(errorOf(missing.body)?.extensions.code).toBe("NOT_FOUND");

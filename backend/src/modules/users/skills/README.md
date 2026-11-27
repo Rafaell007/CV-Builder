@@ -15,8 +15,8 @@ The skills of a user (PLAN.md S6.4, D13, D16): the Skills tab of User Details an
   1. `FORBIDDEN`: neither the owner nor an admin. Also for an unknown user, so a user cannot probe which ids exist.
   2. `NOT_FOUND` "User not found": an admin sends an unknown user.
   3. The input: an unknown catalog skill → `BAD_USER_INPUT` with a field error on `skillId` ("Skill not found"), also when the skill is deleted between the check and the write (`P2003`).
-- **Update:** the user is read from the link, so a link of another user cannot be changed by sending its id. Unknown link → `NOT_FOUND` "User skill not found". The CVs keep their own mastery: a CV skill has its own copy.
-- **Remove (D13):** one transaction. It reads the links with `id in ids AND userId`; when one id is missing or belongs to another user, it answers `NOT_FOUND` and removes nothing. Then it removes the same catalog skills from **this user's** CVs (`CvSkill`) and the links. Other users, their CVs and the catalog skill stay.
+- **Update:** the user is read from the link, so a link of another user cannot be changed by sending its id. Unknown link → `FORBIDDEN` for a user and `NOT_FOUND` "User skill not found" for an admin, the same order as add and remove. The CVs keep their own mastery: a CV skill has its own copy.
+- **Remove (D13):** one transaction. It lowercases the ids and drops repeats (the input check compares them as text), then reads the links with `id in ids AND userId`; when one id is missing or belongs to another user, it answers `NOT_FOUND` and removes nothing. Then it removes the same catalog skills from **this user's** CVs (`CvSkill`) and the links. Other users, their CVs and the catalog skill stay.
 - **Errors:**
   - The user already has the skill (unique index, `P2002`) → `CONFLICT` "The user already has this skill". It also covers two parallel adds.
   - The transaction was stopped (`P2034`) or timed out (`P2028`) → `CONFLICT` with `reason: "CONCURRENT_CHANGE"` (`toTransactionConflict`). Nothing was saved, so the client can try again.
