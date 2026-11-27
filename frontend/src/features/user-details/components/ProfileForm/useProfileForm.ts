@@ -1,12 +1,11 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useMemo, useRef, useState, type BaseSyntheticEvent } from "react";
+import { useMemo, useState, type BaseSyntheticEvent } from "react";
 import { useWatch } from "react-hook-form";
 import { z } from "zod";
 import { useToast } from "@/shared/components";
-import { readFailure } from "@/shared/failures";
-import { applyServerFieldErrors, useZodForm } from "@/shared/forms";
+import { useServerForm } from "@/shared/forms";
 import { USER_NAME_MAX_LENGTH, userProfileRules } from "@/shared/userProfile";
 import { getUserDisplayName } from "@/shared/utils";
 import type { ProfileFormValues, ProfileGeneralError, ProfileUser } from "../../user-details.types";
@@ -34,9 +33,6 @@ export function useProfileForm(user: ProfileUser) {
   const t = useTranslations("userDetails.profile.form");
   const toast = useToast();
   const { update, pending } = useUpdateProfile();
-  const [generalError, setGeneralError] = useState<ProfileGeneralError | null>(null);
-  // A ref changes at once: two submits in the same tick cannot both pass (duplicate submissions are prevented).
-  const sending = useRef(false);
 
   const schema = useMemo(
     () =>
@@ -57,9 +53,24 @@ export function useProfileForm(user: ProfileUser) {
   // The last saved values: the "unchanged" state for UPDATE. Set from the answer of a save, so it does not depend on
   // when the cached user re-renders this form.
   const [savedValues, setSavedValues] = useState(initialValues);
-  const form = useZodForm<ProfileFormValues, ProfileFormValues>(schema, {
-    defaultValues: initialValues,
-  });
+  const {
+    form,
+    generalError,
+    reset,
+    showError,
+    submit: submitForm,
+  } = useServerForm<ProfileFormValues, ProfileFormValues, Exclude<ProfileGeneralError, "failed">>(
+    schema,
+    {
+      defaultValues: initialValues,
+      serverFields: { fields: SERVER_FIELDS, getMessage: () => t("errors.serverInvalid") },
+      // Field errors show under their fields; anything they cannot show (and every other failure) is the general error.
+      placeFailure: (failure) =>
+        failure.kind === "invalid"
+          ? { show: "fieldErrors", otherwise: toProfileGeneralError(failure) }
+          : { show: "general", error: toProfileGeneralError(failure) },
+    },
+  );
 
   const [firstName, lastName, departmentId, positionId] = useWatch({
     control: form.control,
@@ -70,25 +81,12 @@ export function useProfileForm(user: ProfileUser) {
     savedValues,
   );
 
-  /** Shows a failed save: under a field when one field is to blame, otherwise as the general message. */
-  function showError(error: unknown) {
-    const failure = readFailure(error);
-    const allShown =
-      failure.kind === "invalid" &&
-      applyServerFieldErrors(error, form.setError, {
-        fields: SERVER_FIELDS,
-        getMessage: () => t("errors.serverInvalid"),
-      });
-    setGeneralError(allShown ? null : toProfileGeneralError(failure));
-  }
-
   async function save(values: ProfileFormValues) {
-    setGeneralError(null);
     try {
       const saved = await update(toUpdateProfileInput(user.id, values));
       // The saved (trimmed) values become the "unchanged" state, so UPDATE is disabled again.
       const savedFormValues = toProfileFormValues(saved);
-      form.reset(savedFormValues);
+      reset(savedFormValues);
       setSavedValues(savedFormValues);
       toast.success({
         title: t("success.title"),
@@ -101,14 +99,8 @@ export function useProfileForm(user: ProfileUser) {
   }
 
   /** Validates, then saves the checked values. A second submit during the request is ignored. */
-  async function submit(event?: BaseSyntheticEvent) {
-    if (sending.current) return;
-    sending.current = true;
-    try {
-      await form.handleSubmit(save)(event);
-    } finally {
-      sending.current = false;
-    }
+  function submit(event?: BaseSyntheticEvent) {
+    return submitForm(event, save);
   }
 
   return { form, initialValues, hasChanged, pending, generalError, submit };

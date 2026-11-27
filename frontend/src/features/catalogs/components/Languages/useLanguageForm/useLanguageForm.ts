@@ -1,10 +1,9 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useMemo, useRef, useState, type BaseSyntheticEvent } from "react";
+import { useMemo, useState, type BaseSyntheticEvent } from "react";
 import { useWatch } from "react-hook-form";
-import { readFailure } from "@/shared/failures";
-import { applyServerFieldErrors, useZodForm } from "@/shared/forms";
+import { useServerForm } from "@/shared/forms";
 import { ISO_TAKEN_REASON } from "../languages.constants";
 import type { LanguageFormValues, LanguageInput } from "../languages.types";
 import { languageFormSchema, normalizeIso } from "../utils";
@@ -25,19 +24,16 @@ function normalize(values: LanguageFormValues): LanguageFormValues {
 }
 
 /**
- * The language form (name, ISO code, native name) that Create and Update share: the rules, the guard against a double
- * submit and the mapping of a failed request. A failed request keeps the typed values: `CONFLICT` with reason
+ * The language form (name, ISO code, native name) that Create and Update share: the rules and the mapping of a failed
+ * request. A failed request keeps the typed values: `CONFLICT` with reason
  * `ISO_TAKEN` shows "ISO code already exists" under the ISO code, any other `CONFLICT` "Language already exists" under
  * the name, a `BAD_USER_INPUT` field error shows under its field, anything else becomes one general message (`failed`).
+ * The guard against a double submit is in `useServerForm`.
  */
 export function useLanguageForm() {
   const t = useTranslations(NAMESPACE);
-  const [failed, setFailed] = useState(false);
   // The normalized values the form started with: a save is only worth sending when one of them differs.
   const [original, setOriginal] = useState(EMPTY_VALUES);
-
-  // A ref changes at once: two submits in the same tick cannot both pass.
-  const sending = useRef(false);
 
   const schema = useMemo(
     () =>
@@ -52,8 +48,27 @@ export function useLanguageForm() {
       }),
     [t],
   );
-  const form = useZodForm<LanguageFormValues, LanguageFormValues>(schema, {
+  const {
+    form,
+    generalError,
+    reset: resetForm,
+    showError,
+    submit: submitForm,
+  } = useServerForm(schema, {
     defaultValues: EMPTY_VALUES,
+    serverFields: {
+      fields: ["name", "iso", "nativeName"],
+      getMessage: () => t("form.errors.serverInvalid"),
+    },
+    placeFailure: ({ kind, reason }) => {
+      if (kind === "conflict" && reason === ISO_TAKEN_REASON) {
+        return { show: "field", field: "iso", message: t("form.errors.isoTaken") };
+      }
+      if (kind === "conflict") {
+        return { show: "field", field: "name", message: t("form.errors.nameTaken") };
+      }
+      return { show: "fieldErrors", otherwise: "failed" };
+    },
   });
 
   const [name, iso, nativeName] = useWatch({
@@ -69,57 +84,19 @@ export function useLanguageForm() {
 
   /** Fills the form with `values` (they become the new "unchanged" state) and clears the general error. */
   function reset(values: LanguageFormValues) {
-    form.reset(values);
+    resetForm(values);
     setOriginal(normalize(values));
-    setFailed(false);
-  }
-
-  /** Shows a failed request: a taken ISO code or name or a field error under its field, anything else as the general message. */
-  function showError(error: unknown) {
-    const { kind, reason } = readFailure(error);
-    if (kind === "conflict" && reason === ISO_TAKEN_REASON) {
-      form.setError(
-        "iso",
-        { type: "server", message: t("form.errors.isoTaken") },
-        { shouldFocus: true },
-      );
-      setFailed(false);
-      return;
-    }
-    if (kind === "conflict") {
-      form.setError(
-        "name",
-        { type: "server", message: t("form.errors.nameTaken") },
-        { shouldFocus: true },
-      );
-      setFailed(false);
-      return;
-    }
-    const allShown = applyServerFieldErrors(error, form.setError, {
-      fields: ["name", "iso", "nativeName"],
-      getMessage: () => t("form.errors.serverInvalid"),
-    });
-    setFailed(!allShown);
   }
 
   /**
-   * Validates, then calls `send` with the trimmed values and the uppercase ISO code. A second submit during the
-   * request is ignored. `send` must not throw; it calls `showError`.
+   * Validates, then calls `send` with the trimmed values and the uppercase ISO code. `send` must not throw; it calls
+   * `showError`.
    */
   async function submit(event: BaseSyntheticEvent, send: (input: LanguageInput) => Promise<void>) {
-    if (sending.current) return;
-    sending.current = true;
-    try {
-      await form.handleSubmit(async (values) => {
-        setFailed(false);
-        await send(values);
-      })(event);
-    } finally {
-      sending.current = false;
-    }
+    await submitForm(event, send);
   }
 
-  return { form, failed, hasChanged, reset, showError, submit };
+  return { form, failed: generalError !== null, hasChanged, reset, showError, submit };
 }
 
 export type UseLanguageFormResult = ReturnType<typeof useLanguageForm>;
