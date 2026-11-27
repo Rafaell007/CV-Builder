@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import type { AuthUser } from "../../../common/auth";
-import { ValidationFailedException } from "../../../common/errors";
+import { toTransactionConflict, ValidationFailedException } from "../../../common/errors";
 import { Prisma } from "../../../generated/prisma/client";
 import type { Mastery } from "../../../generated/prisma/enums";
 import { PrismaService } from "../../../prisma/prisma.service";
@@ -142,6 +142,7 @@ function cvSkillNotFound(): NotFoundException {
  *   add the same skill at the same time.
  * - P2003: the CV or the skill was deleted after the checks.
  * - P2025: the link was deleted after the access check.
+ * - P2034, P2028: the add transaction was stopped; nothing was saved (`CONCURRENT_CHANGE`).
  */
 function translateDatabaseError(error: unknown): unknown {
   if (!(error instanceof Prisma.PrismaClientKnownRequestError)) return error;
@@ -153,7 +154,7 @@ function translateDatabaseError(error: unknown): unknown {
     case "P2025":
       return cvSkillNotFound();
     default:
-      return error;
+      return toTransactionConflict(error);
   }
 }
 

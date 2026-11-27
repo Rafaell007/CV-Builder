@@ -1,6 +1,6 @@
 import { ConflictException, NotFoundException } from "@nestjs/common";
 import type { AuthUser } from "../../../common/auth";
-import { ValidationFailedException } from "../../../common/errors";
+import { CONCURRENT_CHANGE_REASON, ValidationFailedException } from "../../../common/errors";
 import { Prisma } from "../../../generated/prisma/client";
 import { Mastery, Role } from "../../../generated/prisma/enums";
 import type { PrismaService } from "../../../prisma/prisma.service";
@@ -251,6 +251,20 @@ describe("CvSkillsService.add", () => {
     expect(await rejection(service.add(USER, { cvId: "cv-1", skillId: "skill-1" }))).toBeInstanceOf(
       NotFoundException,
     );
+  });
+
+  it.each([
+    ["P2034", "a deadlock or write conflict"],
+    ["P2028", "a transaction that did not finish in time"],
+  ])("fails with a CONFLICT to retry on %s (%s)", async (code) => {
+    transaction.mockRejectedValueOnce(databaseError(code));
+
+    const error = await rejection(service.add(USER, { cvId: "cv-1", skillId: "skill-1" }));
+
+    expect(error).toBeInstanceOf(ConflictException);
+    expect((error as ConflictException).getResponse()).toMatchObject({
+      reason: CONCURRENT_CHANGE_REASON,
+    });
   });
 
   it("does not hide other database errors", async () => {
