@@ -1,9 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useMemo, useRef, useState, type BaseSyntheticEvent } from "react";
-import { readFailure } from "@/shared/failures";
-import { applyServerFieldErrors, useZodForm } from "@/shared/forms";
+import { useMemo } from "react";
+import { useServerForm } from "@/shared/forms";
 import type { CvProjectFormSubmit, CvProjectFormValues, ProjectRange } from "../cvProjects.types";
 import {
   cvProjectFormSchema,
@@ -18,21 +17,18 @@ const SERVER_FIELDS = ["projectId", "startDate", "endDate", "roleIds", "responsi
 // The kinds with their own text. Every other kind of `readFailure` shows the general `failed` text.
 const OWN_TEXT_KINDS = ["notFound", "forbidden", "conflict", "invalid"] as const;
 
-type FormError = (typeof OWN_TEXT_KINDS)[number] | "failed";
+type OwnTextKind = (typeof OWN_TEXT_KINDS)[number];
 
 /**
  * The form that Add project and Update project share (page 23: "Validation rules are identical to Add Project"):
- * the fields with their rules, the guard against a double submit and the mapping of a failed request.
+ * the fields with their rules and the mapping of a failed request. The guard against a double submit is in
+ * `useServerForm`.
  * A failed request keeps every typed value: `BAD_USER_INPUT` field errors show under their field, anything else
  * becomes one general message (`error`). `rangeOf` gives the days of a project; it must stay the same function
  * until the catalog changes, because a new function builds the rules again.
  */
 export function useCvProjectForm(rangeOf: (projectId: string) => ProjectRange | undefined) {
   const t = useTranslations("cvs.projects.form.errors");
-  const [error, setError] = useState<FormError | undefined>();
-
-  // A ref changes at once: two submits in the same tick cannot both pass (page 23, Mutation States).
-  const sending = useRef(false);
 
   // One text for each code of the date rule: the form rules and the answer of the backend show the same texts.
   const dateTexts = useMemo<CvProjectDateTexts>(
@@ -59,19 +55,13 @@ export function useCvProjectForm(rangeOf: (projectId: string) => ProjectRange | 
       ),
     [t, dateTexts, rangeOf],
   );
-  const form = useZodForm<CvProjectFormValues, CvProjectFormSubmit>(schema, {
+  const { form, generalError, reset, showError, submit } = useServerForm<
+    CvProjectFormValues,
+    CvProjectFormSubmit,
+    OwnTextKind
+  >(schema, {
     defaultValues: EMPTY_CV_PROJECT_FORM_VALUES,
-  });
-
-  /** Fills the form with `values` (they become the new "unchanged" state) and clears the general error. */
-  function reset(values: CvProjectFormValues) {
-    form.reset(values);
-    setError(undefined);
-  }
-
-  /** Shows a failed request: field errors under their field, anything else as the general message. */
-  function showError(failure: unknown) {
-    const allShown = applyServerFieldErrors(failure, form.setError, {
+    serverFields: {
       fields: SERVER_FIELDS,
       getMessage: (field, reasons) => {
         switch (field) {
@@ -87,33 +77,21 @@ export function useCvProjectForm(rangeOf: (projectId: string) => ProjectRange | 
             return t("server.responsibilities");
         }
       },
-    });
-    const { kind } = readFailure(failure);
-    const ownText = OWN_TEXT_KINDS.find((item) => item === kind);
-    setError(allShown ? undefined : (ownText ?? "failed"));
-  }
+    },
+    // Field errors first; when they do not all show, the kind with its own text, else `failed`.
+    placeFailure: ({ kind }) => ({
+      show: "fieldErrors",
+      otherwise: OWN_TEXT_KINDS.find((item) => item === kind) ?? "failed",
+    }),
+  });
 
-  /**
-   * Validates, then calls `send` with the checked values. The guard runs when the form is submitted, not while
-   * rendering: a second submit during the request is ignored. `send` must not throw; it calls `showError`.
-   */
-  async function submit(
-    event: BaseSyntheticEvent,
-    send: (values: CvProjectFormSubmit) => Promise<void>,
-  ) {
-    if (sending.current) return;
-    sending.current = true;
-    try {
-      await form.handleSubmit(async (values) => {
-        setError(undefined);
-        await send(values);
-      })(event);
-    } finally {
-      sending.current = false;
-    }
-  }
-
-  return { form, error: error === undefined ? undefined : t(error), reset, showError, submit };
+  return {
+    form,
+    error: generalError === null ? undefined : t(generalError),
+    reset,
+    showError,
+    submit,
+  };
 }
 
 export type UseCvProjectFormResult = ReturnType<typeof useCvProjectForm>;
