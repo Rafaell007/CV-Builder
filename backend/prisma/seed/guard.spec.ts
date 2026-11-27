@@ -69,6 +69,30 @@ describe("assertSeedAllowed", () => {
       },
     );
 
+    it("uses the host query parameter, because the pg driver connects to it instead of the address host", () => {
+      expect(() =>
+        assertSeedAllowed("postgresql://u:p@localhost:5432/cv_builder?host=db.example.com", {}),
+      ).toThrow(/db\.example\.com.*SEED_ALLOW_REMOTE/s);
+    });
+
+    it("refuses a host query parameter that is a socket path", () => {
+      expect(() =>
+        assertSeedAllowed("postgresql://u:p@localhost/cv_builder?host=/var/run/postgresql", {}),
+      ).toThrow(/SEED_ALLOW_REMOTE/);
+    });
+
+    it("keeps the connection string out of the error when it is not a URL", () => {
+      let error: unknown;
+      try {
+        assertSeedAllowed("not a url, password secret", {});
+      } catch (caught) {
+        error = caught;
+      }
+
+      expect(error).toEqual(new Error("Refusing to seed: DATABASE_URL is not a valid URL."));
+      expect(JSON.stringify(error, Object.getOwnPropertyNames(error))).not.toContain("secret");
+    });
+
     it("keeps the password out of the error message", () => {
       expect(() => assertSeedAllowed(REMOTE_URL, {})).toThrow(
         expect.objectContaining({ message: expect.not.stringContaining("secret") }),
