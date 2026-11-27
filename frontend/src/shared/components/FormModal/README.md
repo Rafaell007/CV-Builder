@@ -1,6 +1,6 @@
 # FormModal
 
-`Modal` with a form, for every create and update modal (e.g. Add skill, Update skill). It only displays the form's state; the caller's hook owns the form (React Hook Form + Zod via `useZodForm`).
+`Modal` with a form, for every create and update modal (e.g. Add skill, Update skill). It only displays the form's state; the caller's hook owns the form (React Hook Form + Zod via `useServerForm`).
 
 - The submit button is disabled until `canSubmit`: pass `formState.isValid && formState.isDirty`.
 - `isSubmitting` shows the button's loading state; a second click or Enter is ignored, and CANCEL, ×, Escape and the overlay do not close the modal while a request runs.
