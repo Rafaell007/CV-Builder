@@ -1,17 +1,19 @@
-import { THEME_COOKIE, THEMES } from "../../preferences.constants";
+"use client";
 
-const forcedThemes = THEMES.filter((theme) => theme !== "system");
+import { useSyncExternalStore } from "react";
+import { PREFERENCES_SCRIPT } from "./preferencesScript.constants";
 
-// Runs in <head> before the first paint, so a saved theme shows without a flash.
-// Plain JS (no imports); keep in sync with readCookie and applyTheme.
-const script = `(function () {
-  try {
-    var match = document.cookie.match(new RegExp("(?:^|; )" + ${JSON.stringify(THEME_COOKIE)} + "=([^;]*)"));
-    var theme = match ? decodeURIComponent(match[1]) : null;
-    if (${JSON.stringify(forcedThemes)}.indexOf(theme) !== -1) document.documentElement.setAttribute("data-theme", theme);
-  } catch (error) {}
-})();`;
+const subscribe = () => () => {};
+const isServerRender = () => true;
+const isClientRender = () => false;
 
+// The script is only needed in the server HTML: it runs before the first paint. React 19 warns when the client
+// creates a <script> (a language change swaps the root layout), so after hydration it renders nothing.
+// Hydration still sees the server snapshot (true), so the server's tag is reused and nothing mismatches.
 export function PreferencesScript() {
-  return <script dangerouslySetInnerHTML={{ __html: script }} />;
+  const isServerHtml = useSyncExternalStore(subscribe, isClientRender, isServerRender);
+  if (!isServerHtml) return null;
+  return (
+    <script dangerouslySetInnerHTML={{ __html: PREFERENCES_SCRIPT }} suppressHydrationWarning />
+  );
 }

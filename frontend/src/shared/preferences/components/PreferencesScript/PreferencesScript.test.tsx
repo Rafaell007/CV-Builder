@@ -1,12 +1,9 @@
-import { render } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { PreferencesScript } from "./PreferencesScript";
+import { PREFERENCES_SCRIPT } from "./preferencesScript.constants";
 
-// React does not execute rendered <script> tags, so the test runs its code the way the browser would.
+// next/script injects the code outside React, so the test runs the same string the way the browser would.
 const runScript = () => {
-  const { container } = render(<PreferencesScript />);
-  const code = container.querySelector("script")?.textContent ?? "";
-  new Function(code)();
+  new Function(PREFERENCES_SCRIPT)();
 };
 
 afterEach(() => {
