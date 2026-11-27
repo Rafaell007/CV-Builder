@@ -1,5 +1,6 @@
 import { CombinedGraphQLErrors } from "@apollo/client";
 import { act } from "@testing-library/react";
+import { useTranslations } from "next-intl";
 import type { BaseSyntheticEvent, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "@/shared/testing";
@@ -21,12 +22,14 @@ const fakeEvent = {
 // renderWithProviders renders elements; this small component lets the hook run inside the same providers.
 function setup() {
   let current!: ReturnType<typeof useCvForm>;
+  let text!: ReturnType<typeof useTranslations<"cvs.form">>;
   function Probe(): ReactNode {
     current = useCvForm(defaultValues);
+    text = useTranslations("cvs.form");
     return null;
   }
   renderWithProviders(<Probe />);
-  return { result: () => current };
+  return { result: () => current, t: () => text };
 }
 
 function badUserInput(field: string): CombinedGraphQLErrors {
@@ -54,12 +57,41 @@ function pendingSend() {
 
 describe("useCvForm", () => {
   it("shows a BAD_USER_INPUT error on name under the field and does not set failed", () => {
-    const { result } = setup();
+    const { result, t } = setup();
 
     act(() => result().showError(badUserInput("name")));
 
-    expect(result().form.getFieldState("name").error).toMatchObject({ type: "server" });
+    expect(result().form.getFieldState("name").error).toMatchObject({
+      type: "server",
+      message: t()("errors.serverInvalid"),
+    });
     expect(result().failed).toBe(false);
+  });
+
+  it.each(["name", "education", "description"] as const)(
+    "shows the translated server text under %s",
+    (field) => {
+      const { result, t } = setup();
+
+      act(() => result().showError(badUserInput(field)));
+
+      expect(t()("errors.serverInvalid")).toBe("The server did not accept this value");
+      expect(result().form.getFieldState(field).error).toMatchObject({
+        type: "server",
+        message: "The server did not accept this value",
+      });
+      expect(result().failed).toBe(false);
+    },
+  );
+
+  it("clears a field error set by the server on reset", () => {
+    const { result } = setup();
+    act(() => result().showError(badUserInput("education")));
+    expect(result().form.getFieldState("education").error).toBeDefined();
+
+    act(() => result().reset(defaultValues));
+
+    expect(result().form.getFieldState("education").error).toBeUndefined();
   });
 
   it("sets failed for a network error", () => {
