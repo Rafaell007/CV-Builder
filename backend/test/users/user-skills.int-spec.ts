@@ -12,6 +12,7 @@ const LIST = `query ($userId: ID!) { userSkills(userId: $userId) { ${FIELDS} } }
 const ADD = `mutation ($input: AddUserSkillInput!) { addUserSkill(input: $input) { ${FIELDS} } }`;
 const UPDATE = `mutation ($input: UpdateUserSkillInput!) { updateUserSkill(input: $input) { ${FIELDS} } }`;
 const REMOVE = `mutation ($input: RemoveUserSkillsInput!) { removeUserSkills(input: $input) }`;
+const ADD_TO_CV = `mutation ($input: AddCvSkillInput!) { addCvSkill(input: $input) { id } }`;
 
 const MISSING_ID = "00000000-0000-4000-8000-000000000000";
 
@@ -374,6 +375,22 @@ describe("user skills", () => {
       expect(await list(ann, ann.id)).toHaveLength(3);
       expect(await list(ben, ben.id)).toHaveLength(1);
       expect(await cvSkillNames(annCv)).toEqual(["Node.js", "React"]);
+    });
+
+    it("never leaves a CV with a skill its owner no longer has, when an add to the CV runs at the same time (D13)", async () => {
+      for (let round = 0; round < 10; round += 1) {
+        await prisma.cvSkill.deleteMany();
+        await prisma.userSkill.deleteMany();
+        const link = await addedLink(ann);
+
+        await Promise.all([
+          call(ann, ADD_TO_CV, { input: { cvId: annCv, skillId: react } }),
+          call(ann, REMOVE, { input: { userId: ann.id, ids: [link.id] } }),
+        ]);
+
+        expect(await prisma.userSkill.count({ where: { userId: ann.id } })).toBe(0);
+        expect(await cvSkillNames(annCv)).toEqual([]);
+      }
     });
 
     it("requires a verified email (D16)", async () => {

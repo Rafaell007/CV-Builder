@@ -120,6 +120,8 @@ export class UserSkillsService {
         });
         if (links.length !== ids.length) throw userSkillNotFound();
         const skillIds = links.map((link) => link.skillId);
+        // The links go first. A parallel `addCvSkill` holds the owner's skill FOR SHARE until its CV link is
+        // saved, so this delete waits for it, and the CV delete below then sees that link too (D13).
         await tx.userSkill.deleteMany({ where: { id: { in: ids }, userId } });
         await tx.cvSkill.deleteMany({ where: { skillId: { in: skillIds }, cv: { userId } } });
       });
