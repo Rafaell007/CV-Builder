@@ -316,6 +316,15 @@ export const deleteUserRefusedMock = (
   result: { errors: [{ message, extensions }] },
 });
 
+/** The same request, answered with one GraphQL error per item of `extensionsList` (the first item is the first error). */
+export const withErrors = (
+  mock: MockLink.MockedResponse,
+  extensionsList: Record<string, unknown>[],
+): MockLink.MockedResponse => ({
+  ...mock,
+  result: { errors: extensionsList.map((extensions) => ({ message: "Refused", extensions })) },
+});
+
 /** `deleteUser` that fails before the backend answers (no network). */
 export const deleteUserNetworkErrorMock = (id: string): MockLink.MockedResponse => ({
   request: { query: DeleteUserDocument, variables: { id } },

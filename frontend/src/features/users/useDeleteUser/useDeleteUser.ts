@@ -4,10 +4,12 @@ import { useApolloClient, useMutation } from "@apollo/client/react";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { useToast } from "@/shared/components";
+import { readFailure, type Failure } from "@/shared/failures";
 import { DeleteUserDocument, UsersDocument } from "@/shared/graphql";
+import { CONCURRENT_CHANGE_REASON } from "@/shared/userProfile";
 import { getUserDisplayName } from "@/shared/utils";
+import { SELF_DELETE_REASON } from "../users.constants";
 import type { UserListItem } from "../users.types";
-import { toDeleteUserFailure } from "../utils";
 
 export type UseDeleteUserResult = {
   /** The user the admin chose to delete. The modal is open while this is set. */
@@ -63,8 +65,8 @@ export function useDeleteUser(): UseDeleteUserResult {
       return true;
     } catch (error) {
       setUser(null);
-      const failure = toDeleteUserFailure(error);
-      if (failure === "notFound") {
+      const failure = readFailure(error);
+      if (failure.kind === "notFound") {
         client.cache.evict({ id: "ROOT_QUERY", fieldName: "users" });
         // Not awaited: the toast shows at once; the list loads in the background. A failed reload shows the list's
         // own error state, so it is not reported here again.
@@ -86,10 +88,10 @@ export function useDeleteUser(): UseDeleteUserResult {
   };
 }
 
-function failureText(failure: ReturnType<typeof toDeleteUserFailure>) {
-  if (failure === "self") return "selfText";
-  if (failure === "notFound") return "notFoundText";
-  if (failure === "forbidden") return "forbiddenText";
-  if (failure === "concurrentChange") return "concurrentChangeText";
+function failureText({ kind, reason }: Failure) {
+  if (kind === "conflict" && reason === SELF_DELETE_REASON) return "selfText";
+  if (kind === "notFound") return "notFoundText";
+  if (kind === "forbidden") return "forbiddenText";
+  if (kind === "conflict" && reason === CONCURRENT_CHANGE_REASON) return "concurrentChangeText";
   return "failedText";
 }

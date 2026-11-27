@@ -10,6 +10,7 @@ import {
   deleteUserRefusedMock,
   usersMock,
   variablesFor,
+  withErrors,
 } from "../users.mocks";
 import { useUsers } from "../useUsers";
 import { useDeleteUser } from "./useDeleteUser";
@@ -182,6 +183,25 @@ describe("useDeleteUser", () => {
 
     expect(await screen.findByText("This user no longer exists.")).toBeInTheDocument();
     await waitFor(() => expect(result().list.users).toEqual([]));
+  });
+
+  it("shows the text of the NOT_FOUND error when it is not the first error of the response", async () => {
+    const { result } = setup({
+      mocks: [
+        withErrors(deleteUserMock(bravo.id), [
+          { code: "CONFLICT", reason: "SELF_DELETE" },
+          { code: "NOT_FOUND" },
+        ]),
+      ],
+    });
+    act(() => result().askToDelete(bravo));
+
+    await act(async () => {
+      await result().confirm();
+    });
+
+    expect(await screen.findByText("This user no longer exists.")).toBeInTheDocument();
+    expect(screen.queryByText("You cannot delete your own account.")).not.toBeInTheDocument();
   });
 
   it("shows the friendly text and no network message when the request fails", async () => {
