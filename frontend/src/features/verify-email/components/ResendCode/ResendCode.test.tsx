@@ -2,6 +2,7 @@ import { act } from "@testing-library/react";
 import { GraphQLError } from "graphql";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ResendVerificationCodeDocument } from "@/shared/graphql";
+import { ALREADY_VERIFIED_REASON } from "@/shared/session";
 import { renderWithProviders, screen, type RenderWithProvidersOptions } from "@/shared/testing";
 import { ResendCode } from "./index";
 
@@ -133,7 +134,7 @@ describe("ResendCode", () => {
   });
 
   it("tells the page when the account is verified already", async () => {
-    const { user } = renderResend([resendMock(failure("CONFLICT", "ALREADY_VERIFIED"))]);
+    const { user } = renderResend([resendMock(failure("CONFLICT", ALREADY_VERIFIED_REASON))]);
 
     await user.click(button());
 
