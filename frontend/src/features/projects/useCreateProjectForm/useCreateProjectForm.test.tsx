@@ -2,7 +2,11 @@ import { act, screen } from "@testing-library/react";
 import type { BaseSyntheticEvent, ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import { renderWithProviders, type RenderWithProvidersOptions } from "@/shared/testing";
-import { createProjectMock } from "../projects.mocks";
+import {
+  createProjectInvalidMock,
+  createProjectMock,
+  createProjectNetworkErrorMock,
+} from "../projects.mocks";
 import { useCreateProjectForm } from "./useCreateProjectForm";
 
 const input = {
@@ -54,5 +58,60 @@ describe("useCreateProjectForm", () => {
     expect(result().failed).toBe(false);
     expect(result().isOpen).toBe(false);
     expect(await screen.findByText("Project created")).toBeInTheDocument();
+  });
+
+  describe("when the request fails", () => {
+    type Result = () => ReturnType<typeof useCreateProjectForm>;
+
+    function openAndFill(result: Result) {
+      act(() => {
+        result().open();
+        fillForm(result().form);
+      });
+    }
+
+    async function submit(result: Result) {
+      await act(() => result().submit(fakeEvent as unknown as BaseSyntheticEvent));
+    }
+
+    const typed = { name: input.name, domain: input.domain, description: input.description };
+
+    it("shows a BAD_USER_INPUT error under its field, keeps the values and the modal open", async () => {
+      const { result } = setup({ mocks: [createProjectInvalidMock(input, ["name"])] });
+      openAndFill(result);
+      await submit(result);
+
+      expect(result().form.getFieldState("name").error?.message).toBeTruthy();
+      expect(result().failed).toBe(false);
+      expect(result().isOpen).toBe(true);
+      expect(result().form.getValues()).toMatchObject(typed);
+      expect(screen.queryByText("Project created")).not.toBeInTheDocument();
+    });
+
+    it("keeps the values and the modal open after a network failure and sets failed", async () => {
+      const { result } = setup({ mocks: [createProjectNetworkErrorMock(input)] });
+      openAndFill(result);
+      await submit(result);
+
+      expect(result().failed).toBe(true);
+      expect(result().isOpen).toBe(true);
+      expect(result().form.getValues()).toMatchObject(typed);
+      expect(screen.queryByText("Project created")).not.toBeInTheDocument();
+    });
+
+    it("accepts a second submit after a failure", async () => {
+      const { result } = setup({
+        mocks: [createProjectNetworkErrorMock(input), createProjectMock(input)],
+      });
+      openAndFill(result);
+      await submit(result);
+      expect(result().failed).toBe(true);
+
+      await submit(result);
+
+      expect(result().failed).toBe(false);
+      expect(result().isOpen).toBe(false);
+      expect(await screen.findByText("Project created")).toBeInTheDocument();
+    });
   });
 });
