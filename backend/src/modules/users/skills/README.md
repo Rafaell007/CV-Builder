@@ -19,6 +19,6 @@ The skills of a user (PLAN.md S6.4, D13, D16): the Skills tab of User Details an
 - **Remove (D13):** one transaction. It lowercases the ids and drops repeats (the input check compares them as text), then reads the links with `id in ids AND userId`; when one id is missing or belongs to another user, it answers `NOT_FOUND` and removes nothing. Then it removes the same catalog skills from **this user's** CVs (`CvSkill`) and the links. Other users, their CVs and the catalog skill stay.
 - **Errors:**
   - The user already has the skill (unique index, `P2002`) → `CONFLICT` "The user already has this skill". It also covers two parallel adds.
-  - The transaction was stopped (`P2034`) or timed out (`P2028`) → `CONFLICT` with `reason: "CONCURRENT_CHANGE"` (`toTransactionConflict`). Nothing was saved, so the client can try again.
+  - The transaction was stopped (`P2034`) or timed out (`P2028`) → `CONFLICT` with `reason: "CONCURRENT_CHANGE"` (`toTransactionConflict` in `common/errors`). Nothing was saved, so the client can try again.
 - **Tests:** `*.spec.ts` next to the code; `backend/test/users/user-skills.int-spec.ts` runs every operation over HTTP against the test database (owner, other user, admin, unverified user, duplicates in parallel, removal from CVs).
 - **Docs:** [User skills page](../../../../../docs/pages/12-user-skills-page.md) · [Skills page](../../../../../docs/pages/16-skills-page.md) · [PLAN.md S6.4, D13, D16](../../../../../PLAN.md)

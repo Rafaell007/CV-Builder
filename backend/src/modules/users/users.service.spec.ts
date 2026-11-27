@@ -4,14 +4,13 @@ import {
   HttpException,
   NotFoundException,
 } from "@nestjs/common";
-import { ValidationFailedException } from "../../common/errors";
+import { CONCURRENT_CHANGE_REASON, ValidationFailedException } from "../../common/errors";
 import { PageInput, SortDirection } from "../../common/pagination";
 import { Prisma } from "../../generated/prisma/client";
 import type { PrismaService } from "../../prisma/prisma.service";
 import { EMAIL_TAKEN_REASON } from "../auth/auth.service";
 import { Role } from "../auth/models/role.enum";
 import { hashPassword } from "../auth/password";
-import { CONCURRENT_CHANGE_REASON } from "./user-lock";
 import { OWN_ROLE_REASON, SELF_DELETE_REASON, UsersService } from "./users.service";
 
 // argon2 is slow and its output random; the tests only need to know the service stores what it returns.

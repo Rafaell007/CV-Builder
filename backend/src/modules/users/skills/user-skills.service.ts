@@ -5,11 +5,11 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import type { AuthUser } from "../../../common/auth";
-import { ValidationFailedException } from "../../../common/errors";
+import { toTransactionConflict, ValidationFailedException } from "../../../common/errors";
 import { Prisma } from "../../../generated/prisma/client";
 import { PrismaService } from "../../../prisma/prisma.service";
 import { Role } from "../../auth/models/role.enum";
-import { canonicalId, lockActorAndTarget, toTransactionConflict } from "../user-lock";
+import { canonicalId, lockActorAndTarget } from "../user-lock";
 import type { AddUserSkillInput } from "./dto/add-user-skill.input";
 import type { RemoveUserSkillsInput } from "./dto/remove-user-skills.input";
 import type { UpdateUserSkillInput } from "./dto/update-user-skill.input";

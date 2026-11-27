@@ -18,7 +18,7 @@ The users list, the admin user management and the profile (PLAN.md S6.1, S6.3, �
   - Unknown department or position → `BAD_USER_INPUT` with a field error on `departmentId` / `positionId` ("Department not found", "Position not found"), both at once. Checked before the write; a delete between the check and the write (`P2003`) gives the same error.
   - Email taken (unique index, `P2002`) → `CONFLICT` with `reason: "EMAIL_TAKEN"`, the same reason as sign-up.
   - Unknown user → `NOT_FOUND` "User not found".
-  - PostgreSQL stopped the transaction because a parallel one needs the same rows (a deadlock or write conflict, `P2034`, e.g. a delete while the user's browser refreshes its token), or Prisma rolled it back because it did not finish in time (`P2028`, default 5 s) → `CONFLICT` with `reason: "CONCURRENT_CHANGE"` ("The user was changed at the same time. Try again"). Nothing was saved, so the frontend can offer a retry and show its own text for the reason.
+  - PostgreSQL stopped the transaction because a parallel one needs the same rows (a deadlock or write conflict, `P2034`, e.g. a delete while the user's browser refreshes its token), or Prisma rolled it back because it did not finish in time (`P2028`, default 5 s) → `CONFLICT` with `reason: "CONCURRENT_CHANGE"` ("The data was changed at the same time. Try again", `toTransactionConflict` in `common/errors`). Nothing was saved, so the frontend can offer a retry and show its own text for the reason.
 - **D24, `CONFLICT` with a `reason`:**
   - `SELF_DELETE`: an admin deletes themselves. Checked inside the lock, like `OWN_ROLE`, so both mutations check in the same order: `FORBIDDEN`, `NOT_FOUND`, then `CONFLICT`.
   - `OWN_ROLE`: an admin removes their own Admin role.

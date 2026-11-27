@@ -1,5 +1,10 @@
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
-import { type FieldError, ValidationFailedException } from "../../common/errors";
+import {
+  type FieldError,
+  toTransactionConflict,
+  TRANSACTION_CONFLICT_CODES,
+  ValidationFailedException,
+} from "../../common/errors";
 import { escapeLike, ListArgs, resolveSort, toSkipTake } from "../../common/pagination";
 import { Prisma } from "../../generated/prisma/client";
 import { PrismaService } from "../../prisma/prisma.service";
@@ -12,12 +17,7 @@ import type { UpdateProfileInput } from "./dto/update-profile.input";
 import type { UpdateUserInput } from "./dto/update-user.input";
 import type { User } from "./models/user";
 import type { UserPage } from "./models/user-page";
-import {
-  canonicalId,
-  lockActorAndTarget,
-  toTransactionConflict,
-  TRANSACTION_CONFLICT_CODES,
-} from "./user-lock";
+import { canonicalId, lockActorAndTarget } from "./user-lock";
 
 /** `extensions.reason` of the `CONFLICT` when an admin removes their own Admin role (D24). */
 export const OWN_ROLE_REASON = "OWN_ROLE";

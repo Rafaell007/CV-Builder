@@ -2,7 +2,8 @@
 
 Gives every GraphQL error a stable `extensions.code` (D7). The frontend reads these codes.
 
-- **Exports:** `GraphQLExceptionFilter`, `ErrorCode`, `ValidationFailedException`, `FieldError`.
+- **Exports:** `GraphQLExceptionFilter`, `ErrorCode`, `ValidationFailedException`, `FieldError`, `toTransactionConflict`, `TRANSACTION_CONFLICT_CODES`, `CONCURRENT_CHANGE_REASON`.
+- **Transaction conflicts:** `toTransactionConflict` turns `P2034` (deadlock, write conflict) and `P2028` (transaction timeout) into `CONFLICT` with `reason: "CONCURRENT_CHANGE"`: nothing was saved, so the client can try again. Used by the users, avatars, user skills and CV skills writes.
 - **Mapping:** see the table in the [backend README](../../../README.md#3-throw-errors). An unknown error is logged and returned as `INTERNAL_SERVER_ERROR` without details.
 - **Prisma:** `P2002` becomes `CONFLICT` and `P2025` becomes `NOT_FOUND`, with a fixed message (the Prisma text names tables and columns).
 - **HTTP:** a request that is not GraphQL (for example an unknown route) gets Nest's normal JSON error, because the filter extends `BaseExceptionFilter`.

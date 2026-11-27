@@ -5,7 +5,8 @@ import {
   UnsupportedMediaTypeException,
 } from "@nestjs/common";
 import { PrismaService } from "../../../prisma/prisma.service";
-import { canonicalId, lockActorAndTarget, toTransactionConflict } from "../user-lock";
+import { toTransactionConflict } from "../../../common/errors";
+import { canonicalId, lockActorAndTarget } from "../user-lock";
 import { UNSUPPORTED_FILE_TYPE_REASON } from "./avatars.constants";
 import { detectImageType } from "./image-type.utils";
 
