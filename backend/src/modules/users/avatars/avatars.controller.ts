@@ -12,12 +12,21 @@ import {
   Res,
   StreamableFile,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { Throttle } from "@nestjs/throttler";
 import { type AuthUser, CurrentUser, requireUser } from "../../../common/auth";
+import { GqlThrottlerGuard } from "../../../common/throttling";
+import { AvatarActorGuard } from "./avatar-actor.guard";
 import { avatarVersion } from "./avatar-url.utils";
-import { AVATAR_FILE_FIELD, AVATAR_MAX_BYTES } from "./avatars.constants";
+import {
+  AVATAR_FILE_FIELD,
+  AVATAR_MAX_BYTES,
+  AVATAR_READ_LIMIT,
+  AVATAR_READ_TTL_MS,
+} from "./avatars.constants";
 import { AvatarsService } from "./avatars.service";
 
 /** The part of the Express response that `find` uses. Express provides it; tests can fake it. */
@@ -42,6 +51,8 @@ export class AvatarsController {
    * again each time, so it never keeps an old photo under an address that stays the same.
    */
   @Get()
+  @UseGuards(GqlThrottlerGuard)
+  @Throttle({ default: { limit: AVATAR_READ_LIMIT, ttl: AVATAR_READ_TTL_MS } })
   async find(
     @Param("id", ParseUUIDPipe) id: string,
     @Query("v") version: string | undefined,
@@ -59,11 +70,14 @@ export class AvatarsController {
   }
 
   /**
-   * Multipart with one file in the field `file`. Multer keeps it in memory and stops reading at 5 MB, which
-   * Nest answers with 413. Other fields or a second file answer 400. The service checks the content (415).
+   * Multipart with one file in the field `file`. Guards run before the interceptor: too many calls answer 429
+   * and a user who is neither the owner nor an admin answers 403, both before the file is read. Then Multer keeps
+   * the file in memory and stops reading at 5 MB, which Nest answers with 413. Other fields or a second file
+   * answer 400. The service checks the actor again under the row lock, then the content (415).
    */
   @Post()
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(GqlThrottlerGuard, AvatarActorGuard)
   @UseInterceptors(
     FileInterceptor(AVATAR_FILE_FIELD, {
       limits: { fileSize: AVATAR_MAX_BYTES, files: 1, fields: 0 },
@@ -82,6 +96,7 @@ export class AvatarsController {
 
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(GqlThrottlerGuard, AvatarActorGuard)
   async remove(
     @CurrentUser() actor: AuthUser | undefined,
     @Param("id", ParseUUIDPipe) id: string,

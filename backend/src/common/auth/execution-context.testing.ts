@@ -21,8 +21,9 @@ export function httpContext(
   handler: () => unknown,
   user?: AuthUser,
   res: object = {},
+  params?: Record<string, string>,
 ): ExecutionContext {
-  const args = [{ user }, res, () => undefined]; // Express handler args: request, response, next
+  const args = [{ user, ...(params && { params }) }, res, () => undefined]; // Express handler args: request, response, next
   const context = new ExecutionContextHost(args, controllerClass, handler);
   context.setType("http");
   return context;

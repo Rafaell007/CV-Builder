@@ -221,6 +221,12 @@ describe("avatars REST", () => {
       expect(Buffer.compare(response.body as Buffer, PNG)).toBe(0);
     });
 
+    it("refuses another user before the upload is read: a request the file reader would refuse gets 403", async () => {
+      // The file reader answers 400 to an extra form field, so a 403 shows that it never ran for ben.
+      await upload(ben, ann.id, PNG).field("note", "extra").expect(403);
+      await upload(ann, ann.id, PNG).field("note", "extra").expect(400);
+    });
+
     it("lets an admin upload and remove the avatar of another user", async () => {
       await upload(admin, ben.id, JPG, { filename: "a.jpg", contentType: "image/jpeg" }).expect(
         204,
@@ -259,8 +265,13 @@ describe("avatars REST", () => {
 
     it("answers 400 for an id that is not a UUID", async () => {
       await download(ann, "not-a-uuid").expect(400);
-      await upload(ann, "not-a-uuid", PNG).expect(400);
-      await remove(ann, "not-a-uuid").expect(400);
+      await upload(admin, "not-a-uuid", PNG).expect(400);
+      await remove(admin, "not-a-uuid").expect(400);
+    });
+
+    it("answers 403, not 400, to a user who writes to an id that is not a UUID", async () => {
+      await upload(ann, "not-a-uuid", PNG).expect(403);
+      await remove(ann, "not-a-uuid").expect(403);
     });
   });
 
