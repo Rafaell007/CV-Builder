@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import type { UpdateProfileInput } from "@/shared/graphql";
 import { renderWithProviders } from "@/shared/testing";
+import { CONCURRENT_CHANGE_REASON } from "@/shared/userProfile";
 import {
   updateProfileMock,
   updateProfileNetworkErrorMock,
@@ -128,7 +129,7 @@ describe("useProfileForm", () => {
   it.each([
     [{ code: "FORBIDDEN" }, "forbidden"],
     [{ code: "NOT_FOUND" }, "notFound"],
-    [{ code: "CONFLICT", reason: "CONCURRENT_CHANGE" }, "concurrentChange"],
+    [{ code: "CONFLICT", reason: CONCURRENT_CHANGE_REASON }, "concurrentChange"],
     [{ code: "BAD_USER_INPUT", fieldErrors: [{ field: "role", messages: ["x"] }] }, "failed"],
   ])(
     "shows %o as the general error %s and keeps the typed values",
