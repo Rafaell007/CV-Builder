@@ -17,7 +17,7 @@ export function useUpdateSkillForm(
 ) {
   const t = useTranslations("catalogs.skills");
   const toast = useToast();
-  const { form, failed, hasChanged, reset, showError, submit: submitForm } = useSkillForm();
+  const { form, failed, hasChanged, reset, submit: submitForm } = useSkillForm();
   // The skill stays set while the modal fades out, so the request still has its id.
   const [skill, setSkill] = useState<SkillListItem | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -30,17 +30,12 @@ export function useUpdateSkillForm(
 
   async function send(input: SkillInput) {
     if (!skill) return;
-    try {
-      const saved = await update(skill.id, input);
-      setIsOpen(false);
-      toast.success({
-        title: t("update.success.title"),
-        description: t("update.success.text", { name: saved.name }),
-      });
-    } catch (error) {
-      // Nothing resets the form here, so the values stay.
-      showError(error);
-    }
+    const saved = await update(skill.id, input);
+    setIsOpen(false);
+    toast.success({
+      title: t("update.success.title"),
+      description: t("update.success.text", { name: saved.name }),
+    });
   }
 
   function submit(event: BaseSyntheticEvent) {

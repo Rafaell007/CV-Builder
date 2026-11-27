@@ -14,7 +14,7 @@ import { useSkillForm } from "../useSkillForm";
 export function useCreateSkillForm(create: (input: SkillInput) => Promise<SkillListItem>) {
   const t = useTranslations("catalogs.skills");
   const toast = useToast();
-  const { form, failed, hasChanged, reset, showError, submit: submitForm } = useSkillForm();
+  const { form, failed, hasChanged, reset, submit: submitForm } = useSkillForm();
   const [isOpen, setIsOpen] = useState(false);
 
   function open() {
@@ -23,17 +23,12 @@ export function useCreateSkillForm(create: (input: SkillInput) => Promise<SkillL
   }
 
   async function send(input: SkillInput) {
-    try {
-      const created = await create(input);
-      setIsOpen(false);
-      toast.success({
-        title: t("create.success.title"),
-        description: t("create.success.text", { name: created.name }),
-      });
-    } catch (error) {
-      // Nothing resets the form here, so the values stay.
-      showError(error);
-    }
+    const created = await create(input);
+    setIsOpen(false);
+    toast.success({
+      title: t("create.success.title"),
+      description: t("create.success.text", { name: created.name }),
+    });
   }
 
   function submit(event: BaseSyntheticEvent) {
