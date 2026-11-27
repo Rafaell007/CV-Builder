@@ -17,6 +17,12 @@ input AddCvSkillInput {
   skillId: ID!
 }
 
+input AddUserSkillInput {
+  mastery: Mastery!
+  skillId: ID!
+  userId: ID!
+}
+
 type AvailableCvSkill {
   category: SkillCategory!
   id: ID!
@@ -212,6 +218,7 @@ enum Mastery {
 type Mutation {
   addCvProject(input: AddCvProjectInput!): CvProject!
   addCvSkill(input: AddCvSkillInput!): CvSkill!
+  addUserSkill(input: AddUserSkillInput!): UserSkill!
   changePassword(input: ChangePasswordInput!): Boolean!
   createCv(input: CreateCvInput!): Cv!
   createDepartment(input: CreateDepartmentInput!): Department!
@@ -231,6 +238,7 @@ type Mutation {
   refresh: Boolean!
   removeCvProjects(input: RemoveCvProjectsInput!): Boolean!
   removeCvSkills(input: RemoveCvSkillsInput!): Boolean!
+  removeUserSkills(input: RemoveUserSkillsInput!): Boolean!
   resendVerificationCode: Boolean!
   resetPassword(input: ResetPasswordInput!): Boolean!
   signIn(input: SignInInput!): SessionUser!
@@ -246,6 +254,7 @@ type Mutation {
   updateProject(input: UpdateProjectInput!): Project!
   updateSkill(input: UpdateSkillInput!): Skill!
   updateUser(input: UpdateUserInput!): User!
+  updateUserSkill(input: UpdateUserSkillInput!): UserSkill!
   verifyEmail(input: VerifyEmailInput!): SessionUser!
 }
 
@@ -318,6 +327,7 @@ type Query {
   skillCategories: [SkillCategory!]!
   skills: [EnvironmentSkill!]!
   user(id: ID!): User!
+  userSkills(userId: ID!): [UserSkill!]!
   users(page: PageInput! = {number: 1, size: 10}, search: String, sort: SortInput): UserPage!
 }
 
@@ -329,6 +339,11 @@ input RemoveCvProjectsInput {
 input RemoveCvSkillsInput {
   cvId: ID!
   ids: [ID!]!
+}
+
+input RemoveUserSkillsInput {
+  ids: [ID!]!
+  userId: ID!
 }
 
 input ResetPasswordInput {
@@ -458,6 +473,11 @@ input UpdateUserInput {
   role: Role!
 }
 
+input UpdateUserSkillInput {
+  id: ID!
+  mastery: Mastery!
+}
+
 type User {
   avatarUrl: String
   createdAt: DateTime!
@@ -473,6 +493,17 @@ type User {
 type UserPage {
   items: [User!]!
   total: Int!
+}
+
+type UserSkill {
+  category: SkillCategory!
+  createdAt: DateTime!
+  id: ID!
+  mastery: Mastery!
+  name: String!
+  skillId: ID!
+  updatedAt: DateTime!
+  userId: ID!
 }
 
 input VerifyEmailInput {
