@@ -39,6 +39,31 @@ const eslintConfig = defineConfig([
     extends: [tseslint.configs.recommended],
   },
   {
+    // A server form uses `useServerForm`, which owns the guard against a double submit and the failure placement.
+    // Only `shared/forms` itself, stories and tests may build a form from `useZodForm`.
+    files: ["frontend/src/**/*.{ts,tsx}"],
+    ignores: [
+      "frontend/src/shared/forms/**",
+      "frontend/src/**/*.stories.tsx",
+      "frontend/src/**/*.test.{ts,tsx}",
+    ],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@/shared/forms",
+              importNames: ["useZodForm"],
+              message:
+                "Use useServerForm from @/shared/forms. It owns the guard against a double submit, the general error and the placement of a failed request.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     rules: {
       "@typescript-eslint/no-explicit-any": "error",
     },
