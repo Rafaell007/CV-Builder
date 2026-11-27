@@ -1,11 +1,11 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useMemo, useState, type BaseSyntheticEvent } from "react";
+import { useMemo, useState } from "react";
 import { useWatch } from "react-hook-form";
 import { useServerForm } from "@/shared/forms";
 import { ISO_TAKEN_REASON } from "../languages.constants";
-import type { LanguageFormValues, LanguageInput } from "../languages.types";
+import type { LanguageFormValues } from "../languages.types";
 import { languageFormSchema, normalizeIso } from "../utils";
 
 const NAMESPACE = "catalogs.languages";
@@ -53,7 +53,7 @@ export function useLanguageForm() {
     generalError,
     reset: resetForm,
     showError,
-    submit: submitForm,
+    submit,
   } = useServerForm(schema, {
     defaultValues: EMPTY_VALUES,
     serverFields: {
@@ -86,14 +86,6 @@ export function useLanguageForm() {
   function reset(values: LanguageFormValues) {
     resetForm(values);
     setOriginal(normalize(values));
-  }
-
-  /**
-   * Validates, then calls `send` with the trimmed values and the uppercase ISO code. An error that `send` throws is
-   * shown by the form (`useServerForm`).
-   */
-  async function submit(event: BaseSyntheticEvent, send: (input: LanguageInput) => Promise<void>) {
-    await submitForm(event, send);
   }
 
   return { form, failed: generalError !== null, hasChanged, reset, showError, submit };

@@ -1,10 +1,10 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useMemo, useState, type BaseSyntheticEvent } from "react";
+import { useMemo, useState } from "react";
 import { useWatch } from "react-hook-form";
 import { useServerForm } from "@/shared/forms";
-import type { SkillFormValues, SkillInput } from "../skills.types";
+import type { SkillFormValues } from "../skills.types";
 import { skillFormSchema } from "../utils";
 
 const NAMESPACE = "catalogs.skills";
@@ -35,7 +35,7 @@ export function useSkillForm() {
     generalError,
     reset: resetForm,
     showError,
-    submit: submitForm,
+    submit,
   } = useServerForm(schema, {
     defaultValues: EMPTY_VALUES,
     serverFields: {
@@ -58,14 +58,6 @@ export function useSkillForm() {
   function reset(values: SkillFormValues) {
     resetForm(values);
     setOriginal({ name: values.name.trim(), categoryId: values.categoryId });
-  }
-
-  /**
-   * Validates, then calls `send` with the trimmed name and the category. An error that `send` throws is shown by the
-   * form (`useServerForm`).
-   */
-  async function submit(event: BaseSyntheticEvent, send: (input: SkillInput) => Promise<void>) {
-    await submitForm(event, send);
   }
 
   return { form, failed: generalError !== null, hasChanged, reset, showError, submit };
