@@ -17,6 +17,7 @@
     "test/**/*.ts",
     "prisma.config.ts",
     "prisma/seed.ts",
+    "prisma/check-seed-target.ts",
     "prisma/seed/**/*.ts"
   ],
   "exclude": ["node_modules", "dist"]

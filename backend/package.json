@@ -15,7 +15,7 @@
     "schema:generate": "prisma generate && nest build && node dist/generate-schema",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:reset": "prisma migrate reset && prisma db seed",
+    "db:reset": "tsx prisma/check-seed-target.ts && prisma migrate reset && prisma db seed",
     "db:seed": "prisma db seed"
   },
   "dependencies": {
