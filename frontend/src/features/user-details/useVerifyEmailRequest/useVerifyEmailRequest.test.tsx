@@ -5,6 +5,7 @@ import { act, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MeDocument } from "@/shared/graphql";
+import { ALREADY_VERIFIED_REASON } from "@/shared/session";
 import { renderWithProviders } from "@/shared/testing";
 import {
   meMock,
@@ -90,7 +91,7 @@ describe("useVerifyEmailRequest", () => {
 
   it("stays and hides the button when the email is already verified", async () => {
     const { hook, request, cachedMe } = setup([
-      resendCodeRefusedMock({ code: "CONFLICT", reason: "ALREADY_VERIFIED" }),
+      resendCodeRefusedMock({ code: "CONFLICT", reason: ALREADY_VERIFIED_REASON }),
     ]);
 
     await request();
