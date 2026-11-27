@@ -64,7 +64,6 @@ export function useCreateUserForm() {
     form,
     generalError,
     reset,
-    showError,
     submit: submitForm,
   } = useUserForm({
     schema,
@@ -79,17 +78,12 @@ export function useCreateUserForm() {
   }
 
   async function send(values: UserFormSubmit) {
-    try {
-      const user = await create(toCreateUserInput(values));
-      setIsOpen(false);
-      toast.success({
-        title: t("create.success.title"),
-        description: t("create.success.text", { name: getUserDisplayName(user) }),
-      });
-    } catch (error) {
-      // Nothing resets the form here, so the values stay.
-      showError(error);
-    }
+    const user = await create(toCreateUserInput(values));
+    setIsOpen(false);
+    toast.success({
+      title: t("create.success.title"),
+      description: t("create.success.text", { name: getUserDisplayName(user) }),
+    });
   }
 
   function submit(event: BaseSyntheticEvent) {
