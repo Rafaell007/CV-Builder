@@ -1,6 +1,7 @@
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MeDocument, VerifyEmailDocument } from "@/shared/graphql";
+import { ALREADY_VERIFIED_REASON } from "@/shared/session";
 import { renderWithProviders, screen, waitFor } from "@/shared/testing";
 import { VerifyEmailForm } from "./index";
 
@@ -204,7 +205,7 @@ describe("VerifyEmailForm", () => {
 
   it("sends a user whose account is verified already to the application", async () => {
     const { user } = renderWithProviders(<VerifyEmailForm />, {
-      mocks: [verifyMock(failure("CONFLICT", "ALREADY_VERIFIED"))],
+      mocks: [verifyMock(failure("CONFLICT", ALREADY_VERIFIED_REASON))],
     });
 
     await enterCode(user);
