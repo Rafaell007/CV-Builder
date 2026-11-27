@@ -2,7 +2,12 @@ import { act, screen } from "@testing-library/react";
 import type { BaseSyntheticEvent, ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import { renderWithProviders, type RenderWithProvidersOptions } from "@/shared/testing";
-import { createCvMock, createInput } from "../cvForm.mocks";
+import {
+  createCvInvalidMock,
+  createCvMock,
+  createCvNetworkErrorMock,
+  createInput,
+} from "../cvForm.mocks";
 import { useCreateCvForm } from "./useCreateCvForm";
 
 // The submit handler only needs these two methods of the form event.
@@ -66,5 +71,60 @@ describe("useCreateCvForm", () => {
 
     expect(result().failed).toBe(false);
     expect(result().isOpen).toBe(false);
+  });
+
+  describe("when the request fails", () => {
+    type Result = () => ReturnType<typeof useCreateCvForm>;
+
+    function openAndFill(result: Result) {
+      act(() => {
+        result().open();
+        result().form.setValue("name", createInput.name);
+        result().form.setValue("education", createInput.education);
+        result().form.setValue("description", createInput.description);
+      });
+    }
+
+    async function submit(result: Result) {
+      await act(() => result().submit(fakeEvent as unknown as BaseSyntheticEvent));
+    }
+
+    it("shows a BAD_USER_INPUT error under its field, keeps the values and the modal open", async () => {
+      const { result } = setup({ mocks: [createCvInvalidMock(createInput, "name")] });
+      openAndFill(result);
+      await submit(result);
+
+      expect(result().form.getFieldState("name").error?.message).toBeTruthy();
+      expect(result().failed).toBe(false);
+      expect(result().isOpen).toBe(true);
+      expect(result().form.getValues()).toEqual(createInput);
+      expect(screen.queryByText("CV created")).not.toBeInTheDocument();
+    });
+
+    it("keeps the values and the modal open after a network failure and sets failed", async () => {
+      const { result } = setup({ mocks: [createCvNetworkErrorMock(createInput)] });
+      openAndFill(result);
+      await submit(result);
+
+      expect(result().failed).toBe(true);
+      expect(result().isOpen).toBe(true);
+      expect(result().form.getValues()).toEqual(createInput);
+      expect(screen.queryByText("CV created")).not.toBeInTheDocument();
+    });
+
+    it("accepts a second submit after a failure", async () => {
+      const { result } = setup({
+        mocks: [createCvNetworkErrorMock(createInput), createCvMock(createInput)],
+      });
+      openAndFill(result);
+      await submit(result);
+      expect(result().failed).toBe(true);
+
+      await submit(result);
+
+      expect(result().failed).toBe(false);
+      expect(result().isOpen).toBe(false);
+      expect(await screen.findByText("CV created")).toBeInTheDocument();
+    });
   });
 });

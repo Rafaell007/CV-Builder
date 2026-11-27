@@ -52,7 +52,6 @@ export function useUpdateUserForm() {
     form,
     generalError,
     reset,
-    showError,
     submit: submitForm,
   } = useUserForm({
     schema,
@@ -71,17 +70,12 @@ export function useUpdateUserForm() {
 
   async function send(values: UserFormSubmit) {
     if (!user) return;
-    try {
-      const saved = await update(toUpdateUserInput(user, values));
-      setIsOpen(false);
-      toast.success({
-        title: t("update.success.title"),
-        description: t("update.success.text", { name: getUserDisplayName(saved) }),
-      });
-    } catch (error) {
-      // Nothing resets the form here, so the values stay.
-      showError(error);
-    }
+    const saved = await update(toUpdateUserInput(user, values));
+    setIsOpen(false);
+    toast.success({
+      title: t("update.success.title"),
+      description: t("update.success.text", { name: getUserDisplayName(saved) }),
+    });
   }
 
   function submit(event: BaseSyntheticEvent) {

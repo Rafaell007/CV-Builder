@@ -61,8 +61,8 @@ export function useSkillForm() {
   }
 
   /**
-   * Validates, then calls `send` with the trimmed name and the category. `send` must not throw; it calls
-   * `showError`.
+   * Validates, then calls `send` with the trimmed name and the category. An error that `send` throws is shown by the
+   * form (`useServerForm`).
    */
   async function submit(event: BaseSyntheticEvent, send: (input: SkillInput) => Promise<void>) {
     await submitForm(event, send);

@@ -89,8 +89,8 @@ export function useLanguageForm() {
   }
 
   /**
-   * Validates, then calls `send` with the trimmed values and the uppercase ISO code. `send` must not throw; it calls
-   * `showError`.
+   * Validates, then calls `send` with the trimmed values and the uppercase ISO code. An error that `send` throws is
+   * shown by the form (`useServerForm`).
    */
   async function submit(event: BaseSyntheticEvent, send: (input: LanguageInput) => Promise<void>) {
     await submitForm(event, send);

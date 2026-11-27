@@ -26,7 +26,7 @@ export function useCreateProjectForm() {
   const t = useTranslations("projects.create");
   const toast = useToast();
   const { create } = useCreateProject();
-  const { form, failed, reset, showError, submit: submitForm } = useProjectForm(EMPTY_VALUES);
+  const { form, failed, reset, submit: submitForm } = useProjectForm(EMPTY_VALUES);
   const [isOpen, setIsOpen] = useState(false);
 
   function open() {
@@ -35,17 +35,12 @@ export function useCreateProjectForm() {
   }
 
   async function send(values: ProjectFormSubmit) {
-    try {
-      await create(toCreateProjectInput(values));
-      setIsOpen(false);
-      toast.success({
-        title: t("success.title"),
-        description: t("success.text", { name: values.name }),
-      });
-    } catch (error) {
-      // Nothing resets the form here, so the values stay.
-      showError(error);
-    }
+    await create(toCreateProjectInput(values));
+    setIsOpen(false);
+    toast.success({
+      title: t("success.title"),
+      description: t("success.text", { name: values.name }),
+    });
   }
 
   function submit(event: BaseSyntheticEvent) {

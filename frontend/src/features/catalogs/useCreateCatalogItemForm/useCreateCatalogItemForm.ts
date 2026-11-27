@@ -18,14 +18,7 @@ export function useCreateCatalogItemForm(
 ) {
   const t = useTranslations(namespace);
   const toast = useToast();
-  const {
-    form,
-    failed,
-    hasChanged,
-    reset,
-    showError,
-    submit: submitForm,
-  } = useCatalogNameForm(namespace);
+  const { form, failed, hasChanged, reset, submit: submitForm } = useCatalogNameForm(namespace);
   const [isOpen, setIsOpen] = useState(false);
 
   function open() {
@@ -34,17 +27,12 @@ export function useCreateCatalogItemForm(
   }
 
   async function send(name: string) {
-    try {
-      const created = await create(name);
-      setIsOpen(false);
-      toast.success({
-        title: t("create.success.title"),
-        description: t("create.success.text", { name: created.name }),
-      });
-    } catch (error) {
-      // Nothing resets the form here, so the name stays.
-      showError(error);
-    }
+    const created = await create(name);
+    setIsOpen(false);
+    toast.success({
+      title: t("create.success.title"),
+      description: t("create.success.text", { name: created.name }),
+    });
   }
 
   function submit(event: BaseSyntheticEvent) {

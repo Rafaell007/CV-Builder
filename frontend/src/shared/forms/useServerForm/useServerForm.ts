@@ -103,8 +103,8 @@ export function useServerForm<
 
   /**
    * Validates, then calls `send` with the checked values. A second submit during the request is ignored. The general
-   * error clears only after validation passed. `send` must not throw; it calls `showError`. A form that submits without
-   * a DOM event passes `undefined`.
+   * error clears only after validation passed. An error that `send` throws goes to `showError`, so `send` needs no
+   * `try/catch` of its own. A form that submits without a DOM event passes `undefined`.
    */
   async function submit(
     event: BaseSyntheticEvent | undefined,
@@ -115,7 +115,11 @@ export function useServerForm<
     try {
       await form.handleSubmit(async (values) => {
         setGeneralError(null);
-        await send(values);
+        try {
+          await send(values);
+        } catch (error) {
+          showError(error);
+        }
       })(event);
     } finally {
       sending.current = false;

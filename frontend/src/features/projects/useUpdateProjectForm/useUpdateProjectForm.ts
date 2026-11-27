@@ -28,7 +28,7 @@ export function useUpdateProjectForm() {
   const t = useTranslations("projects.update");
   const toast = useToast();
   const { update } = useUpdateProject();
-  const { form, failed, reset, showError, submit: submitForm } = useProjectForm(EMPTY_VALUES);
+  const { form, failed, reset, submit: submitForm } = useProjectForm(EMPTY_VALUES);
   // The project stays set while the modal fades out, so the request still has its id.
   const [project, setProject] = useState<ProjectListItem | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -41,17 +41,12 @@ export function useUpdateProjectForm() {
 
   async function send(values: ProjectFormSubmit) {
     if (!project) return;
-    try {
-      await update(toUpdateProjectInput(project, values));
-      setIsOpen(false);
-      toast.success({
-        title: t("success.title"),
-        description: t("success.text", { name: values.name }),
-      });
-    } catch (error) {
-      // Nothing resets the form here, so the values stay.
-      showError(error);
-    }
+    await update(toUpdateProjectInput(project, values));
+    setIsOpen(false);
+    toast.success({
+      title: t("success.title"),
+      description: t("success.text", { name: values.name }),
+    });
   }
 
   function submit(event: BaseSyntheticEvent) {

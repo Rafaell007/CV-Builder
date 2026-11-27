@@ -53,7 +53,7 @@ export function useCatalogNameForm(namespace: CatalogNamespace) {
     setOriginal(name.trim());
   }
 
-  /** Validates, then calls `send` with the trimmed name. `send` must not throw; it calls `showError`. */
+  /** Validates, then calls `send` with the trimmed name. An error that `send` throws is shown by the form. */
   async function submit(event: BaseSyntheticEvent, send: (name: string) => Promise<void>) {
     await submitForm(event, ({ name }) => send(name));
   }
