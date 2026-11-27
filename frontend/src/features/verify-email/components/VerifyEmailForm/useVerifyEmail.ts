@@ -7,7 +7,7 @@ import { useCurrentUser } from "@/shared/currentUser";
 import { readFailure } from "@/shared/failures";
 import { MeDocument, VerifyEmailDocument } from "@/shared/graphql";
 import { useRouter } from "@/shared/i18n";
-import { HOME_PATH } from "@/shared/session";
+import { ALREADY_VERIFIED_REASON, HOME_PATH } from "@/shared/session";
 import type { VerifyEmailErrorKey, VerifyEmailFailure } from "./verify-email.types";
 import { validateCode } from "./utils";
 
@@ -24,7 +24,7 @@ function toVerifyEmailFailure(error: unknown): VerifyEmailFailure {
   const { kind, reason } = readFailure(error);
   const known = reason === undefined ? undefined : CODE_REASONS[reason];
 
-  if (kind === "conflict" && reason === "ALREADY_VERIFIED") return "alreadyVerified";
+  if (kind === "conflict" && reason === ALREADY_VERIFIED_REASON) return "alreadyVerified";
   if (kind === "invalid" && known !== undefined) return known;
   // TOO_MANY_ATTEMPTS has the code TOO_MANY_REQUESTS too. The throttler answers without a reason.
   if (kind === "tooManyRequests") return known ?? "tooManyRequests";

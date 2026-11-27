@@ -4,6 +4,7 @@ import { useMutation } from "@apollo/client/react";
 import { useState } from "react";
 import { readFailure } from "@/shared/failures";
 import { ResendVerificationCodeDocument } from "@/shared/graphql";
+import { ALREADY_VERIFIED_REASON } from "@/shared/session";
 import type { ResendFailure, ResendMessage } from "./resend-code.types";
 import { useCooldown } from "./useCooldown";
 
@@ -14,7 +15,7 @@ export const RESEND_COOLDOWN_SECONDS = 60;
 // RESEND_COOLDOWN from the service, or the throttler's answer without a reason: both mean "wait".
 function toResendFailure(error: unknown): ResendFailure {
   const { kind, reason } = readFailure(error);
-  if (kind === "conflict" && reason === "ALREADY_VERIFIED") return "alreadyVerified";
+  if (kind === "conflict" && reason === ALREADY_VERIFIED_REASON) return "alreadyVerified";
   return kind === "tooManyRequests" ? "cooldown" : "failed";
 }
 

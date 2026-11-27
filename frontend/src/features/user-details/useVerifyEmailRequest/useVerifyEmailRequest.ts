@@ -7,7 +7,7 @@ import { useToast } from "@/shared/components";
 import { readFailure } from "@/shared/failures";
 import { MeDocument, ResendVerificationCodeDocument } from "@/shared/graphql";
 import { useRouter } from "@/shared/i18n";
-import { VERIFY_EMAIL_PATH } from "@/shared/session";
+import { ALREADY_VERIFIED_REASON, VERIFY_EMAIL_PATH } from "@/shared/session";
 
 /** What a VERIFY EMAIL request ended with (backend auth README › Errors). */
 type VerifyEmailRequestOutcome = "sent" | "sentRecently" | "alreadyVerified" | "failed";
@@ -16,7 +16,7 @@ type VerifyEmailRequestOutcome = "sent" | "sentRecently" | "alreadyVerified" | "
 // answer (no reason) does not say that, so it counts as a failure.
 function toOutcome(error: unknown): VerifyEmailRequestOutcome {
   const { kind, reason } = readFailure(error);
-  if (kind === "conflict" && reason === "ALREADY_VERIFIED") return "alreadyVerified";
+  if (kind === "conflict" && reason === ALREADY_VERIFIED_REASON) return "alreadyVerified";
   if (kind === "tooManyRequests" && reason === "RESEND_COOLDOWN") return "sentRecently";
   return "failed";
 }
