@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Suspense } from "react";
 import { expect, within } from "storybook/test";
 import {
+  AVATAR_PHOTO_MOCK,
   departmentOptionsErrorMock,
   departmentOptionsMock,
   meMock,
@@ -65,6 +66,37 @@ export const AdminEditsEmployee: Story = {
     const canvas = within(canvasElement);
     await expect(await canvas.findByRole("button", { name: "Update" })).toBeInTheDocument();
     await expect(canvas.queryByRole("button", { name: "Verify email" })).not.toBeInTheDocument();
+  },
+};
+
+/** An Admin on an employee with a photo: the upload control next to it and the red Remove × on hover or focus. */
+export const AdminWithPhoto: Story = {
+  parameters: {
+    apollo: {
+      mocks: [meMock("ADMIN"), userMock("10", emma, assigned, AVATAR_PHOTO_MOCK), ...options],
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(await canvas.findByLabelText("Upload avatar image")).toBeInTheDocument();
+    await expect(canvas.getByRole("button", { name: "Remove avatar" })).toBeEnabled();
+  },
+};
+
+/** Another employee's profile with a photo: the photo alone, centred; no upload, no Remove. */
+export const ReadOnlyWithPhoto: Story = {
+  parameters: {
+    apollo: {
+      mocks: [meMock("USER"), userMock("10", emma, assigned, AVATAR_PHOTO_MOCK), ...options],
+    },
+    // Same read-only fields as `ReadOnly`: Figma's grey is below WCAG 4.5:1 (docs/design-tokens.md). Warning only.
+    a11y: { test: "todo" },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(await canvas.findByRole("img", { name: "Emma Employee" })).toBeInTheDocument();
+    await expect(canvas.queryByLabelText("Upload avatar image")).not.toBeInTheDocument();
+    await expect(canvas.queryByRole("button", { name: "Remove avatar" })).not.toBeInTheDocument();
   },
 };
 

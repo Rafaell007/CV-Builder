@@ -2,7 +2,7 @@ import { Reflector } from "@nestjs/core";
 import { Role } from "../../generated/prisma/enums";
 import type { AuthUser } from "./auth-user";
 import { IS_PUBLIC_KEY, Public, ROLES_KEY, Roles, VERIFIED_KEY, Verified } from "./decorators";
-import { graphqlContext } from "./graphql-context.testing";
+import { graphqlContext, httpContext } from "./execution-context.testing";
 import { getRequestUser } from "./request-user";
 
 class SampleResolver {
@@ -48,5 +48,11 @@ describe("getRequestUser (behind @CurrentUser)", () => {
     const context = graphqlContext(SampleResolver, SampleResolver.prototype.open);
 
     expect(getRequestUser(context)).toBeUndefined();
+  });
+
+  it("returns the user of a REST request too", () => {
+    const context = httpContext(SampleResolver, SampleResolver.prototype.open, signedIn);
+
+    expect(getRequestUser(context)).toBe(signedIn);
   });
 });

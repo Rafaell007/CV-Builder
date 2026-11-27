@@ -8,6 +8,21 @@
   },
   "profile": {
     "memberSince": "Członek od {date}",
+    "avatar": {
+      "upload": "Prześlij zdjęcie awatara",
+      "hint": "png, jpg lub gif, maksymalnie {max} MB",
+      "remove": "Usuń awatar",
+      "uploaded": "Awatar zaktualizowany",
+      "removed": "Awatar usunięty",
+      "errors": {
+        "uploadFailed": "Nie udało się przesłać awatara",
+        "removeFailed": "Nie udało się usunąć awatara",
+        "wrongType": "Dozwolone są tylko obrazy png, jpg lub gif.",
+        "tooLarge": "Plik nie może być większy niż {max} MB.",
+        "forbidden": "Nie masz uprawnień do tej operacji.",
+        "tryAgain": "Coś poszło nie tak. Spróbuj ponownie."
+      }
+    },
     "verifyEmail": {
       "button": "Zweryfikuj e-mail",
       "sent": "Wysłaliśmy e-mail weryfikacyjny",

@@ -1,19 +1,39 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
+import { ExecutionContextHost } from "@nestjs/core/helpers/execution-context-host";
 import { ThrottlerStorageService } from "@nestjs/throttler";
 import type { ExecutionContext } from "@nestjs/common";
 import { GqlThrottlerGuard } from "./gql-throttler.guard";
 
-// GraphQL operations have no HTTP request of their own; the guard must read it from the GraphQL context.
+class Handlers {
+  signIn(): void {}
+}
+
 const req = { ip: "10.0.0.1" };
 const res = { header: jest.fn() };
-const context = {
-  getType: () => "graphql",
-  getClass: () => class Resolver {},
-  getHandler: () => function signIn() {},
-  getArgs: () => [{}, {}, { req, res }, {}],
-  getArgByIndex: (index: number) => [{}, {}, { req, res }, {}][index],
-} as unknown as ExecutionContext;
+
+// GraphQL operations have no HTTP request of their own; the guard must read it from the GraphQL context.
+function graphqlCall(): ExecutionContext {
+  const host = new ExecutionContextHost(
+    [{}, {}, { req, res }, {}], // GraphQL resolver args: root, args, context, info
+    Handlers,
+    Handlers.prototype.signIn,
+  );
+  host.setType("graphql");
+  return host;
+}
+
+function restCall(): ExecutionContext {
+  const host = new ExecutionContextHost(
+    [req, res, () => undefined], // Express handler args: request, response, next
+    Handlers,
+    Handlers.prototype.signIn,
+  );
+  host.setType("http");
+  return host;
+}
+
+const context = graphqlCall();
 
 async function createGuard(limit: number): Promise<GqlThrottlerGuard> {
   const guard = new GqlThrottlerGuard(
@@ -42,5 +62,12 @@ describe("GqlThrottlerGuard", () => {
     expect(error).toBeInstanceOf(HttpException);
     expect((error as HttpException).getStatus()).toBe(HttpStatus.TOO_MANY_REQUESTS);
     expect((error as HttpException).message).toBe("Too many attempts, try again later");
+  });
+
+  it("throttles a REST call too, with the request from the HTTP context", async () => {
+    const guard = await createGuard(1);
+
+    await expect(guard.canActivate(restCall())).resolves.toBe(true);
+    await expect(guard.canActivate(restCall())).rejects.toThrow(HttpException);
   });
 });

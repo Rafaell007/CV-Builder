@@ -3,7 +3,7 @@ import { Reflector } from "@nestjs/core";
 import { Role } from "../../generated/prisma/enums";
 import type { AuthUser } from "./auth-user";
 import { Roles } from "./decorators";
-import { graphqlContext } from "./graphql-context.testing";
+import { graphqlContext, httpContext } from "./execution-context.testing";
 import { RolesGuard } from "./roles.guard";
 
 class SampleResolver {
@@ -53,6 +53,15 @@ describe("RolesGuard", () => {
 
     expect(guard.canActivate(graphqlContext(AdminResolver, handler, admin))).toBe(true);
     expect(() => guard.canActivate(graphqlContext(AdminResolver, handler, user))).toThrow(
+      ForbiddenException,
+    );
+  });
+
+  it("reads the user of a REST request too", () => {
+    const handler = SampleResolver.prototype.adminOnly;
+
+    expect(guard.canActivate(httpContext(SampleResolver, handler, admin))).toBe(true);
+    expect(() => guard.canActivate(httpContext(SampleResolver, handler, user))).toThrow(
       ForbiddenException,
     );
   });

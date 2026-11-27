@@ -7,6 +7,7 @@ mutation UpdateUser($input: UpdateUserInput!) {
     firstName
     lastName
     role
+    avatarUrl
     department {
       id
       name

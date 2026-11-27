@@ -10,7 +10,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "outDir": "./dist",
-    "types": ["node", "jest"]
+    "types": ["node", "jest", "multer"]
   },
   "include": [
     "src/**/*.ts",

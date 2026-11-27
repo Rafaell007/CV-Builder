@@ -4,7 +4,7 @@ import { Role } from "../../generated/prisma/enums";
 import type { AuthUser } from "./auth-user";
 import { Verified } from "./decorators";
 import { EmailNotVerifiedException } from "./email-not-verified.exception";
-import { graphqlContext } from "./graphql-context.testing";
+import { graphqlContext, httpContext } from "./execution-context.testing";
 import { VerifiedGuard } from "./verified.guard";
 
 class SampleResolver {
@@ -46,5 +46,14 @@ describe("VerifiedGuard", () => {
     const context = graphqlContext(SampleResolver, SampleResolver.prototype.verifiedOnly);
 
     expect(() => guard.canActivate(context)).toThrow(UnauthorizedException);
+  });
+
+  it("reads the user of a REST request too", () => {
+    const handler = SampleResolver.prototype.verifiedOnly;
+
+    expect(guard.canActivate(httpContext(SampleResolver, handler, verified))).toBe(true);
+    expect(() => guard.canActivate(httpContext(SampleResolver, handler, unverified))).toThrow(
+      EmailNotVerifiedException,
+    );
   });
 });

@@ -11,6 +11,7 @@ export { ContactPageIcon } from "./ContactPageIcon";
 export { DeleteForeverIcon } from "./DeleteForeverIcon";
 export { DomainIcon } from "./DomainIcon";
 export { ExpandMoreIcon } from "./ExpandMoreIcon";
+export { FileUploadIcon } from "./FileUploadIcon";
 export { FolderCopyIcon } from "./FolderCopyIcon";
 export { LogoIcon } from "./LogoIcon";
 export { LogoutIcon } from "./LogoutIcon";

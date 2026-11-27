@@ -59,6 +59,16 @@ describe("UsersTable", () => {
     }
   });
 
+  it("shows the photo of a user who has one, the initials for the others", () => {
+    const photo = "/api/users/u2/avatar?v=1";
+    render({ users: [alpha, { ...bravo, avatarUrl: photo }] });
+
+    // The avatar is hidden from screen readers (the name is in the next columns), so it is found by its tag.
+    expect(rowOf(bravo.email).querySelector("img")).toHaveAttribute("src", photo);
+    expect(rowOf(alpha.email).querySelector("img")).toBeNull();
+    expect(within(rowOf(alpha.email)).getByText("AL")).toBeInTheDocument();
+  });
+
   it("shows a dash for each missing value, and the email initial for a user without a name", () => {
     render();
 

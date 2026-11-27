@@ -1,5 +1,5 @@
-import { fireEvent } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { act, fireEvent } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders, screen } from "@/shared/testing";
 import { Avatar } from "./Avatar";
 
@@ -24,6 +24,20 @@ describe("Avatar", () => {
 
     expect(container.querySelector("img")).toBeNull();
     expect(screen.getByText("JK")).toBeInTheDocument();
+  });
+
+  it("loads the image again, as a new <img>, when retryImage allows it", async () => {
+    const retryImage = vi.fn().mockResolvedValue(true);
+    const { container } = renderWithProviders(
+      <Avatar name="Jan Kowalski" src="/jan.png" retryImage={retryImage} />,
+    );
+    const first = container.querySelector("img");
+
+    await act(async () => fireEvent.error(first as HTMLImageElement));
+
+    const second = container.querySelector("img");
+    expect(second).toHaveAttribute("src", "/jan.png");
+    expect(second).not.toBe(first);
   });
 
   it("names the picture after the user", () => {

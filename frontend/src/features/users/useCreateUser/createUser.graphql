@@ -7,6 +7,7 @@ mutation CreateUser($input: CreateUserInput!) {
     firstName
     lastName
     role
+    avatarUrl
     department {
       id
       name

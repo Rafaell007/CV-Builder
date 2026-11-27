@@ -1,10 +1,11 @@
 import { ExecutionContext, HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { GqlExecutionContext } from "@nestjs/graphql";
 import { ThrottlerGuard } from "@nestjs/throttler";
+import { getRequest, getResponse } from "../auth";
 
 /**
- * `ThrottlerGuard` for GraphQL (D23). The stock guard reads the request from the HTTP context,
- * which does not exist for a resolver. Use it with `@UseGuards(GqlThrottlerGuard)` on a resolver method.
+ * `ThrottlerGuard` for GraphQL (D23), which also works on a REST controller. The stock guard reads
+ * the request from the HTTP context, which does not exist for a resolver. Use it with
+ * `@UseGuards(GqlThrottlerGuard)` on a resolver or controller method.
  */
 @Injectable()
 export class GqlThrottlerGuard extends ThrottlerGuard {
@@ -12,11 +13,10 @@ export class GqlThrottlerGuard extends ThrottlerGuard {
     req: Record<string, unknown>;
     res: Record<string, unknown>;
   } {
-    const { req, res } = GqlExecutionContext.create(context).getContext<{
-      req: Record<string, unknown>;
-      res: Record<string, unknown>;
-    }>();
-    return { req, res };
+    return {
+      req: getRequest<Record<string, unknown>>(context),
+      res: getResponse<Record<string, unknown>>(context),
+    };
   }
 
   protected override throwThrottlingException(): Promise<void> {

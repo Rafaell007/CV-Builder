@@ -8,6 +8,7 @@ query Users($page: PageInput!, $search: String, $sort: SortInput) {
       firstName
       lastName
       role
+      avatarUrl
       department {
         id
         name

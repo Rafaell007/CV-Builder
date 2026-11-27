@@ -43,6 +43,7 @@ export const alpha: UserListItem = {
   firstName: "Alpha",
   lastName: "Lima",
   role: "ADMIN",
+  avatarUrl: null,
   department: departments.react,
   position: positions.softwareEngineer,
 };
@@ -54,6 +55,7 @@ export const bravo: UserListItem = {
   firstName: "Bravo",
   lastName: "Tango",
   role: "USER",
+  avatarUrl: null,
   department: departments.dotNet,
   position: positions.dataAnalyst,
 };
@@ -65,6 +67,7 @@ export const charlie: UserListItem = {
   firstName: "Charlie",
   lastName: null,
   role: "USER",
+  avatarUrl: null,
   department: departments.java,
   position: null,
 };
@@ -76,6 +79,7 @@ export const emailOnly: UserListItem = {
   firstName: null,
   lastName: null,
   role: "USER",
+  avatarUrl: null,
   department: null,
   position: null,
 };
@@ -232,6 +236,7 @@ export const createUserMock = (
         firstName: input.firstName,
         lastName: input.lastName,
         role: input.role,
+        avatarUrl: null,
         department: departmentById(input.departmentId),
         position: positionById(input.positionId),
         ...created,
@@ -271,6 +276,7 @@ export const updateUserMock = (
         firstName: input.firstName,
         lastName: input.lastName,
         role: input.role,
+        avatarUrl: null,
         department: departmentById(input.departmentId),
         position: positionById(input.positionId),
       },

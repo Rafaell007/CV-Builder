@@ -1,4 +1,4 @@
-import { act, screen } from "@testing-library/react";
+﻿import { act, screen } from "@testing-library/react";
 import { Suspense } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "@/shared/testing";
@@ -17,6 +17,9 @@ vi.mock("@/shared/i18n", async (importOriginal) =>
     () => ({ push: vi.fn(), replace: vi.fn() }),
   ),
 );
+
+const PHOTO = "/api/users/10/avatar?v=1";
+const withPhoto = () => userMock("10", undefined, undefined, PHOTO);
 
 // The tab reads `me`, `user(id)` and the form options with useSuspenseQuery; on the page the route preloads them on
 // the server. React 19 shows a suspended tree only inside an awaited act(); without it the fallback never leaves.
@@ -121,6 +124,40 @@ describe("UserProfile", () => {
 
     expect(await screen.findByRole("button", { name: "Update" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Verify email" })).toBeInTheDocument();
+  });
+
+  it("shows the photo and lets an Admin upload or remove it", async () => {
+    await setup(withPhoto(), "en", "ADMIN");
+
+    const avatar = await screen.findByRole("img", { name: "Emma Employee" });
+    expect(avatar.querySelector("img")).toHaveAttribute("src", PHOTO);
+    expect(screen.getByLabelText("Upload avatar image")).toHaveAccessibleDescription(
+      "png, jpg or gif no more than 5MB",
+    );
+    expect(screen.getByRole("button", { name: "Remove avatar" })).toBeInTheDocument();
+  });
+
+  it("offers upload but no Remove when there is no photo", async () => {
+    await setup(userMock("10"), "en", "ADMIN");
+
+    expect(await screen.findByLabelText("Upload avatar image")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Remove avatar" })).not.toBeInTheDocument();
+  });
+
+  it("shows another employee's photo with no upload and no Remove", async () => {
+    await setup(withPhoto());
+
+    const avatar = await screen.findByRole("img", { name: "Emma Employee" });
+    expect(avatar.querySelector("img")).toHaveAttribute("src", PHOTO);
+    expect(screen.queryByLabelText("Upload avatar image")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Remove avatar" })).not.toBeInTheDocument();
+  });
+
+  it("writes the avatar texts in the language of the page", async () => {
+    await setup(withPhoto(), "pl", "ADMIN");
+
+    expect(await screen.findByLabelText("Prześlij zdjęcie awatara")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Usuń awatar" })).toBeInTheDocument();
   });
 
   it("offers no VERIFY EMAIL to an Admin on another employee's profile", async () => {

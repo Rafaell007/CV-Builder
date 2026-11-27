@@ -1,0 +1,62 @@
+/*
+ * Figma Design system › Avatar Uploader › "Remove image" (read 2026-11-26): a 24×24 red circle (#c63031, radius 12)
+ * with a #f5f5f7 12×12 cross, flush in the top-right corner of the 120×120 photo (offset 0 / 0, read 2026-11-26).
+ */
+.frame {
+  position: relative;
+  flex: none;
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius-round);
+}
+
+/* Prediction: not drawn in Figma. Focus lands here after the photo is removed by keyboard; the Button ring. */
+.frame:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.remove {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-6);
+  height: var(--space-6);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-round);
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+  cursor: pointer;
+
+  /* Hidden but still in the tab order: keyboard focus shows it (`:focus-within` below). */
+  opacity: 0;
+}
+
+.frame:hover .remove,
+.frame:focus-within .remove {
+  opacity: 1;
+}
+
+/* Touch screens have no hover: always shown. */
+@media (hover: none) {
+  .remove {
+    opacity: 1;
+  }
+}
+
+/* Prediction: not drawn in Figma; the same ring as Button. */
+.remove:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Prediction: not drawn in Figma; while an upload or a removal runs. */
+.remove:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
