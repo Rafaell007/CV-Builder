@@ -3,6 +3,7 @@ import type { BaseSyntheticEvent, ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import type { CreateUserInput } from "@/shared/graphql";
 import { renderWithProviders, type RenderWithProvidersOptions } from "@/shared/testing";
+import { EMAIL_TAKEN_REASON } from "../users.constants";
 import {
   createUserMock,
   createUserNetworkErrorMock,
@@ -87,7 +88,7 @@ describe("useCreateUserForm", () => {
 
   it("shows a taken email under Email and keeps the values", async () => {
     const { result } = setup({
-      mocks: [createUserRefusedMock(input, { code: "CONFLICT", reason: "EMAIL_TAKEN" })],
+      mocks: [createUserRefusedMock(input, { code: "CONFLICT", reason: EMAIL_TAKEN_REASON })],
     });
     openAndFill(result);
     await submit(result);

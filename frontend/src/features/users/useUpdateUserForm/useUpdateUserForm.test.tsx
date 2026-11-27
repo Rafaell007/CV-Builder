@@ -3,6 +3,8 @@ import type { BaseSyntheticEvent, ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import type { UpdateUserInput } from "@/shared/graphql";
 import { renderWithProviders, type RenderWithProvidersOptions } from "@/shared/testing";
+import { CONCURRENT_CHANGE_REASON } from "@/shared/userProfile";
+import { OWN_ROLE_REASON } from "../users.constants";
 import {
   bravo,
   departments,
@@ -101,7 +103,7 @@ describe("useUpdateUserForm", () => {
 
   it("shows OWN_ROLE as its own message and keeps the values", async () => {
     const { result } = setup({
-      mocks: [updateUserRefusedMock(input, { code: "CONFLICT", reason: "OWN_ROLE" })],
+      mocks: [updateUserRefusedMock(input, { code: "CONFLICT", reason: OWN_ROLE_REASON })],
     });
     openAndChange(result);
     await submit(result);
@@ -113,7 +115,7 @@ describe("useUpdateUserForm", () => {
 
   it("shows CONCURRENT_CHANGE as its own message and keeps the values", async () => {
     const { result } = setup({
-      mocks: [updateUserRefusedMock(input, { code: "CONFLICT", reason: "CONCURRENT_CHANGE" })],
+      mocks: [updateUserRefusedMock(input, { code: "CONFLICT", reason: CONCURRENT_CHANGE_REASON })],
     });
     openAndChange(result);
     await submit(result);
@@ -135,7 +137,7 @@ describe("useUpdateUserForm", () => {
     const { result } = setup({
       mocks: [
         withErrors(updateUserMock(input), [
-          { code: "CONFLICT", reason: "OWN_ROLE" },
+          { code: "CONFLICT", reason: OWN_ROLE_REASON },
           { code: "NOT_FOUND" },
         ]),
       ],
