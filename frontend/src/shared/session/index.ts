@@ -1,6 +1,7 @@
 // Public entry for the session helpers. The server side (proxy) lives in `@/server/session`.
 export {
   ACCESS_COOKIE,
+  ALREADY_VERIFIED_REASON,
   HOME_PATH,
   REFRESH_COOKIE,
   SESSION_OPERATIONS,

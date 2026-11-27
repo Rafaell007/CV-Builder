@@ -10,6 +10,8 @@ How the frontend keeps a user signed in and decides who may open which route (PL
 - **Apollo:** `createSessionLink` in [`@/shared/apollo`](../apollo/README.md) uses `refreshSession` and `redirectToSignIn`.
 - **Current user:** [`useCurrentUser`](../currentUser/README.md).
 
+`VERIFY_EMAIL_PATH` and `ALREADY_VERIFIED_REASON` (the backend `extensions.reason` when the account is verified already) are shared by the verify-email and user-details features.
+
 `SESSION_OPERATIONS` (`SignIn`, `SignOut`, `Refresh`) never trigger a refresh. Name your sign-in and sign-out operations like that.
 
 Docs: [Next.js proxy](https://nextjs.org/docs/app/api-reference/file-conventions/proxy) · [PLAN D9, D21](../../../../PLAN.md)
