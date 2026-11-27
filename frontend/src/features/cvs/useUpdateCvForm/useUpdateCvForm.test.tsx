@@ -2,7 +2,12 @@ import { act, screen } from "@testing-library/react";
 import type { BaseSyntheticEvent, ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import { renderWithProviders, type RenderWithProvidersOptions } from "@/shared/testing";
-import { backendCv, updateCvMock } from "../cvForm.mocks";
+import {
+  backendCv,
+  updateCvInvalidMock,
+  updateCvMock,
+  updateCvNetworkErrorMock,
+} from "../cvForm.mocks";
 import { useUpdateCvForm } from "./useUpdateCvForm";
 
 // The submit handler only needs these two methods of the form event.
@@ -73,5 +78,62 @@ describe("useUpdateCvForm", () => {
 
     expect(result().failed).toBe(false);
     expect(result().isOpen).toBe(false);
+  });
+
+  describe("when the request fails", () => {
+    type Result = () => ReturnType<typeof useUpdateCvForm>;
+
+    function openAndEdit(result: Result) {
+      act(() => {
+        result().open(backendCv);
+        result().form.setValue("name", "Backend CV 2", { shouldDirty: true });
+      });
+    }
+
+    async function submit(result: Result) {
+      await act(() => result().submit(fakeEvent as unknown as BaseSyntheticEvent));
+    }
+
+    const typed = {
+      name: "Backend CV 2",
+      education: backendCv.education,
+      description: backendCv.description,
+    };
+
+    it("shows a BAD_USER_INPUT error under its field, keeps the values and the modal open", async () => {
+      const { result } = setup({ mocks: [updateCvInvalidMock(input, "name")] });
+      openAndEdit(result);
+      await submit(result);
+
+      expect(result().form.getFieldState("name").error?.message).toBeTruthy();
+      expect(result().failed).toBe(false);
+      expect(result().isOpen).toBe(true);
+      expect(result().form.getValues()).toEqual(typed);
+      expect(screen.queryByText("CV updated")).not.toBeInTheDocument();
+    });
+
+    it("keeps the values and the modal open after a network failure and sets failed", async () => {
+      const { result } = setup({ mocks: [updateCvNetworkErrorMock(input)] });
+      openAndEdit(result);
+      await submit(result);
+
+      expect(result().failed).toBe(true);
+      expect(result().isOpen).toBe(true);
+      expect(result().form.getValues()).toEqual(typed);
+      expect(screen.queryByText("CV updated")).not.toBeInTheDocument();
+    });
+
+    it("accepts a second submit after a failure", async () => {
+      const { result } = setup({ mocks: [updateCvNetworkErrorMock(input), updateCvMock(input)] });
+      openAndEdit(result);
+      await submit(result);
+      expect(result().failed).toBe(true);
+
+      await submit(result);
+
+      expect(result().failed).toBe(false);
+      expect(result().isOpen).toBe(false);
+      expect(await screen.findByText("CV updated")).toBeInTheDocument();
+    });
   });
 });
