@@ -10,6 +10,7 @@ import {
   updateUserRefusedMock,
   usersMock,
   variablesFor,
+  withErrors,
 } from "../users.mocks";
 import type { UserListItem } from "../users.types";
 import { useUsers } from "../useUsers";
@@ -109,6 +110,27 @@ describe("useUpdateUser", () => {
       await expect(result().update(input)).rejects.toMatchObject({
         errors: [expect.objectContaining({ extensions: { code: "NOT_FOUND" } })],
       });
+    });
+
+    await waitFor(() => expect(result().list.users).toEqual([]));
+  });
+
+  it("loads the open list again when NOT_FOUND is not the first error of the response", async () => {
+    const tangoSearch = variablesFor({ search: "tango" });
+    const { result } = setupWithList({
+      mocks: [
+        usersMock([bravo], { variables: tangoSearch }),
+        withErrors(updateUserMock(input, bravo.email), [
+          { code: "CONFLICT", reason: "OWN_ROLE" },
+          { code: "NOT_FOUND" },
+        ]),
+        usersMock([], { variables: tangoSearch }),
+      ],
+    });
+    await waitFor(() => expect(result().list.users).toEqual([bravo]));
+
+    await act(async () => {
+      await expect(result().update(input)).rejects.toBeDefined();
     });
 
     await waitFor(() => expect(result().list.users).toEqual([]));
