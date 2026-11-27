@@ -18,22 +18,17 @@ export function useCvDetailsForm(cv: CvDetailsData) {
   const t = useTranslations("cvs.update");
   const toast = useToast();
   const { update } = useUpdateCv();
-  const { form, failed, reset, showError, submit: submitForm } = useCvForm(toCvFormValues(cv));
+  const { form, failed, reset, submit: submitForm } = useCvForm(toCvFormValues(cv));
   const { isValid, isDirty, isSubmitting } = form.formState;
 
   async function send(values: CvFormValues) {
-    try {
-      const saved = await update(toUpdateCvInput(cv, values));
-      // Only now, after the backend confirmed the save, do the saved values become the unchanged state.
-      reset(toCvFormValues(saved));
-      toast.success({
-        title: t("success.title"),
-        description: t("success.text", { name: saved.name }),
-      });
-    } catch (error) {
-      // Nothing resets the form here, so the values stay.
-      showError(error);
-    }
+    const saved = await update(toUpdateCvInput(cv, values));
+    // Only now, after the backend confirmed the save, do the saved values become the unchanged state.
+    reset(toCvFormValues(saved));
+    toast.success({
+      title: t("success.title"),
+      description: t("success.text", { name: saved.name }),
+    });
   }
 
   function submit(event: BaseSyntheticEvent) {

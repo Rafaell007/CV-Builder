@@ -20,7 +20,7 @@ export function useCreateCvForm(userId?: string) {
   const t = useTranslations("cvs.create");
   const toast = useToast();
   const { create } = useCreateCv();
-  const { form, failed, reset, showError, submit: submitForm } = useCvForm(EMPTY_VALUES);
+  const { form, failed, reset, submit: submitForm } = useCvForm(EMPTY_VALUES);
   const [isOpen, setIsOpen] = useState(false);
 
   function open() {
@@ -29,17 +29,12 @@ export function useCreateCvForm(userId?: string) {
   }
 
   async function send(values: CvFormValues) {
-    try {
-      await create(toCreateCvInput(values, userId));
-      setIsOpen(false);
-      toast.success({
-        title: t("success.title"),
-        description: t("success.text", { name: values.name }),
-      });
-    } catch (error) {
-      // Nothing resets the form here, so the values stay.
-      showError(error);
-    }
+    await create(toCreateCvInput(values, userId));
+    setIsOpen(false);
+    toast.success({
+      title: t("success.title"),
+      description: t("success.text", { name: values.name }),
+    });
   }
 
   function submit(event: BaseSyntheticEvent) {

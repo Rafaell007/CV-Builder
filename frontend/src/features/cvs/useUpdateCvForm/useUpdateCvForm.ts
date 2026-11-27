@@ -21,7 +21,7 @@ export function useUpdateCvForm(userId?: string) {
   const t = useTranslations("cvs.update");
   const toast = useToast();
   const { update } = useUpdateCv();
-  const { form, failed, reset, showError, submit: submitForm } = useCvForm(EMPTY_VALUES);
+  const { form, failed, reset, submit: submitForm } = useCvForm(EMPTY_VALUES);
   // The CV stays set while the modal fades out, so the request still has its id.
   const [cv, setCv] = useState<CvListItem | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -34,17 +34,12 @@ export function useUpdateCvForm(userId?: string) {
 
   async function send(values: CvFormValues) {
     if (!cv) return;
-    try {
-      await update(toUpdateCvInput(cv, values, userId));
-      setIsOpen(false);
-      toast.success({
-        title: t("success.title"),
-        description: t("success.text", { name: values.name }),
-      });
-    } catch (error) {
-      // Nothing resets the form here, so the values stay.
-      showError(error);
-    }
+    await update(toUpdateCvInput(cv, values, userId));
+    setIsOpen(false);
+    toast.success({
+      title: t("success.title"),
+      description: t("success.text", { name: values.name }),
+    });
   }
 
   function submit(event: BaseSyntheticEvent) {
