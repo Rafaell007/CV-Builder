@@ -143,6 +143,7 @@ describe("useDeleteUser", () => {
       { code: "CONFLICT", reason: "CONCURRENT_CHANGE" },
       "Someone changed this user at the same time. Try again.",
     ],
+    [{ code: "CONFLICT" }, "Something went wrong. Please try again."],
     [{ code: "INTERNAL_SERVER_ERROR" }, "Something went wrong. Please try again."],
   ])(
     "closes and shows a translated text, not the backend message, for %o",

@@ -8,4 +8,4 @@ One place that reads why a GraphQL request failed (KAN-168).
 - Network and server errors are `unknown`.
 - The module returns no text. Each feature maps the kind to its own translated text, and treats the kinds it does not support as `unknown` at its own call site. The meaning of a `reason` belongs to the feature (for example `ISO_TAKEN_REASON` in Languages).
 
-Used by: CVs, CV skills, CV projects, catalogs, Languages and the auth forms (sign-in, sign-up, verify email, forgot password, reset password, change password).
+Used by: Users, CVs, CV skills, CV projects, catalogs, Languages and the auth forms (sign-in, sign-up, verify email, forgot password, reset password, change password).
