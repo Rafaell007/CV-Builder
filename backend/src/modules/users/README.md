@@ -7,6 +7,7 @@ The users list, the admin user management and the profile (PLAN.md S6.1, S6.3, �
   - `createUser(input: { email, password, firstName, lastName, departmentId, positionId, role })`, `updateUser(input: { id, firstName, lastName, departmentId, positionId, role })` return the `User`. `deleteUser(id)` returns `true`.
   - `updateProfile(input: { id, firstName, lastName, departmentId, positionId })` returns the `User` (User Details, Profile tab).
 - **REST:** `GET` / `POST` / `DELETE /api/users/:id/avatar` for the profile photo: see [avatars/README.md](avatars/README.md).
+- **User skills:** `userSkills`, `addUserSkill`, `updateUserSkill`, `removeUserSkills` (S6.4): see [skills/README.md](skills/README.md).
 - **Search:** split into words; each word must be in the first name, the last name or the email, without regard to letter case ("alpha lim" finds Alpha Lima). `%`, `_` and `\` are plain characters (`escapeLike`).
 - **Sort:** `firstName` (default, ascending), `lastName`, `department`, `position` (by the name of the department or position), then by id. Any other field gives `BAD_USER_INPUT`. Empty values follow PostgreSQL on every column: last in A→Z, first in Z→A (Prisma cannot set "nulls last" on a relation's column, so one rule for all).
 - **Create:** the email is trimmed and lowercased (like sign-up, so sign-in finds it); the password follows D33 (8–128 characters with a letter and a digit, stricter than the page's "at least 6") and is stored only as an argon2 hash; names are trimmed, required, at most 100 characters. The user starts verified (D16).
@@ -17,7 +18,7 @@ The users list, the admin user management and the profile (PLAN.md S6.1, S6.3, �
   - Unknown department or position → `BAD_USER_INPUT` with a field error on `departmentId` / `positionId` ("Department not found", "Position not found"), both at once. Checked before the write; a delete between the check and the write (`P2003`) gives the same error.
   - Email taken (unique index, `P2002`) → `CONFLICT` with `reason: "EMAIL_TAKEN"`, the same reason as sign-up.
   - Unknown user → `NOT_FOUND` "User not found".
-  - PostgreSQL stopped the transaction because a parallel one needs the same rows (a deadlock or write conflict, `P2034`, e.g. a delete while the user's browser refreshes its token), or Prisma rolled it back because it did not finish in time (`P2028`, default 5 s) → `CONFLICT` with `reason: "CONCURRENT_CHANGE"` ("The user was changed at the same time. Try again"). Nothing was saved, so the frontend can offer a retry and show its own text for the reason.
+  - PostgreSQL stopped the transaction because a parallel one needs the same rows (a deadlock or write conflict, `P2034`, e.g. a delete while the user's browser refreshes its token), or Prisma rolled it back because it did not finish in time (`P2028`, default 5 s) → `CONFLICT` with `reason: "CONCURRENT_CHANGE"` ("The data was changed at the same time. Try again", `toTransactionConflict` in `common/errors`). Nothing was saved, so the frontend can offer a retry and show its own text for the reason.
 - **D24, `CONFLICT` with a `reason`:**
   - `SELF_DELETE`: an admin deletes themselves. Checked inside the lock, like `OWN_ROLE`, so both mutations check in the same order: `FORBIDDEN`, `NOT_FOUND`, then `CONFLICT`.
   - `OWN_ROLE`: an admin removes their own Admin role.

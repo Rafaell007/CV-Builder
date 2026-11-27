@@ -1,7 +1,8 @@
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import type { AuthUser } from "../../../common/auth";
-import { ValidationFailedException } from "../../../common/errors";
+import { toTransactionConflict, ValidationFailedException } from "../../../common/errors";
 import { Prisma } from "../../../generated/prisma/client";
+import type { Mastery } from "../../../generated/prisma/enums";
 import { PrismaService } from "../../../prisma/prisma.service";
 import { CvsService } from "../cvs.service";
 import type { AddCvSkillInput } from "./dto/add-cv-skill.input";
@@ -74,23 +75,27 @@ export class CvSkillsService {
 
   async add(user: AuthUser, { cvId, skillId, mastery }: AddCvSkillInput): Promise<CvSkill> {
     const { ownerId } = await this.cvs.assertAccessible(user, cvId);
-    // The owner's own skills are the only source: a skill id alone grants nothing (page doc, security).
-    const ownerSkill = await this.prisma.userSkill.findUnique({
-      where: { userId_skillId: { userId: ownerId, skillId } },
-      select: { mastery: true },
-    });
-    if (ownerSkill === null) {
-      throw new ValidationFailedException([
-        { field: "skillId", messages: ["Skill is not available for the owner of this CV"] },
-      ]);
-    }
-
     try {
-      const row = await this.prisma.cvSkill.create({
-        data: { cvId, skillId, mastery: mastery ?? ownerSkill.mastery },
-        include: WITH_CATEGORY,
+      return await this.prisma.$transaction(async (tx) => {
+        // The owner's own skills are the only source: a skill id alone grants nothing (page doc, security).
+        // FOR SHARE keeps the owner's skill until the link is saved, so a parallel `removeUserSkills` waits
+        // and then removes the new link from the CV as well (D13). A remove that came first leaves no row here.
+        // A tagged template: Prisma sends the ids as query parameters, never as SQL text.
+        const [ownerSkill] = await tx.$queryRaw<{ mastery: Mastery }[]>`
+          SELECT mastery FROM "UserSkill"
+          WHERE "userId" = ${ownerId}::uuid AND "skillId" = ${skillId}::uuid
+          FOR SHARE`;
+        if (ownerSkill === undefined) {
+          throw new ValidationFailedException([
+            { field: "skillId", messages: ["Skill is not available for the owner of this CV"] },
+          ]);
+        }
+        const row = await tx.cvSkill.create({
+          data: { cvId, skillId, mastery: mastery ?? ownerSkill.mastery },
+          include: WITH_CATEGORY,
+        });
+        return toCvSkill(row);
       });
-      return toCvSkill(row);
     } catch (error) {
       throw translateDatabaseError(error);
     }
@@ -137,6 +142,7 @@ function cvSkillNotFound(): NotFoundException {
  *   add the same skill at the same time.
  * - P2003: the CV or the skill was deleted after the checks.
  * - P2025: the link was deleted after the access check.
+ * - P2034, P2028: the add transaction was stopped; nothing was saved (`CONCURRENT_CHANGE`).
  */
 function translateDatabaseError(error: unknown): unknown {
   if (!(error instanceof Prisma.PrismaClientKnownRequestError)) return error;
@@ -148,7 +154,7 @@ function translateDatabaseError(error: unknown): unknown {
     case "P2025":
       return cvSkillNotFound();
     default:
-      return error;
+      return toTransactionConflict(error);
   }
 }
 

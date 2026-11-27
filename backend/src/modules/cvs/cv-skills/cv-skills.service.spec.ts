@@ -1,6 +1,6 @@
 import { ConflictException, NotFoundException } from "@nestjs/common";
 import type { AuthUser } from "../../../common/auth";
-import { ValidationFailedException } from "../../../common/errors";
+import { CONCURRENT_CHANGE_REASON, ValidationFailedException } from "../../../common/errors";
 import { Prisma } from "../../../generated/prisma/client";
 import { Mastery, Role } from "../../../generated/prisma/enums";
 import type { PrismaService } from "../../../prisma/prisma.service";
@@ -20,6 +20,7 @@ const prisma = {
     deleteMany: jest.fn(),
   },
   userSkill: { findMany: jest.fn(), findUnique: jest.fn() },
+  $queryRaw: jest.fn(),
   $transaction: transaction,
 };
 // The work of a transaction runs against the same mock, as if it were the transaction client.
@@ -75,7 +76,7 @@ beforeEach(() => {
   prisma.cvSkill.create.mockResolvedValue(storedLink());
   prisma.cvSkill.update.mockResolvedValue(storedLink({ mastery: Mastery.EXPERT }));
   prisma.cvSkill.deleteMany.mockResolvedValue({ count: 1 });
-  prisma.userSkill.findUnique.mockResolvedValue({ mastery: Mastery.INTERMEDIATE });
+  prisma.$queryRaw.mockResolvedValue([{ mastery: Mastery.INTERMEDIATE }]);
 });
 
 describe("CvSkillsService.list", () => {
@@ -173,10 +174,10 @@ describe("CvSkillsService.add", () => {
   it("adds a skill of the owner with the owner's mastery when none is sent", async () => {
     await service.add(USER, { cvId: "cv-1", skillId: "skill-1" });
 
-    expect(prisma.userSkill.findUnique).toHaveBeenCalledWith({
-      where: { userId_skillId: { userId: "owner-1", skillId: "skill-1" } },
-      select: { mastery: true },
-    });
+    // A tagged template call: the SQL parts first, then the values Prisma sends as parameters.
+    const [sql, ...values] = prisma.$queryRaw.mock.calls[0] as [TemplateStringsArray, ...unknown[]];
+    expect(sql.join("?")).toContain("FOR SHARE");
+    expect(values).toEqual(["owner-1", "skill-1"]);
     expect(firstCall<{ data: unknown }>(prisma.cvSkill.create).data).toEqual({
       cvId: "cv-1",
       skillId: "skill-1",
@@ -207,7 +208,7 @@ describe("CvSkillsService.add", () => {
   });
 
   it("refuses a skill that the owner does not have, with a field error on skillId", async () => {
-    prisma.userSkill.findUnique.mockResolvedValue(null);
+    prisma.$queryRaw.mockResolvedValue([]);
 
     const error = await rejection(service.add(USER, { cvId: "cv-1", skillId: "skill-9" }));
 
@@ -224,7 +225,7 @@ describe("CvSkillsService.add", () => {
     expect(await rejection(service.add(USER, { cvId: "cv-2", skillId: "skill-1" }))).toBeInstanceOf(
       NotFoundException,
     );
-    expect(prisma.userSkill.findUnique).not.toHaveBeenCalled();
+    expect(prisma.$queryRaw).not.toHaveBeenCalled();
     expect(prisma.cvSkill.create).not.toHaveBeenCalled();
   });
 
@@ -250,6 +251,20 @@ describe("CvSkillsService.add", () => {
     expect(await rejection(service.add(USER, { cvId: "cv-1", skillId: "skill-1" }))).toBeInstanceOf(
       NotFoundException,
     );
+  });
+
+  it.each([
+    ["P2034", "a deadlock or write conflict"],
+    ["P2028", "a transaction that did not finish in time"],
+  ])("fails with a CONFLICT to retry on %s (%s)", async (code) => {
+    transaction.mockRejectedValueOnce(databaseError(code));
+
+    const error = await rejection(service.add(USER, { cvId: "cv-1", skillId: "skill-1" }));
+
+    expect(error).toBeInstanceOf(ConflictException);
+    expect((error as ConflictException).getResponse()).toMatchObject({
+      reason: CONCURRENT_CHANGE_REASON,
+    });
   });
 
   it("does not hide other database errors", async () => {
