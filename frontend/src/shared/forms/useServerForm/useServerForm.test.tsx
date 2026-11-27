@@ -75,6 +75,16 @@ describe("placeServerError", () => {
     expect(setError).not.toHaveBeenCalled();
   });
 
+  it("does not apply the field errors of a response that has a field placement", () => {
+    const { setError, place } = setup();
+
+    expect(
+      place(graphQlError(badUserInput("name"), { code: "CONFLICT", reason: "EMAIL_TAKEN" })),
+    ).toBeNull();
+    expect(setError).toHaveBeenCalledTimes(1);
+    expect(setError).toHaveBeenCalledWith("email", expect.anything(), expect.anything());
+  });
+
   it("applies the field errors and clears the general error when every one has its field", () => {
     const { setError, place } = setup();
 
@@ -164,6 +174,17 @@ describe("useServerForm", () => {
     await act(() => result().submit(fakeEvent, send));
     expect(send).toHaveBeenCalledWith(defaultValues);
     expect(result().generalError).toBeNull();
+  });
+
+  it("keeps the general error that send shows through showError", async () => {
+    const { result } = setup();
+    const send = vi.fn(async () => {
+      result().showError(graphQlError({ code: "FORBIDDEN" }));
+    });
+
+    await act(() => result().submit(fakeEvent, send));
+
+    expect(result().generalError).toBe("forbidden");
   });
 
   it("sets the general error that placeFailure gives and keeps the typed values", async () => {
