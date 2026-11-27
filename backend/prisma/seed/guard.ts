@@ -21,14 +21,19 @@ export function assertSeedAllowed(connectionString: string, env: NodeJS.ProcessE
 
   const url = parseConnectionString(connectionString);
   // The pg driver connects to the host query parameter when there is one, not to the host of the address.
+  // Prisma migrate reset may read these parameters in another way, so every host source must be local.
   // URL keeps the case of the host for a postgresql: address, but host names are case-insensitive.
-  const hostname = (url.searchParams.get("host") ?? url.hostname).toLowerCase();
+  // No host at all means the default host, which is localhost.
+  const hostnames = [url.hostname, url.searchParams.get("host"), url.searchParams.get("hostaddr")]
+    .filter((hostname): hostname is string => Boolean(hostname))
+    .map((hostname) => hostname.toLowerCase());
+  const remoteHostname = hostnames.find((hostname) => !LOCAL_HOSTS.has(hostname));
   const databaseName = url.pathname.slice(1);
-  const isLocal = LOCAL_HOSTS.has(hostname) || TEST_DATABASE_NAME.test(databaseName);
+  const isLocal = remoteHostname === undefined || TEST_DATABASE_NAME.test(databaseName);
 
   if (!isLocal && env["SEED_ALLOW_REMOTE"] !== "1") {
     throw new Error(
-      `Refusing to seed "${databaseName}" on host "${hostname}": it is not a local or test database. ` +
+      `Refusing to seed "${databaseName}" on host "${remoteHostname}": it is not a local or test database. ` +
         "To seed a remote demo database on purpose, set SEED_ALLOW_REMOTE=1.",
     );
   }
